@@ -1,6 +1,7 @@
 #=============================SET ALL PARAMETERS REQUIRED FOR SIMULATION
 SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #--------------------------------------Set up variables for cancer model
+    
 #---Input table of variables from file
     filename                                <- paste(model,'-input-variables.csv',sep='')
     TABLE_VARIABLES                         <- read.table(filename,header=TRUE,sep=',')
