@@ -1,19 +1,17 @@
 #=============================SET ALL PARAMETERS REQUIRED FOR SIMULATION
 SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #--------------------------------------Set up variables for cancer model
-path_name=''
-print(path_name)
 #---Input table of variables from file
-    filename                                <- paste(path_name,model,'-input-variables.csv',sep='')
+    filename                                <- paste(model,'-input-variables.csv',sep='')
     TABLE_VARIABLES                         <- read.table(filename,header=TRUE,sep=',')
 #---Input table of total population dynamics
-    filename                                <- paste(path_name,model,'-input-population-dynamics.csv',sep='')
+    filename                                <- paste(model,'-input-population-dynamics.csv',sep='')
     TABLE_POPULATION_DYNAMICS               <- read.table(filename,header=TRUE,sep=',')
 #---Input table of chromosome bin counts and centromere locations
-    filename                                <- paste(path_name,model,'-input-copy-number-blocks.csv',sep='')
+    filename                                <- paste(model,'-input-copy-number-blocks.csv',sep='')
     TABLE_CHROMOSOME_CN_INFO                <- read.table(filename,header=TRUE,sep=',')
 #---Input table of mutational and CNA genes, Warning : Execute later because it is empty now
-    filename                                <- paste(path_name,model,'-input-cancer-genes.csv',sep='')
+    filename                                <- paste(model,'-input-cancer-genes.csv',sep='')
     if (file.size(filename)!=0){
         TABLE_CANCER_GENES                  <- read.table(filename,header=TRUE,sep=',')
     }
