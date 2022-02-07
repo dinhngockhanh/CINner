@@ -7,12 +7,10 @@
 SIMULATOR_VARIABLES_for_simulation(model)
 }
 \arguments{
-\item{x}{A number.}
-
-\item{y}{A number.}
+\item{model}{Name of model.}
 }
 \value{
-The sum of \code{x} and \code{y}.
+Nothing.
 }
 \description{
 Add together two numbers
