@@ -1,7 +1,7 @@
 #=========================================SIMULATIONS FOR 1ST MANUSCRIPT
 TEST_SIMULATIONS_FOR_FIRST_MANUSCRIPT <- function(model,stage_final,N_simulations) {
 #-------------------------Create folder to store simulation output files
-    folder_name                 <- paste(path_name,model,'_R',sep='')
+    folder_name                 <- paste(model,'_R',sep='')
     if (!file.exists(folder_name)) {
 #       If the folder with same name doesn't already exist, then create it
         dir.create(folder_name)
