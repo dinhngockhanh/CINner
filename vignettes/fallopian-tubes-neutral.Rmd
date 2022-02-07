@@ -21,6 +21,11 @@ library(signals)
 library(CancerSimulator)
 ```
 
+```{r setup}
+devtools::load_all()
+devtools::document()
+```
+
 ## Background
 This vignett illustates how to use the program to create simulations for a model.
 First we install the simulator...
