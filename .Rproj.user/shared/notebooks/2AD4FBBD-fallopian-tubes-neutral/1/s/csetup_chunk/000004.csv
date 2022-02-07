@@ -1,7 +1,3 @@
 "0","library(ggplot2)"
 "0","library(signals)"
-"2","Registered S3 method overwritten by 'data.table':
-  method           from
-  print.data.table     
-"
 "0","library(CancerSimulator)"
