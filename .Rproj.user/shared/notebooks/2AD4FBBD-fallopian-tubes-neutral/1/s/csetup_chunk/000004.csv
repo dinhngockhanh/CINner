@@ -1,3 +1,12 @@
-"0","library(ggplot2)"
-"0","library(signals)"
-"0","library(CancerSimulator)"
+"0","devtools::load_all()"
+"2","[36mℹ[39m Loading [34m[34mCancerSimulator[34m[39m
+"
+"0","devtools::document()"
+"2","[36mℹ[39m Updating [34m[34mCancerSimulator[34m[39m documentation
+"
+"2","[36mℹ[39m Loading [34m[34mCancerSimulator[34m[39m
+"
+"1","Writing NAMESPACE
+"
+"1","Writing NAMESPACE
+"

@@ -1,8 +1,8 @@
 ---
-title: "Simulations for neutral evolution in the fallopian tubes"
+title: "Simulations for neutral evolution in the Fallopian tubes"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Simulations for neutral evolution in the fallopian tubes}
+  %\VignetteIndexEntry{Simulations for neutral evolution in the Fallopian tubes}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
