@@ -2,7 +2,7 @@
 % Please edit documentation in R/SIMULATOR_VARIABLES_for_simulation.r
 \name{SIMULATOR_VARIABLES_for_simulation}
 \alias{SIMULATOR_VARIABLES_for_simulation}
-\title{Add together two numbers}
+\title{Input variables to simulate a cancer model}
 \usage{
 SIMULATOR_VARIABLES_for_simulation(model)
 }
@@ -13,9 +13,8 @@ SIMULATOR_VARIABLES_for_simulation(model)
 Nothing.
 }
 \description{
-Add together two numbers
+Input variables to simulate a cancer model
 }
 \examples{
-add(1, 1)
-add(10, 1)
+SIMULATOR_VARIABLES_for_simulation("FALLOPIAN-TUBES-NEUTRAL")
 }

@@ -1,10 +1,9 @@
-#' Add together two numbers
+#' Input variables to simulate a cancer model
 #'
 #' @param model Name of model.
 #' @return Nothing.
 #' @examples
-#' add(1, 1)
-#' add(10, 1)
+#' SIMULATOR_VARIABLES_for_simulation("FALLOPIAN-TUBES-NEUTRAL")
 #=============================SET ALL PARAMETERS REQUIRED FOR SIMULATION
 SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #--------------------------------------Set up variables for cancer model
