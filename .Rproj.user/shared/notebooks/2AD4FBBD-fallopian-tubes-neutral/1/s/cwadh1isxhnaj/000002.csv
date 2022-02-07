@@ -1,0 +1,3 @@
+"0","stage_final                   <- 1"
+"0","package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)"
+"0","package_clonal_evolution      <- package_output[[1]]"
