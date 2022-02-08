@@ -33,17 +33,6 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
         strand          <- sample.int(no_strands,size=1)
         break
     }
-
-print('--------------------------------------------------------BEFORE:')
-print(ploidy_chrom_1)
-print(ploidy_block_1[[chrom]])
-print(ploidy_allele_1[[chrom]])
-# print(ploidy_chrom_2)
-# print(ploidy_block_2[[chrom]])
-# print(ploidy_allele_2[[chrom]])
-print('--------------------------------------------------------')
-print(strand)
-
 #   Find all drivers located on this strand in the losing cell
     if ((i_gain==1)&&(driver_count_2>0)) {
         pos_drivers_to_move     <- intersect(find((driver_map_2[,2]==chrom)),find((driver_map_2[,3]==strand)))
@@ -69,12 +58,8 @@ print(strand)
     if (i_gain==1) {
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
         ploidy_allele_1[[chrom]][[chrom_ploidy]]    <- ploidy_allele_2[[chrom]][[strand]]
-
-
-
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
         if(strand<=chrom_ploidy){
-# print('DID THIS!!!')
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_2[[chrom]][[i_strand]]<- ploidy_allele_2[[chrom]][[i_strand+1]]
             }
@@ -84,12 +69,8 @@ print(strand)
     else { if (i_gain==2) {
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
         ploidy_allele_2[[chrom]][[chrom_ploidy]]    <- ploidy_allele_1[[chrom]][[strand]]
-
-
-
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
         if(strand<=chrom_ploidy){
-# print('DID THIS!!!')
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_1[[chrom]][[i_strand]] <- ploidy_allele_1[[chrom]][[i_strand+1]]
             }
@@ -151,15 +132,6 @@ print(strand)
         }
     }
 #-----------------------------------------------Output the new genotypes
-
-print('--------------------------------------------------------AFTER:')
-print(ploidy_chrom_1)
-print(ploidy_block_1[[chrom]])
-print(ploidy_allele_1[[chrom]])
-print(ploidy_chrom_2)
-print(ploidy_block_2[[chrom]])
-print(ploidy_allele_2[[chrom]])
-
     genotype_list_ploidy_chrom[[genotype_daughter_1]]      <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]     <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]]      <<- ploidy_block_1

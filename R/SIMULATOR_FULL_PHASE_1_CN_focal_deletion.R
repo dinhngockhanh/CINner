@@ -39,6 +39,14 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react,genotype_
         block_end       <- block_start+focal_length-1
         break
     }
+
+print('========================================BEFORE')
+print(ploidy_block[[chrom]][[strand]])
+print(ploidy_allele[[chrom]][[strand]])
+print('========================================INFORMATION')
+print(block_start)
+print(block_end)
+
 #   Find all drivers located on this region
     if ((driver_count==0)||(length(intersect(which(driver_map[,4]>=block_start),which(driver_map[,4]<=block_end)))==0)) {
         pos_drivers_to_delete   <- c()
@@ -58,6 +66,10 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react,genotype_
         driver_map              <- driver_map[-pos_drivers_to_delete,]
     }
 #------------------------------------------------Output the new genotype
+print('========================================BEFORE')
+print(ploidy_block[[chrom]][[strand]])
+print(ploidy_allele[[chrom]][[strand]])
+
     genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
     genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele
     genotype_list_ploidy_block[[genotype_daughter]]           <<- ploidy_block
