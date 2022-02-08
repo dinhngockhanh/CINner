@@ -22,9 +22,7 @@ devtools::install_github("dinhngockhanh/CancerSimulator")
 library(ggplot2)
 library(signals)
 library(CancerSimulator)
-```
 
-```{r setup}
 devtools::load_all()
 devtools::document()
 ```

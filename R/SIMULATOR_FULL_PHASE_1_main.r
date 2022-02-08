@@ -303,8 +303,8 @@ final_clonal_ID     <- evolution_traj_clonal_ID[[length(evolution_traj_clonal_ID
 for(i in 1:length(final_clonal_ID)){
     clonal_ID       <- final_clonal_ID[i]
     print('-----------------------------------------------------------')
-    # print(genotype_list_ploidy_chrom[[clonal_ID]])
-    # print(genotype_list_ploidy_block[[clonal_ID]])
+    print(genotype_list_ploidy_chrom[[clonal_ID]])
+    print(genotype_list_ploidy_block[[clonal_ID]])
     # print(genotype_list_ploidy_chrom[[clonal_ID]])
 }
 
