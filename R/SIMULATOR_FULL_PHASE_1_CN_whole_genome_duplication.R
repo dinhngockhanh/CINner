@@ -23,6 +23,7 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
         for (strand in 1:chrom_ploidy/2) {
 
 print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+print(chrom_ploidy/2+strand)
 print(ploidy_allele_1[[chrom]][[chrom_ploidy/2+strand]])
 print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 print(ploidy_allele_1[[chrom]][[strand]])
