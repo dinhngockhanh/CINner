@@ -70,7 +70,6 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
         ploidy_allele_2[[chrom]][[chrom_ploidy]]    <- ploidy_allele_1[[chrom]][[strand]]
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
-
         if(strand<chrom_ploidy){
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_1[[chrom]][[i_strand]] <- ploidy_allele_1[[chrom]][[i_strand+1]]
