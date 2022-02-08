@@ -62,7 +62,13 @@ print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 # print(block_CN+1)
 # print(2*block_CN)
 # print(block)
-print(ploidy_allele[[chrom]][[strand]])
+
+# print(ploidy_allele[[chrom]][[strand]])
+
+print(block_CN+1)
+print(2*block_CN)
+print(block)
+print(ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block])
 
         ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
         # for(i_unit in block_CN+1:2*block_CN){
