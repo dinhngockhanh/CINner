@@ -219,11 +219,6 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                     end
                 end
 %               Update DNA length and selection rates of daughter cells
-
-
-
-
-
                 SIMULATOR_FULL_PHASE_1_genotype_update(genotype_daughter_1,genotype_daughter_2);
 %               Check if either daughter cell did not create a new clone
                 [genotype_to_react,genotype_daughter_1,genotype_daughter_2,position_to_react,position_daughter_1,position_daughter_2] = SIMULATOR_FULL_PHASE_1_genotype_cleaning(genotype_to_react,genotype_daughter_1,genotype_daughter_2,position_to_react,position_daughter_1,position_daughter_2);
