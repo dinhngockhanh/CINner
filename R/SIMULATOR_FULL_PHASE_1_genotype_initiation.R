@@ -27,9 +27,6 @@ SIMULATOR_FULL_PHASE_1_genotype_initiation <- function(genotype_to_react) {
     genotype_list_DNA_length[[N_clones]]            <<- 0
     genotype_list_selection_rate[N_clones]          <<- 0
     genotype_list_prob_new_drivers[N_clones]        <<- 0
-
-print(genotype_list_ploidy_allele)
-
 #---------------------Create a new genotype for the second daughter cell
     N_clones                                        <<- N_clones+1
     genotype_daughter_2                             <- N_clones
@@ -56,9 +53,7 @@ print(genotype_list_ploidy_allele)
     genotype_list_DNA_length[[N_clones]]            <<- 0
     genotype_list_selection_rate[N_clones]          <<- 0
     genotype_list_prob_new_drivers[N_clones]        <<- 0
-
-print(genotype_list_ploidy_allele)
-
+    
     output                                          <<- list()
     output[[1]]                                     <<- genotype_daughter_1
     output[[2]]                                     <<- genotype_daughter_2
