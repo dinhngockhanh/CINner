@@ -192,7 +192,7 @@ We can create multiple simulations for the same model with function `TEST_SIMULA
 
 ```{r}
 stage_final                   <- 1
-N_simulations                 <- 10
+N_simulations                 <- 1
 output                        <- TEST_SIMULATIONS_FOR_FIRST_MANUSCRIPT(MODEL,stage_final,N_simulations)
 # package_clonal_evolution      <- package_output[[1]]
 ```
