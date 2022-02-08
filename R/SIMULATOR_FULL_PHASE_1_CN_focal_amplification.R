@@ -55,7 +55,6 @@ print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 print(chrom)
 print(strand)
 print(block_CN)
-print(ploidy_allele[[chrom]][[strand]])
 print(nrow(ploidy_allele[[chrom]][[strand]]))
 
         if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
