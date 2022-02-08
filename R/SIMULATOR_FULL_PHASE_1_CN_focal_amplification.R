@@ -56,6 +56,7 @@ print(chrom)
 print(strand)
 print(block_CN)
 print(ploidy_allele[[chrom]][[strand]])
+print(nrow(ploidy_allele[[chrom]][[strand]]))
 
         if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
             ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]])))
