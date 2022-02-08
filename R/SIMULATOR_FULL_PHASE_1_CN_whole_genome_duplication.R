@@ -22,19 +22,21 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
         chrom_ploidy    <- ploidy_chrom_1[chrom]
         for (strand in 1:(chrom_ploidy/2)) {
 print('===============================================================')
-print(chrom)
-print(strand)
-print(chrom_ploidy/2+strand)
-print(ploidy_allele_1[[chrom]][[strand]])
+# print(chrom)
+# print(strand)
+# print(chrom_ploidy/2+strand)
+# print(ploidy_allele_1[[chrom]][[strand]])
+print(ploidy_allele_1)
             ploidy_allele_1[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_1[[chrom]][[strand]]
         }
         chrom_ploidy    <- ploidy_chrom_2[chrom]
         for (strand in 1:(chrom_ploidy/2)) {
 print('===============================================================')
-print(chrom)
-print(strand)
-print(chrom_ploidy/2+strand)
-print(ploidy_allele_2[[chrom]][[strand]])
+# print(chrom)
+# print(strand)
+# print(chrom_ploidy/2+strand)
+# print(ploidy_allele_2[[chrom]][[strand]])
+print(ploidy_allele_2)
             ploidy_allele_2[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_2[[chrom]][[strand]]
         }
     }
