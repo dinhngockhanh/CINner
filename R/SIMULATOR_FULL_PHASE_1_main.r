@@ -49,6 +49,8 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     genotype_list_ploidy_allele                 <<- list()
     genotype_list_ploidy_allele[[1]]            <<- cell_vec_ploidy_allele
 
+print(cell_vec_ploidy_allele)
+
     genotype_list_ploidy_block                  <<- list()
     genotype_list_ploidy_block[[1]]             <<- cell_mat_ploidy_block
 

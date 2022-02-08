@@ -1,9 +1,6 @@
 #==================================================CREATE ONE SIMULATION
 SIMULATOR_FULL_PROGRAM_one_simulation <- function(model,stage_final) {
     SIMULATOR_VARIABLES_for_simulation(model)
-
-print('TESTING')
-
 #------------------------------------------Simulate the clonal evolution
     flag_success                                    <- 0
     while (flag_success==0) {
