@@ -199,7 +199,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 }
 #               Simulate whole genome duplication event
                 if (flag_whole_genome_duplication==1) {
-print('WHOLE-GENOME DUPLICATION')
+# print('WHOLE-GENOME DUPLICATION')
                     SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate missegregation event
