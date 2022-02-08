@@ -53,7 +53,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     genotype_list_ploidy_block[[1]]             <<- cell_mat_ploidy_block
 
     assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('genotype_list_ploidy_allele',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('genotype_list_ploidy_allele',genotype_list_ploidy_allele,envir=.GlobalEnv)
     assign('genotype_list_ploidy_block',genotype_list_ploidy_block,envir=.GlobalEnv)
 #-------------------------------------Set up the initial driver genotype
     cell_mat_drivers                            <- c(0)
