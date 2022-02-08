@@ -61,13 +61,13 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
         }
 
         for(i_unit in block_CN+1:2*block_CN){
-# print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-# print(block_CN+1)
-# print(2*block_CN)
-# print(i_unit)
-# print(nrow(ploidy_allele[[chrom]][[strand]]))
-# print(block)
-# print(ncol(ploidy_allele[[chrom]][[strand]]))
+print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+print(block_CN+1)
+print(2*block_CN)
+print(i_unit)
+print(nrow(ploidy_allele[[chrom]][[strand]]))
+print(block)
+print(ncol(ploidy_allele[[chrom]][[strand]]))
 
             ploidy_allele[[chrom]][[strand]][i_unit,block]              <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
         }
