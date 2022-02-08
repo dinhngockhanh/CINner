@@ -38,9 +38,9 @@ print('--------------------------------------------------------BEFORE:')
 print(ploidy_chrom_1)
 print(ploidy_block_1[[chrom]])
 print(ploidy_allele_1[[chrom]])
-print(ploidy_chrom_2)
-print(ploidy_block_2[[chrom]])
-print(ploidy_allele_2[[chrom]])
+# print(ploidy_chrom_2)
+# print(ploidy_block_2[[chrom]])
+# print(ploidy_allele_2[[chrom]])
 print('--------------------------------------------------------')
 print(strand)
 
@@ -74,6 +74,7 @@ print(strand)
 
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
         if(strand<chrom_ploidy){
+print('DID THIS!!!')
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_2[[chrom]][[i_strand]]<- ploidy_allele_2[[chrom]][[i_strand+1]]
             }
@@ -88,6 +89,7 @@ print(strand)
 
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
         if(strand<chrom_ploidy){
+print('DID THIS!!!')
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_1[[chrom]][[i_strand]] <- ploidy_allele_1[[chrom]][[i_strand+1]]
             }
