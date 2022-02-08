@@ -47,17 +47,6 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
         }
         break
     }
-
-print('============================================================BEFORE')
-print(ploidy_chrom_1)
-print(ploidy_block_1[[chrom]])
-print(ploidy_allele_1[[chrom]])
-print('============================================================INFORMATION')
-print('strand:')
-print(strand)
-print('cell to gain:')
-print(i_gain)
-
 #   Find all drivers located on this strand arm in the losing cell
     if (i_gain==1) {
         driver_count_lose   <- driver_count_2
@@ -146,15 +135,6 @@ print(i_gain)
         }
     }
 #-----------------------------------------------Output the new genotypes
-
-print('============================================================AFTER')
-print(ploidy_chrom_1)
-print(ploidy_block_1[[chrom]])
-print(ploidy_allele_1[[chrom]])
-print(ploidy_chrom_2)
-print(ploidy_block_2[[chrom]])
-print(ploidy_allele_2[[chrom]])
-
     genotype_list_ploidy_chrom[[genotype_daughter_1]]       <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]      <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]]       <<- ploidy_block_1
