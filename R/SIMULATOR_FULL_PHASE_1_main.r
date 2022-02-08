@@ -49,8 +49,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     genotype_list_ploidy_allele                 <<- list()
     genotype_list_ploidy_allele[[1]]            <<- cell_vec_ploidy_allele
 
-print(cell_vec_ploidy_allele)
-
     genotype_list_ploidy_block                  <<- list()
     genotype_list_ploidy_block[[1]]             <<- cell_mat_ploidy_block
 
@@ -286,6 +284,10 @@ print(cell_vec_ploidy_allele)
 
 
 
+    package_clonal_evolution[[7]]           <- genotype_list_ploidy_allele
+
+
+
     package_clonal_evolution[[8]]           <- genotype_list_driver_count
     package_clonal_evolution[[9]]           <- genotype_list_driver_map
     package_clonal_evolution[[10]]          <- genotype_list_selection_rate
@@ -295,6 +297,17 @@ print(cell_vec_ploidy_allele)
     package_clonal_evolution[[14]]          <- evolution_traj_divisions
     package_clonal_evolution[[15]]          <- evolution_traj_clonal_ID
     package_clonal_evolution[[16]]          <- evolution_traj_population
+
+
+final_clonal_ID     <- evolution_traj_clonal_ID[[length(evolution_traj_clonal_ID)]]
+for(i in 1:length(final_clonal_ID)){
+    clonal_ID       <- final_clonal_ID[i]
+    print('-----------------------------------------------------------')
+    print(genotype_list_ploidy_chrom[[clonal_ID]])
+    print(genotype_list_ploidy_block[[clonal_ID]])
+    # print(genotype_list_ploidy_chrom[[clonal_ID]])
+}
+
 
     output                                  <- list()
     output[[1]]                             <- flag_success
