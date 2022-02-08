@@ -50,6 +50,13 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
 #   Update the chromosome strand allele identity
     for(block in block_start:block_end){
         block_CN                <- ploidy_block[[chrom]][[strand]][block]
+
+print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+print(chrom)
+print(strand)
+print(block_CN)
+print(ploidy_allele[[chrom]][[strand]])
+
         if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
             ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]])))
         }
