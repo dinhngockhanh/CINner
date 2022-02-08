@@ -50,40 +50,15 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
 #   Update the chromosome strand allele identity
     for(block in block_start:block_end){
         block_CN                <- ploidy_block[[chrom]][[strand]][block]
-
-print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-
         if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
             ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]])))
         }
 
-# print(nrow(ploidy_allele[[chrom]][[strand]]))
-# print(ncol(ploidy_allele[[chrom]][[strand]]))
-# print(block_CN+1)
-# print(2*block_CN)
-# print(block)
+        # ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
 
-# print(ploidy_allele[[chrom]][[strand]])
-
-print(block_CN+1)
-print(2*block_CN)
-print(block)
-
-print(nrow(ploidy_allele[[chrom]][[strand]]))
-print(ncol(ploidy_allele[[chrom]][[strand]]))
-
-test<-ploidy_allele[[chrom]][[strand]]
-
-print(test)
-
-print(test[block_CN+1:2*block_CN,block])
-
-print(ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block])
-
-        ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
-        # for(i_unit in block_CN+1:2*block_CN){
-        #     ploidy_allele[[chrom]][[strand]][i_unit,block]              <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
-        # }
+        for(i_unit in block_CN+1:2*block_CN){
+            ploidy_allele[[chrom]][[strand]][i_unit,block]              <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
+        }
     }
 #   Change the local CN on the amplified region
     ploidy_block[[chrom]][[strand]][block_start:block_end] <- 2*ploidy_block[[chrom]][[strand]][block_start:block_end]
