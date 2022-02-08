@@ -60,6 +60,10 @@ print(nrow(ploidy_allele[[chrom]][[strand]]))
         if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
             ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]])))
         }
+
+print(nrow(ploidy_allele[[chrom]][[strand]]))
+print(ncol(ploidy_allele[[chrom]][[strand]]))
+
         ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
         # for(i_unit in block_CN+1:2*block_CN){
         #     ploidy_allele[[chrom]][[strand]][i_unit,block]              <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
