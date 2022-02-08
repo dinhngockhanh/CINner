@@ -74,6 +74,8 @@ print(ncol(ploidy_allele[[chrom]][[strand]]))
 
 test<-ploidy_allele[[chrom]][[strand]]
 
+print(test)
+
 print(test[block_CN+1:2*block_CN,block])
 
 print(ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block])
