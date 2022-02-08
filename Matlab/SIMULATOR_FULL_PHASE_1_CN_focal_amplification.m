@@ -59,9 +59,6 @@ function SIMULATOR_FULL_PHASE_1_CN_focal_amplification(genotype_to_react,genotyp
         block_CN                = ploidy_block{chrom,strand}(block);
         ploidy_allele{chrom,strand}(block_CN+1:2*block_CN,block)    = ploidy_allele{chrom,strand}(1:block_CN,block);
     end
-    while all(ploidy_allele{chrom,strand}(end,:)==0)
-        ploidy_allele{chrom,strand}(end,:)                      = [];
-    end
 %   Change the local CN on the amplified region
     ploidy_block{chrom,strand}(block_start:block_end)   = 2*ploidy_block{chrom,strand}(block_start:block_end);
 %   Change the driver count

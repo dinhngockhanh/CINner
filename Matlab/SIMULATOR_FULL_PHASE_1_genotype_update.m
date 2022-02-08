@@ -7,11 +7,13 @@ function SIMULATOR_FULL_PHASE_1_genotype_update(genotype_1,genotype_2)
     global N_chromosomes size_CN_block_DNA
 %---------------------------------Get the CN profile of the new genotype
     ploidy_chrom_1      = genotype_list_ploidy_chrom{genotype_1};
+    ploidy_allele_1     = genotype_list_ploidy_allele{genotype_1};
     ploidy_block_1      = genotype_list_ploidy_block{genotype_1};
     driver_count_1      = genotype_list_driver_count(genotype_1);
     driver_map_1        = genotype_list_driver_map{genotype_1};
 
     ploidy_chrom_2      = genotype_list_ploidy_chrom{genotype_2};
+    ploidy_allele_2     = genotype_list_ploidy_allele{genotype_2};
     ploidy_block_2      = genotype_list_ploidy_block{genotype_2};
     driver_count_2      = genotype_list_driver_count(genotype_2);
     driver_map_2        = genotype_list_driver_map{genotype_2};

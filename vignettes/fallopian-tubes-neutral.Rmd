@@ -148,9 +148,41 @@ ggplot(df,aes(vec_time_plot)) +
 
 TO BE CONTINUED: exploring the CN structure of the final population
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```{r}
 
+# head(ascn_min)
+# cl_min      <- umap_clustering(ascn_min)
+# plotHeatmap(ascn_min,plotcol="state",clusters=cl_min$clustering,tree=cl_min$tree,reorderclusters=TRUE,plottree=FALSE)
+# plotHeatmap(ascn_min,plotcol="Min",clusters=cl_min$clustering,tree=cl_min$tree,reorderclusters=TRUE,plottree=FALSE)
+
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -77,25 +77,11 @@ function SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(genotype_to_react,ge
         ploidy_allele_1{chrom,chrom_ploidy}                                 = zeros(size(ploidy_allele_2{chrom,strand}));
         ploidy_allele_1{chrom,chrom_ploidy}(1:end,block_start:block_end)    = ploidy_allele_2{chrom,strand}(1:end,block_start:block_end);
         ploidy_allele_2{chrom,strand}(1:end,block_start:block_end)          = 0;
-
-        % while all(ploidy_allele_1{chrom,chrom_ploidy}(end,:)==0)
-        %     ploidy_allele_1{chrom,chrom_ploidy}(end,:)                      = [];
-        % end
-        % while all(ploidy_allele_2{chrom,strand}(end,:)==0)
-        %     ploidy_allele_2{chrom,strand}(end,:)                            = [];
-        % end
     elseif i_gain==2
         chrom_ploidy                                                        = ploidy_chrom_2(chrom);
         ploidy_allele_2{chrom,chrom_ploidy}                                 = zeros(size(ploidy_allele_1{chrom,strand}));
         ploidy_allele_2{chrom,chrom_ploidy}(1:end,block_start:block_end)    = ploidy_allele_1{chrom,strand}(1:end,block_start:block_end);
         ploidy_allele_1{chrom,strand}(1:end,block_start:block_end)          = 0;
-
-        % while all(ploidy_allele_1{chrom,strand}(end,:)==0)
-        %     ploidy_allele_1{chrom,strand}(end,:)                            = [];
-        % end
-        % while all(ploidy_allele_2{chrom,chrom_ploidy}(end,:)==0)
-        %     ploidy_allele_2{chrom,chrom_ploidy}(end,:)                      = [];
-        % end
     end
 %   Move the chromosome arm from losing cell to winning cell
     if i_gain==1
