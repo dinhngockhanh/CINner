@@ -51,7 +51,7 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
     for(block in block_start:block_end){
         block_CN                <- ploidy_block[[chrom]][[strand]][block]
         if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
-            ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]]))
+            ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]])))
         }
         ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
         # for(i_unit in block_CN+1:2*block_CN){
