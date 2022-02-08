@@ -16,7 +16,8 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react,genotype_
         evolution_origin                           <<- evolution_origin[-genotype_daughter_2]
         evolution_genotype_changes                 <<- evolution_genotype_changes[-genotype_daughter_2]
 
-        genotype_list_ploidy_chrom                 <<-genotype_list_ploidy_chrom[-genotype_daughter_2]
+        genotype_list_ploidy_chrom                 <<- genotype_list_ploidy_chrom[-genotype_daughter_2]
+        genotype_list_ploidy_allele                <<- genotype_list_ploidy_allele[-genotype_daughter_2]
         genotype_list_ploidy_block                 <<- genotype_list_ploidy_block[-genotype_daughter_2]
         genotype_list_driver_count                 <<- genotype_list_driver_count[-genotype_daughter_2]
         genotype_list_driver_map                   <<- genotype_list_driver_map[-genotype_daughter_2]
@@ -45,6 +46,8 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react,genotype_
         evolution_origin                           <<- evolution_origin[-genotype_daughter_1]
         evolution_genotype_changes                 <<- evolution_genotype_changes[-genotype_daughter_1]
 
+        genotype_list_ploidy_chrom                 <<- genotype_list_ploidy_chrom[-genotype_daughter_1]
+        genotype_list_ploidy_allele                <<- genotype_list_ploidy_allele[-genotype_daughter_1]
         genotype_list_ploidy_block                 <<- genotype_list_ploidy_block[-genotype_daughter_1]
         genotype_list_driver_count                 <<- genotype_list_driver_count[-genotype_daughter_1]
         genotype_list_driver_map                   <<- genotype_list_driver_map[-genotype_daughter_1]
@@ -74,6 +77,7 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react,genotype_
         evolution_origin                           <<- evolution_origin[-genotype_daughter_2]
         evolution_genotype_changes                 <<- evolution_genotype_changes[-genotype_daughter_2]
         genotype_list_ploidy_chrom                 <<- genotype_list_ploidy_chrom[-genotype_daughter_2]
+        genotype_list_ploidy_allele                <<- genotype_list_ploidy_allele[-genotype_daughter_2]
         genotype_list_ploidy_block                 <<- genotype_list_ploidy_block[-genotype_daughter_2]
         genotype_list_driver_count                 <<- genotype_list_driver_count[-genotype_daughter_2]
         genotype_list_driver_map                   <<- genotype_list_driver_map[-genotype_daughter_2]
@@ -103,6 +107,7 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react,genotype_
         evolution_genotype_changes                  <<- evolution_genotype_changes[-c(genotype_daughter_1, genotype_daughter_2)]
 
         genotype_list_ploidy_chrom                  <<- genotype_list_ploidy_chrom[-c(genotype_daughter_1, genotype_daughter_2)]
+        genotype_list_ploidy_allele                <<- genotype_list_ploidy_allele[-c(genotype_daughter_1, genotype_daughter_2)]
         genotype_list_ploidy_block                  <<- genotype_list_ploidy_block[-c(genotype_daughter_1, genotype_daughter_2)]
         genotype_list_driver_count                  <<- genotype_list_driver_count[-c(genotype_daughter_1, genotype_daughter_2)]
         genotype_list_driver_map                    <<- genotype_list_driver_map[-c(genotype_daughter_1, genotype_daughter_2)]

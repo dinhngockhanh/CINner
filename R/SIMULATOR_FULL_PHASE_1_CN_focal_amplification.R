@@ -3,6 +3,7 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
 #------------------------------------Find the new CN and driver profiles
 #   Initialize the daughter's CN and driver profiles
     ploidy_chrom        <- genotype_list_ploidy_chrom[[genotype_daughter]]
+    ploidy_allele       <- genotype_list_ploidy_allele[[genotype_daughter]]
     ploidy_block        <- genotype_list_ploidy_block[[genotype_daughter]]
     driver_count        <- genotype_list_driver_count[genotype_daughter]
     driver_map          <- genotype_list_driver_map[[genotype_daughter]]
@@ -46,6 +47,17 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
         pos_drivers_to_amplify   <- intersect(intersect(which(driver_map[,2]==chrom),which(driver_map[,3]==strand)),intersect(which(driver_map[,4]>=block_start),which(driver_map[,4]<=block_end)))
     }
     N_drivers_to_amplify         <- length(pos_drivers_to_amplify)
+#   Update the chromosome strand allele identity
+    for(block in block_start:block_end){
+        block_CN                <- ploidy_block[[chrom]][[strand]][block]
+        if(2*block_CN > nrow(ploidy_allele[[chrom]][[strand]])){
+            ploidy_allele[[chrom]][[strand]]                            <- rbind(ploidy_allele[[chrom]][[strand]],matrix(0,2*block_CN-nrow(ploidy_allele[[chrom]][[strand]]),ncol(ploidy_allele[[chrom]][[strand]]))
+        }
+        ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
+        # for(i_unit in block_CN+1:2*block_CN){
+        #     ploidy_allele[[chrom]][[strand]][i_unit,block]              <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
+        # }
+    }
 #   Change the local CN on the amplified region
     ploidy_block[[chrom]][[strand]][block_start:block_end] <- 2*ploidy_block[[chrom]][[strand]][block_start:block_end]
 #   Change the driver count
@@ -62,6 +74,7 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
     }
 #------------------------------------------------Output the new genotype
     genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
+    genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele
     genotype_list_ploidy_block[[genotype_daughter]]           <<- ploidy_block
     genotype_list_driver_count[genotype_daughter]             <<- driver_count
     genotype_list_driver_map[[genotype_daughter]]             <<- driver_map

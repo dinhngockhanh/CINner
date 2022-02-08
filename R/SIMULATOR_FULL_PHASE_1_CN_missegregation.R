@@ -3,13 +3,14 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
 #------------------------------------Find the new CN and driver profiles
 #   Find the daughter cells' current CN and driver profiles
     ploidy_chrom_1      <- genotype_list_ploidy_chrom[[genotype_daughter_1]]
+    ploidy_allele_1     <- genotype_list_ploidy_allele[[genotype_daughter_1]]
     ploidy_block_1      <- genotype_list_ploidy_block[[genotype_daughter_1]]
     driver_count_1      <- genotype_list_driver_count[genotype_daughter_1]
     driver_map_1        <- genotype_list_driver_map[[genotype_daughter_1]]
 
     ploidy_chrom_2      <- genotype_list_ploidy_chrom[[genotype_daughter_2]]
+    ploidy_allele_2     <- genotype_list_ploidy_allele[[genotype_daughter_2]]
     ploidy_block_2      <- genotype_list_ploidy_block[[genotype_daughter_2]]
-
     driver_count_2      <- genotype_list_driver_count[genotype_daughter_2]
     driver_map_2        <- genotype_list_driver_map[[genotype_daughter_2]]
 #   Find information about the missegregation
@@ -51,6 +52,31 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     else { if (i_gain==2) {
         ploidy_chrom_2[chrom]   <- ploidy_chrom_2[chrom]+1
         ploidy_chrom_1[chrom]   <- ploidy_chrom_1[chrom]-1
+        }
+    }
+#   Update the chromosome strand allele identities of daughter cells
+    if (i_gain==1) {
+        chrom_ploidy                                <- ploidy_chrom_1[chrom]
+        ploidy_allele_1[[chrom]][[chrom_ploidy]]    <- ploidy_allele_2[[chrom]][[strand]]
+        chrom_ploidy                                <- ploidy_chrom_2[chrom]
+        if(strand<chrom_ploidy){
+            for(i_strand in strand:chrom_ploidy){
+                ploidy_allele_2[[chrom]][[i_strand]]<- ploidy_allele_2[[chrom]][[i_strand+1]]
+            }
+        }
+        ploidy_allele_2[[chrom]]                    <- ploidy_allele_2[[chrom]][-(chrom_ploidy+1)] # Remove item from ploidy_block_2[[chrom]]
+        }
+    else { if (i_gain==2) {
+        chrom_ploidy                                <- ploidy_chrom_2[chrom]
+        ploidy_allele_2[[chrom]][[chrom_ploidy]]    <- ploidy_allele_1[[chrom]][[strand]]
+        chrom_ploidy                                <- ploidy_chrom_1[chrom]
+
+        if(strand<chrom_ploidy){
+            for(i_strand in strand:chrom_ploidy){
+                ploidy_allele_1[[chrom]][[i_strand]] <- ploidy_allele_1[[chrom]][[i_strand+1]]
+            }
+        }
+        ploidy_allele_1[[chrom]]                     <- ploidy_allele_1[[chrom]][-(chrom_ploidy+1)]
         }
     }
 #   Move the chromosome strand from losing cell to winning cell
@@ -108,6 +134,7 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     }
 #-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom[[genotype_daughter_1]]      <<- ploidy_chrom_1
+    genotype_list_ploidy_allele[[genotype_daughter_1]]     <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]]      <<- ploidy_block_1
     genotype_list_driver_count[genotype_daughter_1]        <<- driver_count_1
     genotype_list_driver_map[[genotype_daughter_1]]        <<- driver_map_1
@@ -120,6 +147,7 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     }
 
     genotype_list_ploidy_chrom[[genotype_daughter_2]]      <<- ploidy_chrom_2
+    genotype_list_ploidy_allele[[genotype_daughter_2]]     <<- ploidy_allele_2
     genotype_list_ploidy_block[[genotype_daughter_2]]      <<- ploidy_block_2
     genotype_list_driver_count[genotype_daughter_2]        <<- driver_count_2
     genotype_list_driver_map[[genotype_daughter_2]]        <<- driver_map_2

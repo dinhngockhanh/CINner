@@ -21,6 +21,18 @@ SIMULATOR_FULL_PHASE_1_genotype_comparison <- function(genotype_1,genotype_2) {
             }
         }
     }
+#--------------------------------------Compare chromosome strand alleles
+    ploidy_allele_1 <- genotype_list_ploidy_allele[[genotype_1]]
+    ploidy_allele_2 <- genotype_list_ploidy_allele[[genotype_2]]
+    for (chrom in 1:N_chromosomes) {
+        chrom_ploidy    <- ploidy_chrom_1[chrom]
+        for (strand in 1:chrom_ploidy) {
+            if (any(ploidy_allele_1[[chrom]][[strand]] != ploidy_allele_2[[chrom]][[strand]])) {
+                output  <- 0
+                return(output)
+            }
+        }
+    }
 #--------------------------------------------------Compare driver counts
     driver_count_1  <- genotype_list_driver_count[genotype_1]
     driver_count_2  <- genotype_list_driver_count[genotype_2]

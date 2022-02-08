@@ -3,11 +3,13 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
 #------------------------------------Find the new CN and driver profiles
 #   Find the daughter cells' current CN and driver profiles
     ploidy_chrom_1      <- genotype_list_ploidy_chrom[[genotype_daughter_1]]
+    ploidy_allele_1     <- genotype_list_ploidy_allele[[genotype_daughter_1]]
     ploidy_block_1      <- genotype_list_ploidy_block[[genotype_daughter_1]]
     driver_count_1      <- genotype_list_driver_count[genotype_daughter_1]
     driver_map_1        <- genotype_list_driver_map[[genotype_daughter_1]]
 
     ploidy_chrom_2      <- genotype_list_ploidy_chrom[[genotype_daughter_2]]
+    ploidy_allele_2     <- genotype_list_ploidy_allele[[genotype_daughter_2]]
     ploidy_block_2      <- genotype_list_ploidy_block[[genotype_daughter_2]]
     driver_count_2      <- genotype_list_driver_count[genotype_daughter_2]
     driver_map_2        <- genotype_list_driver_map[[genotype_daughter_2]]
@@ -72,18 +74,32 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
         ploidy_chrom_2[chrom]   <- ploidy_chrom_2[chrom]+1
         }
     }
-#   Move the chromosome arm from losing cell to winning cell
+#   Update the chromosome strand allele identities of daughter cells
     if (i_gain==1) {
-        chrom_ploidy                                                   <- ploidy_chrom_1[chrom]
-        ploidy_block_1[[chrom]][[chrom_ploidy]]                        <- rep(0,length(ploidy_block_2[[chrom]][[strand]]))
-        ploidy_block_1[[chrom]][[chrom_ploidy]][block_start:block_end] <- ploidy_block_2[[chrom]][[strand]][block_start:block_end]
-        ploidy_block_2[[chrom]][[strand]][block_start:block_end]       <- 0
+        chrom_ploidy                                                    <- ploidy_chrom_1[chrom]
+        ploidy_allele_1[[chrom]][[chrom_ploidy]]                        <- matrix(0,nrow(ploidy_allele_2[[chrom]][[strand]]),ncol(ploidy_allele_2[[chrom]][[strand]]))
+        ploidy_allele_1[[chrom]][[chrom_ploidy]][,block_start:block_end]<- ploidy_allele_2[[chrom]][[strand]][,block_start:block_end]
+        ploidy_allele_2[[chrom]][[strand]][,block_start:block_end]      <- 0
         }
     else { if (i_gain==2) {
-        chrom_ploidy                                                   <- ploidy_chrom_2[chrom]
-        ploidy_block_2[[chrom]][[chrom_ploidy]]                        <- rep(0,length(ploidy_block_1[[chrom]][[strand]]))
-        ploidy_block_2[[chrom]][[chrom_ploidy]][block_start:block_end] <- ploidy_block_1[[chrom]][[strand]][block_start:block_end]
-        ploidy_block_1[[chrom]][[strand]][block_start:block_end]       <- 0
+        chrom_ploidy                                                    <- ploidy_chrom_2[chrom]
+        ploidy_allele_2[[chrom]][[chrom_ploidy]]                        <- matrix(0,nrow(ploidy_allele_1[[chrom]][[strand]]),ncol(ploidy_allele_1[[chrom]][[strand]]))
+        ploidy_allele_2[[chrom]][[chrom_ploidy]][,block_start:block_end]<- ploidy_allele_1[[chrom]][[strand]][,block_start:block_end]
+        ploidy_allele_1[[chrom]][[strand]][,block_start:block_end]      <- 0
+        }
+    }
+#   Move the chromosome arm from losing cell to winning cell
+    if (i_gain==1) {
+        chrom_ploidy                                                    <- ploidy_chrom_1[chrom]
+        ploidy_block_1[[chrom]][[chrom_ploidy]]                         <- rep(0,length(ploidy_block_2[[chrom]][[strand]]))
+        ploidy_block_1[[chrom]][[chrom_ploidy]][block_start:block_end]  <- ploidy_block_2[[chrom]][[strand]][block_start:block_end]
+        ploidy_block_2[[chrom]][[strand]][block_start:block_end]        <- 0
+        }
+    else { if (i_gain==2) {
+        chrom_ploidy                                                    <- ploidy_chrom_2[chrom]
+        ploidy_block_2[[chrom]][[chrom_ploidy]]                         <- rep(0,length(ploidy_block_1[[chrom]][[strand]]))
+        ploidy_block_2[[chrom]][[chrom_ploidy]][block_start:block_end]  <- ploidy_block_1[[chrom]][[strand]][block_start:block_end]
+        ploidy_block_1[[chrom]][[strand]][block_start:block_end]        <- 0
         }
     }
 #   Change the driver count in each daughter cell
@@ -120,6 +136,7 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
     }
 #-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom[[genotype_daughter_1]]       <<- ploidy_chrom_1
+    genotype_list_ploidy_allele[[genotype_daughter_1]]      <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]]       <<- ploidy_block_1
     genotype_list_driver_count[genotype_daughter_1]         <<- driver_count_1
     genotype_list_driver_map[[genotype_daughter_1]]         <<- driver_map_1
@@ -132,6 +149,7 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
     }
 
     genotype_list_ploidy_chrom[[genotype_daughter_2]]       <<- ploidy_chrom_2
+    genotype_list_ploidy_allele[[genotype_daughter_2]]      <<- ploidy_allele_2
     genotype_list_ploidy_block[[genotype_daughter_2]]       <<- ploidy_block_2
     genotype_list_driver_count[genotype_daughter_2]         <<- driver_count_2
     genotype_list_driver_map[[genotype_daughter_2]]         <<- driver_map_2
