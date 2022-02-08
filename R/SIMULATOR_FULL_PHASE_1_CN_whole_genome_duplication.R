@@ -17,6 +17,11 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
     ploidy_chrom_1      <- 2*ploidy_chrom_1
     ploidy_chrom_2      <- 2*ploidy_chrom_2
 
+print('--------------------------------------------------------BEFORE:')
+print(ploidy_chrom_1)
+print(ploidy_block_1[[10]])
+print(ploidy_allele_1[[10]])
+
 #   Update the chromosome strand allele identities of daughter cells
     for (chrom in 1:N_chromosomes) {
         chrom_ploidy    <- ploidy_chrom_1[chrom]
@@ -28,7 +33,6 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
             ploidy_allele_2[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_2[[chrom]][[strand]]
         }
     }
-
 #   Multiply the chromosome strands in each daughter cell
     for (chrom in 1:N_chromosomes) {
         chrom_ploidy    <- ploidy_chrom_1[chrom]
@@ -61,6 +65,12 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
         }
     }
 #-----------------------------------------------Output the new genotypes
+
+print('--------------------------------------------------------AFTER:')
+print(ploidy_chrom_1)
+print(ploidy_block_1[[10]])
+print(ploidy_allele_1[[10]])
+
     genotype_list_ploidy_chrom[[genotype_daughter_1]]         <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]        <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]]         <<- ploidy_block_1
