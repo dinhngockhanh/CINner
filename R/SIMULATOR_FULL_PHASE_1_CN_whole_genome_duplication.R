@@ -23,10 +23,9 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 print(chrom_ploidy)
 print(chrom_ploidy/2)
-        for (strand in 1:chrom_ploidy/2) {
+        for (strand in 1:(chrom_ploidy/2)) {
 
 print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-print(ploidy_chrom_1)
 print(chrom_ploidy/2)
 print(strand)
 
@@ -40,7 +39,7 @@ print(ploidy_allele_1[[chrom]][[strand]])
             ploidy_allele_1[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_1[[chrom]][[strand]]
         }
         chrom_ploidy    <- ploidy_chrom_2[chrom]
-        for (strand in 1:chrom_ploidy/2) {
+        for (strand in 1:(chrom_ploidy/2)) {
             ploidy_allele_2[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_2[[chrom]][[strand]]
         }
     }
@@ -48,11 +47,11 @@ print(ploidy_allele_1[[chrom]][[strand]])
 #   Multiply the chromosome strands in each daughter cell
     for (chrom in 1:N_chromosomes) {
         chrom_ploidy    <- ploidy_chrom_1[chrom]
-        for (strand in 1:chrom_ploidy/2) {
+        for (strand in 1:(chrom_ploidy/2)) {
             ploidy_block_1[[chrom]][[chrom_ploidy/2+strand]]    <- ploidy_block_1[[chrom]][[strand]]
         }
         chrom_ploidy    <- ploidy_chrom_2[chrom]
-        for (strand in 1:chrom_ploidy/2) {
+        for (strand in 1:(chrom_ploidy/2)) {
             ploidy_block_2[[chrom]][[chrom_ploidy/2+strand]]    <- ploidy_block_2[[chrom]][[strand]]
         }
     }
