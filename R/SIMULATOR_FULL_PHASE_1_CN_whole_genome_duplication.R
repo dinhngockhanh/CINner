@@ -20,26 +20,13 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
 #   Update the chromosome strand allele identities of daughter cells
     for (chrom in 1:N_chromosomes) {
         chrom_ploidy    <- ploidy_chrom_1[chrom]
-print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-print(chrom_ploidy)
-print(chrom_ploidy/2)
         for (strand in 1:(chrom_ploidy/2)) {
-
-print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-print(chrom_ploidy/2)
-print(strand)
-
-
-
 print(chrom_ploidy/2+strand)
-print(ploidy_allele_1[[chrom]][[chrom_ploidy/2+strand]])
-print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-print(ploidy_allele_1[[chrom]][[strand]])
-
             ploidy_allele_1[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_1[[chrom]][[strand]]
         }
         chrom_ploidy    <- ploidy_chrom_2[chrom]
         for (strand in 1:(chrom_ploidy/2)) {
+print(chrom_ploidy/2+strand)
             ploidy_allele_2[[chrom]][[chrom_ploidy/2+strand]]   <- ploidy_allele_2[[chrom]][[strand]]
         }
     }
