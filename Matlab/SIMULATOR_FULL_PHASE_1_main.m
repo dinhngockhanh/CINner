@@ -37,7 +37,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     global T_tau_step
 %-----------------------------------------Set up the initial CN genotype
     cell_vec_ploidy_chrom                       = 2*ones(1,N_chromosomes);
-    cell_vec_ploidy_allele                      = [ones(1,N_chromosomes);2*ones(1,N_chromosomes)];
+
     cell_mat_ploidy_block                       = cell(1,1);
     for chrom=1:N_chromosomes
         ploidy                                  = cell_vec_ploidy_chrom(chrom);
@@ -46,6 +46,16 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
             cell_mat_ploidy_block{chrom,strand} = ones(1,no_blocks);
         end
     end
+
+    cell_vec_ploidy_allele                      = cell(1,1);
+    for chrom=1:N_chromosomes
+        ploidy                                  = cell_vec_ploidy_chrom(chrom);
+        no_blocks                               = vec_CN_block_no(chrom);
+        for strand=1:ploidy
+            cell_vec_ploidy_allele{chrom,strand}= strand*ones(1,no_blocks);
+        end
+    end
+
     genotype_list_ploidy_chrom                  = cell(1);
     genotype_list_ploidy_chrom{1}               = cell_vec_ploidy_chrom;
 
@@ -272,12 +282,13 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     package_clonal_evolution{16}            = evolution_traj_population;
 
 
-final_clonal_ID=evolution_traj_clonal_ID{end};
-for i=1:length(final_clonal_ID)
-clonal_ID   = final_clonal_ID(i);
-disp('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
-disp(genotype_list_ploidy_chrom{clonal_ID});
-disp(genotype_list_ploidy_block{clonal_ID});
-end
+% final_clonal_ID=evolution_traj_clonal_ID{end};
+% for i=1:length(final_clonal_ID)
+% clonal_ID   = final_clonal_ID(i);
+% disp('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
+% disp(genotype_list_ploidy_chrom{clonal_ID});
+% disp(genotype_list_ploidy_block{clonal_ID});
+% disp(genotype_list_ploidy_allele{clonal_ID});
+% end
 
 end

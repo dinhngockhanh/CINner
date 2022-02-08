@@ -27,7 +27,7 @@ devtools::document()
 ```
 
 ## Background
-This vignett illustates how to use the program to create simulations for a model.
+This vignette illustates how to use the program to create simulations for a model.
 First we install the simulator...
 
 

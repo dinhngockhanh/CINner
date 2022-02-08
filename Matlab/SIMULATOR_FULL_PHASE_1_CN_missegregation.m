@@ -59,22 +59,16 @@ function SIMULATOR_FULL_PHASE_1_CN_missegregation(genotype_to_react,genotype_dau
 %   Update the chromosome strand allele identities of daughter cells
     if i_gain==1
         chrom_ploidy                                = ploidy_chrom_1(chrom);
-        ploidy_allele_1(chrom_ploidy,chrom)         = ploidy_allele_2(strand,chrom);
+        ploidy_allele_1{chrom,chrom_ploidy}         = ploidy_allele_2{chrom,strand};
         chrom_ploidy                                = ploidy_chrom_2(chrom);
-        ploidy_allele_2(strand:chrom_ploidy,chrom)  = ploidy_allele_2(strand+1:chrom_ploidy+1,chrom);
-        ploidy_allele_2(chrom_ploidy+1,chrom)       = 0;
-        if all(ploidy_allele_2(end,:)==0)
-            ploidy_allele_2(end,:)                  = [];
-        end
+        ploidy_allele_2(chrom,strand:chrom_ploidy)  = ploidy_allele_2(chrom,strand+1:chrom_ploidy+1);
+        ploidy_allele_2{chrom,chrom_ploidy+1}       = [];
     elseif i_gain==2
         chrom_ploidy                                = ploidy_chrom_2(chrom);
-        ploidy_allele_2(chrom_ploidy,chrom)         = ploidy_allele_1(strand,chrom);
+        ploidy_allele_2{chrom,chrom_ploidy}         = ploidy_allele_1{chrom,strand};
         chrom_ploidy                                = ploidy_chrom_1(chrom);
-        ploidy_allele_1(strand:chrom_ploidy,chrom)  = ploidy_allele_1(strand+1:chrom_ploidy+1,chrom);
-        ploidy_allele_1(chrom_ploidy+1,chrom)       = 0;
-        if all(ploidy_allele_1(end,:)==0)
-            ploidy_allele_1(end,:)                  = [];
-        end
+        ploidy_allele_1(chrom,strand:chrom_ploidy)  = ploidy_allele_1(chrom,strand+1:chrom_ploidy+1);
+        ploidy_allele_1{chrom,chrom_ploidy+1}       = [];
     end
 %   Move the chromosome strand from losing cell to winning cell
     if i_gain==1

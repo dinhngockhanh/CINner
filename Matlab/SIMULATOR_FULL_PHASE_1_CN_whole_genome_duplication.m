@@ -25,15 +25,15 @@ function SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,ge
     ploidy_chrom_1      = 2*ploidy_chrom_1;
     ploidy_chrom_2      = 2*ploidy_chrom_2;
 %   Update the chromosome strand allele identities of daughter cells
-    ploidy_allele_1     = [ploidy_allele_1;zeros(size(ploidy_allele_1,1),N_chromosomes)];
     for chrom=1:N_chromosomes
         chrom_ploidy    = ploidy_chrom_1(chrom);
-        ploidy_allele_1(chrom_ploidy/2+1:chrom_ploidy,chrom)    = ploidy_allele_1(1:chrom_ploidy/2,chrom);
-    end
-    ploidy_allele_2     = [ploidy_allele_2;zeros(size(ploidy_allele_2,1),N_chromosomes)];
-    for chrom=1:N_chromosomes
+        for strand=1:chrom_ploidy/2
+            ploidy_allele_1{chrom,chrom_ploidy/2+strand}    = ploidy_allele_1{chrom,strand};
+        end
         chrom_ploidy    = ploidy_chrom_2(chrom);
-        ploidy_allele_2(chrom_ploidy/2+1:chrom_ploidy,chrom)    = ploidy_allele_2(1:chrom_ploidy/2,chrom);
+        for strand=1:chrom_ploidy/2
+            ploidy_allele_2{chrom,chrom_ploidy/2+strand}    = ploidy_allele_2{chrom,strand};
+        end
     end
 %   Multiply the chromosome strands in each daughter cell
     for chrom=1:N_chromosomes

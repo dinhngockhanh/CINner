@@ -54,8 +54,13 @@ function SIMULATOR_FULL_PHASE_1_CN_focal_deletion(genotype_to_react,genotype_dau
         pos_drivers_to_delete   = intersect(intersect(find(driver_map(:,2)==chrom),find(driver_map(:,3)==strand)),intersect(find(driver_map(:,4)>=block_start),find(driver_map(:,4)<=block_end)));
     end
     N_drivers_to_delete         = length(pos_drivers_to_delete);
+%   Update the chromosome strand allele identity
+    ploidy_allele{chrom,strand}(1:end,block_start:block_end)    = 0;
+    while all(ploidy_allele{chrom,strand}(end,:)==0)
+        ploidy_allele{chrom,strand}(end,:)                      = [];
+    end
 %   Change the local CN on the deleted region
-    ploidy_block{chrom,strand}(block_start:block_end)   = 0;
+    ploidy_block{chrom,strand}(block_start:block_end)           = 0;
 %   Change the driver count
     driver_count                = driver_count-N_drivers_to_delete;
 %   Delete the drivers
