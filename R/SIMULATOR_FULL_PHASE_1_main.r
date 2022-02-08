@@ -39,7 +39,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
         no_blocks                               <- vec_CN_block_no[chrom]
         cell_vec_ploidy_allele[[chrom]]         <- list()
         for(strand in 1:ploidy){
-            cell_vec_ploidy_allele[[chrom]][[strand]]   <- rep(strand,no_blocks)
+            cell_vec_ploidy_allele[[chrom]][[strand]]   <- matrix(rep(strand,no_blocks),nrow=1)
         }
     }
 
