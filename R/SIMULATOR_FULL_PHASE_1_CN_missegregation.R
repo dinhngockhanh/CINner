@@ -73,8 +73,8 @@ print(strand)
 
 
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
-        if(strand<chrom_ploidy){
-print('DID THIS!!!')
+        if(strand<=chrom_ploidy){
+# print('DID THIS!!!')
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_2[[chrom]][[i_strand]]<- ploidy_allele_2[[chrom]][[i_strand+1]]
             }
@@ -88,8 +88,8 @@ print('DID THIS!!!')
 
 
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
-        if(strand<chrom_ploidy){
-print('DID THIS!!!')
+        if(strand<=chrom_ploidy){
+# print('DID THIS!!!')
             for(i_strand in strand:chrom_ploidy){
                 ploidy_allele_1[[chrom]][[i_strand]] <- ploidy_allele_1[[chrom]][[i_strand+1]]
             }
@@ -102,7 +102,7 @@ print('DID THIS!!!')
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
         ploidy_block_1[[chrom]][[chrom_ploidy]]     <- ploidy_block_2[[chrom]][[strand]]
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
-        if(strand<chrom_ploidy){
+        if(strand<=chrom_ploidy){
             for(i_strand in strand:chrom_ploidy){
                 ploidy_block_2[[chrom]][[i_strand]] <- ploidy_block_2[[chrom]][[i_strand+1]]
             }
@@ -117,7 +117,7 @@ print('DID THIS!!!')
         ploidy_block_2[[chrom]][[chrom_ploidy]]     <- ploidy_block_1[[chrom]][[strand]]
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
 
-        if(strand<chrom_ploidy){
+        if(strand<=chrom_ploidy){
             for(i_strand in strand:chrom_ploidy){
                 ploidy_block_1[[chrom]][[i_strand]] <- ploidy_block_1[[chrom]][[i_strand+1]]
             }
