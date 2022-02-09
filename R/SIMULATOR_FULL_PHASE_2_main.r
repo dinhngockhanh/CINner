@@ -70,14 +70,19 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_chr                 <- rep(chrom,1,chrom_block_count)
             vec_start               <- seq(0,size_CN_block_DNA*(chrom_block_count-1),by=size_CN_block_DNA)+1
             vec_end                 <- seq(size_CN_block_DNA,size_CN_block_DNA*chrom_block_count,by=size_CN_block_DNA)
+#           Find major/minor CN counts of each chromosome block
+            vec_Min                 <- rep(0,1,chrom_block_count)
+            vec_Maj                 <- rep(0,1,chrom_block_count)
+            for (strand in 1:chrom_ploidy){
+                mat_allele          <- ploidy_allele[[chrom]][[strand]]
+print(mat_allele)
+            }
 
 
 
-
-
-print(vec_chr)
-print(vec_start)
-print(vec_end)
+# print(vec_chr)
+# print(vec_start)
+# print(vec_end)
 
         }
 
