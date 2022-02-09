@@ -111,10 +111,15 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         cell_genotype_profile       <- cbind(cell_genotype_profile,rep(cell_ID,nrow(cell_genotype_profile)))
         names(cell_genotype_profile)<- c("chr","start","end","copy","state","Min","Maj","cell_id")
-
-
-print(cell_genotype_profile)
+#       Update table of CN profiles for all cells in the sample
+        if (i_cell==1){
+            sample_genotype_profile <- cell_genotype_profile
+        }
+        else{
+            sample_genotype_profile <- rbind(sample_genotype_profile,cell_genotype_profile)
+        }
     }
+    print(sample_genotype_profile)
 
 
 
