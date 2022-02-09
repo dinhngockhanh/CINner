@@ -47,19 +47,38 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique          <- unique(sample_genotype)
     sample_genotype_unique_profile  <- list()
-    for(i_clone in 1:length(sample_genotype_unique)){
+    for(i_clone in 1:1){
+    # for(i_clone in 1:length(sample_genotype_unique)){
 #       Extract CN information for the clone from clonal evolution data
         clone_ID                    <- sample_genotype_unique[i_clone]
         ploidy_chrom                <- genotype_list_ploidy_chrom[[clone_ID]]
         ploidy_block                <- genotype_list_ploidy_block[[clone_ID]]
         ploidy_allele               <- genotype_list_ploidy_allele[[clone_ID]]
+#       Build the CN profile in SIGNALS style for the clone
+        vec_clone_chr               <- c()
+        vec_clone_start             <- c()
+        vec_clone_end               <- c()
+        vec_clone_copy              <- c()
+        vec_clone_state             <- c()
+        vec_clone_Min               <- c()
+        vec_clone_Maj               <- c()
+        for (chrom in 1:1){
+        # for (chrom in 1:N_chromosomes){
+            chrom_block_count       <- vec_CN_block_no[chrom]
+            chrom_ploidy            <- ploidy_chrom[chrom]
+
+print(chrom)
+print(chrom_block_count)
+print(chrom_ploidy)
+
+        }
 
 
-print('---------------------------------------------------------------')
-print(clone_ID)
-print(ploidy_chrom)
-print(ploidy_block[[1]])
-print(ploidy_allele[[1]])
+# print('---------------------------------------------------------------')
+# print(clone_ID)
+# print(ploidy_chrom)
+# print(ploidy_block[[1]])
+# print(ploidy_allele[[1]])
 
     }
 
