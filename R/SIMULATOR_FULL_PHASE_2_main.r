@@ -31,10 +31,6 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     }
     node_genotype_current           <- sample(x=final_population,size=N_sample,replace=FALSE)
 #   Initialize data for leaves of sample phylogeny
-
-print(node_genotype_current)
-print(phylogeny_genotype)
-
     phylogeny_elapsed_gens[node_list_current]   <- 1
     for (node in N_sample:2*N_sample-1) {
         phylogeny_elapsed_genotypes[[node]]     <- node_genotype_current[node-N_sample+1]
@@ -42,13 +38,24 @@ print(phylogeny_genotype)
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
 
-print(phylogeny_genotype)
+
+
+
 
 #---------------------------------Create CN object for the sampled cells
     sample_genotype                 <- phylogeny_genotype[N_sample:(2*N_sample-1)]
+#---Find the CN profiles for each clone found in the sample
+    sample_genotype_unique          <- unique(sample_genotype)
+    sample_genotype_unique_profile  <- list()
+    for(i_clone in 1:length(sample_genotype_unique)){
+
+    }
+
+
 
 
 print(sample_genotype)
+print(sample_genotype_unique)
 
 
 # print(N_sample)
