@@ -119,17 +119,15 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             sample_genotype_profile <- rbind(sample_genotype_profile,cell_genotype_profile)
         }
     }
-    print(sample_genotype_profile)
 
 
 
-# print(sample_genotype)
-# print(sample_genotype_unique)
 
 
-# print(N_sample)
-# print(genotype_list_ploidy_block[[1]])
-# print(genotype_list_ploidy_allele[[1]])
+#---------------------------------Output package of data from simulation
+    output                                  <- list()
+    output[[1]]                             <- sample_genotype_profile
+    return(output)
 
 
 }
