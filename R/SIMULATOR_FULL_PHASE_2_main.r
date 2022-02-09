@@ -58,14 +58,16 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 print('---------------------------------------------------------------')
 print(clone_ID)
 print(ploidy_chrom)
+print(ploidy_block[[1]])
+print(ploidy_allele[[1]])
 
     }
 
 
 
 
-print(sample_genotype)
-print(sample_genotype_unique)
+# print(sample_genotype)
+# print(sample_genotype_unique)
 
 
 # print(N_sample)
