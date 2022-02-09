@@ -97,9 +97,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_clone_Maj           <- c(vec_clone_Maj,vec_Maj)
         }
 #       Store the CN profile for the clone
-        genotype_unique_profile     <- data.frame(vec_clone_chr,vec_clone_start,vec_clone_end,vec_clone_copy,vec_clone_state,vec_clone_Min,vec_clone_Maj)
-
-
+        genotype_unique_profile                     <- data.frame(vec_clone_chr,vec_clone_start,vec_clone_end,vec_clone_copy,vec_clone_state,vec_clone_Min,vec_clone_Maj)
+        names(genotype_unique_profile)              <- c("chr","start","end","copy","state","Min","Maj")
+        sample_genotype_unique_profile[[i_clone]]   <- genotype_unique_profile
 
 print('---------------------------------------------------------------')
 print(genotype_unique_profile)
