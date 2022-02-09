@@ -100,12 +100,18 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         genotype_unique_profile                     <- data.frame(vec_clone_chr,vec_clone_start,vec_clone_end,vec_clone_copy,vec_clone_state,vec_clone_Min,vec_clone_Maj)
         names(genotype_unique_profile)              <- c("chr","start","end","copy","state","Min","Maj")
         sample_genotype_unique_profile[[i_clone]]   <- genotype_unique_profile
-
-print('---------------------------------------------------------------')
-print(genotype_unique_profile)
-
     }
+#---Find the CN profiles for each cell in the sample
+    for (i_cell in 1:N_sample){
+        clone_ID                    <- sample_genotype[i_cell]
+        i_clone                     <- which(sample_genotype_unique==clone_ID)[1]
 
+
+print('-----------------------------------------------')
+print(sample_genotype_unique)
+print(clone_ID)
+print(i_clone)
+    }
 
 
 
