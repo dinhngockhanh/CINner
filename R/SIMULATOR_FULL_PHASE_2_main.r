@@ -47,8 +47,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique          <- unique(sample_genotype)
     sample_genotype_unique_profile  <- list()
-    for(i_clone in 1:1){
-    # for(i_clone in 1:length(sample_genotype_unique)){
+    for(i_clone in 1:length(sample_genotype_unique)){
 #       Extract CN information for the clone from clonal evolution data
         clone_ID                    <- sample_genotype_unique[i_clone]
         ploidy_chrom                <- genotype_list_ploidy_chrom[[clone_ID]]
@@ -62,8 +61,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         vec_clone_state             <- c()
         vec_clone_Min               <- c()
         vec_clone_Maj               <- c()
-        for (chrom in 1:3){
-        # for (chrom in 1:N_chromosomes){
+        for (chrom in 1:N_chromosomes){
             chrom_block_count       <- vec_CN_block_no[chrom]
             chrom_ploidy            <- ploidy_chrom[chrom]
 #           Find location information of each chromosome block
@@ -98,26 +96,13 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_clone_Min           <- c(vec_clone_Min,vec_Min)
             vec_clone_Maj           <- c(vec_clone_Maj,vec_Maj)
         }
-print('---------------------------------------------------------------')
-print(vec_clone_chr)
-print('---------------------------------------------------------------')
-print(vec_clone_start)
-print('---------------------------------------------------------------')
-print(vec_clone_end)
-print('---------------------------------------------------------------')
-print(vec_clone_Min)
-print('---------------------------------------------------------------')
-print(vec_clone_Maj)
-print('---------------------------------------------------------------')
-print(vec_clone_copy)
-print('---------------------------------------------------------------')
-print(vec_clone_state)
+#       Store the CN profile for the clone
+        genotype_unique_profile     <- data.frame(vec_clone_chr,vec_clone_start,vec_clone_end,vec_clone_copy,vec_clone_state,vec_clone_Min,vec_clone_Maj)
 
-# print('---------------------------------------------------------------')
-# print(clone_ID)
-# print(ploidy_chrom)
-# print(ploidy_block[[1]])
-# print(ploidy_allele[[1]])
+
+
+print('---------------------------------------------------------------')
+print(genotype_unique_profile)
 
     }
 
