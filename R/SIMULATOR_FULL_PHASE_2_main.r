@@ -109,6 +109,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 
 print('-----------------------------------------------')
 print(sample_genotype_unique)
+print(sample_genotype)
 print(clone_ID)
 print(i_clone)
     }
