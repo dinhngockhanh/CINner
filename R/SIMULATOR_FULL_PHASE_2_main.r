@@ -97,8 +97,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_clone_state         <- c(vec_clone_state,vec_state)
             vec_clone_Min           <- c(vec_clone_Min,vec_Min)
             vec_clone_Maj           <- c(vec_clone_Maj,vec_Maj)
-
-
+        }
 print('---------------------------------------------------------------')
 print(vec_clone_chr)
 print('---------------------------------------------------------------')
@@ -113,8 +112,6 @@ print('---------------------------------------------------------------')
 print(vec_clone_copy)
 print('---------------------------------------------------------------')
 print(vec_clone_state)
-        }
-
 
 # print('---------------------------------------------------------------')
 # print(clone_ID)
