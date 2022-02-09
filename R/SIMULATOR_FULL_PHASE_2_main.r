@@ -75,14 +75,25 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_Maj                 <- rep(0,1,chrom_block_count)
             for (strand in 1:chrom_ploidy){
                 mat_allele          <- ploidy_allele[[chrom]][[strand]]
-print(mat_allele)
+                for (CN_row in 1:nrow(mat_allele)){
+                    for (CN_block in 1:ncol(mat_allele)){
+                        if (mat_allele[CN_row,CN_block]==1){
+                            vec_Maj[CN_block]   <- vec_Maj[CN_block]+1;
+                        }
+                        else{if(mat_allele[CN_row,CN_block]==2){
+                            vec_Min[CN_block]   <- vec_Min[CN_block]+1;
+                        }}
+                    }
+                }
             }
 
 
 
-# print(vec_chr)
-# print(vec_start)
-# print(vec_end)
+print(vec_chr)
+print(vec_start)
+print(vec_end)
+print(vec_Min)
+print(vec_Maj)
 
         }
 
