@@ -11,11 +11,13 @@ SFS_totalsteps,50,,Bin count in SFS data
 rate_driver,0,per bp per cell division,Poisson rate of getting new driver mutations
 driver_order,,,Required trajectory for driver acquisition (blank if none)
 rate_passenger,9e-11,per bp per cell division,Poisson rate of getting new passenger mutations
-prob_CN_whole_genome_duplication,8e-6,per cell division,Probability for a cell division to harbor a WGD event
-prob_CN_missegregation,8e-6,per cell division,Probability for a cell division to harbor a chromosome mis-segregation event
-prob_CN_chrom_arm_missegregation,8e-6,per cell division,Probability for a cell division to harbor a chromosome-arm mis-segregation event
-prob_CN_focal_amplification,8e-6,per cell division,Probability for a cell division to harbor a focal amplification event
-prob_CN_focal_deletion,8e-6,per cell division,Probability for a cell division to harbor a focal deletion event
+
+prob_CN_whole_genome_duplication,5e-5,per cell division,Probability for a cell division to harbor a WGD event
+prob_CN_missegregation,5e-5,per cell division,Probability for a cell division to harbor a chromosome mis-segregation event
+prob_CN_chrom_arm_missegregation,5e-5,per cell division,Probability for a cell division to harbor a chromosome-arm mis-segregation event
+prob_CN_focal_amplification,5e-5,per cell division,Probability for a cell division to harbor a focal amplification event
+prob_CN_focal_deletion,5e-5,per cell division,Probability for a cell division to harbor a focal deletion event
+
 prob_CN_focal_amplified_length,0.1,,Geometric parameter for the block length of a focal amplification event
 prob_CN_focal_deletion_length,0.1,,Geometric parameter for the block length of a focal deletion event
 prob_coverage,0.05,,Mean coverage depth

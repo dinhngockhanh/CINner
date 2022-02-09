@@ -72,7 +72,7 @@ The program uses the tau-leaping algorithm to speed up, for which `T_tau_step` i
 cat('age_birth                                                    = ',age_birth,'(years)\n')
 cat('age_end                                                      = ',age_end,'(years)\n')
 cat('cell_lifespan                                                = ',cell_lifespan,'(days)\n')
-cat('N_sample                                                     = ',N_sample,'(years)\n')
+cat('N_sample                                                     = ',N_sample,'(cells)\n')
 cat('T_tau_step                                                   = ',T_tau_step,'(days)\n')
 ```
 
@@ -124,23 +124,13 @@ Function `SIMULATOR_FULL_PROGRAM_one_simulation` outputs one simulation for the 
 ```{r}
 stage_final                   <- 2
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
-package_clonal_evolution      <- package_output[[1]]
-package_clonal_evolution      <- package_output[[2]]
 ```
 
-
-
-
-
-
-
-
-
-
-
-We first inspect the dynamics of the total cell population.
+We first inspect the dynamics of the total cell population. The information is stored in entry 1 of the output package.
 
 ```{r, fig.height=4 , fig.width=10}
+package_clonal_evolution      <- package_output[[1]]
+
 vec_time                      <- package_clonal_evolution[[13]]
 vec_clonal_populations        <- package_clonal_evolution[[16]]
 
@@ -163,23 +153,32 @@ ggplot(df,aes(vec_time_plot)) +
       ggtitle("Expected (red line) vs Simulated (blue dots) dynamics of total cell count")
 ```
 
-
-
-
-
-
-
-
-
-
-TO BE CONTINUED: exploring the CN structure of the final population
+Now we explore the CN structures found in the sample. This is stored in entry 2 of the output package.
 
 ```{r}
+sample_genotype_profiles      <- package_output[[2]]
+# sample_genotype_profiles      <- package_sample_phylogeny[[1]]
 
-# head(ascn_min)
-# cl_min      <- umap_clustering(ascn_min)
-# plotHeatmap(ascn_min,plotcol="state",clusters=cl_min$clustering,tree=cl_min$tree,reorderclusters=TRUE,plottree=FALSE)
-# plotHeatmap(ascn_min,plotcol="Min",clusters=cl_min$clustering,tree=cl_min$tree,reorderclusters=TRUE,plottree=FALSE)
+head(sample_genotype_profiles)
+```
+
+We can use the `umap_clustering` function to infer the phylogeny tree and clustering of the sampled cells based on their CN profiles. This may not be the same as the true phylogeny tree and clustering from the simulation.
+
+```{r}
+cl_inferred                   <- umap_clustering(package_sample_phylogeny)
+```
+
+The CN profiles can be plotted using function `plotHeatmap` in library signals.
+We first plot the total CN profiles.
+
+```{r}
+plotHeatmap(package_sample_phylogeny,plotcol="state",clusters=cl_inferred$clustering,tree=cl_inferred$tree,reorderclusters=TRUE,plottree=FALSE)
+```
+
+Then the plot of the minor CN profiles.
+
+```{r}
+plotHeatmap(package_sample_phylogeny,plotcol="Min",clusters=cl_inferred$clustering,tree=cl_inferred$tree,reorderclusters=TRUE,plottree=FALSE)
 
 ```
 
