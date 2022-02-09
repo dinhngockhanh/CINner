@@ -8,10 +8,16 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model,stage_final) {
         flag_success                                <- output[[1]]
         package_clonal_evolution                    <- output[[2]]
     }
-    if(stage_final==1){
+    if(stage_final>=1){
         package_output                              <- list()
         package_output[[1]]                         <- package_clonal_evolution
-        return(package_output)
     }
-
+#------------------------------------------Simulate the sample phylogeny
+    if(stage_final>=2){
+        output                                      <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
+        package_sample_phylogeny                    <- output[[1]]
+        package_output[[2]]                         <- package_sample_phylogeny
+    }
+#------------------------------------------Output the simulation package
+    return(package_output)
 }

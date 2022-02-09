@@ -112,14 +112,20 @@ Similarly, the centromere location of each chromosome is also computed in bin co
 barplot(vec_centromere_location,main="Centromere location of each chromosome",xlab="Chromosome",names.arg=c(1:N_chromosomes))
 ```
 
+
+
+
+
 ## Create and inspect one simulation
 Function `SIMULATOR_FULL_PROGRAM_one_simulation` outputs one simulation for the model. The parameter `stage_final` decides where to stop the simulation:
 - `stage_final`=1 outputs the evolution at the clonal level
+- `stage_final`=2 also outputs the sample phylogeny
 
 ```{r}
-stage_final                   <- 1
+stage_final                   <- 2
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 package_clonal_evolution      <- package_output[[1]]
+package_clonal_evolution      <- package_output[[2]]
 ```
 
 We first inspect the dynamics of the total cell population.
@@ -147,20 +153,16 @@ ggplot(df,aes(vec_time_plot)) +
       ggtitle("Expected (red line) vs Simulated (blue dots) dynamics of total cell count")
 ```
 
+
+
+
+
+
+
+
+
+
 TO BE CONTINUED: exploring the CN structure of the final population
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ```{r}
 

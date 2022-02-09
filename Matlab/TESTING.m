@@ -7,8 +7,8 @@
     path(path,R_folder);
 %----------------------------TEST THE COPY-NUMBER ALLELE TRACKING SYSTEM
     model           = 'FALLOPIAN-TUBES-NEUTRAL';
-    stage_final     = 1;
-    N_simulations   = 100;
+    stage_final     = 2;
+    N_simulations   = 1;
 tic
     TEST_SIMULATIONS_FOR_FIRST_MANUSCRIPT(model,stage_final,N_simulations);
 toc

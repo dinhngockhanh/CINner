@@ -264,13 +264,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     package_clonal_evolution{4}             = N_clones;
     package_clonal_evolution{5}             = genotype_list_ploidy_chrom;
     package_clonal_evolution{6}             = genotype_list_ploidy_block;
-
-
-
     package_clonal_evolution{7}             = genotype_list_ploidy_allele;
-
-
-
     package_clonal_evolution{8}             = genotype_list_driver_count;
     package_clonal_evolution{9}             = genotype_list_driver_map;
     package_clonal_evolution{10}            = genotype_list_selection_rate;
