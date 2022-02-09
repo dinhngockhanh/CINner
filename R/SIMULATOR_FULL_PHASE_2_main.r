@@ -66,10 +66,18 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         # for (chrom in 1:N_chromosomes){
             chrom_block_count       <- vec_CN_block_no[chrom]
             chrom_ploidy            <- ploidy_chrom[chrom]
+#           Find location information of each chromosome block
+            vec_chr                 <- rep(chrom,1,chrom_block_count)
+            vec_start               <- seq(0,size_CN_block_DNA*(chrom_block_count-1))+1
+            vec_end                 <- seq(size_CN_block_DNA,size_CN_block_DNA*chrom_block_count,by=size_CN_block_DNA)
 
-print(chrom)
-print(chrom_block_count)
-print(chrom_ploidy)
+
+
+
+
+print(vec_chr)
+print(vec_start)
+print(vec_end)
 
         }
 
