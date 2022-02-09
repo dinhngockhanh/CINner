@@ -21,8 +21,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #   Initialize the current list of nodes in the sample phylogeny
     node_list_current               <- N_sample:(2*N_sample-1)
 #   Initialize the current list of genoytpes of the nodes
-    final_clonal_ID                 <- tail(evolution_traj_clonal_ID,1)
-    final_clonal_population         <- tail(evolution_traj_population,1)
+    final_clonal_ID                 <- tail(evolution_traj_clonal_ID,1)[[1]]
+    final_clonal_population         <- tail(evolution_traj_population,1)[[1]]
     final_population                <- c()
 
 print(final_clonal_ID)
