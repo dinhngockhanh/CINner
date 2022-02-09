@@ -110,6 +110,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #       Add column for cell ID
         cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         cell_genotype_profile       <- cbind(cell_genotype_profile,rep(cell_ID,nrow(cell_genotype_profile)))
+        names(cell_genotype_profile)<- c("chr","start","end","copy","state","Min","Maj","cell_id")
 
 
 print(cell_genotype_profile)
