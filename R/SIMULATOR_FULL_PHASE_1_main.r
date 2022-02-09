@@ -20,9 +20,13 @@
     # print(evolution_genotype_changes)
 SIMULATOR_FULL_PHASE_1_main <- function() {
 #-----------------------------------------Set up the initial CN genotype
+#   Set up the strand count for each chromosome
     cell_vec_ploidy_chrom                       <- rep(1,N_chromosomes)
     cell_vec_ploidy_chrom[1:N_chromosomes]      <- 2
-
+    genotype_list_ploidy_chrom                  <<- list()
+    genotype_list_ploidy_chrom[[1]]             <<- cell_vec_ploidy_chrom
+    assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+#   Set up the CN count for each chrosomome strand
     cell_mat_ploidy_block                       <- list()
     for(chrom in 1:N_chromosomes){
         ploidy                                  <- cell_vec_ploidy_chrom[chrom]
@@ -32,7 +36,10 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
             cell_mat_ploidy_block[[chrom]][[strand]]    <- rep(1,no_blocks)
         }
     }
-
+    genotype_list_ploidy_block                  <<- list()
+    genotype_list_ploidy_block[[1]]             <<- cell_mat_ploidy_block
+    assign('genotype_list_ploidy_block',genotype_list_ploidy_block,envir=.GlobalEnv)
+#   Set up the CN allele info for each chromosome strand
     cell_vec_ploidy_allele                      <- list()
     for(chrom in 1:N_chromosomes){
         ploidy                                  <- cell_vec_ploidy_chrom[chrom]
@@ -42,19 +49,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
             cell_vec_ploidy_allele[[chrom]][[strand]]   <- matrix(rep(strand,no_blocks),nrow=1)
         }
     }
-
-    genotype_list_ploidy_chrom                  <<- list()
-    genotype_list_ploidy_chrom[[1]]             <<- cell_vec_ploidy_chrom
-
     genotype_list_ploidy_allele                 <<- list()
     genotype_list_ploidy_allele[[1]]            <<- cell_vec_ploidy_allele
-
-    genotype_list_ploidy_block                  <<- list()
-    genotype_list_ploidy_block[[1]]             <<- cell_mat_ploidy_block
-
-    assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
     assign('genotype_list_ploidy_allele',genotype_list_ploidy_allele,envir=.GlobalEnv)
-    assign('genotype_list_ploidy_block',genotype_list_ploidy_block,envir=.GlobalEnv)
 #-------------------------------------Set up the initial driver genotype
     cell_mat_drivers                            <- c(0)
     genotype_list_driver_count                  <<- matrix(0,1,1)
