@@ -29,6 +29,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         clonal_population           <- final_clonal_population[i]
         final_population            <- c(final_population,clone) # append clone to final_population
     }
+
+print(final_population)
+
     node_genotype_current           <- sample(x=final_population,size=N_sample,replace=FALSE);
 
 print(node_genotype_current)
