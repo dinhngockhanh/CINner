@@ -25,8 +25,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     final_clonal_population         <- tail(evolution_traj_population,1)
     final_population                <- c()
 
-# print(final_clonal_ID)
-# print(final_clonal_population)
+print(final_clonal_ID)
+print(final_clonal_population)
 
     for (i in 1:length(final_clonal_ID)) {
         clone                       <- final_clonal_ID[i]
