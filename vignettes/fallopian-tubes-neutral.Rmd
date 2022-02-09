@@ -128,6 +128,16 @@ package_clonal_evolution      <- package_output[[1]]
 package_clonal_evolution      <- package_output[[2]]
 ```
 
+
+
+
+
+
+
+
+
+
+
 We first inspect the dynamics of the total cell population.
 
 ```{r, fig.height=4 , fig.width=10}
