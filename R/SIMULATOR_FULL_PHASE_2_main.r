@@ -67,7 +67,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             chrom_block_count       <- vec_CN_block_no[chrom]
             chrom_ploidy            <- ploidy_chrom[chrom]
 #           Find location information of each chromosome block
-            vec_chr                 <- rep(chrom,1,chrom_block_count)
+            vec_chr                 <- rep(as.character(chrom),1,chrom_block_count)
             vec_start               <- seq(0,size_CN_block_DNA*(chrom_block_count-1),by=size_CN_block_DNA)+1
             vec_end                 <- seq(size_CN_block_DNA,size_CN_block_DNA*chrom_block_count,by=size_CN_block_DNA)
 #           Find major/minor CN counts of each chromosome block
@@ -86,15 +86,33 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
                     }
                 }
             }
+#           Find total CN count of each chromosome block
+            vec_copy                <- vec_Min+vec_Maj
+            vec_state               <- vec_copy
+#           Update the CN information of the clone
+            vec_clone_chr           <- c(vec_clone_chr,vec_chr)
+            vec_clone_start         <- c(vec_clone_start,vec_start)
+            vec_clone_end           <- c(vec_clone_end,vec_end)
+            vec_clone_copy          <- c(vec_clone_copy,vec_copy)
+            vec_clone_state         <- c(vec_clone_state,vec_state)
+            vec_clone_Min           <- c(vec_clone_Min,vec_Min)
+            vec_clone_Maj           <- c(vec_clone_Maj,vec_Maj)
 
 
-
-print(vec_chr)
-print(vec_start)
-print(vec_end)
-print(vec_Min)
-print(vec_Maj)
-
+print('---------------------------------------------------------------')
+print(vec_clone_chr)
+print('---------------------------------------------------------------')
+print(vec_clone_start)
+print('---------------------------------------------------------------')
+print(vec_clone_end)
+print('---------------------------------------------------------------')
+print(vec_clone_Min)
+print('---------------------------------------------------------------')
+print(vec_clone_Maj)
+print('---------------------------------------------------------------')
+print(vec_clone_copy)
+print('---------------------------------------------------------------')
+print(vec_clone_state)
         }
 
 
