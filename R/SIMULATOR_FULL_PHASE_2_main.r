@@ -33,6 +33,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #   Initialize data for leaves of sample phylogeny
 
 print(node_genotype_current)
+print(phylogeny_genotype)
 
     phylogeny_elapsed_gens[node_list_current]   <- 1
     for (node in N_sample:2*N_sample-1) {
@@ -41,7 +42,7 @@ print(node_genotype_current)
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
 
-
+print(phylogeny_genotype)
 
 #---------------------------------Create CN object for the sampled cells
     sample_genotype                 <- phylogeny_genotype[N_sample:2*N_sample-1]
