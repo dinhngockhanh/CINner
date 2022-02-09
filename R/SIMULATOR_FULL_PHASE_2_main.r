@@ -14,8 +14,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 
 
 print(genotype_list_ploidy_chrom)
-print(genotype_list_ploidy_block[[1]])
-print(genotype_list_ploidy_allele[[1]])
+# print(genotype_list_ploidy_block[[1]])
+# print(genotype_list_ploidy_allele[[1]])
 
 
 }
