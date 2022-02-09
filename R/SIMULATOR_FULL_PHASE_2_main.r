@@ -24,26 +24,15 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     final_clonal_ID                 <- tail(evolution_traj_clonal_ID,1)[[1]]
     final_clonal_population         <- tail(evolution_traj_population,1)[[1]]
     final_population                <- c()
-
-print(final_clonal_ID)
-print(final_clonal_population)
-
     for (i in 1:length(final_clonal_ID)) {
         clone                       <- final_clonal_ID[i]
         clonal_population           <- final_clonal_population[i]
-
-print('---------------------------------')
-print(clone)
-print(clonal_population)
-
         final_population            <- c(final_population,rep(clone,1,clonal_population)) # append clone to final_population
-
-print(clonal_population)
     }
-
-print(final_population)
-
     node_genotype_current           <- sample(x=final_population,size=N_sample,replace=FALSE);
+
+
+
 
 print(node_genotype_current)
 
