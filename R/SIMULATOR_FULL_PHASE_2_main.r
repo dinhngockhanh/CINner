@@ -50,10 +50,14 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     for(i_clone in 1:length(sample_genotype_unique)){
 #       Extract CN information for the clone from clonal evolution data
         clone_ID                    <- sample_genotype_unique[i_clone]
+        ploidy_chrom                <- genotype_list_ploidy_chrom[[clone_ID]]
+        ploidy_block                <- genotype_list_ploidy_block[[clone_ID]]
+        ploidy_allele               <- genotype_list_ploidy_allele[[clone_ID]]
 
 
-
+print('---------------------------------------------------------------')
 print(clone_ID)
+print(ploidy_chrom)
 
     }
 
