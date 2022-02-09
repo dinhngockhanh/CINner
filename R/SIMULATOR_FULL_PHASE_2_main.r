@@ -62,7 +62,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         vec_clone_state             <- c()
         vec_clone_Min               <- c()
         vec_clone_Maj               <- c()
-        for (chrom in 1:1){
+        for (chrom in 1:3){
         # for (chrom in 1:N_chromosomes){
             chrom_block_count       <- vec_CN_block_no[chrom]
             chrom_ploidy            <- ploidy_chrom[chrom]
