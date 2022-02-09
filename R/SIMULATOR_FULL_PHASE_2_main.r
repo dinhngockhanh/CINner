@@ -45,7 +45,7 @@ print(phylogeny_genotype)
 print(phylogeny_genotype)
 
 #---------------------------------Create CN object for the sampled cells
-    sample_genotype                 <- phylogeny_genotype[N_sample:2*N_sample-1]
+    sample_genotype                 <- phylogeny_genotype[N_sample:(2*N_sample-1)]
 
 
 print(sample_genotype)
