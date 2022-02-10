@@ -68,21 +68,26 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_chr                 <- rep(as.character(chrom),1,chrom_block_count)
             vec_start               <- seq(0,size_CN_block_DNA*(chrom_block_count-1),by=size_CN_block_DNA)+1
             vec_end                 <- seq(size_CN_block_DNA,size_CN_block_DNA*chrom_block_count,by=size_CN_block_DNA)
-#           Find major/minor CN counts of each chromosome block
-            vec_Min                 <- rep(0,1,chrom_block_count)
-            vec_Maj                 <- rep(0,1,chrom_block_count)
+#           Find CN counts for each allele of each chromosome block
+            vec_Allele_1            <- rep(0,1,chrom_block_count)
+            vec_Allele_2            <- rep(0,1,chrom_block_count)
             for (strand in 1:chrom_ploidy){
-                mat_allele          <- ploidy_allele[[chrom]][[strand]]
+                mat_allele                  <- ploidy_allele[[chrom]][[strand]]
                 for (CN_row in 1:nrow(mat_allele)){
-                    for (CN_block in 1:ncol(mat_allele)){
-                        if (mat_allele[CN_row,CN_block]==1){
-                            vec_Maj[CN_block]   <- vec_Maj[CN_block]+1;
-                        }
-                        else{if(mat_allele[CN_row,CN_block]==2){
-                            vec_Min[CN_block]   <- vec_Min[CN_block]+1;
-                        }}
-                    }
+                    list_1                  <- which(mat_allele[CN_row,]==1)
+                    vec_Allele_1[list_1]    <- vec_Allele_1[list_1]+1
+                    list_2                  <- which(mat_allele[CN_row,]==2)
+                    vec_Allele_2[list_2]    <- vec_Allele_2[list_2]+1
                 }
+            }
+#           Find Major/Minor CN counts of each chromosome block
+            if (mean(vec_Allele_1)<=mean(vec_Allele_2)){
+                vec_Min             <- vec_Allele_1
+                vec_Maj             <- vec_Allele_2
+            }
+            else{
+                vec_Min             <- vec_Allele_2
+                vec_Maj             <- vec_Allele_1
             }
 #           Find total CN count of each chromosome block
             vec_copy                <- vec_Min+vec_Maj

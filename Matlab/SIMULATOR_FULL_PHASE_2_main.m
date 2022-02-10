@@ -69,20 +69,25 @@ function [package_sample_phylogeny,runtime] = SIMULATOR_FULL_PHASE_2_main(packag
             vec_chr                 = chrom*ones(1,chrom_block_count);
             vec_start               = size_CN_block_DNA*(0:chrom_block_count-1)+1;
             vec_end                 = size_CN_block_DNA*(1:chrom_block_count);
-%           Find major/minor CN counts of each chromosome block
-            vec_Min                 = zeros(1,chrom_block_count);
-            vec_Maj                 = zeros(1,chrom_block_count);
+%           Find CN counts for each allele of each chromosome block
+            vec_Allele_1            = zeros(1,chrom_block_count);
+            vec_Allele_2            = zeros(1,chrom_block_count);
             for strand=1:chrom_ploidy
-                mat_allele          = ploidy_allele{chrom,strand};
+                mat_allele                  = ploidy_allele{chrom,strand};
                 for CN_row=1:size(mat_allele,1)
-                    for CN_block=1:size(mat_allele,2)
-                        if mat_allele(CN_row,CN_block)==1
-                            vec_Maj(CN_block)   = vec_Maj(CN_block)+1;
-                        elseif mat_allele(CN_row,CN_block)==2
-                            vec_Min(CN_block)   = vec_Min(CN_block)+1;
-                        end
-                    end
+                    list_1                  = find(mat_allele(CN_row)==1);
+                    vec_Allele_1(list_1)    = vec_Allele_1(list_1)+1;
+                    list_2                  = find(mat_allele(CN_row)==2);
+                    vec_Allele_2(list_2)    = vec_Allele_2(list_2)+1;
                 end
+            end
+%           Find Major/Minor CN counts of each chromosome block
+            if mean(vec_Allele_1)<=mean(vec_Allele_2)
+                vec_Min             = vec_Allele_1;
+                vec_Maj             = vec_Allele_2;
+            else
+                vec_Min             = vec_Allele_2;
+                vec_Maj             = vec_Allele_1;
             end
 %           Find total CN count of each chromosome block
             vec_copy                = vec_Min+vec_Maj;
