@@ -126,7 +126,6 @@ print('skip-2')
 #               Update the nodes
                 if ((node_1==0)&&(node_2==0)) {
 #                   There is no merging....
-print('skip-3')
                     next
                     }
                 else { if ((node_1>0)&&(node_2==0)) {

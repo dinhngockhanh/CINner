@@ -132,7 +132,6 @@ disp('skip-2')
 %               Update the nodes
                 if (node_1==0)&&(node_2==0)
 %                   There is no merging....
-disp('skip-3')
                     continue
                 elseif (node_1>0)&&(node_2==0)
 %                   There is no merging but node 1 has one more division...
