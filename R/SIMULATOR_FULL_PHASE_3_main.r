@@ -18,7 +18,13 @@ print('FIRST')
 #   Initialize information to build phylogeny in hclust style
     hclust_row                                  <- 0
     hclust_nodes                                <- rep(0,1,2*N_sample-1)
+
+print(hclust_nodes)
+
     hclust_nodes[N_sample:2*N_sample-1]         <- (-1:-N_sample)
+
+print(hclust_nodes)
+
     hclust_labels                               <- sample_cell_ID
 
 print(hclust_nodes)
