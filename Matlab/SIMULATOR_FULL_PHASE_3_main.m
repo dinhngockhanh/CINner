@@ -76,8 +76,8 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
 
 % if (rem(i,1000) == 0)
 '---------------------------------------------------------'
-time
-matrix_division
+% time
+% matrix_division
 % N_clones
 % end
 
@@ -95,12 +95,14 @@ matrix_division
             position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
 %           If daughter genotypes are not in current nodes, move on
             if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
+disp('skip-1')
                 continue
             end
 %           For each specific division...
             for division=1:no_divisions
 %               If these genotypes are not in current nodes, move on
                 if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
+disp('skip-2')
                     continue
                 end
 %               Choose the first daughter node
@@ -130,6 +132,7 @@ matrix_division
 %               Update the nodes
                 if (node_1==0)&&(node_2==0)
 %                   There is no merging....
+disp('skip-3')
                     continue
                 elseif (node_1>0)&&(node_2==0)
 %                   There is no merging but node 1 has one more division...

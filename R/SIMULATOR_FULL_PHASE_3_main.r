@@ -68,8 +68,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 # if((i%%1000)==0){
 print('---------------------------------------------------------')
-print(time)
-print(matrix_division)
+# print(time)
+# print(matrix_division)
 # print(N_clones)
 # }
 
@@ -87,12 +87,14 @@ print(matrix_division)
             position_daughter_2                 <- which(total_clonal_ID==genotype_daughter_2)
 #           If daughter genotypes are not in current nodes, move on
             if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
+print('skip-1')
                 next
             }
 #           For each specific division...
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
+print('skip-2')
                     next
                 }
 #               Choose the first daughter node
@@ -124,6 +126,7 @@ print(matrix_division)
 #               Update the nodes
                 if ((node_1==0)&&(node_2==0)) {
 #                   There is no merging....
+print('skip-3')
                     next
                     }
                 else { if ((node_1>0)&&(node_2==0)) {
