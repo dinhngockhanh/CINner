@@ -42,7 +42,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
     # for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-100,-1)) {
+    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
 
 print('----------------------------------------------------------------')
 print(i)

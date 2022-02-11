@@ -53,7 +53,7 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
     % for i=length(evolution_traj_divisions):-1:1
-    for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-100
+    for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-1000
 
 disp('----------------------------------------------------------------')
 disp(i)
