@@ -20,6 +20,9 @@ print('FIRST')
     hclust_nodes                                <- rep(0,1,2*N_sample-1)
     hclust_nodes[N_sample:2*N_sample-1]         <- (-1:-N_sample)
     hclust_labels                               <- sample_cell_ID
+
+print(hclust_nodes)
+
 print('SECOND')
 #   Initialize actual phylogeny in hclust style
     hclust_merge                                <- matrix(0,nrow=N_sample-1,ncol=2)
