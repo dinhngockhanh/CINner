@@ -130,6 +130,10 @@ print(sample_clone_ID)
     output[[1]]                             <- sample_genotype_profile
     output[[2]]                             <- sample_cell_ID
     output[[3]]                             <- sample_clone_ID
+
+'CHECKING PHASE 2'
+head(output)
+
     return(output)
 
 
