@@ -48,9 +48,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 print('---------------------------------------------------------------')
 
-print(T_current)
+print(length(evolution_traj_divisions))
 
-print(evolution_traj_time[length(evolution_traj_time)])
+print(T_current)
 
 print(time)
 
