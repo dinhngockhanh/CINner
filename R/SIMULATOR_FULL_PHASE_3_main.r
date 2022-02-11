@@ -1,5 +1,5 @@
-#==============================================PHASE 2: SAMPLE PHYLOGENY
-SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution) {
+#==============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
+SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample) {
 
 # #----------------------------------------Initialize the phylogeny record
 #     phylogeny_origin                <- rep(0,length=2*N_sample-1)
