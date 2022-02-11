@@ -14,22 +14,12 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model,stage_final) {
     }
 #----------------------------------------------------Simulate the sample
     if(stage_final>=2){
-        output                                      <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
-
-print('========================================================OUTPUT')
-print(output)
-
-        package_sample                              <- output[[1]]
-
-print('========================================================package_sample')
-print(package_sample)
-
+        package_sample                              <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
         package_output[[2]]                         <- package_sample
     }
 #-----------------------------------Simulate the phylogeny of the sample
     if(stage_final>=3){
-        output                                      <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample)
-        package_sample_phylogeny                    <- output[[1]]
+        package_sample_phylogeny                    <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample)
         package_output[[3]]                         <- package_sample_phylogeny
     }
 #------------------------------------------Output the simulation package
