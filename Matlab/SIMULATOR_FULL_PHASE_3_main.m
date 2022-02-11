@@ -54,6 +54,11 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
 %----------------------------------------Build the sample phylogeny tree
     % for i=length(evolution_traj_divisions):-1:1
     for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-100
+
+disp('----------------------------------------------------------------')
+disp(i)
+disp(length(node_list_current))
+
 %       Get time point
         time                                    = evolution_traj_time(i);
 %       Report on progress
@@ -73,14 +78,6 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
         end
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
-
-% if (rem(i,1000) == 0)
-'---------------------------------------------------------'
-% time
-% matrix_division
-% N_clones
-% end
-
 %       For each type of divisions...
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
@@ -95,14 +92,12 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
             position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
 %           If daughter genotypes are not in current nodes, move on
             if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
-disp('skip-1')
                 continue
             end
 %           For each specific division...
             for division=1:no_divisions
 %               If these genotypes are not in current nodes, move on
                 if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
-disp('skip-2')
                     continue
                 end
 %               Choose the first daughter node

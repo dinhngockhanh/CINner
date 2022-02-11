@@ -43,6 +43,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #----------------------------------------Build the sample phylogeny tree
     # for (i in seq(length(evolution_traj_divisions),1,-1)) {
     for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-100,-1)) {
+
+print('----------------------------------------------------------------')
+print(i)
+print(length(node_list_current))
+
 #       Get time point
         time                                    <- evolution_traj_time[i]
 #       Get current total clonal population (after divisions)
@@ -65,14 +70,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         if (is.null(matrix_division)){
             next
         }
-
-# if((i%%1000)==0){
-print('---------------------------------------------------------')
-# print(time)
-# print(matrix_division)
-# print(N_clones)
-# }
-
 #       For each type of divisions...
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
@@ -87,14 +84,12 @@ print('---------------------------------------------------------')
             position_daughter_2                 <- which(total_clonal_ID==genotype_daughter_2)
 #           If daughter genotypes are not in current nodes, move on
             if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
-print('skip-1')
                 next
             }
 #           For each specific division...
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
-print('skip-2')
                     next
                 }
 #               Choose the first daughter node
