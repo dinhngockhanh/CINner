@@ -14,11 +14,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     sample_cell_ID                              <- package_sample[[2]]
     sample_clone_ID                             <- package_sample[[3]]
 #-----------------------------------Initialize phylogeny in hclust style
+print('FIRST')
 #   Initialize information to build phylogeny in hclust style
     hclust_row                                  <- 0
     hclust_nodes                                <- rep(0,1,2*N_sample-1)
     hclust_nodes[N_sample:2*N_sample-1]         <- (-1:-N_sample)
     hclust_labels                               <- sample_cell_ID
+print('SECOND')
 #   Initialize actual phylogeny in hclust style
     hclust_merge                                <- matrix(0,nrow=N_sample-1,ncol=2)
     hclust_height                               <- rep(0,1,N_sample-1)
