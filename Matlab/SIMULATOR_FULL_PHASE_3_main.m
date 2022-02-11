@@ -57,6 +57,10 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
 %       Get time point
         time                                    = evolution_traj_time(i);
 
+disp('---------------------------------------------------------------')
+
+disp(T_current)
+
 disp(evolution_traj_time(end))
 
 disp(time)

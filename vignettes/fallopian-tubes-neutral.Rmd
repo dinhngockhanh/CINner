@@ -131,6 +131,20 @@ Function `SIMULATOR_FULL_PROGRAM_one_simulation` outputs one simulation for the 
 - `stage_final`=2 also outputs the CN profiles in a sample
 - `stage_final`=3 also outputs the phylogeny of the sample
 
+
+```{r setup}
+devtools::install_github("dinhngockhanh/CancerSimulator")
+
+
+library(ggplot2)
+library(signals)
+library(CancerSimulator)
+
+devtools::load_all()
+devtools::document()
+```
+
+
 ```{r}
 stage_final                   <- 3
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)

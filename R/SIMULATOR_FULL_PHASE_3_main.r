@@ -46,6 +46,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #       Get time point
         time                                    <- evolution_traj_time[i]
 
+print('---------------------------------------------------------------')
+
+print(T_current)
+
+print(evolution_traj_time[length(evolution_traj_time)])
+
 print(time)
 
 #       Get current total clonal population (after divisions)
