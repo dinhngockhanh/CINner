@@ -21,7 +21,7 @@ print('FIRST')
 
 print(N_sample)
 
-    hclust_nodes[N_sample:2*N_sample-1]         <- (-1:-N_sample)
+    hclust_nodes[N_sample:(2*N_sample-1)]       <- (-1:-N_sample)
 
 print(hclust_nodes)
 
