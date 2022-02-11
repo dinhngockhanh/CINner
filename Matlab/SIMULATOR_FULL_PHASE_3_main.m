@@ -175,6 +175,17 @@ end
 
 
 
+
+
+
+
+% disp(phylogeny_origin)
+% disp(phylogeny_elapsed_gens)
+% disp(phylogeny_genotype)
+disp(phylogeny_birthtime)
+% disp(phylogeny_deathtime)
+
+
 %-----------------------------------------Reorder the nodes for plotting
 %---Find an order on all nodes of the phylogeny in our style
 %   Find number of progeny of each node

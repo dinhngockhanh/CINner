@@ -169,12 +169,17 @@ if((i%%1000)==0){
             }
         }
     }
+#   Assign original cell to be born at the beginning of clonal evolution
+    phylogeny_birthtime[1]                  <- evolution_traj_time[1]
 
-print(phylogeny_origin)
-print(phylogeny_elapsed_gens)
-print(phylogeny_genotype)
+
+
+
+# print(phylogeny_origin)
+# print(phylogeny_elapsed_gens)
+# print(phylogeny_genotype)
 print(phylogeny_birthtime)
-print(phylogeny_deathtime)
+# print(phylogeny_deathtime)
 
 
 
