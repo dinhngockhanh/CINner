@@ -59,7 +59,7 @@ print('---------------------------------')
             sample_clonal_population[genotype]  <- sample_clonal_population[genotype]+1
         }
 
-print(sample_clonal_population)
+# print(sample_clonal_population)
 
 #       Get list of eligible nodes of each genotype
         sample_eligible_nodes                   <- vector("list",length=N_clones)
@@ -67,6 +67,9 @@ print(sample_clonal_population)
             genotype                            <- node_genotype_current[node]
             sample_eligible_nodes[[genotype]]   <- c(sample_eligible_nodes[[genotype]], node_list_current[node])
         }
+
+print(sample_eligible_nodes)
+
 #       Get list of divisions
         matrix_division                         <- evolution_traj_divisions[[i]]
 #       For each type of divisions...
