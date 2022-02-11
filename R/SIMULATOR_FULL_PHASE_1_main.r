@@ -94,7 +94,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     assign('evolution_origin',evolution_origin,envir=.GlobalEnv)
     assign('evolution_genotype_changes',evolution_genotype_changes,envir=.GlobalEnv)
 
-    evolution_traj_count                        <- 0
+    evolution_traj_count                        <- 1
 #--------------------------------------Set up counts for the simulations
 #   Current time
     T_current                       <- T_start_time
@@ -271,7 +271,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #       Update record of clonal evolution over time
         evolution_traj_count                                <- evolution_traj_count+1
 
-        evolution_traj_time                                 <- c(evolution_traj_time, T_current)
+        evolution_traj_time[evolution_traj_count]           <- T_current
         evolution_traj_clonal_ID[[evolution_traj_count]]    <- clonal_ID_current
         evolution_traj_population[[evolution_traj_count]]   <- clonal_population_current
         evolution_traj_divisions[[evolution_traj_count]]    <- mat_divisions

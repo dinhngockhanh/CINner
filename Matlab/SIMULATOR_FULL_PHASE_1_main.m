@@ -96,7 +96,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     evolution_traj_population                   = {clonal_population_current};
     evolution_traj_divisions                    = {};
 
-    evolution_traj_count                        = 0;
+    evolution_traj_count                        = 1;
 %--------------------------------------Set up counts for the simulations
 %   Current time
     T_current                                   = T_start_time;
