@@ -84,6 +84,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     next
                 }
 #               Choose the first daughter node
+
+print('FIRST')
+print(sample_clonal_population[genotype_daughter_1])
+print(total_clonal_population[position_daughter_1])
+print(runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
+
                 logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
                 if (logic_node_1==1) {
                     pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
@@ -97,6 +103,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     total_clonal_population[position_daughter_1]                <- total_clonal_population[position_daughter_1]-1
                 }
 #               Choose the second daughter node
+
+print('SECOND')
+print(sample_clonal_population[genotype_daughter_2])
+print(total_clonal_population[position_daughter_2])
+print(runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
+
                 logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
                 if (logic_node_2==1) {
                     pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
