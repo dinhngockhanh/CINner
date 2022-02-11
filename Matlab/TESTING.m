@@ -5,9 +5,12 @@
     mother_folder   = current_folder(1:idcs(end)-1);
     R_folder        = [mother_folder '/vignettes'];
     path(path,R_folder);
-%----------------------------TEST THE COPY-NUMBER ALLELE TRACKING SYSTEM
+%------------------------------------------TEST THE SIMULATION ALGORITHM
     model           = 'FALLOPIAN-TUBES-NEUTRAL';
-    stage_final     = 2;
+%   stage_final     = 1:    outputs the clonal evolution
+%   stage_final     = 2:    also outputs the CN profiles of a sample
+%   stage_final     = 3:    also outputs the phylogeny of the sample
+    stage_final     = 3;
     N_simulations   = 1;
 tic
     TEST_SIMULATIONS_FOR_FIRST_MANUSCRIPT(model,stage_final,N_simulations);
