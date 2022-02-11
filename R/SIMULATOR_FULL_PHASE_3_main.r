@@ -64,6 +64,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         if (is.null(matrix_division)){
             next
         }
+
+if((i%%1000)==0){
+    print(i)
+}
+
 #       For each type of divisions...
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions

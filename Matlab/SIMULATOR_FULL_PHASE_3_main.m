@@ -72,6 +72,11 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
         end
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
+
+if (rem(i,1000) == 0)
+    disp(i)
+end
+
 %       For each type of divisions...
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
