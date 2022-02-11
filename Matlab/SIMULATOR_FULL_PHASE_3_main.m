@@ -189,11 +189,11 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
             daughter_node_2                     = vec_daughter_nodes(2);
             progeny_count_2                     = progeny_count(daughter_node_2);
             if progeny_count_1<progeny_count_2
-                phylogeny_order(daughter_node_1) = phylogeny_order(node);
-                phylogeny_order(daughter_node_2) = phylogeny_order(node)+progeny_count_1;
+                phylogeny_order(daughter_node_1)    = phylogeny_order(node);
+                phylogeny_order(daughter_node_2)    = phylogeny_order(node)+progeny_count_1;
             else
-                phylogeny_order(daughter_node_1) = phylogeny_order(node)+progeny_count_2;
-                phylogeny_order(daughter_node_2) = phylogeny_order(node);
+                phylogeny_order(daughter_node_1)    = phylogeny_order(node)+progeny_count_2;
+                phylogeny_order(daughter_node_2)    = phylogeny_order(node);
             end
         end
     end

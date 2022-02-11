@@ -17,18 +17,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     for (i in 1:length(final_clonal_ID)) {
         clone                       <- final_clonal_ID[i]
         clonal_population           <- final_clonal_population[i]
-        final_population            <- c(final_population,rep(clone,1,clonal_population)) # append clone to final_population
+        final_population            <- c(final_population,rep(clone,1,clonal_population))
     }
     node_genotype_current           <- sample(x=final_population,size=N_sample,replace=FALSE)
-
-
-
-
-
-
-
-
-
 #---------------------------------Create CN object for the sampled cells
     sample_genotype                 <- node_genotype_current
 #---Find the CN profiles for each clone found in the sample
@@ -94,9 +85,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         sample_genotype_unique_profile[[i_clone]]   <- genotype_unique_profile
     }
 #---Find the CN profiles for each cell in the sample
-    sample_cell_ID                  <- list();
+    sample_cell_ID                  <- list()
     sample_clone_ID                 <- sample_genotype
-
     for (i_cell in 1:N_sample){
         clone_ID                    <- sample_genotype[i_cell]
         i_clone                     <- which(sample_genotype_unique==clone_ID)[1]
@@ -123,6 +113,4 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     output[[2]]                             <- sample_cell_ID
     output[[3]]                             <- sample_clone_ID
     return(output)
-
-
 }
