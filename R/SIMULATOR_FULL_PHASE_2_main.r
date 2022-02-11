@@ -120,6 +120,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 
 print('sample_genotype_profile')
 head(sample_genotype_profile)
+
 print('sample_cell_ID')
 print(sample_cell_ID)
 print('sample_clone_ID')
@@ -132,7 +133,7 @@ print(sample_clone_ID)
     output[[2]]                             <- sample_cell_ID
     output[[3]]                             <- sample_clone_ID
 
-'CHECKING PHASE 2'
+print('CHECKING PHASE 2')
 head(output)
 
     return(output)
