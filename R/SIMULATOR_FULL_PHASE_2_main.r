@@ -117,25 +117,11 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             sample_genotype_profile <- rbind(sample_genotype_profile,cell_genotype_profile)
         }
     }
-
-print('sample_genotype_profile')
-head(sample_genotype_profile)
-
-print('sample_cell_ID')
-print(sample_cell_ID)
-print('sample_clone_ID')
-print(sample_clone_ID)
-
-
 #---------------------------------Output package of data from simulation
     output                                  <- list()
     output[[1]]                             <- sample_genotype_profile
     output[[2]]                             <- sample_cell_ID
     output[[3]]                             <- sample_clone_ID
-
-print('CHECKING PHASE 2')
-print(output)
-
     return(output)
 
 
