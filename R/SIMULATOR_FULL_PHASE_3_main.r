@@ -66,7 +66,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         }
 
 if((i%%1000)==0){
-    print(i)
+    print('---------------------------------------------------------')
+    print(time)
 }
 
 #       For each type of divisions...

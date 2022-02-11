@@ -74,7 +74,8 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
         matrix_division                         = evolution_traj_divisions{i};
 
 if (rem(i,1000) == 0)
-    disp(i)
+    disp('---------------------------------------------------------')
+    disp(time)
 end
 
 %       For each type of divisions...
