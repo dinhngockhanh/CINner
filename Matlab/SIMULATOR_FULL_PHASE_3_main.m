@@ -59,11 +59,9 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
 
 disp('---------------------------------------------------------------')
 
-disp(T_current)
+disp(length(evolution_traj_divisions))
 
-disp(evolution_traj_time(end))
-
-disp(time)
+disp(length(evolution_traj_time))
 
 %       Report on progress
         total_clonal_ID                         = evolution_traj_clonal_ID{i+1};

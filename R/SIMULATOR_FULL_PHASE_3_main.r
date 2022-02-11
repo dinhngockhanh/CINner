@@ -50,9 +50,7 @@ print('---------------------------------------------------------------')
 
 print(length(evolution_traj_divisions))
 
-print(T_current)
-
-print(time)
+print(length(evolution_traj_time))
 
 #       Get current total clonal population (after divisions)
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
