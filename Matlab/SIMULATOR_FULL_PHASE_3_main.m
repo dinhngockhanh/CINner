@@ -53,7 +53,6 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
     for i=length(evolution_traj_divisions):-1:1
-    % for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-10
 %       Get time point
         time                                    = evolution_traj_time(i);
 %       Report on progress
@@ -160,14 +159,6 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
                     node_genotype_current                                   = [genotype_mother node_genotype_current];
                     node_list_current(pos_delete)                           = [];
                     node_list_current                                       = [node_mother node_list_current];
-
-disp('--------------------------------------------')
-disp(phylogeny_origin)
-disp(phylogeny_elapsed_gens)
-disp(phylogeny_genotype)
-disp(phylogeny_birthtime)
-disp(phylogeny_deathtime)
-
                 end
             end
         end

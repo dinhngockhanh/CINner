@@ -42,7 +42,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-10,-1)) {
 #       Get time point
         time                                    <- evolution_traj_time[i]
 #       Get current total clonal population (after divisions)
@@ -62,6 +61,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         }
 #       Get list of divisions
         matrix_division                         <- evolution_traj_divisions[[i]]
+        if (is.null(matrix_division)){
+            next
+        }
 #       For each type of divisions...
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
@@ -85,16 +87,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     next
                 }
 #               Choose the first daughter node
-                # if (sample_clonal_population[genotype_daughter_1]<=0){
-                #     logic_node_1                                                <- 0
-                # }
-                # else{
-                #     logic_node_1                                                <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
-                # }
                 logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
-
-
-
                 if (logic_node_1==1) {
                     pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
                     node_1                                                      <- sample_eligible_nodes[[genotype_daughter_1]][pos_node_1]
@@ -107,16 +100,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     total_clonal_population[position_daughter_1]                <- total_clonal_population[position_daughter_1]-1
                 }
 #               Choose the second daughter node
-                # if (sample_clonal_population[genotype_daughter_2]<=0){
-                #     logic_node_2                                                <- 0
-                # }
-                # else{
-                #     logic_node_2                                                <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
-                # }
                 logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
-
-
-
                 if (logic_node_2==1) {
                     pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
                     node_2                                                      <- sample_eligible_nodes[[genotype_daughter_2]][pos_node_2]
