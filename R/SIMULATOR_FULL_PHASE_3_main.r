@@ -14,29 +14,14 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     sample_cell_ID                              <- package_sample[[2]]
     sample_clone_ID                             <- package_sample[[3]]
 #-----------------------------------Initialize phylogeny in hclust style
-print('FIRST')
 #   Initialize information to build phylogeny in hclust style
     hclust_row                                  <- 0
     hclust_nodes                                <- rep(0,1,2*N_sample-1)
-
-print(N_sample)
-
     hclust_nodes[N_sample:(2*N_sample-1)]       <- (-1:-N_sample)
-
-print(hclust_nodes)
-
     hclust_labels                               <- sample_cell_ID
-
-print(hclust_nodes)
-print(hclust_labels)
-
-print('SECOND')
 #   Initialize actual phylogeny in hclust style
     hclust_merge                                <- matrix(0,nrow=N_sample-1,ncol=2)
     hclust_height                               <- rep(0,1,N_sample-1)
-
-print('HERE')
-
 #--------------------------------------Initialize phylogeny in our style
     phylogeny_origin                            <- rep(0,length=2*N_sample-1)
     phylogeny_elapsed_gens                      <- rep(0,length=2*N_sample-1)
@@ -64,8 +49,8 @@ print('HERE')
         total_clonal_population                 <- evolution_traj_population[[i+1]]
 
 print('---------------------------------')
-print(total_clonal_ID)
-print(total_clonal_population)
+# print(total_clonal_ID)
+# print(total_clonal_population)
 
 #       Get current sample clonal population (after divisions)
         sample_clonal_population                <- rep(0,length=N_clones)
@@ -73,6 +58,9 @@ print(total_clonal_population)
             genotype                            <- node_genotype_current[node]
             sample_clonal_population[genotype]  <- sample_clonal_population[genotype]+1
         }
+
+print(sample_clonal_population)
+
 #       Get list of eligible nodes of each genotype
         sample_eligible_nodes                   <- vector("list",length=N_clones)
         for (node in 1:length(node_genotype_current)) {
