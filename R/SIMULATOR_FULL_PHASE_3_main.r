@@ -41,12 +41,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
-    # for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
+    for (i in seq(length(evolution_traj_divisions),1,-1)) {
+    # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
 
-print('----------------------------------------------------------------')
-print(i)
-print(length(node_list_current))
+# print('----------------------------------------------------------------')
+# print(i)
+# print(length(node_list_current))
 
 #       Get time point
         time                                    <- evolution_traj_time[i]
@@ -143,12 +143,11 @@ print(length(node_list_current))
 #                   Nodes 1 and 2 are mergning...
                     node_mother                                             <- min(node_list_current)-1
 #                   Update phylogeny in hclust style
-
-
-
-
-
-
+                    hclust_row                                              <- hclust_row+1;
+                    hclust_nodes[node_mother]                               <- hclust_row;
+                    hclust_merge[hclust_row,1]                              <- hclust_nodes(node_1)
+                    hclust_merge[hclust_row,2]                              <- hclust_nodes(node_2)
+                    hclust_height[hclust_row]                               <- T_current-time
 #                   Update phylogeny in our style
                     phylogeny_origin[node_1]                                <- node_mother
                     phylogeny_origin[node_2]                                <- node_mother
@@ -178,11 +177,11 @@ print(length(node_list_current))
 # print(phylogeny_origin)
 # print(phylogeny_elapsed_gens)
 # print(phylogeny_genotype)
-print(phylogeny_birthtime)
+# print(phylogeny_birthtime)
 # print(phylogeny_deathtime)
 
-
-
+print(hclust_merge)
+print(hclust_height)
 
 
 }
