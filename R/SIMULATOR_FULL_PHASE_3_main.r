@@ -41,17 +41,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
-    # for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-10,-1)) {
+    for (i in seq(length(evolution_traj_divisions),1,-1)) {
+    # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-10,-1)) {
 #       Get time point
         time                                    <- evolution_traj_time[i]
-
-print('---------------------------------------------------------------')
-
-print(length(evolution_traj_divisions))
-
-print(length(evolution_traj_time))
-
 #       Get current total clonal population (after divisions)
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
         total_clonal_population                 <- evolution_traj_population[[i+1]]
