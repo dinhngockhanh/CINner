@@ -134,7 +134,7 @@ print(sample_clone_ID)
     output[[3]]                             <- sample_clone_ID
 
 print('CHECKING PHASE 2')
-head(output)
+print(output)
 
     return(output)
 
