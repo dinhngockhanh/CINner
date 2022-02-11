@@ -22,6 +22,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #   Initialize actual phylogeny in hclust style
     hclust_merge                                <- matrix(0,nrow=N_sample-1,ncol=2)
     hclust_height                               <- rep(0,1,N_sample-1)
+
+print('HERE')
+
 #--------------------------------------Initialize phylogeny in our style
     phylogeny_origin                            <- rep(0,length=2*N_sample-1)
     phylogeny_elapsed_gens                      <- rep(0,length=2*N_sample-1)
