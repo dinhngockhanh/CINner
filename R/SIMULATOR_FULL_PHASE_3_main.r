@@ -166,6 +166,14 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     node_genotype_current                                   <- c(genotype_mother, node_genotype_current)
                     node_list_current                                       <- node_list_current[-pos_delete]
                     node_list_current                                       <- c(node_mother, node_list_current)
+
+print('--------------------------------------------')
+print(phylogeny_origin)
+print(phylogeny_elapsed_gens)
+print(phylogeny_genotype)
+print(phylogeny_birthtime)
+print(phylogeny_deathtime)
+
                     }
                 }}}
             }
