@@ -256,7 +256,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
         evolution_traj_time(evolution_traj_count)       = T_current;
         evolution_traj_clonal_ID{evolution_traj_count}  = clonal_ID_current;
         evolution_traj_population{evolution_traj_count} = clonal_population_current;
-        evolution_traj_divisions{evolution_traj_count}  = mat_divisions;
+        evolution_traj_divisions{evolution_traj_count-1}= mat_divisions;
     end
 %---------------------------------Output package of data from simulation
     if isnan(N_cells_current)
