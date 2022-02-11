@@ -22,6 +22,7 @@ print('FIRST')
     hclust_labels                               <- sample_cell_ID
 
 print(hclust_nodes)
+print(hclust_labels)
 
 print('SECOND')
 #   Initialize actual phylogeny in hclust style
