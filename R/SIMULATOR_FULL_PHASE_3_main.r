@@ -69,7 +69,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 # if((i%%1000)==0){
 print('---------------------------------------------------------')
 print(time)
-print(matrix_division)
+# print(matrix_division)
+print(N_clones)
 # }
 
 #       For each type of divisions...

@@ -77,6 +77,8 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
 % if (rem(i,1000) == 0)
 '---------------------------------------------------------'
 time
+matrix_division
+N_clones
 % end
 
 %       For each type of divisions...
