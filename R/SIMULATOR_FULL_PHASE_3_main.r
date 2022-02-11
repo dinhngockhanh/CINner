@@ -47,6 +47,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #       Get current total clonal population (after divisions)
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
         total_clonal_population                 <- evolution_traj_population[[i+1]]
+
+print('---------------------------------')
+print(total_clonal_ID)
+print(total_clonal_population)
+
 #       Get current sample clonal population (after divisions)
         sample_clonal_population                <- rep(0,length=N_clones)
         for (node in 1:length(node_genotype_current)) {
