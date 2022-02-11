@@ -1,3 +1,6 @@
+#==============================================PHASE 2: SAMPLE PHYLOGENY
+SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution) {
+
 # #----------------------------------------Initialize the phylogeny record
 #     phylogeny_origin                <- rep(0,length=2*N_sample-1)
 #     phylogeny_elapsed_gens          <- rep(0,length=2*N_sample-1)
@@ -15,3 +18,5 @@
 #     }
 #     phylogeny_genotype[node_list_current]       <- node_genotype_current
 #     phylogeny_deathtime[node_list_current]      <- T_current
+
+}

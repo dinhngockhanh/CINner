@@ -118,7 +118,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         }
     }
 
-
+head(sample_genotype_profile)
 print(sample_cell_ID)
 print(sample_clone_ID)
 
