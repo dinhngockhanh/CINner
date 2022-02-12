@@ -115,8 +115,13 @@ if (i%%1000==0){
 #               Choose the first daughter node
 
                 if (N_runif>=length(vec_runif)-4){
+start.time_mini <- Sys.time()
                     vec_runif                                                   <- runif(10000000)
                     N_runif                                                     <- 0
+end.time_mini <- Sys.time()
+time.taken <- end.time_mini - start.time_mini
+print(time.taken)
+
                 }
 
 # start.time <- Sys.time()
