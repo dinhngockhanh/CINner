@@ -85,7 +85,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         sample_genotype_unique_profile[[i_clone]]   <- genotype_unique_profile
     }
 #---Find the CN profiles for each cell in the sample
-    sample_cell_ID                  <- list()
+    sample_cell_ID                  <- c()
     sample_clone_ID                 <- sample_genotype
     for (i_cell in 1:N_sample){
         clone_ID                    <- sample_genotype[i_cell]
@@ -94,9 +94,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         cell_genotype_profile       <- sample_genotype_unique_profile[[i_clone]]
 #       Add column for cell ID
         cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
-
-        sample_cell_ID[[i_cell]]    <- cell_ID
-
+        sample_cell_ID[i_cell]      <- cell_ID
         cell_genotype_profile       <- cbind(cell_genotype_profile,rep(cell_ID,nrow(cell_genotype_profile)))
         names(cell_genotype_profile)<- c("chr","start","end","copy","state","Min","Maj","cell_id")
 #       Update table of CN profiles for all cells in the sample
