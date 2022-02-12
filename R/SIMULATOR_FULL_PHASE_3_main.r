@@ -54,7 +54,6 @@ if (i%%1000==0){
     TIME_TOTAL<-0
 }
 
-start.time <- Sys.time()
 #       Get time point
         time                                    <- evolution_traj_time[i]
 #       Get current total clonal population (after divisions)
@@ -78,12 +77,14 @@ start.time <- Sys.time()
             next
         }
 #       For each type of divisions...
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL<-TIME_TOTAL+time.taken
-
+########################################################################
+########################################################################
+########################################################################
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
+
+start.time <- Sys.time()
+
             no_divisions                        <- matrix_division[event_type,1]
 #           Get genotype of mother
             genotype_mother                     <- matrix_division[event_type,2]
@@ -97,6 +98,11 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
             if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
                 next
             }
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+TIME_TOTAL<-TIME_TOTAL+time.taken
+
 #           For each specific division...
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
@@ -178,7 +184,9 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
                 }}}
             }
         }
-
+########################################################################
+########################################################################
+########################################################################
     }
 #   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime[1]                  <- evolution_traj_time[1]

@@ -65,7 +65,6 @@ if rem(i,1000)==0
     TIME_TOTAL  = 0;
 end
 
-tic_mini=tic;
 %       Get time point
         time                                    = evolution_traj_time(i);
 %       Report on progress
@@ -86,11 +85,14 @@ tic_mini=tic;
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
 %       For each type of divisions...
-TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
+
+tic_mini=tic;
+
             no_divisions                        = matrix_division(event_type,1);
 %           Get genotype of mother
             genotype_mother                     = matrix_division(event_type,2);
@@ -104,6 +106,9 @@ TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
             if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
                 continue
             end
+
+TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
+
 %           For each specific division...
             for division=1:no_divisions
 %               If these genotypes are not in current nodes, move on
@@ -178,6 +183,9 @@ TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
                 end
             end
         end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
 %   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime(1)              = evolution_traj_time(1);
