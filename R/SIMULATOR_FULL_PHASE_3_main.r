@@ -47,7 +47,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 if (i%%1000==0){
     print('----------------------------------------------------------------')
     print(i)
-    print(length(node_list_current))    
+    print(length(node_list_current))
 }
 
 
@@ -57,6 +57,7 @@ if (i%%1000==0){
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
         total_clonal_population                 <- evolution_traj_population[[i+1]]
 #       Get current sample clonal population (after divisions)
+start.time <- Sys.time()
         sample_clonal_population                <- rep(0,length=N_clones)
         for (node in 1:length(node_genotype_current)) {
             genotype                            <- node_genotype_current[node]
@@ -68,6 +69,9 @@ if (i%%1000==0){
             genotype                            <- node_genotype_current[node]
             sample_eligible_nodes[[genotype]]   <- c(sample_eligible_nodes[[genotype]], node_list_current[node])
         }
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+print(time.taken)
 #       Get list of divisions
         matrix_division                         <- evolution_traj_divisions[[i]]
         if (is.null(matrix_division)){

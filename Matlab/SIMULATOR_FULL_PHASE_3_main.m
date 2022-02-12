@@ -67,6 +67,7 @@ end
         total_clonal_ID                         = evolution_traj_clonal_ID{i+1};
         total_clonal_population                 = evolution_traj_population{i+1};
 %       Get current sample clonal population (after divisions)
+tic
         sample_clonal_population                = zeros(1,N_clones);
         for node=1:length(node_genotype_current)
             genotype                            = node_genotype_current(node);
@@ -78,6 +79,7 @@ end
             genotype                            = node_genotype_current(node);
             sample_eligible_nodes{genotype}     = [sample_eligible_nodes{genotype} node_list_current(node)];
         end
+toc
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
 %       For each type of divisions...
