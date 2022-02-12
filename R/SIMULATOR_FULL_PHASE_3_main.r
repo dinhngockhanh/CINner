@@ -64,7 +64,7 @@ if (i%%1000==0){
 
     TIME_TOTAL_1<-0
     TIME_TOTAL_2<-0
-    
+
     # start.time <- Sys.time()
 }
 #       Get time point
@@ -103,9 +103,6 @@ if (i%%1000==0){
 ########################################################################
 ########################################################################
 ########################################################################
-
-start.time <- Sys.time()
-
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
@@ -122,6 +119,9 @@ start.time <- Sys.time()
                 next
             }
 #           For each specific division...
+
+start.time <- Sys.time()
+
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
@@ -221,12 +221,12 @@ start.time <- Sys.time()
                     }
                 }}}
             }
-        }
-
+            
 end.time <- Sys.time()
 time.taken <- end.time - start.time
 TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
 
+        }
 ########################################################################
 ########################################################################
 ########################################################################
