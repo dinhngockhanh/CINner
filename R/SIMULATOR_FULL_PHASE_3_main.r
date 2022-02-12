@@ -230,6 +230,9 @@ head(phylogeny_hclust)
     output                                          <- list()
     output[[1]]                                     <- phylogeny_hclust
     output[[2]]                                     <- hclust_clustering
+
+    return(output)
+
 # print(hclust_merge)
 # print(hclust_height)
 # print(hclust_order)
