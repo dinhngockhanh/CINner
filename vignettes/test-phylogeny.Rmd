@@ -22,7 +22,9 @@ sample_genotype_profiles      <- package_sample[[1]]
 package_sample_phylogeny      <- package_output[[3]]
 phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
 
-head(sample_genotype_profiles)
+plotHeatmap(sample_genotype_profiles,plotcol="state",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
+```
 
-head(phylogeny_clustering_truth)
+```{r}
+plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
 ```
