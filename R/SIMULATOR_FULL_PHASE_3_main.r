@@ -42,7 +42,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
 
-    vec_runif                                   <- runif(1000000)
+    vec_runif                                   <- runif(10000000)
     N_runif                                     <- 0
 
 
@@ -114,8 +114,8 @@ if (i%%1000==0){
                 }
 #               Choose the first daughter node
 
-                if (N_runif>=length(vec_runif)-2){
-                    vec_runif                                                   <- runif(1000000)
+                if (N_runif>=length(vec_runif)-4){
+                    vec_runif                                                   <- runif(10000000)
                     N_runif                                                     <- 0
                 }
 
@@ -127,7 +127,10 @@ if (i%%1000==0){
 # time.taken <- end.time - start.time
 # TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
                 if (logic_node_1==1) {
-                    pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
+                    # pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
+                    N_runif                                                     <- N_runif+1
+                    pos_node_1                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_1])
+
                     node_1                                                      <- sample_eligible_nodes[[genotype_daughter_1]][pos_node_1]
                     sample_eligible_nodes[[genotype_daughter_1]]                <- sample_eligible_nodes[[genotype_daughter_1]][-pos_node_1]
                     sample_clonal_population[genotype_daughter_1]               <- sample_clonal_population[genotype_daughter_1]-1
@@ -146,7 +149,10 @@ if (i%%1000==0){
 # time.taken <- end.time - start.time
 # TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
                 if (logic_node_2==1) {
-                    pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
+                    # pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
+                    N_runif                                                     <- N_runif+1
+                    pos_node_2                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_2])
+
                     node_2                                                      <- sample_eligible_nodes[[genotype_daughter_2]][pos_node_2]
                     sample_eligible_nodes[[genotype_daughter_2]]                <- sample_eligible_nodes[[genotype_daughter_2]][-pos_node_2]
                     sample_clonal_population[genotype_daughter_2]               <- sample_clonal_population[genotype_daughter_2]-1
