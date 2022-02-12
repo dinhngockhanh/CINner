@@ -92,9 +92,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
-
-tic_mini_1=tic;
-
             no_divisions                        = matrix_division(event_type,1);
 %           Get genotype of mother
             genotype_mother                     = matrix_division(event_type,2);
@@ -104,26 +101,27 @@ tic_mini_1=tic;
 %           Get genotype of 2nd daughter
             genotype_daughter_2                 = matrix_division(event_type,4);
             position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
-
-TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
-
 %           If daughter genotypes are not in current nodes, move on
             if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
                 continue
             end
 %           For each specific division...
-
-tic_mini_2=tic;
-
             for division=1:no_divisions
 %               If these genotypes are not in current nodes, move on
                 if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
                     continue
                 end
 %               Choose the first daughter node
+tic_mini_1=tic;
                 logic_node_1                                                = rand<sample_clonal_population(genotype_daughter_1)/total_clonal_population(position_daughter_1);
+% TIME_TOTAL_1=TIME_TOTAL_1+1;
+TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
+
                 if logic_node_1==1
+tic_mini_2=tic;
                     pos_node_1                                              = randi(sample_clonal_population(genotype_daughter_1));
+% TIME_TOTAL_2=TIME_TOTAL_2+1;
+TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
                     node_1                                                  = sample_eligible_nodes{genotype_daughter_1}(pos_node_1);
                     sample_eligible_nodes{genotype_daughter_1}(pos_node_1)  = [];
                     sample_clonal_population(genotype_daughter_1)           = sample_clonal_population(genotype_daughter_1)-1;
@@ -133,9 +131,15 @@ tic_mini_2=tic;
                     total_clonal_population(position_daughter_1)            = total_clonal_population(position_daughter_1)-1;
                 end
 %               Choose the second daughter node
+tic_mini_1=tic;
                 logic_node_2                                                = rand<sample_clonal_population(genotype_daughter_2)/total_clonal_population(position_daughter_2);
+% TIME_TOTAL_1=TIME_TOTAL_1+1;
+TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
                 if logic_node_2==1
+tic_mini_2=tic;
                     pos_node_2                                              = randi(sample_clonal_population(genotype_daughter_2));
+% TIME_TOTAL_2=TIME_TOTAL_2+1;
+TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
                     node_2                                                  = sample_eligible_nodes{genotype_daughter_2}(pos_node_2);
                     sample_eligible_nodes{genotype_daughter_2}(pos_node_2)  = [];
                     sample_clonal_population(genotype_daughter_2)           = sample_clonal_population(genotype_daughter_2)-1;
@@ -187,9 +191,6 @@ tic_mini_2=tic;
                     node_list_current                                       = [node_mother node_list_current];
                 end
             end
-
-TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
-
         end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
