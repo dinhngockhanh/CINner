@@ -67,7 +67,6 @@ end
         total_clonal_ID                         = evolution_traj_clonal_ID{i+1};
         total_clonal_population                 = evolution_traj_population{i+1};
 %       Get current sample clonal population (after divisions)
-tic
         sample_clonal_population                = zeros(1,N_clones);
         for node=1:length(node_genotype_current)
             genotype                            = node_genotype_current(node);
@@ -79,10 +78,10 @@ tic
             genotype                            = node_genotype_current(node);
             sample_eligible_nodes{genotype}     = [sample_eligible_nodes{genotype} node_list_current(node)];
         end
-toc
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
 %       For each type of divisions...
+tic
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
             no_divisions                        = matrix_division(event_type,1);
@@ -172,6 +171,7 @@ toc
                 end
             end
         end
+toc
     end
 %   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime(1)              = evolution_traj_time(1);

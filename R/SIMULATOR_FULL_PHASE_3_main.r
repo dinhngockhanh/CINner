@@ -57,7 +57,6 @@ if (i%%1000==0){
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
         total_clonal_population                 <- evolution_traj_population[[i+1]]
 #       Get current sample clonal population (after divisions)
-start.time <- Sys.time()
         sample_clonal_population                <- rep(0,length=N_clones)
         for (node in 1:length(node_genotype_current)) {
             genotype                            <- node_genotype_current[node]
@@ -69,15 +68,13 @@ start.time <- Sys.time()
             genotype                            <- node_genotype_current[node]
             sample_eligible_nodes[[genotype]]   <- c(sample_eligible_nodes[[genotype]], node_list_current[node])
         }
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-print(time.taken)
 #       Get list of divisions
         matrix_division                         <- evolution_traj_divisions[[i]]
         if (is.null(matrix_division)){
             next
         }
 #       For each type of divisions...
+start.time <- Sys.time()
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
@@ -173,7 +170,10 @@ print(time.taken)
                     }
                 }}}
             }
-        }
+        }     
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+print(time.taken)
     }
 #   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime[1]                  <- evolution_traj_time[1]
