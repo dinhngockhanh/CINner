@@ -52,7 +52,9 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_genotype(node_list_current)       = node_genotype_current;
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
+
 TIME_TOTAL=0;
+
     for i=length(evolution_traj_divisions):-1:1
     % for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-1000
 
@@ -63,6 +65,7 @@ if rem(i,1000)==0
     TIME_TOTAL  = 0;
 end
 
+tic_mini=tic;
 %       Get time point
         time                                    = evolution_traj_time(i);
 %       Report on progress
@@ -83,9 +86,9 @@ end
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
 %       For each type of divisions...
+TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
 
-tic_mini=tic;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
             no_divisions                        = matrix_division(event_type,1);
@@ -175,7 +178,6 @@ tic_mini=tic;
                 end
             end
         end
-TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
     end
 %   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime(1)              = evolution_traj_time(1);

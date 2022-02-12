@@ -54,7 +54,7 @@ if (i%%1000==0){
     TIME_TOTAL<-0
 }
 
-
+start.time <- Sys.time()
 #       Get time point
         time                                    <- evolution_traj_time[i]
 #       Get current total clonal population (after divisions)
@@ -78,7 +78,10 @@ if (i%%1000==0){
             next
         }
 #       For each type of divisions...
-start.time <- Sys.time()
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+TIME_TOTAL<-TIME_TOTAL+time.taken
+
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
@@ -175,9 +178,7 @@ start.time <- Sys.time()
                 }}}
             }
         }
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL<-TIME_TOTAL+time.taken
+
     }
 #   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime[1]                  <- evolution_traj_time[1]
