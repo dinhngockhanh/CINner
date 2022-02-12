@@ -215,16 +215,27 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #------------------------------------------------Create clustering table
     hclust_clustering                               <- data.frame(sample_cell_ID,as.character(sample_clone_ID))
     names(hclust_clustering)                        <- c('cell_id','clone_id')
-
 #--------------------------------Create phylogeny object in hclust style
+#   Create phylogeny object in hclust style
+    phylogeny_hclust                                <- list()
+    phylogeny_hclust$merge                          <- hclust_merge
+    phylogeny_hclust$height                         <- hclust_height
+    phylogeny_hclust$order                          <- hclust_order
+    phylogeny_hclust$labels                         <- sample_cell_ID
+    class(phylogeny_hclust)                         <- "hclust"
 
-print(hclust_merge)
-print(hclust_height)
-print(hclust_order)
 
-print(sample_cell_ID)
-print(sample_clone_ID)
 
-print(hclust_clustering)
+#---------------------------------Output package of data from simulation
+    output                                          <- list()
+    output[[1]]                                     <- phylogeny_hclust
+# print(hclust_merge)
+# print(hclust_height)
+# print(hclust_order)
+#
+# print(sample_cell_ID)
+# print(sample_clone_ID)
+#
+# print(hclust_clustering)
 
 }
