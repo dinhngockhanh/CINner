@@ -246,7 +246,7 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
 
 
     sample_clone_ID_letters                         <- c()
-    for (i_clone=1:length(sample_clone_ID_unique_numeric)){
+    for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
         clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
         clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
