@@ -243,35 +243,15 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
     sample_clone_ID_numeric                         <- sample_clone_ID
     sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
     sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
-
-
     sample_clone_ID_letters                         <- c()
     for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
         clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
         clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
         sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
-
-print('---------------------------------------------------------------')
-print(sample_clone_ID_unique_numeric)
-print(sample_clone_ID_unique_letters)
-print('Clone-OLD:')
-print(clone_ID_numeric)
-print('Clone-NEW:')
-print(clone_ID_letters)
-print('Positions:')
-print(vec_cell_ID)
-print(sample_clone_ID_letters)
     }
-
-print('===============================================================')
-
-print(sample_clone_ID)
-
-print(sample_clone_ID_letters)
-
-
-    hclust_clustering                               <- data.frame(sample_cell_ID,as.character(clone_ID_letters))
+#   Create clustering table
+    hclust_clustering                               <- data.frame(sample_cell_ID,sample_clone_ID_letters)
     names(hclust_clustering)                        <- c('cell_id','clone_id')
 #--------------------------------Create phylogeny object in hclust style
 #   Create phylogeny object in hclust style
