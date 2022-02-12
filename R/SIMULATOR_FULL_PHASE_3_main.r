@@ -143,8 +143,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #                   Nodes 1 and 2 are mergning...
                     node_mother                                             <- min(node_list_current)-1
 #                   Update phylogeny in hclust style
-                    hclust_row                                              <- hclust_row+1;
-                    hclust_nodes[node_mother]                               <- hclust_row;
+                    hclust_row                                              <- hclust_row+1
+                    hclust_nodes[node_mother]                               <- hclust_row
                     hclust_merge[hclust_row,1]                              <- hclust_nodes[node_1]
                     hclust_merge[hclust_row,2]                              <- hclust_nodes[node_2]
                     hclust_height[hclust_row]                               <- T_current-time
@@ -174,6 +174,44 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
+
+
+
+
+#-----------------------------------------Reorder the nodes for plotting
+#---Find an order on all nodes of the phylogeny in our style
+#   Find number of progeny of each node
+    progeny_count                                   <- rep(0,2*N_sample-1)
+    progeny_count[N_sample:(2*N_sample-1)]          <- 1
+    for (node in (2*N_sample-1):2){
+        mother_node                                 <- phylogeny_origin[node]
+        progeny_count[mother_node]                  <- progeny_count[mother_node]+progeny_count[node]
+    }
+#   Reorder the sample phylogeny tree based on progeny counts
+    phylogeny_order                                 <- rep(0,2*N_sample-1)
+    phylogeny_order[1]                              <- 1
+    for (node in 1:(2*N_sample-1)){
+        vec_daughter_nodes                          <- which(phylogeny_origin==node)
+        if (length(vec_daughter_nodes)==2){
+            daughter_node_1                         <- vec_daughter_nodes[1]
+            progeny_count_1                         <- progeny_count[daughter_node_1]
+            daughter_node_2                         <- vec_daughter_nodes[2]
+            progeny_count_2                         <- progeny_count[daughter_node_2]
+            if (progeny_count_1<progeny_count_2){
+                phylogeny_order[daughter_node_1]    <- phylogeny_order[node]
+                phylogeny_order[daughter_node_2]    <- phylogeny_order[node]+progeny_count_1
+            }
+            else{
+                phylogeny_order[daughter_node_1]    <- phylogeny_order[node]+progeny_count_2
+                phylogeny_order[daughter_node_2]    <- phylogeny_order[node]
+            }
+        }
+    }
+#---Extract the order for phylogeny in hclust style
+    hclust_order                                    <- phylogeny_order[N_sample:(2*N_sample-1)]
+
+
+
 # print(phylogeny_origin)
 # print(phylogeny_elapsed_gens)
 # print(phylogeny_genotype)
@@ -182,6 +220,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 print(hclust_merge)
 print(hclust_height)
+print(hclust_order)
 
 
 }
