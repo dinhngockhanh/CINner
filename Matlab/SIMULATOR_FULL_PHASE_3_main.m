@@ -103,12 +103,12 @@ tic_mini=tic;
             genotype_daughter_2                 = matrix_division(event_type,4);
             position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
 %           If daughter genotypes are not in current nodes, move on
-            if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
-                continue
-            end
 
 TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
 
+            if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
+                continue
+            end
 %           For each specific division...
             for division=1:no_divisions
 %               If these genotypes are not in current nodes, move on

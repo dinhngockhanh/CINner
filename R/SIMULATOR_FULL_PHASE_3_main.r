@@ -95,14 +95,14 @@ start.time <- Sys.time()
             genotype_daughter_2                 <- matrix_division[event_type,4]
             position_daughter_2                 <- which(total_clonal_ID==genotype_daughter_2)
 #           If daughter genotypes are not in current nodes, move on
-            if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
-                next
-            }
 
 end.time <- Sys.time()
 time.taken <- end.time - start.time
 TIME_TOTAL<-TIME_TOTAL+time.taken
 
+            if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
+                next
+            }
 #           For each specific division...
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
