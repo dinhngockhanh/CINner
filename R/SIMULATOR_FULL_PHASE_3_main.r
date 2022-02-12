@@ -209,14 +209,14 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     }
 #---Extract the order for phylogeny in hclust style
 
-    # hclust_order                                    <- phylogeny_order[N_sample:(2*N_sample-1)]
+    hclust_order                                    <- phylogeny_order[N_sample:(2*N_sample-1)]
 
-    hclust_order_inverse                            <- phylogeny_order[N_sample:(2*N_sample-1)]
-    hclust_order                                    <- rep(0,N_sample)
-    for (i in 1:N_sample){
-        loc                                         <- which(hclust_order_inverse==i)
-        hclust_order[loc]                           <- i
-    }
+    # hclust_order_inverse                            <- phylogeny_order[N_sample:(2*N_sample-1)]
+    # hclust_order                                    <- rep(0,N_sample)
+    # for (i in 1:N_sample){
+    #     loc                                         <- which(hclust_order_inverse==i)
+    #     hclust_order[loc]                           <- i
+    # }
 
 
 

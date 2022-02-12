@@ -15,4 +15,5 @@ stage_final                   <- 3
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 
 package_sample_phylogeny      <- package_output[[3]]
+phylogeny_hclust              <- package_sample_phylogeny[[1]]
 ```
