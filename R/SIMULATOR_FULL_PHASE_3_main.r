@@ -87,6 +87,16 @@ if (i%%1000==0){
         if (is.null(matrix_division)){
             next
         }
+
+
+
+        if (N_runif>=length(vec_runif)-4*sum(matrix_division[,1])){
+            vec_runif                           <- runif(10000000)
+            N_runif                             <- 0
+        }
+
+
+
 #       For each type of divisions...
 ########################################################################
 ########################################################################
@@ -113,16 +123,6 @@ if (i%%1000==0){
                     next
                 }
 #               Choose the first daughter node
-
-                if (N_runif>=length(vec_runif)-4){
-start.time_mini <- Sys.time()
-                    vec_runif                                                   <- runif(10000000)
-                    N_runif                                                     <- 0
-end.time_mini <- Sys.time()
-time.taken <- end.time_mini - start.time_mini
-print(time.taken)
-
-                }
 
 # start.time <- Sys.time()
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
