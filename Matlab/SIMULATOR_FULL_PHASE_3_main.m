@@ -53,17 +53,22 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
 
-TIME_TOTAL=0;
+TIME_TOTAL_1=0;
+TIME_TOTAL_2=0;
 
     for i=length(evolution_traj_divisions):-1:1
     % for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-1000
 
 if rem(i,1000)==0
     disp('----------------------------------------------------------------')
-    disp(TIME_TOTAL)
+    disp(TIME_TOTAL_1)
+    disp(TIME_TOTAL_2)
 
-    TIME_TOTAL  = 0;
+    TIME_TOTAL_1=0;
+    TIME_TOTAL_2=0;
 end
+
+tic_mini_1=tic;
 
 %       Get time point
         time                                    = evolution_traj_time(i);
@@ -84,15 +89,17 @@ end
         end
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
+
+TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
+
 %       For each type of divisions...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tic_mini_2=tic;
+
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
-
-tic_mini=tic;
-
             no_divisions                        = matrix_division(event_type,1);
 %           Get genotype of mother
             genotype_mother                     = matrix_division(event_type,2);
@@ -103,9 +110,6 @@ tic_mini=tic;
             genotype_daughter_2                 = matrix_division(event_type,4);
             position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
 %           If daughter genotypes are not in current nodes, move on
-
-TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
-
             if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
                 continue
             end
@@ -183,6 +187,9 @@ TIME_TOTAL = TIME_TOTAL+toc(tic_mini);
                 end
             end
         end
+
+TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

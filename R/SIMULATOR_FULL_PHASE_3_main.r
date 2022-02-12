@@ -42,17 +42,22 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
 
-TIME_TOTAL<-0
+TIME_TOTAL_1<-0
+TIME_TOTAL_2<-0
 
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
     # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
 
 if (i%%1000==0){
     print('----------------------------------------------------------------')
-    print(TIME_TOTAL)
+    print(TIME_TOTAL_1)
+    print(TIME_TOTAL_2)
 
-    TIME_TOTAL<-0
+    TIME_TOTAL_1<-0
+    TIME_TOTAL_2<-0
 }
+
+start.time <- Sys.time()
 
 #       Get time point
         time                                    <- evolution_traj_time[i]
@@ -76,15 +81,19 @@ if (i%%1000==0){
         if (is.null(matrix_division)){
             next
         }
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
+
 #       For each type of divisions...
 ########################################################################
 ########################################################################
 ########################################################################
-        for (event_type in 1:nrow(matrix_division)) {
-#           Get number of divisions
-
 start.time <- Sys.time()
 
+        for (event_type in 1:nrow(matrix_division)) {
+#           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
 #           Get genotype of mother
             genotype_mother                     <- matrix_division[event_type,2]
@@ -95,11 +104,6 @@ start.time <- Sys.time()
             genotype_daughter_2                 <- matrix_division[event_type,4]
             position_daughter_2                 <- which(total_clonal_ID==genotype_daughter_2)
 #           If daughter genotypes are not in current nodes, move on
-
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL<-TIME_TOTAL+time.taken
-
             if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
                 next
             }
@@ -184,6 +188,11 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
                 }}}
             }
         }
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+TIME_TOTAL_2<-TIME_TOTAL_2+time.taken
+
 ########################################################################
 ########################################################################
 ########################################################################

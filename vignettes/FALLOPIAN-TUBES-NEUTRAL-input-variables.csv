@@ -5,7 +5,7 @@ Population_end,Inf,cell count,Condition for ending simulation (Inf if no conditi
 Max_events,Inf,event count,Condition for ending simulation (Inf if no condition)
 cell_lifespan,7,day,Lifespan of one cell
 
-N_sample,10,cell count,Number of cells in sequencing sample
+N_sample,100,cell count,Number of cells in sequencing sample
 
 bound_driver,3,driver count,Maximum driver count in viable cells (cells exceeding this will die)
 bound_ploidy,10,local CN,Maximum local CN in viable cells (cells exceeding this will die)
@@ -14,11 +14,11 @@ rate_driver,0,per bp per cell division,Poisson rate of getting new driver mutati
 driver_order,,,Required trajectory for driver acquisition (blank if none)
 rate_passenger,9e-11,per bp per cell division,Poisson rate of getting new passenger mutations
 
-prob_CN_whole_genome_duplication,5e-5,per cell division,Probability for a cell division to harbor a WGD event
-prob_CN_missegregation,5e-5,per cell division,Probability for a cell division to harbor a chromosome mis-segregation event
-prob_CN_chrom_arm_missegregation,5e-5,per cell division,Probability for a cell division to harbor a chromosome-arm mis-segregation event
-prob_CN_focal_amplification,5e-5,per cell division,Probability for a cell division to harbor a focal amplification event
-prob_CN_focal_deletion,5e-5,per cell division,Probability for a cell division to harbor a focal deletion event
+prob_CN_whole_genome_duplication,3e-5,per cell division,Probability for a cell division to harbor a WGD event
+prob_CN_missegregation,3e-5,per cell division,Probability for a cell division to harbor a chromosome mis-segregation event
+prob_CN_chrom_arm_missegregation,3e-5,per cell division,Probability for a cell division to harbor a chromosome-arm mis-segregation event
+prob_CN_focal_amplification,3e-5,per cell division,Probability for a cell division to harbor a focal amplification event
+prob_CN_focal_deletion,3e-5,per cell division,Probability for a cell division to harbor a focal deletion event
 
 prob_CN_focal_amplified_length,0.1,,Geometric parameter for the block length of a focal amplification event
 prob_CN_focal_deletion_length,0.1,,Geometric parameter for the block length of a focal deletion event
