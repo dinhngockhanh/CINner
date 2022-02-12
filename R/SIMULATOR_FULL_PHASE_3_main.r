@@ -48,22 +48,23 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 TIME_TOTAL_1<-0
 TIME_TOTAL_2<-0
-start.time <- Sys.time()
+
+# start.time <- Sys.time()
 
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
     # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
 
 if (i%%1000==0){
-    end.time <- Sys.time()
-    time.taken <- end.time - start.time
-    TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
+    # end.time <- Sys.time()
+    # time.taken <- end.time - start.time
+    # TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
     print('----------------------------------------------------------------')
     print(TIME_TOTAL_1)
     print(TIME_TOTAL_2)
 
-    TIME_TOTAL_1<-0
-    TIME_TOTAL_2<-0
-    start.time <- Sys.time()
+    # TIME_TOTAL_1<-0
+    # TIME_TOTAL_2<-0
+    # start.time <- Sys.time()
 }
 #       Get time point
         time                                    <- evolution_traj_time[i]
@@ -101,6 +102,9 @@ if (i%%1000==0){
 ########################################################################
 ########################################################################
 ########################################################################
+
+start.time <- Sys.time()
+
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
@@ -123,18 +127,18 @@ if (i%%1000==0){
                     next
                 }
 #               Choose the first daughter node
-
-# start.time <- Sys.time()
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
                 N_runif                                                         <- N_runif+1
                 logic_node_1                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
-# end.time <- Sys.time()
-# time.taken <- end.time - start.time
-# TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
+
+
+
                 if (logic_node_1==1) {
                     # pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
                     N_runif                                                     <- N_runif+1
                     pos_node_1                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_1])
+
+
 
                     node_1                                                      <- sample_eligible_nodes[[genotype_daughter_1]][pos_node_1]
                     sample_eligible_nodes[[genotype_daughter_1]]                <- sample_eligible_nodes[[genotype_daughter_1]][-pos_node_1]
@@ -146,17 +150,18 @@ if (i%%1000==0){
                     total_clonal_population[position_daughter_1]                <- total_clonal_population[position_daughter_1]-1
                 }
 #               Choose the second daughter node
-# start.time <- Sys.time()
                 # logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
                 N_runif                                                         <- N_runif+1
                 logic_node_2                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
-# end.time <- Sys.time()
-# time.taken <- end.time - start.time
-# TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
+
+
+
                 if (logic_node_2==1) {
                     # pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
                     N_runif                                                     <- N_runif+1
                     pos_node_2                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_2])
+
+
 
                     node_2                                                      <- sample_eligible_nodes[[genotype_daughter_2]][pos_node_2]
                     sample_eligible_nodes[[genotype_daughter_2]]                <- sample_eligible_nodes[[genotype_daughter_2]][-pos_node_2]
@@ -216,6 +221,11 @@ if (i%%1000==0){
                 }}}
             }
         }
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
+
 ########################################################################
 ########################################################################
 ########################################################################
