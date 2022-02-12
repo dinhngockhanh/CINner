@@ -42,6 +42,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
 
+    vec_runif                                   <- runif(1000000)
+    N_runif                                     <- 0
+
+
 TIME_TOTAL_1<-0
 TIME_TOTAL_2<-0
 start.time <- Sys.time()
@@ -87,13 +91,6 @@ if (i%%1000==0){
 ########################################################################
 ########################################################################
 ########################################################################
-
-
-
-        vec_runif                               <- runif(2*sum(matrix_division[,1]))
-        N_runif                                 <- 0
-
-
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
@@ -116,6 +113,12 @@ if (i%%1000==0){
                     next
                 }
 #               Choose the first daughter node
+
+                if (N_runif>=length(vec_runif)-2){
+                    vec_runif                                                   <- runif(1000000)
+                    N_runif                                                     <- 0
+                }
+
 # start.time <- Sys.time()
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
                 N_runif                                                         <- N_runif+1
