@@ -62,8 +62,9 @@ if (i%%1000==0){
     print(TIME_TOTAL_1)
     print(TIME_TOTAL_2)
 
-    # TIME_TOTAL_1<-0
-    # TIME_TOTAL_2<-0
+    TIME_TOTAL_1<-0
+    TIME_TOTAL_2<-0
+    
     # start.time <- Sys.time()
 }
 #       Get time point
