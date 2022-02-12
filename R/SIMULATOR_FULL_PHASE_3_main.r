@@ -122,7 +122,7 @@ if (i%%1000==0){
 # start.time <- Sys.time()
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
                 N_runif                                                         <- N_runif+1
-                logic_node_1                                                    <- vec_runif[N_runif]<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
+                logic_node_1                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
 # end.time <- Sys.time()
 # time.taken <- end.time - start.time
 # TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
@@ -144,7 +144,7 @@ if (i%%1000==0){
 # start.time <- Sys.time()
                 # logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
                 N_runif                                                         <- N_runif+1
-                logic_node_2                                                    <- vec_runif[N_runif]<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
+                logic_node_2                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
 # end.time <- Sys.time()
 # time.taken <- end.time - start.time
 # TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
