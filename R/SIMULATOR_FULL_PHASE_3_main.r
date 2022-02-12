@@ -44,17 +44,22 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 TIME_TOTAL_1<-0
 TIME_TOTAL_2<-0
+start.time <- Sys.time()
 
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
     # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
 
 if (i%%1000==0){
+    end.time <- Sys.time()
+    time.taken <- end.time - start.time
+    TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
     print('----------------------------------------------------------------')
     print(TIME_TOTAL_1)
     print(TIME_TOTAL_2)
 
     TIME_TOTAL_1<-0
     TIME_TOTAL_2<-0
+    start.time <- Sys.time()
 }
 #       Get time point
         time                                    <- evolution_traj_time[i]
