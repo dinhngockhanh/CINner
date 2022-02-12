@@ -251,8 +251,24 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
         clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
         sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
+
+print('---------------------------------------------------------------')
+print(sample_clone_ID_unique_numeric)
+print(sample_clone_ID_unique_letters)
+print('Clone-OLD:')
+print(clone_ID_numeric)
+print('Clone-NEW:')
+print(clone_ID_letters)
+print('Positions:')
+print(vec_cell_ID)
+print(sample_clone_ID_letters)
     }
 
+print('===============================================================')
+
+print(sample_clone_ID)
+
+print(sample_clone_ID_letters)
 
 
     hclust_clustering                               <- data.frame(sample_cell_ID,as.character(clone_ID_letters))
