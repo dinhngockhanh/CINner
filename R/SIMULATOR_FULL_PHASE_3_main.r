@@ -249,13 +249,18 @@ TIME_TOTAL<-TIME_TOTAL+time.taken
     phylogeny_hclust$order                          <- hclust_order
     phylogeny_hclust$labels                         <- sample_cell_ID
     class(phylogeny_hclust)                         <- "hclust"
+#---------------------------------Create phylogeny object in phylo style
+#   Create phylogeny object in phylo style
+    phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust, use.labels = TRUE)
+#   Create object containing both phylo-style tree and clustering
+    phylogeny_clustering_truth                      <- list()
+    phylogeny_clustering_truth$tree                 <- phylogeny_phylo
+    phylogeny_clustering_truth$clustering           <- hclust_clustering
 
-head(phylogeny_hclust)
 
 #---------------------------------Output package of data from simulation
     output                                          <- list()
-    output[[1]]                                     <- phylogeny_hclust
-    output[[2]]                                     <- hclust_clustering
+    output[[1]]                                     <- phylogeny_clustering_truth
 
     return(output)
 
