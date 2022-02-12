@@ -41,13 +41,17 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
+
+TIME_TOTAL<-0
+
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
     # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
 
 if (i%%1000==0){
     print('----------------------------------------------------------------')
-    print(i)
-    print(length(node_list_current))
+    print(TIME_TOTAL)
+
+    TIME_TOTAL<-0
 }
 
 
@@ -170,10 +174,10 @@ start.time <- Sys.time()
                     }
                 }}}
             }
-        }     
+        }
 end.time <- Sys.time()
 time.taken <- end.time - start.time
-print(time.taken)
+TIME_TOTAL<-TIME_TOTAL+time.taken
     }
 #   Assign original cell to be born at the beginning of clonal evolution
     phylogeny_birthtime[1]                  <- evolution_traj_time[1]
