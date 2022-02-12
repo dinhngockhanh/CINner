@@ -224,11 +224,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_hclust$labels                         <- sample_cell_ID
     class(phylogeny_hclust)                         <- "hclust"
 
-
+head(phylogeny_hclust)
 
 #---------------------------------Output package of data from simulation
     output                                          <- list()
     output[[1]]                                     <- phylogeny_hclust
+    output[[2]]                                     <- hclust_clustering
 # print(hclust_merge)
 # print(hclust_height)
 # print(hclust_order)
