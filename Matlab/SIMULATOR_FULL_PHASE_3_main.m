@@ -221,9 +221,9 @@ hclust_height
     hclust_order                                = phylogeny_order(N_sample:end);
 
 
-%--------------------------------Create phylogeny object in hclust style
-%   Create clustering table
+%------------------------------------------------Create clustering table
     hclust_clustering                   = table(sample_cell_ID',sample_clone_ID','VariableNames',["cell_id","clone_id"]);
+%--------------------------------Create phylogeny object in hclust style
 %   Create phylogeny object in hclust style
     hclust_object{1}                    = hclust_merge;
     hclust_object{2}                    = hclust_height;

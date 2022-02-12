@@ -212,15 +212,19 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-# print(phylogeny_origin)
-# print(phylogeny_elapsed_gens)
-# print(phylogeny_genotype)
-# print(phylogeny_birthtime)
-# print(phylogeny_deathtime)
+#------------------------------------------------Create clustering table
+    hclust_clustering                               <- data.frame(sample_cell_ID,as.character(sample_clone_ID))
+    names(hclust_clustering)                        <- c('cell_id','clone_id')
+
+#--------------------------------Create phylogeny object in hclust style
 
 print(hclust_merge)
 print(hclust_height)
 print(hclust_order)
 
+print(sample_cell_ID)
+print(sample_clone_ID)
+
+print(hclust_clustering)
 
 }
