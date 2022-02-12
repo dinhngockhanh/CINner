@@ -67,9 +67,6 @@ if rem(i,1000)==0
     TIME_TOTAL_1=0;
     TIME_TOTAL_2=0;
 end
-
-tic_mini_1=tic;
-
 %       Get time point
         time                                    = evolution_traj_time(i);
 %       Report on progress
@@ -89,17 +86,15 @@ tic_mini_1=tic;
         end
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
-
-TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
-
 %       For each type of divisions...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tic_mini_2=tic;
-
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
+
+tic_mini_1=tic;
+
             no_divisions                        = matrix_division(event_type,1);
 %           Get genotype of mother
             genotype_mother                     = matrix_division(event_type,2);
@@ -109,11 +104,17 @@ tic_mini_2=tic;
 %           Get genotype of 2nd daughter
             genotype_daughter_2                 = matrix_division(event_type,4);
             position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
+
+TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
+
 %           If daughter genotypes are not in current nodes, move on
             if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
                 continue
             end
 %           For each specific division...
+
+tic_mini_2=tic;
+
             for division=1:no_divisions
 %               If these genotypes are not in current nodes, move on
                 if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
@@ -186,10 +187,10 @@ tic_mini_2=tic;
                     node_list_current                                       = [node_mother node_list_current];
                 end
             end
-        end
 
 TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
 
+        end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -56,9 +56,6 @@ if (i%%1000==0){
     TIME_TOTAL_1<-0
     TIME_TOTAL_2<-0
 }
-
-start.time <- Sys.time()
-
 #       Get time point
         time                                    <- evolution_traj_time[i]
 #       Get current total clonal population (after divisions)
@@ -81,19 +78,15 @@ start.time <- Sys.time()
         if (is.null(matrix_division)){
             next
         }
-
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
-
 #       For each type of divisions...
 ########################################################################
 ########################################################################
 ########################################################################
-start.time <- Sys.time()
-
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
+
+start.time <- Sys.time()
+
             no_divisions                        <- matrix_division[event_type,1]
 #           Get genotype of mother
             genotype_mother                     <- matrix_division[event_type,2]
@@ -103,11 +96,19 @@ start.time <- Sys.time()
 #           Get genotype of 2nd daughter
             genotype_daughter_2                 <- matrix_division[event_type,4]
             position_daughter_2                 <- which(total_clonal_ID==genotype_daughter_2)
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
+
 #           If daughter genotypes are not in current nodes, move on
             if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
                 next
             }
 #           For each specific division...
+
+start.time <- Sys.time()
+
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
@@ -187,12 +188,12 @@ start.time <- Sys.time()
                     }
                 }}}
             }
-        }
 
 end.time <- Sys.time()
 time.taken <- end.time - start.time
 TIME_TOTAL_2<-TIME_TOTAL_2+time.taken
 
+        }
 ########################################################################
 ########################################################################
 ########################################################################
