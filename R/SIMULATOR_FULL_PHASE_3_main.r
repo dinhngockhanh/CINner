@@ -40,33 +40,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     }
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
-#----------------------------------------Build the sample phylogeny tree
-
+#--------------------------------------------Initialize the runif vector
     vec_runif                                   <- runif(10000000)
     N_runif                                     <- 0
-
-
-TIME_TOTAL_1<-0
-TIME_TOTAL_2<-0
-
-# start.time <- Sys.time()
-
+#----------------------------------------Build the sample phylogeny tree
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1000,-1)) {
-
-if (i%%1000==0){
-    # end.time <- Sys.time()
-    # time.taken <- end.time - start.time
-    # TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
-    print('----------------------------------------------------------------')
-    print(TIME_TOTAL_1)
-    print(TIME_TOTAL_2)
-
-    TIME_TOTAL_1<-0
-    TIME_TOTAL_2<-0
-
-    # start.time <- Sys.time()
-}
 #       Get time point
         time                                    <- evolution_traj_time[i]
 #       Get current total clonal population (after divisions)
@@ -89,20 +67,12 @@ if (i%%1000==0){
         if (is.null(matrix_division)){
             next
         }
-
-
-
+#       Redo runif vector if necessary
         if (N_runif>=length(vec_runif)-4*sum(matrix_division[,1])){
             vec_runif                           <- runif(10000000)
             N_runif                             <- 0
         }
-
-
-
 #       For each type of divisions...
-########################################################################
-########################################################################
-########################################################################
         for (event_type in 1:nrow(matrix_division)) {
 #           Get number of divisions
             no_divisions                        <- matrix_division[event_type,1]
@@ -125,25 +95,13 @@ if (i%%1000==0){
                     next
                 }
 #               Choose the first daughter node
-start.time <- Sys.time()
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
                 N_runif                                                         <- N_runif+1
                 logic_node_1                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
-
-
                 if (logic_node_1==1) {
-start.time <- Sys.time()
                     # pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
                     N_runif                                                     <- N_runif+1
                     pos_node_1                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_1])
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
-
-
                     node_1                                                      <- sample_eligible_nodes[[genotype_daughter_1]][pos_node_1]
                     sample_eligible_nodes[[genotype_daughter_1]]                <- sample_eligible_nodes[[genotype_daughter_1]][-pos_node_1]
                     sample_clonal_population[genotype_daughter_1]               <- sample_clonal_population[genotype_daughter_1]-1
@@ -154,25 +112,13 @@ TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
                     total_clonal_population[position_daughter_1]                <- total_clonal_population[position_daughter_1]-1
                 }
 #               Choose the second daughter node
-start.time <- Sys.time()
                 # logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
                 N_runif                                                         <- N_runif+1
                 logic_node_2                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
-
-
                 if (logic_node_2==1) {
-start.time <- Sys.time()
                     # pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
                     N_runif                                                     <- N_runif+1
                     pos_node_2                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_2])
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
-
-
                     node_2                                                      <- sample_eligible_nodes[[genotype_daughter_2]][pos_node_2]
                     sample_eligible_nodes[[genotype_daughter_2]]                <- sample_eligible_nodes[[genotype_daughter_2]][-pos_node_2]
                     sample_clonal_population[genotype_daughter_2]               <- sample_clonal_population[genotype_daughter_2]-1
@@ -231,20 +177,9 @@ TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
                 }}}
             }
         }
-########################################################################
-########################################################################
-########################################################################
     }
 #   Assign original cell to be born at the beginning of clonal evolution
-    phylogeny_birthtime[1]                  <- evolution_traj_time[1]
-
-
-
-
-
-
-
-
+    phylogeny_birthtime[1]                          <- evolution_traj_time[1]
 #-----------------------------------------Reorder the nodes for plotting
 #---Find an order on all nodes of the phylogeny in our style
 #   Find number of progeny of each node
@@ -281,10 +216,6 @@ TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
         loc                                         <- hclust_order_inverse[i_cell]
         hclust_order[loc]                           <- i_cell
     }
-
-
-
-
 #------------------------------------------------Create clustering table
 #   Change clone ID from genotype index in simulation to [A,B,C,...]
     sample_clone_ID_numeric                         <- sample_clone_ID
@@ -310,26 +241,20 @@ TIME_TOTAL_1<-TIME_TOTAL_1+time.taken
     class(phylogeny_hclust)                         <- "hclust"
 #---------------------------------Create phylogeny object in phylo style
 #   Create phylogeny object in phylo style
-    phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust, use.labels = TRUE)
+    phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
 #   Create object containing both phylo-style tree and clustering
     phylogeny_clustering_truth                      <- list()
     phylogeny_clustering_truth$tree                 <- phylogeny_phylo
     phylogeny_clustering_truth$clustering           <- hclust_clustering
-
-
 #---------------------------------Output package of data from simulation
     output                                          <- list()
     output[[1]]                                     <- phylogeny_clustering_truth
-
+    output[[2]]                                     <- phylogeny_origin
+    output[[3]]                                     <- phylogeny_elapsed_gens
+    output[[4]]                                     <- phylogeny_elapsed_genotypes
+    output[[5]]                                     <- phylogeny_genotype
+    output[[6]]                                     <- phylogeny_birthtime
+    output[[7]]                                     <- phylogeny_deathtime
+    output[[8]]                                     <- phylogeny_order
     return(output)
-
-# print(hclust_merge)
-# print(hclust_height)
-# print(hclust_order)
-#
-# print(sample_cell_ID)
-# print(sample_clone_ID)
-#
-# print(hclust_clustering)
-
 }

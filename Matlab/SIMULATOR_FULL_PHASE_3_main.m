@@ -2,28 +2,18 @@
 function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample)
     global N_sample
 %---------------------------------------------Input the clonal evolution
-    T_current                       = package_clonal_evolution{1};
-    N_clones                        = package_clonal_evolution{4};
-    genotype_list_ploidy_chrom      = package_clonal_evolution{5};
-    genotype_list_ploidy_block      = package_clonal_evolution{6};
-    genotype_list_ploidy_allele     = package_clonal_evolution{7};
-    evolution_traj_time             = package_clonal_evolution{13};
-    evolution_traj_divisions        = package_clonal_evolution{14};
-    evolution_traj_clonal_ID        = package_clonal_evolution{15};
-    evolution_traj_population       = package_clonal_evolution{16};
+    T_current                                   = package_clonal_evolution{1};
+    N_clones                                    = package_clonal_evolution{4};
+    genotype_list_ploidy_chrom                  = package_clonal_evolution{5};
+    genotype_list_ploidy_block                  = package_clonal_evolution{6};
+    genotype_list_ploidy_allele                 = package_clonal_evolution{7};
+    evolution_traj_time                         = package_clonal_evolution{13};
+    evolution_traj_divisions                    = package_clonal_evolution{14};
+    evolution_traj_clonal_ID                    = package_clonal_evolution{15};
+    evolution_traj_population                   = package_clonal_evolution{16};
 %-------------------------------------------------------Input the sample
-    sample_cell_ID                  = package_sample{2};
-    sample_clone_ID                 = package_sample{3};
-
-
-
-
-
-
-
-
-
-
+    sample_cell_ID                              = package_sample{2};
+    sample_clone_ID                             = package_sample{3};
 %-----------------------------------Initialize phylogeny in hclust style
 %   Initialize information to build phylogeny in hclust style
     hclust_row                                  = 0;
@@ -52,21 +42,7 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_genotype(node_list_current)       = node_genotype_current;
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
-
-TIME_TOTAL_1=0;
-TIME_TOTAL_2=0;
-
     for i=length(evolution_traj_divisions):-1:1
-    % for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)-1000
-
-if rem(i,1000)==0
-    disp('----------------------------------------------------------------')
-    disp(TIME_TOTAL_1)
-    disp(TIME_TOTAL_2)
-
-    TIME_TOTAL_1=0;
-    TIME_TOTAL_2=0;
-end
 %       Get time point
         time                                    = evolution_traj_time(i);
 %       Report on progress
@@ -87,9 +63,6 @@ end
 %       Get list of divisions
         matrix_division                         = evolution_traj_divisions{i};
 %       For each type of divisions...
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         for event_type=1:size(matrix_division,1)
 %           Get number of divisions
             no_divisions                        = matrix_division(event_type,1);
@@ -112,16 +85,9 @@ end
                     continue
                 end
 %               Choose the first daughter node
-tic_mini_1=tic;
                 logic_node_1                                                = rand<sample_clonal_population(genotype_daughter_1)/total_clonal_population(position_daughter_1);
-% TIME_TOTAL_1=TIME_TOTAL_1+1;
-TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
-
                 if logic_node_1==1
-tic_mini_2=tic;
                     pos_node_1                                              = randi(sample_clonal_population(genotype_daughter_1));
-% TIME_TOTAL_2=TIME_TOTAL_2+1;
-TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
                     node_1                                                  = sample_eligible_nodes{genotype_daughter_1}(pos_node_1);
                     sample_eligible_nodes{genotype_daughter_1}(pos_node_1)  = [];
                     sample_clonal_population(genotype_daughter_1)           = sample_clonal_population(genotype_daughter_1)-1;
@@ -131,15 +97,9 @@ TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
                     total_clonal_population(position_daughter_1)            = total_clonal_population(position_daughter_1)-1;
                 end
 %               Choose the second daughter node
-tic_mini_1=tic;
                 logic_node_2                                                = rand<sample_clonal_population(genotype_daughter_2)/total_clonal_population(position_daughter_2);
-% TIME_TOTAL_1=TIME_TOTAL_1+1;
-TIME_TOTAL_1 = TIME_TOTAL_1+toc(tic_mini_1);
                 if logic_node_2==1
-tic_mini_2=tic;
                     pos_node_2                                              = randi(sample_clonal_population(genotype_daughter_2));
-% TIME_TOTAL_2=TIME_TOTAL_2+1;
-TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
                     node_2                                                  = sample_eligible_nodes{genotype_daughter_2}(pos_node_2);
                     sample_eligible_nodes{genotype_daughter_2}(pos_node_2)  = [];
                     sample_clonal_population(genotype_daughter_2)           = sample_clonal_population(genotype_daughter_2)-1;
@@ -192,49 +152,28 @@ TIME_TOTAL_2 = TIME_TOTAL_2+toc(tic_mini_2);
                 end
             end
         end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
 %   Assign original cell to be born at the beginning of clonal evolution
-    phylogeny_birthtime(1)              = evolution_traj_time(1);
-
-
-
-
-
-
-
-
-% disp(phylogeny_origin)
-% disp(phylogeny_elapsed_gens)
-% disp(phylogeny_genotype)
-% disp(phylogeny_birthtime)
-% disp(phylogeny_deathtime)
-
-hclust_merge
-hclust_height
-
-
+    phylogeny_birthtime(1)                          = evolution_traj_time(1);
 %-----------------------------------------Reorder the nodes for plotting
 %---Find an order on all nodes of the phylogeny in our style
 %   Find number of progeny of each node
-    progeny_count                               = zeros(1,2*N_sample-1);
-    progeny_count(N_sample:end)                 = 1;
+    progeny_count                                   = zeros(1,2*N_sample-1);
+    progeny_count(N_sample:end)                     = 1;
     for node=2*N_sample-1:-1:2
-        mother_node                             = phylogeny_origin(node);
-        progeny_count(mother_node)              = progeny_count(mother_node)+progeny_count(node);
+        mother_node                                 = phylogeny_origin(node);
+        progeny_count(mother_node)                  = progeny_count(mother_node)+progeny_count(node);
     end
 %   Reorder the sample phylogeny tree based on progeny counts
-    phylogeny_order                             = zeros(1,2*N_sample-1);
-    phylogeny_order(1)                          = 1;
+    phylogeny_order                                 = zeros(1,2*N_sample-1);
+    phylogeny_order(1)                              = 1;
     for node=1:2*N_sample-1
-        vec_daughter_nodes                      = find(phylogeny_origin==node);
+        vec_daughter_nodes                          = find(phylogeny_origin==node);
         if length(vec_daughter_nodes)==2
-            daughter_node_1                     = vec_daughter_nodes(1);
-            progeny_count_1                     = progeny_count(daughter_node_1);
-            daughter_node_2                     = vec_daughter_nodes(2);
-            progeny_count_2                     = progeny_count(daughter_node_2);
+            daughter_node_1                         = vec_daughter_nodes(1);
+            progeny_count_1                         = progeny_count(daughter_node_1);
+            daughter_node_2                         = vec_daughter_nodes(2);
+            progeny_count_2                         = progeny_count(daughter_node_2);
             if progeny_count_1<progeny_count_2
                 phylogeny_order(daughter_node_1)    = phylogeny_order(node);
                 phylogeny_order(daughter_node_2)    = phylogeny_order(node)+progeny_count_1;
@@ -245,28 +184,46 @@ hclust_height
         end
     end
 %---Extract the order for phylogeny in hclust style
-    hclust_order                                = phylogeny_order(N_sample:end);
-
-
+    hclust_order_inverse                            = phylogeny_order(N_sample:end);
+    hclust_order                                    = zeros(1,N_sample);
+    for i_cell=1:N_sample
+        loc                                         = hclust_order_inverse(i_cell);
+        hclust_order(loc)                           = i_cell;
+    end
 %------------------------------------------------Create clustering table
-    hclust_clustering                   = table(sample_cell_ID',sample_clone_ID','VariableNames',["cell_id","clone_id"]);
+%   Change clone ID from genotype index in simulation to [A,B,C,...]
+    sample_clone_ID_numeric                         = sample_clone_ID;
+    sample_clone_ID_unique_numeric                  = unique(sample_clone_ID_numeric);
+    sample_clone_ID_unique_letters                  = {};
+    for i=1:length(sample_clone_ID_unique_numeric)
+        sample_clone_ID_unique_letters{i}           = char(i + 64);
+    end
+    sample_clone_ID_letters                         = cell(1,length(sample_clone_ID_numeric));
+    for i_clone=1:length(sample_clone_ID_unique_numeric)
+        clone_ID_numeric                            = sample_clone_ID_unique_numeric(i_clone);
+        clone_ID_letters                            = sample_clone_ID_unique_letters{i_clone};
+        vec_cell_ID                                 = find(sample_clone_ID_numeric==clone_ID_numeric);
+        for i_cell=1:length(vec_cell_ID)
+            cell_ID                                 = vec_cell_ID(i_cell);
+            sample_clone_ID_letters{cell_ID}        = clone_ID_letters;
+        end
+    end
+%   Create clustering table
+    hclust_clustering                               = table(sample_cell_ID',sample_clone_ID_letters','VariableNames',["cell_id","clone_id"]);
 %--------------------------------Create phylogeny object in hclust style
 %   Create phylogeny object in hclust style
-    hclust_object{1}                    = hclust_merge;
-    hclust_object{2}                    = hclust_height;
-    hclust_object{3}                    = hclust_labels;
-    hclust_object{4}                    = hclust_order;
-    hclust_object{5}                    = hclust_clustering;
-
-
+    phylogeny_hclust{1}                             = hclust_merge;
+    phylogeny_hclust{2}                             = hclust_height;
+    phylogeny_hclust{3}                             = hclust_labels;
+    phylogeny_hclust{4}                             = hclust_order;
+    phylogeny_hclust{5}                             = hclust_clustering;
 %---------------------------------Output package of data from simulation
-    package_sample_phylogeny{1}         = hclust_object;
-
-    package_sample_phylogeny{2}         = phylogeny_origin;
-    package_sample_phylogeny{3}         = phylogeny_elapsed_gens;
-    package_sample_phylogeny{4}         = phylogeny_elapsed_genotypes;
-    package_sample_phylogeny{5}         = phylogeny_genotype;
-    package_sample_phylogeny{6}         = phylogeny_birthtime;
-    package_sample_phylogeny{7}         = phylogeny_deathtime;
-    package_sample_phylogeny{8}         = phylogeny_order;
+    package_sample_phylogeny{1}                     = phylogeny_hclust;
+    package_sample_phylogeny{2}                     = phylogeny_origin;
+    package_sample_phylogeny{3}                     = phylogeny_elapsed_gens;
+    package_sample_phylogeny{4}                     = phylogeny_elapsed_genotypes;
+    package_sample_phylogeny{5}                     = phylogeny_genotype;
+    package_sample_phylogeny{6}                     = phylogeny_birthtime;
+    package_sample_phylogeny{7}                     = phylogeny_deathtime;
+    package_sample_phylogeny{8}                     = phylogeny_order;
 end
