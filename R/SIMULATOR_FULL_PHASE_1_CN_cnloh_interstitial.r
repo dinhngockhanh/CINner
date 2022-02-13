@@ -59,7 +59,7 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genot
     N_drivers_to_gain           <- length(pos_drivers_to_gain)
 #   Update the chromosome strand allele identity of the strand to receive the DNA
     ploidy_allele_strand_give   <- ploidy_allele[[chrom]][[strand_give]]
-    if nrow(ploidy_allele_strand_give)>nrow(ploidy_allele[[chrom]][[strand_take]]){
+    if (nrow(ploidy_allele_strand_give)>nrow(ploidy_allele[[chrom]][[strand_take]])){
         ploidy_allele[[chrom]][[strand_take]]                                                       <- rbind(ploidy_allele[[chrom]][[strand_take]],matrix(0,nrow(ploidy_allele_strand_give)-nrow(ploidy_allele[[chrom]][[strand_take]]),ncol(ploidy_allele_strand_give)))
     }
     end                                                                                             <- nrow(ploidy_allele[[chrom]][[strand_take]])
