@@ -37,7 +37,7 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genot
             cnloh_length<- 1+rgeom(n=1,prob_CN_focal_amplification_length)
         }
 #       Choose the region to harbor the interstitial CN-LOH
-        block_start     <- (chrom_arm-1)*centromere + sample.int(max_length-focal_length+1,size=1)
+        block_start     <- (chrom_arm-1)*centromere + sample.int(max_length-cnloh_length+1,size=1)
         block_end       <- block_start+cnloh_length-1
         break
     }
