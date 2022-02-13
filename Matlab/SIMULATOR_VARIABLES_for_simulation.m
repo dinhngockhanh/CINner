@@ -3,7 +3,18 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     global func_expected_population func_event_rate
     global T_start_time T_end_time age_birth age_end Population_end Max_events
     global SFS_totalsteps N_sample
-    global bound_ploidy prob_CN_whole_genome_duplication prob_CN_missegregation prob_CN_chrom_arm_missegregation prob_CN_focal_amplification prob_CN_focal_amplification_length prob_CN_focal_deletion prob_CN_focal_deletion_length
+    global bound_ploidy
+
+
+    global prob_CN_whole_genome_duplication
+    global prob_CN_missegregation
+    global prob_CN_chrom_arm_missegregation
+    global prob_CN_focal_amplification prob_CN_focal_amplification_length
+    global prob_CN_focal_deletion prob_CN_focal_deletion_length
+    global prob_CN_cnloh_interstitial prob_CN_cnloh_interstitial_length
+    global prob_CN_cnloh_terminal prob_CN_cnloh_terminal_length
+
+
     global bound_driver rate_driver rate_passenger
     global growth_model carrying_capacity rate_base_lifetime rate_selection_recurrently_mutated_genes rate_selection_recurrently_CNA_genes prob_division
     global logistic_initial logistic_slope logistic_halftime
@@ -76,13 +87,20 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     rate_driver                             = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'rate_driver')));
     bound_driver                            = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'bound_driver')));
     bound_ploidy                            = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'bound_ploidy')));
+
     prob_CN_whole_genome_duplication        = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_whole_genome_duplication')));
     prob_CN_missegregation                  = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_missegregation')));
     prob_CN_chrom_arm_missegregation        = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_chrom_arm_missegregation')));
     prob_CN_focal_amplification             = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_amplification')));
-    prob_CN_focal_amplification_length      = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_amplification_length')));
     prob_CN_focal_deletion                  = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_deletion')));
+    prob_CN_cnloh_interstitial              = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_cnloh_interstitial')));
+    prob_CN_cnloh_terminal                  = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_cnloh_terminal')));
+
+    prob_CN_focal_amplification_length      = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_amplification_length')));
     prob_CN_focal_deletion_length           = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_deletion_length')));
+    prob_CN_cnloh_interstitial_length       = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_cnloh_interstitial_length')));
+    prob_CN_cnloh_terminal_length           = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_cnloh_terminal_length')));
+
     rate_passenger                          = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'rate_passenger')));
     prob_coverage                           = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_coverage')));
     alpha_coverage                          = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'alpha_coverage')));

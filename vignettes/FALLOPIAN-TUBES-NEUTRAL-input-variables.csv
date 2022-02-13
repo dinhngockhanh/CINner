@@ -24,6 +24,8 @@ prob_CN_cnloh_terminal,3e-5,per cell division,Probability for a cell division to
 
 prob_CN_focal_amplification_length,0.1,,Geometric parameter for the block length of a focal amplification event
 prob_CN_focal_deletion_length,0.1,,Geometric parameter for the block length of a focal deletion event
+prob_CN_cnloh_interstitial_length,0.1,,Geometric parameter for the block length of an interstitial CN-LOH event
+prob_CN_cnloh_terminal_length,0.1,,Geometric parameter for the block length of a terminal CN-LOH event
 
 prob_coverage,0.05,,Mean coverage depth
 alpha_coverage,0.7,,Alpha parameter for coverage depth

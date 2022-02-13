@@ -24,7 +24,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     global genotype_list_driver_count genotype_list_driver_map genotype_list_DNA_length genotype_list_selection_rate genotype_list_prob_new_drivers
 
     global rate_driver
-    global prob_CN_whole_genome_duplication prob_CN_missegregation prob_CN_chrom_arm_missegregation prob_CN_focal_amplification prob_CN_focal_deletion
+    global prob_CN_whole_genome_duplication prob_CN_missegregation prob_CN_chrom_arm_missegregation prob_CN_focal_amplification prob_CN_focal_deletion prob_CN_cnloh_interstitial prob_CN_cnloh_interstitial_length prob_CN_cnloh_terminal prob_CN_cnloh_terminal_length
 
     global N_clones evolution_origin evolution_genotype_changes
     global clonal_population_current clonal_population_next clonal_ID_current
@@ -41,6 +41,8 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     prob_CN_arm_misseg                          = prob_CN_chrom_arm_missegregation;
     prob_CN_foc_amp                             = prob_CN_focal_amplification;
     prob_CN_foc_del                             = prob_CN_focal_deletion;
+    prob_CN_cnloh_i                             = prob_CN_cnloh_interstitial;
+    prob_CN_cnloh_t                             = prob_CN_cnloh_terminal;
 %-----------------------------------------Set up the initial CN genotype
 %   Set up the strand count for each chromosome
     cell_vec_ploidy_chrom                       = 2*ones(1,N_chromosomes);
@@ -152,7 +154,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
 %           Find probability of new genotype
             DNA_length                          = genotype_list_DNA_length{clone_to_react};
             prob_new_drivers                    = genotype_list_prob_new_drivers(clone_to_react);
-            prob_new_genotype                   = 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_new_drivers);
+            prob_new_genotype                   = 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_CN_cnloh_i)*(1-prob_CN_cnloh_t)*(1-prob_new_drivers);
 %           Find number of events
             prop                                = all_propensity(i);
             count_new_events                    = Inf;
@@ -189,6 +191,8 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                     flag_chrom_arm_missegregation   = rand<(prob_CN_arm_misseg/prob_new_genotype);
                     flag_amplification              = rand<(prob_CN_foc_amp/prob_new_genotype);
                     flag_deletion                   = rand<(prob_CN_foc_del/prob_new_genotype);
+                    flag_cnloh_interstitial         = rand<(prob_CN_cnloh_i/prob_new_genotype);
+                    flag_cnloh_terminal             = rand<(prob_CN_cnloh_t/prob_new_genotype);
                 end
 %               Initiate the two new genotypes
                 [genotype_daughter_1,genotype_daughter_2,position_daughter_1,position_daughter_2]   = SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react);
@@ -222,6 +226,22 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                         SIMULATOR_FULL_PHASE_1_CN_focal_deletion(genotype_to_react,genotype_daughter_1);
                     else
                         SIMULATOR_FULL_PHASE_1_CN_focal_deletion(genotype_to_react,genotype_daughter_2);
+                    end
+                end
+%               Simulate interstitial CN-LOH event
+                if (flag_cnloh_interstitial==1)
+                    if (randi(2)==1)
+                        SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(genotype_to_react,genotype_daughter_1);
+                    else
+                        SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(genotype_to_react,genotype_daughter_2);
+                    end
+                end
+%               Simulate terminal CN-LOH event
+                if (flag_cnloh_terminal==1)
+                    if (randi(2)==1)
+                        SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_daughter_1);
+                    else
+                        SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_daughter_2);
                     end
                 end
 %               Update DNA length and selection rates of daughter cells
