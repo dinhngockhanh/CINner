@@ -16,9 +16,9 @@ function SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(genotype_to_react,genotype
     ploidy_block        = genotype_list_ploidy_block{genotype_daughter};
     driver_count        = genotype_list_driver_count(genotype_daughter);
     driver_map          = genotype_list_driver_map{genotype_daughter};
-%   Find information about the focal amplification
+%   Find information about the interstitial CN-LOH
     while 1
-%       Choose the chromosome to be focally amplified
+%       Choose the chromosome to harbor the interstitial CN-LOH
         chrom           = randi(N_chromosomes);
         no_strands      = ploidy_chrom(chrom);
         if no_strands<=1
