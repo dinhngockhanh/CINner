@@ -96,7 +96,7 @@ cat('Probability of focal deletion                                = ',prob_CN_fo
 The focal amplification/deletion events require additional parameters for the mean length of each event:
 
 ```{r}
-cat('Geometric parameter for bin length of a focal amplification  = ',prob_CN_focal_amplified_length,'\n')
+cat('Geometric parameter for bin length of a focal amplification  = ',prob_CN_focal_amplification_length,'\n')
 cat('Geometric parameter for bin length of a focal deletion       = ',prob_CN_focal_deletion_length,'\n')
 ```
 
