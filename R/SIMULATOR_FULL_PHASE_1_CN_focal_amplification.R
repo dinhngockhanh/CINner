@@ -32,7 +32,7 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
 #       Choose the length of the focal amplification
         focal_length    <- max_length+1
         while (focal_length>max_length) {
-            focal_length<- 1+rgeom(n=1,prob_CN_focal_amplified_length)
+            focal_length<- 1+rgeom(n=1,prob_CN_focal_amplification_length)
         }
 #       Choose the region to be focally amplified
         block_start     <- (chrom_arm-1)*centromere + sample.int(max_length-focal_length+1,size=1)

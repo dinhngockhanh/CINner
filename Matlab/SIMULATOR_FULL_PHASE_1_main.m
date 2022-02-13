@@ -35,9 +35,18 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     global growth_model carrying_capacity rate_selection bound_driver
 
     global T_tau_step
+%---------------------------------------------------Input CN event rates
+    prob_CN_WGD                                 = prob_CN_whole_genome_duplication;
+    prob_CN_misseg                              = prob_CN_missegregation;
+    prob_CN_arm_misseg                          = prob_CN_chrom_arm_missegregation;
+    prob_CN_foc_amp                             = prob_CN_focal_amplification;
+    prob_CN_foc_del                             = prob_CN_focal_deletion;
 %-----------------------------------------Set up the initial CN genotype
+%   Set up the strand count for each chromosome
     cell_vec_ploidy_chrom                       = 2*ones(1,N_chromosomes);
-
+    genotype_list_ploidy_chrom                  = cell(1);
+    genotype_list_ploidy_chrom{1}               = cell_vec_ploidy_chrom;
+%   Set up the CN count for each chrosomome strand
     cell_mat_ploidy_block                       = cell(1,1);
     for chrom=1:N_chromosomes
         ploidy                                  = cell_vec_ploidy_chrom(chrom);
@@ -46,7 +55,9 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
             cell_mat_ploidy_block{chrom,strand} = ones(1,no_blocks);
         end
     end
-
+    genotype_list_ploidy_block                  = cell(1);
+    genotype_list_ploidy_block{1}               = cell_mat_ploidy_block;
+%   Set up the CN allele info for each chromosome strand
     cell_vec_ploidy_allele                      = cell(1,1);
     for chrom=1:N_chromosomes
         ploidy                                  = cell_vec_ploidy_chrom(chrom);
@@ -55,15 +66,8 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
             cell_vec_ploidy_allele{chrom,strand}= strand*ones(1,no_blocks);
         end
     end
-
-    genotype_list_ploidy_chrom                  = cell(1);
-    genotype_list_ploidy_chrom{1}               = cell_vec_ploidy_chrom;
-
     genotype_list_ploidy_allele                 = cell(1);
     genotype_list_ploidy_allele{1}              = cell_vec_ploidy_allele;
-
-    genotype_list_ploidy_block                  = cell(1);
-    genotype_list_ploidy_block{1}               = cell_mat_ploidy_block;
 %-------------------------------------Set up the initial driver genotype
     cell_mat_drivers                            = [0];
     genotype_list_driver_count                  = zeros(1,1);
@@ -148,7 +152,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
 %           Find probability of new genotype
             DNA_length                          = genotype_list_DNA_length{clone_to_react};
             prob_new_drivers                    = genotype_list_prob_new_drivers(clone_to_react);
-            prob_new_genotype                   = 1-(1-prob_CN_whole_genome_duplication)*(1-prob_CN_missegregation)*(1-prob_CN_chrom_arm_missegregation)*(1-prob_CN_focal_amplification)*(1-prob_CN_focal_deletion)*(1-prob_new_drivers);
+            prob_new_genotype                   = 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_new_drivers);
 %           Find number of events
             prop                                = all_propensity(i);
             count_new_events                    = Inf;
@@ -180,11 +184,11 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                 flag_drivers                        = 0;
                 while (max([flag_whole_genome_duplication flag_missegregation flag_chrom_arm_missegregation flag_amplification flag_drivers])==0)
                     flag_drivers                    = rand<(prob_new_drivers/prob_new_genotype);
-                    flag_whole_genome_duplication   = rand<(prob_CN_whole_genome_duplication/prob_new_genotype);
-                    flag_missegregation             = rand<(prob_CN_missegregation/prob_new_genotype);
-                    flag_chrom_arm_missegregation   = rand<(prob_CN_chrom_arm_missegregation/prob_new_genotype);
-                    flag_amplification              = rand<(prob_CN_focal_amplification/prob_new_genotype);
-                    flag_deletion                   = rand<(prob_CN_focal_deletion/prob_new_genotype);
+                    flag_whole_genome_duplication   = rand<(prob_CN_WGD/prob_new_genotype);
+                    flag_missegregation             = rand<(prob_CN_misseg/prob_new_genotype);
+                    flag_chrom_arm_missegregation   = rand<(prob_CN_arm_misseg/prob_new_genotype);
+                    flag_amplification              = rand<(prob_CN_foc_amp/prob_new_genotype);
+                    flag_deletion                   = rand<(prob_CN_foc_del/prob_new_genotype);
                 end
 %               Initiate the two new genotypes
                 [genotype_daughter_1,genotype_daughter_2,position_daughter_1,position_daughter_2]   = SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react);

@@ -19,6 +19,12 @@
     # print(evolution_origin)
     # print(evolution_genotype_changes)
 SIMULATOR_FULL_PHASE_1_main <- function() {
+#---------------------------------------------------Input CN event rates
+    prob_CN_WGD                                 <- prob_CN_whole_genome_duplication
+    prob_CN_misseg                              <- prob_CN_missegregation
+    prob_CN_arm_misseg                          <- prob_CN_chrom_arm_missegregation
+    prob_CN_foc_amp                             <- prob_CN_focal_amplification
+    prob_CN_foc_del                             <- prob_CN_focal_deletion
 #-----------------------------------------Set up the initial CN genotype
 #   Set up the strand count for each chromosome
     cell_vec_ploidy_chrom                       <- rep(1,N_chromosomes)
@@ -147,7 +153,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #           Find probability of new genotype
             DNA_length              <- genotype_list_DNA_length[[clone_to_react]]
             prob_new_drivers        <- genotype_list_prob_new_drivers[clone_to_react]
-            prob_new_genotype       <- 1-(1-prob_CN_whole_genome_duplication)*(1-prob_CN_missegregation)*(1-prob_CN_chrom_arm_missegregation)*(1-prob_CN_focal_amplification)*(1-prob_CN_focal_deletion)*(1-prob_new_drivers)
+            prob_new_genotype       <- 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_new_drivers)
 #           Find number of events
             prop                    <- all_propensity[i]
             count_new_events        <- Inf
@@ -179,11 +185,11 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 flag_drivers                        <- 0
                 while (max(c(flag_whole_genome_duplication, flag_missegregation, flag_chrom_arm_missegregation, flag_amplification, flag_drivers))==0) {
                     flag_drivers                    <- as.numeric(runif(1)<(prob_new_drivers/prob_new_genotype))
-                    flag_whole_genome_duplication   <- as.numeric(runif(1)<(prob_CN_whole_genome_duplication/prob_new_genotype))
-                    flag_missegregation             <- as.numeric(runif(1)<(prob_CN_missegregation/prob_new_genotype))
-                    flag_chrom_arm_missegregation   <- as.numeric(runif(1)<(prob_CN_chrom_arm_missegregation/prob_new_genotype))
-                    flag_amplification              <- as.numeric(runif(1)<(prob_CN_focal_amplification/prob_new_genotype))
-                    flag_deletion                   <- as.numeric(runif(1)<(prob_CN_focal_deletion/prob_new_genotype))
+                    flag_whole_genome_duplication   <- as.numeric(runif(1)<(prob_CN_WGD/prob_new_genotype))
+                    flag_missegregation             <- as.numeric(runif(1)<(prob_CN_misseg/prob_new_genotype))
+                    flag_chrom_arm_missegregation   <- as.numeric(runif(1)<(prob_CN_arm_misseg/prob_new_genotype))
+                    flag_amplification              <- as.numeric(runif(1)<(prob_CN_foc_amp/prob_new_genotype))
+                    flag_deletion                   <- as.numeric(runif(1)<(prob_CN_foc_del/prob_new_genotype))
                 }
 #               Initiate the two new genotypes
                 output              <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react)

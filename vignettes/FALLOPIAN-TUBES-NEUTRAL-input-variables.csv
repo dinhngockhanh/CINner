@@ -19,9 +19,12 @@ prob_CN_missegregation,3e-5,per cell division,Probability for a cell division to
 prob_CN_chrom_arm_missegregation,3e-5,per cell division,Probability for a cell division to harbor a chromosome-arm mis-segregation event
 prob_CN_focal_amplification,3e-5,per cell division,Probability for a cell division to harbor a focal amplification event
 prob_CN_focal_deletion,3e-5,per cell division,Probability for a cell division to harbor a focal deletion event
+prob_CN_cnloh_interstitial,3e-5,per cell division,Probability for a cell division to harbor an interstitial CN-LOH event
+prob_CN_cnloh_terminal,3e-5,per cell division,Probability for a cell division to harbor a terminal CN-LOH event
 
-prob_CN_focal_amplified_length,0.1,,Geometric parameter for the block length of a focal amplification event
+prob_CN_focal_amplification_length,0.1,,Geometric parameter for the block length of a focal amplification event
 prob_CN_focal_deletion_length,0.1,,Geometric parameter for the block length of a focal deletion event
+
 prob_coverage,0.05,,Mean coverage depth
 alpha_coverage,0.7,,Alpha parameter for coverage depth
 lower_limit_cell_counts,0,,Lower limit of cell counts for mutations to be detected

@@ -8,7 +8,7 @@ function SIMULATOR_FULL_PHASE_1_CN_focal_amplification(genotype_to_react,genotyp
     global growth_model bound_driver
     global driver_library
 
-    global prob_CN_focal_amplified_length
+    global prob_CN_focal_amplification_length
 %------------------------------------Find the new CN and driver profiles
 %   Initialize the daughter's CN and driver profiles
     ploidy_chrom        = genotype_list_ploidy_chrom{genotype_daughter};
@@ -39,7 +39,7 @@ function SIMULATOR_FULL_PHASE_1_CN_focal_amplification(genotype_to_react,genotyp
 %       Choose the length of the focal amplification
         focal_length    = max_length+1;
         while focal_length>max_length
-            focal_length= 1+geornd(prob_CN_focal_amplified_length);
+            focal_length= 1+geornd(prob_CN_focal_amplification_length);
         end
 %       Choose the region to be focally amplified
         block_start     = (chrom_arm-1)*centromere + randi(max_length-focal_length+1);

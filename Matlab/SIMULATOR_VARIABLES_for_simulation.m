@@ -3,7 +3,7 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     global func_expected_population func_event_rate
     global T_start_time T_end_time age_birth age_end Population_end Max_events
     global SFS_totalsteps N_sample
-    global bound_ploidy prob_CN_whole_genome_duplication prob_CN_missegregation prob_CN_chrom_arm_missegregation prob_CN_focal_amplification prob_CN_focal_amplified_length prob_CN_focal_deletion prob_CN_focal_deletion_length
+    global bound_ploidy prob_CN_whole_genome_duplication prob_CN_missegregation prob_CN_chrom_arm_missegregation prob_CN_focal_amplification prob_CN_focal_amplification_length prob_CN_focal_deletion prob_CN_focal_deletion_length
     global bound_driver rate_driver rate_passenger
     global growth_model carrying_capacity rate_base_lifetime rate_selection_recurrently_mutated_genes rate_selection_recurrently_CNA_genes prob_division
     global logistic_initial logistic_slope logistic_halftime
@@ -24,7 +24,7 @@ function SIMULATOR_VARIABLES_for_simulation(model)
 %   prob_CN_missegregation              : Probability of chromosome missegregation
 %   prob_CN_chrom_arm_missegregation    : Probability of chromosome arm missegregation
 %   prob_CN_focal_amplification         : Probability of focal CN event in a chromosome
-%   prob_CN_focal_amplified_length      : Geometric parameter for the block length of focal CN event
+%   prob_CN_focal_amplification_length      : Geometric parameter for the block length of focal CN event
 %=========================================DRIVER AND PASSENGER MUTATIONS
 %   bound_driver                        : Bound on driver count in one cell
 %   rate_driver                         : Poisson rate of new driver mutations
@@ -80,7 +80,7 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     prob_CN_missegregation                  = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_missegregation')));
     prob_CN_chrom_arm_missegregation        = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_chrom_arm_missegregation')));
     prob_CN_focal_amplification             = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_amplification')));
-    prob_CN_focal_amplified_length          = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_amplified_length')));
+    prob_CN_focal_amplification_length      = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_amplification_length')));
     prob_CN_focal_deletion                  = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_deletion')));
     prob_CN_focal_deletion_length           = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'prob_CN_focal_deletion_length')));
     rate_passenger                          = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'rate_passenger')));
