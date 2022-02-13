@@ -16,9 +16,9 @@ function SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_dau
     ploidy_block        = genotype_list_ploidy_block{genotype_daughter};
     driver_count        = genotype_list_driver_count(genotype_daughter);
     driver_map          = genotype_list_driver_map{genotype_daughter};
-%   Find information about the focal amplification
+%   Find information about the terminal CN-LOH
     while 1
-%       Choose the chromosome to be focally amplified
+%       Choose the chromosome to harbor the terminal CN-LOH
         chrom           = randi(N_chromosomes);
         no_strands      = ploidy_chrom(chrom);
         if no_strands<=1
@@ -31,19 +31,19 @@ function SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_dau
 %       Find the chromosome's centromere location and length
         centromere      = vec_centromere_location(chrom);
         chrom_length    = vec_CN_block_no(chrom);
-%       Choose the chromosome arm to be focally amplified
+%       Choose the chromosome arm to harbor the terminal CN-LOH
         chrom_arm       = randi(2);
         if chrom_arm==1
             max_length  = centromere;
         elseif chrom_arm==2
             max_length  = chrom_length-centromere;
         end
-%       Choose the length of the interstitial CN-LOH
+%       Choose the length of the terminal CN-LOH
         cnloh_length    = max_length+1;
         while cnloh_length>max_length
             cnloh_length= 1+geornd(prob_CN_cnloh_terminal_length);
         end
-%       Choose the region to harbor the interstitial CN-LOH
+%       Choose the region to harbor the terminal CN-LOH
         if chrom_arm==1
             block_start = 1;
             block_end   = cnloh_length;

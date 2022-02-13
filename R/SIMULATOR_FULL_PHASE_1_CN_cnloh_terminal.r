@@ -1,5 +1,5 @@
-#===============SIMULATE INTERSTITIAL COPY-NEUTRAL LOSS OF HETEROGENEITY
-SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genotype_daughter) {
+#===================SIMULATE TERMINAL COPY-NEUTRAL LOSS OF HETEROGENEITY
+SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal <- function(genotype_to_react,genotype_daughter) {
 #------------------------------------Find the new CN and driver profiles
 #   Initialize the daughter's CN and driver profiles
     ploidy_chrom        <- genotype_list_ploidy_chrom[[genotype_daughter]]
@@ -24,21 +24,27 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genot
         chrom_length    <- vec_CN_block_no[chrom]
 #       Choose the chromosome arm to harbor the terminal CN-LOH
         chrom_arm       <- sample.int(2,size=1)
-        if (chrom_arm==1) {
+        if (chrom_arm==1){
             max_length  <- centromere
             }
-        else { if (chrom_arm==2) {
+        else {if (chrom_arm==2){
             max_length  <- chrom_length-centromere
             }
         }
-#       Choose the length of the interstitial CN-LOH
+#       Choose the length of the terminal CN-LOH
         cnloh_length    <- max_length+1
         while (cnloh_length>max_length) {
-            cnloh_length<- 1+rgeom(n=1,prob_CN_focal_amplification_length)
+            cnloh_length<- 1+rgeom(n=1,prob_CN_cnloh_terminal_length)
         }
-#       Choose the region to harbor the interstitial CN-LOH
-        block_start     <- (chrom_arm-1)*centromere + sample.int(max_length-cnloh_length+1,size=1)
-        block_end       <- block_start+cnloh_length-1
+#       Choose the region to harbor the terminal CN-LOH
+        if (chrom_arm==1){
+            block_start <- 1
+            block_end   <- cnloh_length
+        }
+        else {if (chrom_arm==2){
+            block_start <- chrom_length-cnloh_length+1
+            block_end   <- chrom_length
+        }}
         break
     }
 #   Find all drivers to lose in the strand to receive the DNA
@@ -85,5 +91,8 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genot
     genotype_list_driver_count[genotype_daughter]             <<- driver_count
     genotype_list_driver_map[[genotype_daughter]]             <<- driver_map
     end                                                       <- length(evolution_genotype_changes[[genotype_daughter]])
-    evolution_genotype_changes[[genotype_daughter]][[end+1]]  <<- list('cnloh-interstitial',chrom,strand_give,strand_take,block_start,block_end)
+    evolution_genotype_changes[[genotype_daughter]][[end+1]]  <<- list('cnloh-terminal',chrom,strand_give,strand_take,block_start,block_end)
+
+
+
 }
