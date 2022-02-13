@@ -243,7 +243,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 }
 #               Simulate interstitial CN-LOH event
                 if (flag_cnloh_interstitial==1) {
-print('INTERSTITIAL CN-LOH')
+# print('INTERSTITIAL CN-LOH')
                     if (sample.int(2,size=1)==1) {
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(genotype_to_react,genotype_daughter_1)
                     }
@@ -253,7 +253,7 @@ print('INTERSTITIAL CN-LOH')
                 }
 #               Simulate terminal CN-LOH event
                 if (flag_cnloh_terminal==1) {
-print('TERMINAL CN-LOH')
+# print('TERMINAL CN-LOH')
                     if (sample.int(2,size=1)==1) {
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_daughter_1)
                     }

@@ -11,6 +11,21 @@ devtools::document()
 ```
 
 ```{r}
-stage_final                   <- 2
+stage_final                   <- 3
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+package_sample                <- package_output[[2]]
+sample_genotype_profiles      <- package_sample[[1]]
+
+head(sample_genotype_profiles)
+
+package_sample_phylogeny      <- package_output[[3]]
+phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
+```
+
+```{r}
+plotHeatmap(sample_genotype_profiles,plotcol="state",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=FALSE)
+```
+
+```{r}
+plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=FALSE)
 ```
