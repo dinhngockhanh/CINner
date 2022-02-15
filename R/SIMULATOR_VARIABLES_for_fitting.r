@@ -19,7 +19,7 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
     prob_CN_cnloh_terminal_length       <<- parameter_set$prob_CN_cnloh_terminal_length
 #---------------------------Set up the driver selection rates from input
     vec_selection_rates                 <<- parameter_set$vec_selection_rates
-    
+
 print(vec_selection_rates)
 
 
