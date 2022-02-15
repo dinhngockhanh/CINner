@@ -30,8 +30,8 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
 #       Get its selection strength
         driver_sel_rate                 <- vec_selection_rates[row]
 #       Compute its selection rate for WT and MUT alleles
-        driver_library$s_rate_WT[row]   <- 1/(1+driver_sel_rate)
-        driver_library$s_rate_MUT[row]  <- 1
+        driver_library$s_rate_WT[row]   <<- 1/(1+driver_sel_rate)
+        driver_library$s_rate_MUT[row]  <<- 1
 #       Update normalizer for selection rate
         s_normalization                 <- s_normalization*(1+driver_sel_rate)
     }
@@ -43,7 +43,7 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
 #       Get its selection strength
         driver_sel_rate                 <- vec_selection_rates[row]
 #       Compute its selection rate for WT and MUT alleles
-        driver_library$s_rate_WT[row]   <- s_normalization
-        driver_library$s_rate_MUT[row]  <- s_normalization*(1+driver_sel_rate)
+        driver_library$s_rate_WT[row]   <<- s_normalization
+        driver_library$s_rate_MUT[row]  <<- s_normalization*(1+driver_sel_rate)
     }
 }
