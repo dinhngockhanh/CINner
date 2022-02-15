@@ -5,19 +5,19 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
     ploidy_chrom            <- genotype_list_ploidy_chrom[[genotype_to_react]]
     ploidy_allele           <- genotype_list_ploidy_allele[[genotype_to_react]]
     ploidy_block            <- genotype_list_ploidy_block[[genotype_to_react]]
-    driver_count            <- genotype_list_driver_count[[genotype_to_react]]
+    driver_count            <- genotype_list_driver_count[genotype_to_react]
     driver_map              <- genotype_list_driver_map[[genotype_to_react]]
 #   Find the daughter cells' current CN and driver profiles
     ploidy_chrom_1          <- genotype_list_ploidy_chrom[[genotype_daughter_1]]
     ploidy_allele_1         <- genotype_list_ploidy_allele[[genotype_daughter_1]]
     ploidy_block_1          <- genotype_list_ploidy_block[[genotype_daughter_1]]
-    driver_count_1          <- genotype_list_driver_count[[genotype_daughter_1]]
+    driver_count_1          <- genotype_list_driver_count[genotype_daughter_1]
     driver_map_1            <- genotype_list_driver_map[[genotype_daughter_1]]
 
     ploidy_chrom_2          <- genotype_list_ploidy_chrom[[genotype_daughter_2]]
     ploidy_allele_2         <- genotype_list_ploidy_allele[[genotype_daughter_2]]
     ploidy_block_2          <- genotype_list_ploidy_block[[genotype_daughter_2]]
-    driver_count_2          <- genotype_list_driver_count[[genotype_daughter_2]]
+    driver_count_2          <- genotype_list_driver_count[genotype_daughter_2]
     driver_map_2            <- genotype_list_driver_map[[genotype_daughter_2]]
 #---------------------------Find the eligible driver genes to be mutated
 #   Eliminate already mutated genes from list of eligible genes to mutate
@@ -101,7 +101,7 @@ print(driver_map_1)
     genotype_list_driver_map[[genotype_daughter_1]]     <<- driver_map_1
     evolution_genotype_changes[[genotype_daughter_1]]   <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('new-driver',driver_ID))
 
-    genotype_list_driver_count(genotype_daughter_2)     <<- driver_count_2
+    genotype_list_driver_count[genotype_daughter_2]     <<- driver_count_2
     genotype_list_driver_map[[genotype_daughter_2]]     <<- driver_map_2
     evolution_genotype_changes[[genotype_daughter_2]]   <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('new-driver',driver_ID))
 }
