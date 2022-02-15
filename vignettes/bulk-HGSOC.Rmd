@@ -36,15 +36,6 @@ devtools::load_all()
 devtools::document()
 ```
 
-
-
-
-
-
-
-
-
-
 ## Set up the model
 For this example, we examine the ABC for fitting ....
 
