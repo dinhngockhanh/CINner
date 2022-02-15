@@ -202,11 +202,19 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 position_daughter_1 <- output[[3]]
                 position_daughter_2 <- output[[4]]
 #               Simulate new driver event
+print(flag_drivers)
+print(flag_whole_genome_duplication)
+print(flag_missegregation)
+print(flag_chrom_arm_missegregation)
+print(flag_amplification)
+print(flag_deletion)
+print(flag_cnloh_interstitial)
+print(flag_cnloh_terminal)
                 if (flag_drivers==1) {
 print('=========================================================DRIVER')
                     SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
-print('OUT HERE')
+
 #               Simulate whole genome duplication event
                 if (flag_whole_genome_duplication==1) {
 print('=======================================WHOLE-GENOME DUPLICATION')
