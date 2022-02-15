@@ -93,15 +93,15 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
 print(driver_count)
 print(driver_map)
 print('---------------')
-print(driver_count)
-print(driver_map)
+print(driver_count_1)
+print(driver_map_1)
 
 #-----------------------------------------------Output the new genotypes
-    genotype_list_driver_count[genotype_daughter_1]     <- driver_count_1
-    genotype_list_driver_map[[genotype_daughter_1]]     <- driver_map_1
-    evolution_genotype_changes[[genotype_daughter_1]]   <- c(evolution_genotype_changes[[genotype_daughter_1]],list('new-driver',driver_ID))
+    genotype_list_driver_count[genotype_daughter_1]     <<- driver_count_1
+    genotype_list_driver_map[[genotype_daughter_1]]     <<- driver_map_1
+    evolution_genotype_changes[[genotype_daughter_1]]   <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('new-driver',driver_ID))
 
-    genotype_list_driver_count(genotype_daughter_2)     <- driver_count_2
-    genotype_list_driver_map[[genotype_daughter_2]]     <- driver_map_2
-    evolution_genotype_changes[[genotype_daughter_2]]   <- c(evolution_genotype_changes[[genotype_daughter_2]],list('new-driver',driver_ID))
+    genotype_list_driver_count(genotype_daughter_2)     <<- driver_count_2
+    genotype_list_driver_map[[genotype_daughter_2]]     <<- driver_map_2
+    evolution_genotype_changes[[genotype_daughter_2]]   <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('new-driver',driver_ID))
 }
