@@ -104,4 +104,5 @@ print(driver_map_1)
     genotype_list_driver_count[genotype_daughter_2]     <<- driver_count_2
     genotype_list_driver_map[[genotype_daughter_2]]     <<- driver_map_2
     evolution_genotype_changes[[genotype_daughter_2]]   <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('new-driver',driver_ID))
+    return()
 }
