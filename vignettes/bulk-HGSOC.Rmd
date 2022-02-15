@@ -124,5 +124,5 @@ parameter_set$prob_CN_cnloh_terminal_length           <- prob_CN_cnloh_terminal_
 The following function sets up the model variables according to the input parameter set:
 
 ```{r}
-SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set)
+SIMULATOR_VARIABLES_for_fitting(MODEL,parameter_set)
 ```
