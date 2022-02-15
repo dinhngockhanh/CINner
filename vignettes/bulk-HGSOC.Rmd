@@ -127,6 +127,14 @@ The following function sets up the model variables according to the input parame
 SIMULATOR_VARIABLES_for_fitting(MODEL,parameter_set)
 ```
 
+Specifically, it translates the input selection strengths for mutational drivers into selection rates for the WT and MUT alleles:
+
 ```{r}
 driver_library
+```
+
+
+
+```{r}
+ABC_one_simulation(model,parameter_set)
 ```

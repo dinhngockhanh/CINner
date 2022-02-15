@@ -5,7 +5,6 @@ function package_output = ABC_one_simulation(model,parameter_set)
 %------------------------------------------Simulate the clonal evolution
     flag_success                                    = 0;
     while flag_success==0
-        % disp('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         [flag_success,package_clonal_evolution]     = SIMULATOR_FULL_PHASE_1_main();
     end
 
