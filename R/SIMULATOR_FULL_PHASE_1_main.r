@@ -203,7 +203,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 position_daughter_2 <- output[[4]]
 #               Simulate new driver event
                 if (flag_drivers==1) {
-# print('DRIVER')
+print('DRIVER')
                     SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate whole genome duplication event

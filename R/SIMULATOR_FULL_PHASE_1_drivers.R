@@ -87,6 +87,13 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
     else{
         driver_map_2                                    <- rbind(driver_map_2,c(driver_ID,chrom,strand,block,unit))
     }
+
+print(driver_count)
+print(driver_map)
+print('---------------')
+print(driver_count)
+print(driver_map)
+
 #-----------------------------------------------Output the new genotypes
     genotype_list_driver_count[genotype_daughter_1]     <- driver_count_1
     genotype_list_driver_map[[genotype_daughter_1]]     <- driver_map_1
