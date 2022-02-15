@@ -15,15 +15,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-
-
-
-
-
-
-
-
 ## Background
 ```{r setup}
 devtools::install_github("dinhngockhanh/CancerSimulator")
