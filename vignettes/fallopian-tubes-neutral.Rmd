@@ -15,9 +15,21 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+
+
+
+
+
+
+
+
+## Background
+This vignette illustates how to use the program to create simulations for a model.
+First we install the simulator...
+
 ```{r setup}
 devtools::install_github("dinhngockhanh/CancerSimulator")
-
 
 library(ggplot2)
 library(signals)
@@ -27,9 +39,13 @@ devtools::load_all()
 devtools::document()
 ```
 
-## Background
-This vignette illustates how to use the program to create simulations for a model.
-First we install the simulator...
+
+
+
+
+
+
+
 
 
 ## Set up the model
@@ -80,7 +96,6 @@ For this model, we do not include driver genes and selection:
 
 ```{r}
 cat('Poisson rate of new driver mutations                         = ',rate_driver,'\n')
-
 ```
 
 The following variables dictate the probability of each CN event type during a cell division. Because there is no driver genes and selection, the CN events will always be neutral.
@@ -91,6 +106,8 @@ cat('Probability of chromosome missegragation                     = ',prob_CN_mi
 cat('Probability of chromosome-arm missegragation                 = ',prob_CN_chrom_arm_missegregation,'\n')
 cat('Probability of focal amplification                           = ',prob_CN_focal_amplification,'\n')
 cat('Probability of focal deletion                                = ',prob_CN_focal_deletion,'\n')
+cat('Probability of interstitial CN-LOH                           = ',prob_CN_cnloh_interstitial,'\n')
+cat('Probability of terminal CN-LOH                               = ',prob_CN_cnloh_terminal,'\n')
 ```
 
 The focal amplification/deletion events require additional parameters for the mean length of each event:
@@ -111,10 +128,6 @@ Similarly, the centromere location of each chromosome is also computed in bin co
 ```{r, fig.height=4 , fig.width=10}
 barplot(vec_centromere_location,main="Centromere location of each chromosome",xlab="Chromosome",names.arg=c(1:N_chromosomes))
 ```
-
-
-
-
 
 
 
@@ -197,11 +210,6 @@ We can also plot the phylogeny tree of the sampled cells.
 ```{r}
 plot(phylogeny_clustering_truth$tree,show.tip.label=FALSE)
 ```
-
-
-
-
-
 
 
 

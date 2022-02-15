@@ -46,22 +46,33 @@ function SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,ge
             ploidy_block_2{chrom,chrom_ploidy/2+strand} = ploidy_block_2{chrom,strand};
         end
     end
-%   Change the driver count in each daughter cell
-    driver_count_1      = 2*driver_count_1;
-    driver_count_2      = 2*driver_count_2;
 %   Multiply the drivers in each daughter cell
-    driver_map_1(driver_count_1/2+1:driver_count_1,:)   = driver_map_1(1:driver_count_1/2,:);
-    for driver=size(driver_map_1,1)/2+1:size(driver_map_1,1)
-        chrom                           = driver_map_1(driver,2);
-        chrom_ploidy                    = ploidy_chrom_1(chrom);
-        driver_map_1(driver,3)          = driver_map_1(driver,3)+chrom_ploidy;
+    if driver_count_1>0
+        driver_map_new_1                = driver_map_1;
+        for driver=1:size(driver_map_new_1,1)
+            chrom                       = driver_map_1(driver,2);
+            chrom_ploidy                = ploidy_chrom_1(chrom);
+            driver_map_new_1(driver,3)  = driver_map_new_1(driver,3)+chrom_ploidy;
+        end
+        driver_map_1                    = [driver_map_1;driver_map_new_1];
     end
-    driver_map_2(driver_count_2/2+1:driver_count_2,:)   = driver_map_2(1:driver_count_2/2,:);
-    for driver=size(driver_map_2,1)/2+1:size(driver_map_2,1)
-        chrom                           = driver_map_2(driver,2);
-        chrom_ploidy                    = ploidy_chrom_2(chrom);
-        driver_map_2(driver,3)          = driver_map_2(driver,3)+chrom_ploidy;
+    if driver_count_2>0
+        driver_map_new_2                = driver_map_2;
+        for driver=1:size(driver_map_new_2,1)
+            chrom                       = driver_map_2(driver,2);
+            chrom_ploidy                = ploidy_chrom_2(chrom);
+            driver_map_new_2(driver,3)  = driver_map_new_2(driver,3)+chrom_ploidy;
+        end
+        driver_map_2                    = [driver_map_2;driver_map_new_2];
     end
+%   Change the driver count in each daughter cell
+    driver_unique_1                     = unique(driver_map_1(:,1));
+    driver_unique_1                     = driver_unique_1(driver_unique_1~=0);
+    driver_count_1                      = length(driver_unique_1);
+
+    driver_unique_2                     = unique(driver_map_2(:,1));
+    driver_unique_2                     = driver_unique_2(driver_unique_2~=0);
+    driver_count_2                      = length(driver_unique_2);
 %-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom{genotype_daughter_1}         = ploidy_chrom_1;
     genotype_list_ploidy_allele{genotype_daughter_1}        = ploidy_allele_1;

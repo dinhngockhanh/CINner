@@ -1,5 +1,6 @@
-%==================================================CREATE ONE SIMULATION
+%==========================CREATE ONE SIMULATION WITH DEFAULT PARAMETERS
 function package_output = SIMULATOR_FULL_PROGRAM_one_simulation(model,stage_final)
+%---------------------------------------------Set up the model variables
     SIMULATOR_VARIABLES_for_simulation(model);
 %------------------------------------------Simulate the clonal evolution
     flag_success                                    = 0;
@@ -17,9 +18,4 @@ function package_output = SIMULATOR_FULL_PROGRAM_one_simulation(model,stage_fina
     if (stage_final>=3)
         package_sample_phylogeny                    = SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample);
     end
-
-% %------------------------------------------------Simulate the passengers
-%     [package_passengers,runtime_PHASE_3]                        = SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample);
-% %----------------------------------------------Simulate sampling effects
-%     [package_SFS,runtime_PHASE_4]                               = SIMULATOR_FULL_PHASE_4_main(package_clonal_evolution,package_sample,package_passengers);
 end

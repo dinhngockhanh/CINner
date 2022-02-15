@@ -198,22 +198,27 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                 [genotype_daughter_1,genotype_daughter_2,position_daughter_1,position_daughter_2]   = SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react);
 %               Simulate new driver event
                 if (flag_drivers==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DRIVER')
                     SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2);
                 end
 %               Simulate whole genome duplication event
                 if (flag_whole_genome_duplication==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~WHOLE GENOME DUPLICATION')
                     SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,genotype_daughter_1,genotype_daughter_2);
                 end
 %               Simulate missegregation event
                 if (flag_missegregation==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MISSEGREGATION')
                     SIMULATOR_FULL_PHASE_1_CN_missegregation(genotype_to_react,genotype_daughter_1,genotype_daughter_2);
                 end
 %               Simulate chromosome-arm missegregation event
                 if (flag_chrom_arm_missegregation==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ARM MISSEGREGATION')
                     SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(genotype_to_react,genotype_daughter_1,genotype_daughter_2);
                 end
 %               Simulate focal amplification event
                 if (flag_amplification==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FOCAL AMPLIFICATION')
                     if (randi(2)==1)
                         SIMULATOR_FULL_PHASE_1_CN_focal_amplification(genotype_to_react,genotype_daughter_1);
                     else
@@ -222,6 +227,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                 end
 %               Simulate focal deletion event
                 if (flag_deletion==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FOCAL DELETION')
                     if (randi(2)==1)
                         SIMULATOR_FULL_PHASE_1_CN_focal_deletion(genotype_to_react,genotype_daughter_1);
                     else
@@ -230,6 +236,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                 end
 %               Simulate interstitial CN-LOH event
                 if (flag_cnloh_interstitial==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~INTERSTITIAL CNLOH')
                     if (randi(2)==1)
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(genotype_to_react,genotype_daughter_1);
                     else
@@ -238,6 +245,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                 end
 %               Simulate terminal CN-LOH event
                 if (flag_cnloh_terminal==1)
+% disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TERMINAL CNLOH')
                     if (randi(2)==1)
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_daughter_1);
                     else
@@ -302,15 +310,4 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     package_clonal_evolution{14}            = evolution_traj_divisions;
     package_clonal_evolution{15}            = evolution_traj_clonal_ID;
     package_clonal_evolution{16}            = evolution_traj_population;
-
-
-% final_clonal_ID=evolution_traj_clonal_ID{end};
-% for i=1:length(final_clonal_ID)
-% clonal_ID   = final_clonal_ID(i);
-% disp('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
-% disp(genotype_list_ploidy_chrom{clonal_ID});
-% disp(genotype_list_ploidy_block{clonal_ID});
-% disp(genotype_list_ploidy_allele{clonal_ID});
-% end
-
 end

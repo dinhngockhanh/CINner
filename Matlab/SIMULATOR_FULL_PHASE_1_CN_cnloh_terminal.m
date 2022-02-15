@@ -53,7 +53,7 @@ function SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_dau
         end
         break;
     end
-    fprintf('\n=========================================================\nTERMINAL CN-LOH  ~~~  Chromosome %d, strand %d to strand %d, block %d-%d\n',chrom,strand_give,strand_take,block_start,block_end);
+    % fprintf('\n=========================================================\nTERMINAL CN-LOH  ~~~  Chromosome %d, strand %d to strand %d, block %d-%d\n',chrom,strand_give,strand_take,block_start,block_end);
 %   Find all drivers to lose in the strand to receive the DNA
     if (driver_count==0)||(isempty(intersect(find(driver_map(:,4)>=block_start),find(driver_map(:,4)<=block_end))))
         pos_drivers_to_delete   = [];
@@ -74,18 +74,20 @@ function SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_dau
     ploidy_allele{chrom,strand_take}(1:size(ploidy_allele_strand_give,1),block_start:block_end) = ploidy_allele_strand_give(1:end,block_start:block_end);
 %   Change the local CN on the strand to receive the DNA
     ploidy_block{chrom,strand_take}(block_start:block_end)                                      = ploidy_block{chrom,strand_give}(block_start:block_end);
-%   Change the driver count
-    driver_count                = driver_count-N_drivers_to_delete+N_drivers_to_gain;
 %   Copy the drivers gained during interstitial CN-LOH
     if (N_drivers_to_gain>0)
-        driver_map_to_gain                                  = driver_map(pos_drivers_to_gain,:);
-        driver_map_to_gain(:,3)                             = strand_take;
-        driver_map(end+1:end+N_drivers_to_gain,:)           = driver_map_to_gain;
+        driver_map_new                      = driver_map(pos_drivers_to_gain,:);
+        driver_map_new(:,3)                 = strand_take;
+        driver_map                          = [driver_map;driver_map_new];
     end
 %   Remove the drivers lost during interstitial CN-LOH
     if (N_drivers_to_delete>0)
-        driver_map(pos_drivers_to_delete,:)                 = [];
+        driver_map(pos_drivers_to_delete,:) = [];
     end
+%   Change the driver count
+    driver_unique                           = unique(driver_map(:,1));
+    driver_unique                           = driver_unique(driver_unique~=0);
+    driver_count                            = length(driver_unique);
 %------------------------------------------------Output the new genotype
     genotype_list_ploidy_chrom{genotype_daughter}           = ploidy_chrom;
     genotype_list_ploidy_allele{genotype_daughter}          = ploidy_allele;
