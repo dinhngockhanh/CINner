@@ -38,26 +38,33 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
             ploidy_block_2[[chrom]][[chrom_ploidy/2+strand]]    <- ploidy_block_2[[chrom]][[strand]]
         }
     }
-#   Change the driver count in each daughter cell
-    driver_count_1      <- 2*driver_count_1
-    driver_count_2      <- 2*driver_count_2
 #   Multiply the drivers in each daughter cell
     if (driver_count_1>0){
-        driver_map_1[driver_count_1/2+1:driver_count_1,]   <- driver_map_1[1:driver_count_1/2,]
-        for (driver in length(driver_map_1)/2+1:length(driver_map_1)) {
-            chrom                           <- driver_map_1[driver,2]
-            chrom_ploidy                    <- ploidy_chrom_1[chrom]
-            driver_map_1[driver,3]          <- driver_map_1[driver,3]+chrom_ploidy
+        driver_map_new_1                <- driver_map_1
+        for (driver in 1:nrow(driver_map_new_1)){
+            chrom                       <- driver_map_1[driver,2]
+            chrom_ploidy                <- ploidy_chrom_1[chrom]
+            driver_map_new_1[driver,3]  <- driver_map_new_1[driver,3]+chrom_ploidy
         }
+        driver_map_1                    <- rbind(driver_map_1,driver_map_new_1)
     }
     if (driver_count_2>0){
-        driver_map_2[driver_count_2/2+1:driver_count_2,]   <- driver_map_2[1:driver_count_2/2,]
-        for (driver in length(driver_map_2)/2+1:length(driver_map_2)) {
-            chrom                           <- driver_map_2[driver,2]
-            chrom_ploidy                    <- ploidy_chrom_2[chrom]
-            driver_map_2[driver,3]          <- driver_map_2[driver,3]+chrom_ploidy
+        driver_map_new_2                <- driver_map_2
+        for (driver in 1:nrow(driver_map_new_2)){
+            chrom                       <- driver_map_2[driver,2]
+            chrom_ploidy                <- ploidy_chrom_2[chrom]
+            driver_map_new_2[driver,3]  <- driver_map_new_2[driver,3]+chrom_ploidy
         }
+        driver_map_2                    <- rbind(driver_map_2,driver_map_new_2)
     }
+#   Change the driver count in each daughter cell
+    driver_unique_1                     <- unique(driver_map_1[,1])
+    driver_unique_1                     <- driver_unique_1[driver_unique_1!=0]
+    driver_count_1                      <- length(driver_unique_1)
+
+    driver_unique_2                     <- unique(driver_map_2[,1])
+    driver_unique_2                     <- driver_unique_2[driver_unique_2!=0]
+    driver_count_2                      <- length(driver_unique_2)
 #-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom[[genotype_daughter_1]]         <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]        <<- ploidy_allele_1
