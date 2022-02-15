@@ -48,9 +48,6 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         }
     }
 #   Compute selection rate
-    clone_selection_rate                            = prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT)*prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
-
-print(clone_selection_rate)
-
+    clone_selection_rate                            <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT)*prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     return(clone_selection_rate)
 }
