@@ -36,15 +36,15 @@ function SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,ge
     end
 %---------------------------Find copy count of each eligible driver gene
 %   Find copy number of each eligible driver gene
-    for i_driver=1:size(driver_library_eligible,1)
-        chrom                                           = driver_library_eligible.Chromosome(i_driver);
-        block                                           = driver_library_eligible.Bin(i_driver);
+    for driver=1:size(driver_library_eligible,1)
+        chrom                                           = driver_library_eligible.Chromosome(driver);
+        block                                           = driver_library_eligible.Bin(driver);
         no_strands                                      = ploidy_chrom(chrom);
         driver_copy                                     = 0;
         for strand=1:no_strands
             driver_copy                                 = driver_copy+ploidy_block{chrom,strand}(block);
         end
-        driver_library_eligible.Copy_count(i_driver)    = driver_copy;
+        driver_library_eligible.Copy_count(driver)      = driver_copy;
     end
 %   Delete driver genes with zero copy
     vec_delete                                          = find(driver_library_eligible.Copy_count==0);
@@ -55,8 +55,8 @@ function SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,ge
     end
 %----------------Place the new driver in the daughter cells' driver maps
 %---Choose one driver from the eligible list to mutate
-    i_driver                                            = randi(size(driver_library_eligible,1));
-    driver_library_eligible                             = driver_library_eligible(i_driver,:);
+    driver                                              = randi(size(driver_library_eligible,1));
+    driver_library_eligible                             = driver_library_eligible(driver,:);
 %---Find the new driver's address
 %   Find the new driver's ID
     driver_ID                                           = find(strcmp(driver_library.Gene_ID,driver_library_eligible.Gene_ID));
