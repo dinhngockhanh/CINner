@@ -1,6 +1,5 @@
 #=================================================SIMULATE DRIVER EVENTS
 SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1,genotype_daughter_2) {
-    print('HERE')
 #------------------------------------Find the new CN and driver profiles
 #   Find the mother cell's CN and driver profiles
     ploidy_chrom            <- genotype_list_ploidy_chrom[[genotype_to_react]]
@@ -28,9 +27,6 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
         driver_library_eligible                         <- driver_library_eligible[-vec_loc,]
     }
 #   If no more genes to mutate then no new drivers
-
-print(driver_library_eligible)
-
     if (all(is.na(driver_library_eligible))){
         return()
     }
@@ -76,6 +72,7 @@ print(driver_library_eligible)
         unit                                            <- sample.int(no_units,size=1)
         break
     }
+    print('HERE')
 #---Place the new driver in the daughter cells' driver maps
     driver_count_1                                      <- driver_count_1+1
     if (driver_count_1==1){
