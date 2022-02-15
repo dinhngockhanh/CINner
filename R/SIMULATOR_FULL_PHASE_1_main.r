@@ -61,7 +61,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     genotype_list_ploidy_allele[[1]]            <<- cell_vec_ploidy_allele
     assign('genotype_list_ploidy_allele',genotype_list_ploidy_allele,envir=.GlobalEnv)
 #-------------------------------------Set up the initial driver genotype
-    cell_mat_drivers                            <- c(0)
+    cell_mat_drivers                            <- matrix(0,nrow=1)
     genotype_list_driver_count                  <<- matrix(0,1,1)
     genotype_list_driver_map                    <<- list()
     genotype_list_driver_map[[1]]               <<- cell_mat_drivers
