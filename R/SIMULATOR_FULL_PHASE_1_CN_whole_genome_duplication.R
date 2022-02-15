@@ -66,6 +66,9 @@ print(driver_map_1)
     driver_unique_2                     <- unique(driver_map_2[,1])
     driver_unique_2                     <- driver_unique_2[driver_unique_2!=0]
     driver_count_2                      <- length(driver_unique_2)
+
+print(driver_count_1)
+
 #-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom[[genotype_daughter_1]]         <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]        <<- ploidy_allele_1
