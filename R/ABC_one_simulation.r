@@ -11,6 +11,6 @@ ABC_one_simulation <- function(model,parameter_set) {
     }
 
 
-print(package_clonal_evolution)
+# print(package_clonal_evolution)
 
 }
