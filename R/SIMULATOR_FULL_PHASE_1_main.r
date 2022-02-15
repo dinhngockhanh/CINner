@@ -206,6 +206,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 print('=========================================================DRIVER')
                     SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
+print('OUT HERE')
 #               Simulate whole genome duplication event
                 if (flag_whole_genome_duplication==1) {
 print('=======================================WHOLE-GENOME DUPLICATION')
