@@ -45,6 +45,9 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
 #   Delete driver genes with zero copy
     vec_delete                                          <- which(driver_library_eligible$Copy_count==0)
     driver_library_eligible                             <- driver_library_eligible[-vec_delete,]
+
+print(driver_library_eligible)
+
 #   If no more genes to mutate then no new drivers
     if (all(is.na(driver_library_eligible))){
         return()
@@ -72,7 +75,6 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
         unit                                            <- sample.int(no_units,size=1)
         break
     }
-    print('HERE')
 #---Place the new driver in the daughter cells' driver maps
     driver_count_1                                      <- driver_count_1+1
     if (driver_count_1==1){
