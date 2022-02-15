@@ -47,6 +47,9 @@ print('MADE IT HERE')
     }
 #   Delete driver genes with zero copy
     vec_delete                                          <- which(driver_library_eligible$Copy_count==0)
+
+print(length(vec_delete))
+
     driver_library_eligible                             <- driver_library_eligible[-vec_delete,]
 
 print(vec_delete)
