@@ -126,3 +126,7 @@ The following function sets up the model variables according to the input parame
 ```{r}
 SIMULATOR_VARIABLES_for_fitting(MODEL,parameter_set)
 ```
+
+```{r}
+driver_library
+```

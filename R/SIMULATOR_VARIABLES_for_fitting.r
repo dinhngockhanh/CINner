@@ -25,7 +25,7 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
 #---Compute selection rates for TSGs
     list_TSG                            <- which(driver_library$Gene_role=='TSG')
     s_normalization                     <- 1
-    for (driver=1:length(list_TSG)){
+    for (driver in 1:length(list_TSG)){
         row                             <- list_TSG[driver]
 #       Get its selection strength
         driver_sel_rate                 <- vec_selection_rates[row]
@@ -38,7 +38,7 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
 #---Compute selection rates for ONCOGENEs
     s_normalization                     <- s_normalization^(1/count_ONCOGENE)
     list_ONCOGENE                       <- which(driver_library$Gene_role=='ONCOGENE')
-    for (driver=1:length(list_ONCOGENE)){
+    for (driver in 1:length(list_ONCOGENE)){
         row                             <- list_ONCOGENE[driver]
 #       Get its selection strength
         driver_sel_rate                 <- vec_selection_rates[row]
