@@ -66,18 +66,20 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
     }
 #   Change the local CN on the amplified region
     ploidy_block[[chrom]][[strand]][block_start:block_end] <- 2*ploidy_block[[chrom]][[strand]][block_start:block_end]
-#   Change the driver count
-    driver_count                 <- driver_count+N_drivers_to_amplify
 #   Amplify the drivers
-    if (N_drivers_to_amplify>0) {
-#        driver_map(end+1:end+N_drivers_to_amplify,:)        = driver_map(pos_drivers_to_amplify,:);
-        driver_map               <- rbind(driver_map,driver_map[pos_drivers_to_amplify,])
-        for (driver in (nrow(driver_map)+1-N_drivers_to_amplify):nrow(driver_map)) {
-            block                <- driver_map[driver,4]
-            ploidy_block_driver  <- ploidy_block[[chrom]][[strand]][block]/2
-            driver_map[driver,5] <- driver_map[driver,5]+ploidy_block_driver
+    if (N_drivers_to_amplify>0){
+        driver_map_new                  <- driver_map[pos_drivers_to_amplify,]
+        for (driver in 1:nrow(driver_map_new)){
+            block                       <- driver_map_new[driver,4]
+            ploidy_block_driver         <- ploidy_block[[chrom]][[strand]][block]/2
+            driver_map_new[driver,5]    <- driver_map_new[driver,5]+ploidy_block_driver
         }
+        driver_map                      <- rbind(driver_map,driver_map_new)
     }
+#   Change the driver count
+    driver_unique                       <- unique(driver_map[,1])
+    driver_unique                       <- driver_unique[driver_unique!=0]
+    driver_count                        <- length(driver_unique)
 #------------------------------------------------Output the new genotype
     genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
     genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele

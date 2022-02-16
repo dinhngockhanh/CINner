@@ -51,12 +51,14 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react,genotype_
     ploidy_allele[[chrom]][[strand]][,block_start:block_end]    <- 0
 #   Change the local CN on the deleted region
     ploidy_block[[chrom]][[strand]][block_start:block_end]      <- 0
-#   Change the driver count
-    driver_count                <- driver_count-N_drivers_to_delete
 #   Delete the drivers
-    if (N_drivers_to_delete>0) {
-        driver_map              <- driver_map[-pos_drivers_to_delete,]
+    if (N_drivers_to_delete>0){
+        driver_map                                              <- driver_map[-pos_drivers_to_delete,]
     }
+#   Change the driver count
+    driver_unique                                               <- unique(driver_map[,1])
+    driver_unique                                               <- driver_unique[driver_unique!=0]
+    driver_count                                                <- length(driver_unique)
 #------------------------------------------------Output the new genotype
     genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
     genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele

@@ -102,38 +102,27 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
         ploidy_block_1[[chrom]][[strand]][block_start:block_end]        <- 0
         }
     }
-#   Change the driver count in each daughter cell
-    if (i_gain==1) {
-        driver_count_1      <- driver_count_1+N_drivers_to_move
-        driver_count_2      <- driver_count_2-N_drivers_to_move
-        }
-    else { if (i_gain==2) {
-        driver_count_2      <- driver_count_2+N_drivers_to_move
-        driver_count_1      <- driver_count_1-N_drivers_to_move
-        }
-    }
 #   Move the drivers from losing cell to winning cell
-    if ((i_gain==1)&&(N_drivers_to_move>0)) {
-#        driver_map_1(end+1:end+N_drivers_to_move,:)         = driver_map_2(pos_drivers_to_move,:);
-# row append driver_map_1 by driver_map_2
-#        driver_map_1                                        <- rbind(driver_map_1,driver_map_2)
-# but I don't know how to change some last elements of the 3rd column!
-#        driver_map_1(end+1-N_drivers_to_move:end,3)         = ploidy_chrom_1(chrom);
-# so I suppose to change the pos_drivers_to_move rows of 3rd column of driver_map_2 by ploidy_crom1(chrom) first and then row append to driver_map_1
-        driver_map_2[pos_drivers_to_move,3]                 <- ploidy_chrom_1[chrom]
-        driver_map_1                                        <- rbind(driver_map_1,driver_map_2)
-        driver_map_2                                        <- driver_map_2[-pos_drivers_to_move,] # remove some rows
-        }
-    else { if ((i_gain==2)&&(N_drivers_to_move>0)) {
-#        driver_map_2(end+1:end+N_drivers_to_move,:)         = driver_map_1(pos_drivers_to_move,:);
-#        driver_map_2(end+1-N_drivers_to_move:end,3)         = ploidy_chrom_2(chrom);
-#        driver_map_1(pos_drivers_to_move,:)                 = [];
-
-        driver_map_1[pos_drivers_to_move,3]                 <- ploidy_chrom_2[chrom]
-        driver_map_2                                        <- rbind(driver_map_2,driver_map_1)
-        driver_map_1                                        <- driver_map_1[-pos_drivers_to_move,]
-        }
+    if ((i_gain==1)&&(N_drivers_to_move>0)){
+        driver_map_new_1                                    <- driver_map_2[pos_drivers_to_move,]
+        driver_map_new_1[,3]                                <- ploidy_chrom_1[chrom]
+        driver_map_1                                        <- rbind(driver_map_1,driver_map_new_1)
+        driver_map_2                                        <- driver_map_2[-pos_drivers_to_move,]
     }
+    else{if ((i_gain==2)&&(N_drivers_to_move>0)){
+        driver_map_new_2                                    <- driver_map_1[pos_drivers_to_move,]
+        driver_map_new_2[,3]                                <- ploidy_chrom_2[chrom]
+        driver_map_2                                        <- rbind(driver_map_2,driver_map_new_2)
+        driver_map_1                                        <- driver_map_2[-pos_drivers_to_move,]
+    }}
+#   Change the driver count in each daughter cell
+    driver_unique_1                     <- unique(driver_map_1[,1])
+    driver_unique_1                     <- driver_unique_1[driver_unique_1!=0]
+    driver_count_1                      <- length(driver_unique_1)
+
+    driver_unique_2                     <- unique(driver_map_2[,1])
+    driver_unique_2                     <- driver_unique_2[driver_unique_2!=0]
+    driver_count_2                      <- length(driver_unique_2)
 #-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom[[genotype_daughter_1]]       <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]      <<- ploidy_allele_1

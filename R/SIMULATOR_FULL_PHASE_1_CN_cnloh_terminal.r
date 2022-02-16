@@ -72,18 +72,20 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal <- function(genotype_to_react,genotype_
     ploidy_allele[[chrom]][[strand_take]][1:nrow(ploidy_allele_strand_give),block_start:block_end]              <- ploidy_allele_strand_give[nrow(ploidy_allele_strand_give),block_start:block_end]
 #   Change the local CN on the strand to receive the DNA
     ploidy_block[[chrom]][[strand_take]][block_start:block_end]                                                 <- ploidy_block[[chrom]][[strand_give]][block_start:block_end]
-#   Change the driver count
-    driver_count                <- driver_count-N_drivers_to_delete+N_drivers_to_gain
-#   Copy the drivers gained during interstitial CN-LOH
+#   Copy the drivers gained during terminal CN-LOH
     if (N_drivers_to_gain>0){
-        driver_map_to_gain      <- driver_map[pos_drivers_to_gain,]
-        driver_map_to_gain[,3]  <- strand_take
-        driver_map              <- rbind(driver_map,driver_map_to_gain)
+        driver_map_new                      <- driver_map[pos_drivers_to_gain,]
+        driver_map_new[,3]                  <- strand_take
+        driver_map                          <- rbind(driver_map,driver_map_new)
     }
-#   Remove the drivers lost during interstitial CN-LOH
+#   Remove the drivers lost during terminal CN-LOH
     if (N_drivers_to_delete>0){
-        driver_map              <- driver_map[-pos_drivers_to_delete]
+        driver_map                          <- driver_map[-pos_drivers_to_delete,]
     }
+#   Change the driver count
+    driver_unique                           <- unique(driver_map[,1])
+    driver_unique                           <- driver_unique[driver_unique!=0]
+    driver_count                            <- length(driver_unique)
 #------------------------------------------------Output the new genotype
     genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
     genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele
