@@ -132,6 +132,10 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
         if (!is.matrix(driver_map_new_2)){
             driver_map_new_2                        <- matrix(driver_map_new_2,nrow=1)
         }
+
+print('~~~~~~ 2')
+print(driver_map_new_2)
+
         driver_map_new_2[,3]                        <- ploidy_chrom_2[chrom]
         driver_map_2                                <- rbind(driver_map_2,driver_map_new_2)
         driver_map_1                                <- driver_map_1[-pos_drivers_to_move,]

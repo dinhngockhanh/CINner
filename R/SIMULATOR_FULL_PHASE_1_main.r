@@ -262,7 +262,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                     }
                 }
 
-print('HERE')
+# print('HERE')
 
 #               Update DNA length and selection rates of daughter cells
                 SIMULATOR_FULL_PHASE_1_genotype_update(genotype_daughter_1,genotype_daughter_2)
