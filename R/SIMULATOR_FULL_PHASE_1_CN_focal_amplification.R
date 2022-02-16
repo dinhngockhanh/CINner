@@ -60,12 +60,17 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
         }
         else{
 
-print('~~~~~~~~~~~~~~~~~~~~~~~~~')
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 print(2*block_CN)
 print(nrow(ploidy_allele[[chrom]][[strand]]))
-
+print(block)
+print(ncol(ploidy_allele[[chrom]][[strand]]))
 
             for(i_unit in block_CN+1:2*block_CN){
+
+print('+++')
+print(i_unit)
+
                 ploidy_allele[[chrom]][[strand]][i_unit,block]          <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
             }
         }
