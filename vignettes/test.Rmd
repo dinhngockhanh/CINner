@@ -42,16 +42,6 @@ stage_final                   <- 1
 MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
 N_simulations                 <- 100
 SIMULATOR_FULL_PROGRAM_many_simulations(MODEL,stage_final,N_simulations)
-
-
-package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
-package_sample                <- package_output[[2]]
-sample_genotype_profiles      <- package_sample[[1]]
-
-head(sample_genotype_profiles)
-
-package_sample_phylogeny      <- package_output[[3]]
-phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
 ```
 
 
