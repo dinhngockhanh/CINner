@@ -111,11 +111,6 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     }
 #   Move the drivers from losing cell to winning cell
     if ((i_gain==1)&&(N_drivers_to_move>0)){
-
-# print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   1')
-# print(driver_map_new_1)
-
-
         driver_map_new_1                            <- driver_map_2[pos_drivers_to_move,]
         if (!is.matrix(driver_map_new_1)){
             driver_map_new_1                        <- matrix(driver_map_new_1,nrow=1)
@@ -132,10 +127,6 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
         if (!is.matrix(driver_map_new_2)){
             driver_map_new_2                        <- matrix(driver_map_new_2,nrow=1)
         }
-
-print('~~~~~~ 2')
-print(driver_map_new_2)
-
         driver_map_new_2[,3]                        <- ploidy_chrom_2[chrom]
         driver_map_2                                <- rbind(driver_map_2,driver_map_new_2)
         driver_map_1                                <- driver_map_1[-pos_drivers_to_move,]

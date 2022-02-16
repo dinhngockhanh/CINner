@@ -87,3 +87,51 @@ parameter_set$prob_CN_cnloh_terminal_length           <- prob_CN_cnloh_terminal_
 
 ABC_one_simulation(MODEL,parameter_set)
 ```
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SELECTION OF BULK HGSOC - MANY SIMULATIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+```{r}
+MODEL <- 'HGSOC-BULK'
+SIMULATOR_VARIABLES_for_simulation(MODEL)
+
+vec_selection_rates                                   <- rep(0.05,nrow(driver_library))
+
+rate_driver                                           <- 1e-16
+
+prob_CN_whole_genome_duplication                      <- 1e-6
+prob_CN_missegregation                                <- 1e-6
+prob_CN_chrom_arm_missegregation                      <- 1e-6
+prob_CN_focal_amplification                           <- 1e-6
+prob_CN_focal_deletion                                <- 1e-6
+prob_CN_cnloh_interstitial                            <- 1e-6
+prob_CN_cnloh_terminal                                <- 1e-6
+
+prob_CN_focal_amplification_length                    <- 0.1
+prob_CN_focal_deletion_length                         <- 0.1
+prob_CN_cnloh_interstitial_length                     <- 0.1
+prob_CN_cnloh_terminal_length                         <- 0.1
+
+parameter_set                                         <- list()
+parameter_set$vec_selection_rates                     <- vec_selection_rates
+parameter_set$rate_driver                             <- rate_driver
+parameter_set$prob_CN_whole_genome_duplication        <- prob_CN_whole_genome_duplication
+parameter_set$prob_CN_missegregation                  <- prob_CN_missegregation
+parameter_set$prob_CN_chrom_arm_missegregation        <- prob_CN_chrom_arm_missegregation
+parameter_set$prob_CN_focal_amplification             <- prob_CN_focal_amplification
+parameter_set$prob_CN_focal_deletion                  <- prob_CN_focal_deletion
+parameter_set$prob_CN_cnloh_interstitial              <- prob_CN_cnloh_interstitial
+parameter_set$prob_CN_cnloh_terminal                  <- prob_CN_cnloh_terminal
+parameter_set$prob_CN_focal_amplification_length      <- prob_CN_focal_amplification_length
+parameter_set$prob_CN_focal_deletion_length           <- prob_CN_focal_deletion_length
+parameter_set$prob_CN_cnloh_interstitial_length       <- prob_CN_cnloh_interstitial_length
+parameter_set$prob_CN_cnloh_terminal_length           <- prob_CN_cnloh_terminal_length
+
+
+
+
+N_simulations                                         <- 100
+
+ABC_many_simulations(MODEL,parameter_set,N_simulations)
+```
