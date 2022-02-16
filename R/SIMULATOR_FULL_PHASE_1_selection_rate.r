@@ -25,10 +25,12 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
             return(clone_selection_rate)
         }
     }
+#----------If driver library is empty, then viable cells have sel rate 1
+    if (nrow(driver_library)==0){
+        clone_selection_rate        <- 0
+        return(clone_selection_rate)
+    }
 #------------------------------Compute selection rates for viable clones
-
-print(driver_library)
-
     driver_library_copy                             <- driver_library
     driver_library_copy$Copy_WT                     <- 0
     driver_library_copy$Copy_MUT                    <- 0

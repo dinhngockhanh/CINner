@@ -63,7 +63,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #       ...
     }
     if(length(TABLE_CANCER_GENES)==0){
-        driver_library                      <<- list()
+        driver_library                      <<- data.frame()
     }
     else{
         driver_library                      <<- TABLE_CANCER_GENES
