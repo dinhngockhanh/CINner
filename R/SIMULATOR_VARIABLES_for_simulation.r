@@ -78,4 +78,16 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     func_expected_population                <<- function(time) linear_app_fun(time)
 #---Set up event rate as function of time (in days)
     func_event_rate                         <<- function(time) 1/cell_lifespan
+
+
+
+
+
+    print(prob_CN_whole_genome_duplication)
+    print(prob_CN_missegregation)
+    print(prob_CN_chrom_arm_missegregation)
+    print(prob_CN_focal_amplification)
+    print(prob_CN_focal_deletion)
+    print(prob_CN_cnloh_interstitial)
+    print(prob_CN_cnloh_terminal)
 }
