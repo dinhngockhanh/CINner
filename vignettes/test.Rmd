@@ -15,8 +15,9 @@ devtools::document()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ```{r}
-stage_final                   <- 3
 MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
+stage_final                   <- 3
+
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 package_sample                <- package_output[[2]]
 sample_genotype_profiles      <- package_sample[[1]]
@@ -38,27 +39,51 @@ plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ```{r}
-stage_final                   <- 1
 MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
+stage_final                   <- 1
 N_simulations                 <- 100
 SIMULATOR_FULL_PROGRAM_many_simulations(MODEL,stage_final,N_simulations)
 ```
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SELECTION OF BULK HGSOC - ONE SIMULATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ```{r}
-stage_final                   <- 3
-MODEL                         <- 'HGSOC-BULK'
-package_output                <- ABC_one_simulation(MODEL,stage_final)
-package_sample                <- package_output[[2]]
-sample_genotype_profiles      <- package_sample[[1]]
+MODEL <- 'HGSOC-BULK'
+SIMULATOR_VARIABLES_for_simulation(MODEL)
 
-head(sample_genotype_profiles)
+vec_selection_rates                                   <- rep(0.05,nrow(driver_library))
 
-package_sample_phylogeny      <- package_output[[3]]
-phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
+rate_driver                                           <- 1e-16
+
+prob_CN_whole_genome_duplication                      <- 1e-6
+prob_CN_missegregation                                <- 1e-6
+prob_CN_chrom_arm_missegregation                      <- 1e-6
+prob_CN_focal_amplification                           <- 1e-6
+prob_CN_focal_deletion                                <- 1e-6
+prob_CN_cnloh_interstitial                            <- 1e-6
+prob_CN_cnloh_terminal                                <- 1e-6
+
+prob_CN_focal_amplification_length                    <- 0.1
+prob_CN_focal_deletion_length                         <- 0.1
+prob_CN_cnloh_interstitial_length                     <- 0.1
+prob_CN_cnloh_terminal_length                         <- 0.1
+
+parameter_set                                         <- list()
+parameter_set$vec_selection_rates                     <- vec_selection_rates
+parameter_set$rate_driver                             <- rate_driver
+parameter_set$prob_CN_whole_genome_duplication        <- prob_CN_whole_genome_duplication
+parameter_set$prob_CN_missegregation                  <- prob_CN_missegregation
+parameter_set$prob_CN_chrom_arm_missegregation        <- prob_CN_chrom_arm_missegregation
+parameter_set$prob_CN_focal_amplification             <- prob_CN_focal_amplification
+parameter_set$prob_CN_focal_deletion                  <- prob_CN_focal_deletion
+parameter_set$prob_CN_cnloh_interstitial              <- prob_CN_cnloh_interstitial
+parameter_set$prob_CN_cnloh_terminal                  <- prob_CN_cnloh_terminal
+parameter_set$prob_CN_focal_amplification_length      <- prob_CN_focal_amplification_length
+parameter_set$prob_CN_focal_deletion_length           <- prob_CN_focal_deletion_length
+parameter_set$prob_CN_cnloh_interstitial_length       <- prob_CN_cnloh_interstitial_length
+parameter_set$prob_CN_cnloh_terminal_length           <- prob_CN_cnloh_terminal_length
+
+ABC_one_simulation(MODEL,parameter_set)
 ```

@@ -261,6 +261,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_daughter_2)
                     }
                 }
+
+print('HERE')
+
 #               Update DNA length and selection rates of daughter cells
                 SIMULATOR_FULL_PHASE_1_genotype_update(genotype_daughter_1,genotype_daughter_2)
 #               Check if either daughter cell did not create a new clone
