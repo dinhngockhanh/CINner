@@ -262,12 +262,12 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                     }
                 }
 
-print('DONE WITH EVENTS')
+# print('DONE WITH EVENTS')
 
 #               Update DNA length and selection rates of daughter cells
                 SIMULATOR_FULL_PHASE_1_genotype_update(genotype_daughter_1,genotype_daughter_2)
 
-print('UPDATED DNA')
+# print('UPDATED DNA')
 
 #               Check if either daughter cell did not create a new clone
                 output                                      <- SIMULATOR_FULL_PHASE_1_genotype_cleaning(genotype_to_react,genotype_daughter_1,genotype_daughter_2,position_to_react,position_daughter_1,position_daughter_2)
@@ -278,7 +278,7 @@ print('UPDATED DNA')
                 position_daughter_1                         <- output[[5]]
                 position_daughter_2                         <- output[[6]]
 
-print('CHECK DONE')
+# print('CHECK DONE')
 
 #               Adjust the event count accordingly, and add event to
 #               matrix of divisions
@@ -290,14 +290,14 @@ print('CHECK DONE')
                     mat_divisions                           <- rbind(mat_divisions, c(1, genotype_to_react, genotype_daughter_1, genotype_daughter_2))
                 }
 
-print('DIV ADJUSTION DONE')
+# print('DIV ADJUSTION DONE')
 
 #               Update the clonal population according to what happens
                 clonal_population_next[position_to_react]   <<- clonal_population_next[position_to_react]-1
                 clonal_population_next[position_daughter_1] <<- clonal_population_next[position_daughter_1]+1
                 clonal_population_next[position_daughter_2] <<- clonal_population_next[position_daughter_2]+1
 
-print('UPDATE CLONAL DONE')
+# print('UPDATE CLONAL DONE')
 
             }}
 #           Add the divisions with old genotype to the matrix of divisions
