@@ -56,6 +56,10 @@ print(nrow(driver_map_2))
 print(ncol(driver_map_1))
 print(ncol(driver_map_2))
 
+print((nrow(driver_map_1) != nrow(driver_map_2)))
+print((ncol(driver_map_1) != ncol(driver_map_2)))
+print(((nrow(driver_map_1) != nrow(driver_map_2)) || (ncol(driver_map_1) != ncol(driver_map_2))))
+
     if ((nrow(driver_map_1) != nrow(driver_map_2)) || (ncol(driver_map_1) != ncol(driver_map_2))){
         output      <- 0
         return(output)
