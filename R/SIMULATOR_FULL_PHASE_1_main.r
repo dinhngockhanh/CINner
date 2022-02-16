@@ -120,9 +120,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
         all_propensity              <- T_tau_step*rate_base_lifetime*clonal_population_current
 #       Find the probability of division for all clones
         clonal_portion              <- genotype_list_selection_rate[clonal_ID_current]
-
-print(clonal_portion)
-
         all_prob_division           <- func_expected_population(T_current)/(func_expected_population(T_current)+N_cells_current) * sum(clonal_population_current)*clonal_portion/sum(clonal_portion*clonal_population_current)
 #       Find next time step and initiate next clonal population vector
         T_next                      <- T_current+T_tau_step
@@ -171,11 +168,6 @@ print(clonal_portion)
                 }
             }
             N_events_current        <- N_events_current+count_new_events
-
-print(count_new_events)
-print(prob_division)
-print(prob_new_genotype)
-
             count_event_types       <- rmultinom(n=1,size=count_new_events,prob=c((1-prob_division), prob_division*(1-prob_new_genotype), prob_division*prob_new_genotype))
             count_deaths            <- count_event_types[1]
             count_div_old           <- count_event_types[2]
