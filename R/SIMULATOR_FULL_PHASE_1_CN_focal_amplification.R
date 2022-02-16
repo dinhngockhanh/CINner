@@ -69,7 +69,7 @@ print(nrow(ploidy_allele[[chrom]][[strand]]))
 print(block)
 print(ncol(ploidy_allele[[chrom]][[strand]]))
 
-            for(i_unit in block_CN+1:2*block_CN){
+            for(i_unit in ((block_CN+1):(2*block_CN))){
 
 print('+++')
 print(i_unit)
