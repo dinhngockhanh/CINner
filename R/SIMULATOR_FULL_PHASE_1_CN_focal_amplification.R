@@ -71,6 +71,9 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
 #   Amplify the drivers
     if (N_drivers_to_amplify>0){
         driver_map_new                  <- driver_map[pos_drivers_to_amplify,]
+        if (!is.matrix(driver_map_new)){
+            driver_map_new                        <- matrix(driver_map_new,nrow=1)
+        }
         for (driver in 1:nrow(driver_map_new)){
             block                       <- driver_map_new[driver,4]
             ploidy_block_driver         <- ploidy_block[[chrom]][[strand]][block]/2
