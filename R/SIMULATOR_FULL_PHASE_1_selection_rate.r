@@ -26,6 +26,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         }
     }
 #------------------------------Compute selection rates for viable clones
+
+print(driver_library)
+
     driver_library_copy                             <- driver_library
     driver_library_copy$Copy_WT                     <- 0
     driver_library_copy$Copy_MUT                    <- 0
@@ -40,6 +43,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         }
         driver_library_copy$Copy_WT[i_driver]       <- driver_copy
     }
+
+print(driver_library_copy)
+
     if (driver_count>=1){
         for (i_driver in 1:driver_count){
             driver_ID                               <- driver_map[i_driver,1]
