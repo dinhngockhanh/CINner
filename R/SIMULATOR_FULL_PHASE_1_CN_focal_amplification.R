@@ -55,7 +55,10 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,geno
         }
 
         # ploidy_allele[[chrom]][[strand]][block_CN+1:2*block_CN,block]   <- ploidy_allele[[chrom]][[strand]][1:block_CN,block]
-        if (block_CN==1){
+        if (block_CN==0){
+            next
+        }
+        else{if (block_CN==1){
             ploidy_allele[[chrom]][[strand]][2,block]                   <- ploidy_allele[[chrom]][[strand]][1,block]
         }
         else{
@@ -72,8 +75,7 @@ print('+++')
 print(i_unit)
 
                 ploidy_allele[[chrom]][[strand]][i_unit,block]          <- ploidy_allele[[chrom]][[strand]][i_unit-block_CN,block]
-            }
-        }
+        }}}
     }
 #   Change the local CN on the amplified region
     ploidy_block[[chrom]][[strand]][block_start:block_end] <- 2*ploidy_block[[chrom]][[strand]][block_start:block_end]
