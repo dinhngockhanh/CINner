@@ -168,6 +168,11 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 }
             }
             N_events_current        <- N_events_current+count_new_events
+
+print(count_new_events)
+print(prob_division)
+print(prob_new_genotype)
+
             count_event_types       <- rmultinom(n=1,size=count_new_events,prob=c((1-prob_division), prob_division*(1-prob_new_genotype), prob_division*prob_new_genotype))
             count_deaths            <- count_event_types[1]
             count_div_old           <- count_event_types[2]
