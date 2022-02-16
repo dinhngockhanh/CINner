@@ -155,25 +155,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #           Find probability of new genotype
             DNA_length              <- genotype_list_DNA_length[[clone_to_react]]
             prob_new_drivers        <- genotype_list_prob_new_drivers[clone_to_react]
-
-
-print(prob_CN_whole_genome_duplication)
-print(prob_CN_missegregation)
-print(prob_CN_chrom_arm_missegregation)
-print(prob_CN_focal_amplification)
-print(prob_CN_focal_deletion)
-print(prob_CN_cnloh_interstitial)
-print(prob_CN_cnloh_terminal)
-print('++++++++++++++++++')
-print(prob_CN_WGD)
-print(prob_CN_misseg)
-print(prob_CN_arm_misseg)
-print(prob_CN_foc_amp)
-print(prob_CN_foc_del)
-print(prob_CN_cnloh_i)
-print(prob_CN_cnloh_t)
-print(prob_new_drivers)
-
             prob_new_genotype       <- 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_CN_cnloh_i)*(1-prob_CN_cnloh_t)*(1-prob_new_drivers)
 #           Find number of events
             prop                    <- all_propensity[i]

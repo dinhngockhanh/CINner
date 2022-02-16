@@ -12,6 +12,7 @@ devtools::document()
 
 ```{r}
 stage_final                   <- 3
+MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
 package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 package_sample                <- package_output[[2]]
 sample_genotype_profiles      <- package_sample[[1]]
