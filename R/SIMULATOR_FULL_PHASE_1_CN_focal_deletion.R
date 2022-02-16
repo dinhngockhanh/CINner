@@ -54,6 +54,9 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react,genotype_
 #   Delete the drivers
     if (N_drivers_to_delete>0){
         driver_map                                              <- driver_map[-pos_drivers_to_delete,]
+        if (!is.matrix(driver_map)){
+            driver_map                                          <- matrix(driver_map,nrow=1)
+        }
     }
 #   Change the driver count
     driver_unique                                               <- unique(driver_map[,1])

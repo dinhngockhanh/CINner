@@ -75,6 +75,9 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genot
 #   Remove the drivers lost during interstitial CN-LOH
     if (N_drivers_to_delete>0){
         driver_map                          <- driver_map[-pos_drivers_to_delete,]
+        if (!is.matrix(driver_map)){
+            driver_map                      <- matrix(driver_map,nrow=1)
+        }
     }
 #   Change the driver count
     driver_unique                           <- unique(driver_map[,1])

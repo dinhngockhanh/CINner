@@ -81,6 +81,9 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal <- function(genotype_to_react,genotype_
 #   Remove the drivers lost during terminal CN-LOH
     if (N_drivers_to_delete>0){
         driver_map                          <- driver_map[-pos_drivers_to_delete,]
+        if (!is.matrix(driver_map)){
+            driver_map                      <- matrix(driver_map,nrow=1)
+        }
     }
 #   Change the driver count
     driver_unique                           <- unique(driver_map[,1])

@@ -112,23 +112,21 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
 #   Move the drivers from losing cell to winning cell
     if ((i_gain==1)&&(N_drivers_to_move>0)){
         driver_map_new_1                            <- driver_map_2[pos_drivers_to_move,]
-
-print('-----------1')
-print(driver_map_new_1)
-
         driver_map_new_1[,3]                        <- ploidy_chrom_1[chrom]
         driver_map_1                                <- rbind(driver_map_1,driver_map_new_1)
         driver_map_2                                <- driver_map_2[-pos_drivers_to_move,]
+        if (!is.matrix(driver_map_2)){
+            driver_map_2                            <- matrix(driver_map_2,nrow=1)
+        }
     }
     else{if ((i_gain==2)&&(N_drivers_to_move>0)){
         driver_map_new_2                            <- driver_map_1[pos_drivers_to_move,]
-
-print('-----------2')
-print(driver_map_new_2)
-
         driver_map_new_2[,3]                        <- ploidy_chrom_2[chrom]
         driver_map_2                                <- rbind(driver_map_2,driver_map_new_2)
         driver_map_1                                <- driver_map_1[-pos_drivers_to_move,]
+        if (!is.matrix(driver_map_1)){
+            driver_map_1                            <- matrix(driver_map_1,nrow=1)
+        }
     }}
 #   Change the driver count in each daughter cell
     driver_unique_1                                 <- unique(driver_map_1[,1])
