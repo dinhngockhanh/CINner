@@ -37,13 +37,16 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
 
 
 
+    if ((i_gain==1)&&(driver_count_2>0)) {
+
+
 print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 print(driver_map_2)
-# print(find((driver_map_2[,2]==chrom)))
-# print(find((driver_map_2[,3]==strand)))
-# print(intersect(find((driver_map_2[,2]==chrom)),find((driver_map_2[,3]==strand))))
+print(find((driver_map_2[,2]==chrom)))
+print(find((driver_map_2[,3]==strand)))
+print(intersect(find((driver_map_2[,2]==chrom)),find((driver_map_2[,3]==strand))))
 
-    if ((i_gain==1)&&(driver_count_2>0)) {
+
         pos_drivers_to_move     <- intersect(find((driver_map_2[,2]==chrom)),find((driver_map_2[,3]==strand)))
         }
     else { if ((i_gain==2)&&(driver_count_1>0)) {
