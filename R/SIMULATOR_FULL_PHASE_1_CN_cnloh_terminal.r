@@ -75,6 +75,9 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal <- function(genotype_to_react,genotype_
 #   Copy the drivers gained during terminal CN-LOH
     if (N_drivers_to_gain>0){
         driver_map_new                      <- driver_map[pos_drivers_to_gain,]
+        if (!is.matrix(driver_map_new)){
+            driver_map_new                  <- matrix(driver_map_new,nrow=1)
+        }
         driver_map_new[,3]                  <- strand_take
         driver_map                          <- rbind(driver_map,driver_map_new)
     }
