@@ -36,6 +36,10 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
         chrom                                           <- driver_library_eligible$Chromosome[driver]
         block                                           <- driver_library_eligible$Bin[driver]
         no_strands                                      <- ploidy_chrom[chrom]
+        if (no_strands<1){
+            driver_library_eligible$Copy_count[driver]  <- 0
+            next
+        }
         driver_copy                                     <- 0
         for (strand in 1:no_strands){
             driver_copy                                 <- driver_copy+ploidy_block[[chrom]][[strand]][block]
@@ -90,12 +94,17 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,genotype_daughter_1
         driver_map_2                                    <- rbind(driver_map_2,c(driver_ID,chrom,strand,block,unit))
     }
 #-----------------------------------------------Output the new genotypes
-    genotype_list_driver_count[genotype_daughter_1]     <<- driver_count_1
-    genotype_list_driver_map[[genotype_daughter_1]]     <<- driver_map_1
-    evolution_genotype_changes[[genotype_daughter_1]]   <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('new-driver',driver_ID))
+    genotype_list_driver_count[genotype_daughter_1]                 <<- driver_count_1
+    genotype_list_driver_map[[genotype_daughter_1]]                 <<- driver_map_1
+    loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_1]])
+    evolution_genotype_changes[[genotype_daughter_1]][[loc_end+1]]  <<- c('new-driver',driver_ID)
 
-    genotype_list_driver_count[genotype_daughter_2]     <<- driver_count_2
-    genotype_list_driver_map[[genotype_daughter_2]]     <<- driver_map_2
-    evolution_genotype_changes[[genotype_daughter_2]]   <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('new-driver',driver_ID))
+
+
+
+    genotype_list_driver_count[genotype_daughter_2]                 <<- driver_count_2
+    genotype_list_driver_map[[genotype_daughter_2]]                 <<- driver_map_2
+    loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_2]])
+    evolution_genotype_changes[[genotype_daughter_2]][[loc_end+1]]  <<- c('new-driver',driver_ID)
     return()
 }

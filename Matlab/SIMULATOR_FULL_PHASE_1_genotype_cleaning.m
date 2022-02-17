@@ -5,9 +5,9 @@ function [genotype_to_react,genotype_daughter_1,genotype_daughter_2,position_to_
     global N_clones evolution_origin evolution_genotype_changes
     global clonal_population_current clonal_population_next clonal_ID_current
 %-----------Find indicators of comparison between each pair of genotypes
-    flag_mother_daughter1       = SIMULATOR_FULL_PHASE_1_genotype_comparison(genotype_to_react,genotype_daughter_1);
-    flag_mother_daughter2       = SIMULATOR_FULL_PHASE_1_genotype_comparison(genotype_to_react,genotype_daughter_2);
-    flag_daughter1_daughter2    = SIMULATOR_FULL_PHASE_1_genotype_comparison(genotype_daughter_1,genotype_daughter_2);
+    flag_mother_daughter1                                                       = SIMULATOR_FULL_PHASE_1_genotype_comparison(genotype_to_react,genotype_daughter_1);
+    flag_mother_daughter2                                                       = SIMULATOR_FULL_PHASE_1_genotype_comparison(genotype_to_react,genotype_daughter_2);
+    flag_daughter1_daughter2                                                    = SIMULATOR_FULL_PHASE_1_genotype_comparison(genotype_daughter_1,genotype_daughter_2);
 %--------------------------------------Delete new genotypes if necessary
     if (flag_mother_daughter1==0)&&(flag_mother_daughter2==0)&&(flag_daughter1_daughter2==0)
 %       Case 1: all genotypes are different

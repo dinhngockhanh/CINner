@@ -142,10 +142,12 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
     genotype_list_driver_count[genotype_daughter_1]         <<- driver_count_1
     genotype_list_driver_map[[genotype_daughter_1]]         <<- driver_map_1
     if (i_gain==1) {
-        evolution_genotype_changes[[genotype_daughter_1]]   <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('chromosome-arm-missegregation',chrom,strand,chrom_arm,1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_1]])
+        evolution_genotype_changes[[genotype_daughter_1]][[loc_end+1]]  <<- c('chromosome-arm-missegregation',chrom,strand,chrom_arm,1)
         }
     else { if (i_gain==2) {
-        evolution_genotype_changes[[genotype_daughter_1]]   <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('chromosome-arm-missegregation',chrom,strand,chrom_arm,-1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_1]])
+        evolution_genotype_changes[[genotype_daughter_1]][[loc_end+1]]  <<- c('chromosome-arm-missegregation',chrom,strand,chrom_arm,-1)
         }
     }
 
@@ -155,10 +157,12 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
     genotype_list_driver_count[genotype_daughter_2]         <<- driver_count_2
     genotype_list_driver_map[[genotype_daughter_2]]         <<- driver_map_2
     if (i_gain==1) {
-        evolution_genotype_changes[[genotype_daughter_2]]   <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('chromosome-arm-missegregation',chrom,strand,chrom_arm,-1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_2]])
+        evolution_genotype_changes[[genotype_daughter_2]][[loc_end+1]]  <<- c('chromosome-arm-missegregation',chrom,strand,chrom_arm,-1)
         }
     else { if (i_gain==2) {
-        evolution_genotype_changes[[genotype_daughter_2]]   <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('chromosome-arm-missegregation',chrom,strand,chrom_arm,1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_2]])
+        evolution_genotype_changes[[genotype_daughter_2]][[loc_end+1]]  <<- c('chromosome-arm-missegregation',chrom,strand,chrom_arm,1)        
         }
     }
 }

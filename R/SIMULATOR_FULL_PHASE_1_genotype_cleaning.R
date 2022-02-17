@@ -100,14 +100,14 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react,genotype_
         position_daughter_2                         <- position_daughter_1
         }
     else { if ((flag_mother_daughter1==1)&&(flag_mother_daughter2==1)&&(flag_daughter1_daughter2==1)) {
-    #       Case 5: combine both genotypes into mother genotype
+#       Case 5: combine both genotypes into mother genotype
         N_clones                                    <<- N_clones-2
 
         evolution_origin                            <<- evolution_origin[-c(genotype_daughter_1, genotype_daughter_2)]
         evolution_genotype_changes                  <<- evolution_genotype_changes[-c(genotype_daughter_1, genotype_daughter_2)]
 
         genotype_list_ploidy_chrom                  <<- genotype_list_ploidy_chrom[-c(genotype_daughter_1, genotype_daughter_2)]
-        genotype_list_ploidy_allele                <<- genotype_list_ploidy_allele[-c(genotype_daughter_1, genotype_daughter_2)]
+        genotype_list_ploidy_allele                 <<- genotype_list_ploidy_allele[-c(genotype_daughter_1, genotype_daughter_2)]
         genotype_list_ploidy_block                  <<- genotype_list_ploidy_block[-c(genotype_daughter_1, genotype_daughter_2)]
         genotype_list_driver_count                  <<- genotype_list_driver_count[-c(genotype_daughter_1, genotype_daughter_2)]
         genotype_list_driver_map                    <<- genotype_list_driver_map[-c(genotype_daughter_1, genotype_daughter_2)]

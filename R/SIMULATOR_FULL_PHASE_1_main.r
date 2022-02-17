@@ -29,8 +29,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     prob_CN_cnloh_t                             <- prob_CN_cnloh_terminal
 #-----------------------------------------Set up the initial CN genotype
 #   Set up the strand count for each chromosome
-    cell_vec_ploidy_chrom                       <- rep(1,N_chromosomes)
-    cell_vec_ploidy_chrom[1:N_chromosomes]      <- 2
+    cell_vec_ploidy_chrom                       <- rep(2,N_chromosomes)
     genotype_list_ploidy_chrom                  <<- list()
     genotype_list_ploidy_chrom[[1]]             <<- cell_vec_ploidy_chrom
     assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
@@ -125,11 +124,11 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
         T_next                      <- T_current+T_tau_step
         clonal_population_next      <<- clonal_population_current
         if ((N_cells_current<=0) || (is.null(N_cells_current))) {
-            flag_success            <<- 0 # Let flag_success as global variable
+            flag_success            <- 0
             break
             }
         else { if (T_next>=T_end_time) {
-            flag_success            <<- 1 # Let flag_success as global variable
+            flag_success            <- 1
             T_current               <- T_end_time
             break
             }
@@ -180,12 +179,16 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #-----------Perform division events with new genotype
             if (count_div_new_tmp>=1){ for (j in 1:count_div_new_tmp) {
 #               Find what events lead to the new genotype
+                flag_drivers                        <- 0
                 flag_whole_genome_duplication       <- 0
                 flag_missegregation                 <- 0
                 flag_chrom_arm_missegregation       <- 0
                 flag_amplification                  <- 0
-                flag_drivers                        <- 0
-                while (max(c(flag_whole_genome_duplication, flag_missegregation, flag_chrom_arm_missegregation, flag_amplification, flag_drivers))==0) {
+                flag_deletion                       <- 0
+                flag_cnloh_interstitial             <- 0
+                flag_cnloh_terminal                 <- 0
+                vec_flag                            <- c(flag_drivers,flag_whole_genome_duplication,flag_missegregation,flag_chrom_arm_missegregation,flag_amplification,flag_deletion,flag_cnloh_interstitial,flag_cnloh_terminal)
+                while (max(vec_flag)==0) {
                     flag_drivers                    <- as.numeric(runif(1)<(prob_new_drivers/prob_new_genotype))
                     flag_whole_genome_duplication   <- as.numeric(runif(1)<(prob_CN_WGD/prob_new_genotype))
                     flag_missegregation             <- as.numeric(runif(1)<(prob_CN_misseg/prob_new_genotype))
@@ -196,11 +199,11 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                     flag_cnloh_terminal             <- as.numeric(runif(1)<(prob_CN_cnloh_t/prob_new_genotype))
                 }
 #               Initiate the two new genotypes
-                output              <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react)
-                genotype_daughter_1 <- output[[1]]
-                genotype_daughter_2 <- output[[2]]
-                position_daughter_1 <- output[[3]]
-                position_daughter_2 <- output[[4]]
+                output                              <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react)
+                genotype_daughter_1                 <- output[[1]]
+                genotype_daughter_2                 <- output[[2]]
+                position_daughter_1                 <- output[[3]]
+                position_daughter_2                 <- output[[4]]
 #               Simulate new driver event
                 if (flag_drivers==1) {
 # print('=========================================================DRIVER')
@@ -308,7 +311,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     }
 #---------------------------------Output package of data from simulation
     if (is.null(N_cells_current)) {
-        flag_success                        <<- 0 # Let flag_success as global variable
+        flag_success                        <- 0
     }
 #   Let package_clonal_evolution as a vector of 15 lists or by list() and then define each element
     package_clonal_evolution                <- list()
@@ -318,13 +321,7 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     package_clonal_evolution[[4]]           <- N_clones
     package_clonal_evolution[[5]]           <- genotype_list_ploidy_chrom
     package_clonal_evolution[[6]]           <- genotype_list_ploidy_block
-
-
-
     package_clonal_evolution[[7]]           <- genotype_list_ploidy_allele
-
-
-
     package_clonal_evolution[[8]]           <- genotype_list_driver_count
     package_clonal_evolution[[9]]           <- genotype_list_driver_map
     package_clonal_evolution[[10]]          <- genotype_list_selection_rate
@@ -334,17 +331,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     package_clonal_evolution[[14]]          <- evolution_traj_divisions
     package_clonal_evolution[[15]]          <- evolution_traj_clonal_ID
     package_clonal_evolution[[16]]          <- evolution_traj_population
-
-
-# final_clonal_ID     <- evolution_traj_clonal_ID[[length(evolution_traj_clonal_ID)]]
-# for(i in 1:length(final_clonal_ID)){
-#     clonal_ID       <- final_clonal_ID[i]
-#     print('-----------------------------------------------------------')
-#     print(genotype_list_ploidy_chrom[[clonal_ID]])
-#     print(genotype_list_ploidy_block[[clonal_ID]])
-#     print(genotype_list_ploidy_chrom[[clonal_ID]])
-# }
-
 
     output                                  <- list()
     output[[1]]                             <- flag_success

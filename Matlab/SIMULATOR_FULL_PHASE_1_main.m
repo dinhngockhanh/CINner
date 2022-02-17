@@ -178,13 +178,16 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
 %-----------Perform division events with new genotype
             for j=1:count_div_new_tmp
 %               Find what events lead to the new genotype
+                flag_drivers                        = 0;
                 flag_whole_genome_duplication       = 0;
                 flag_missegregation                 = 0;
                 flag_chrom_arm_missegregation       = 0;
                 flag_amplification                  = 0;
                 flag_deletion                       = 0;
-                flag_drivers                        = 0;
-                while (max([flag_whole_genome_duplication flag_missegregation flag_chrom_arm_missegregation flag_amplification flag_drivers])==0)
+                flag_cnloh_interstitial             = 0;
+                flag_cnloh_terminal                 = 0;
+                vec_flag                            = [flag_drivers flag_whole_genome_duplication flag_missegregation flag_chrom_arm_missegregation flag_amplification flag_deletion flag_cnloh_interstitial flag_cnloh_terminal];
+                while (max(vec_flag)==0)
                     flag_drivers                    = rand<(prob_new_drivers/prob_new_genotype);
                     flag_whole_genome_duplication   = rand<(prob_CN_WGD/prob_new_genotype);
                     flag_missegregation             = rand<(prob_CN_misseg/prob_new_genotype);

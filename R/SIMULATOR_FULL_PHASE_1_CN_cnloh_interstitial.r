@@ -87,11 +87,11 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,genot
     driver_unique                           <- driver_unique[driver_unique!=0]
     driver_count                            <- length(driver_unique)
 #------------------------------------------------Output the new genotype
-    genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
-    genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele
-    genotype_list_ploidy_block[[genotype_daughter]]           <<- ploidy_block
-    genotype_list_driver_count[genotype_daughter]             <<- driver_count
-    genotype_list_driver_map[[genotype_daughter]]             <<- driver_map
-    end                                                       <- length(evolution_genotype_changes[[genotype_daughter]])
-    evolution_genotype_changes[[genotype_daughter]][[end+1]]  <<- list('cnloh-interstitial',chrom,strand_give,strand_take,block_start,block_end)
+    genotype_list_ploidy_chrom[[genotype_daughter]]                 <<- ploidy_chrom
+    genotype_list_ploidy_allele[[genotype_daughter]]                <<- ploidy_allele
+    genotype_list_ploidy_block[[genotype_daughter]]                 <<- ploidy_block
+    genotype_list_driver_count[genotype_daughter]                   <<- driver_count
+    genotype_list_driver_map[[genotype_daughter]]                   <<- driver_map
+    loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter]])
+    evolution_genotype_changes[[genotype_daughter]][[loc_end+1]]    <<- c('cnloh-interstitial',chrom,strand_give,strand_take,block_start,block_end)
 }

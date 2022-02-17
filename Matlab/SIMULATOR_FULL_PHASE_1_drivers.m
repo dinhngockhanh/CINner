@@ -40,6 +40,10 @@ function SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,ge
         chrom                                           = driver_library_eligible.Chromosome(driver);
         block                                           = driver_library_eligible.Bin(driver);
         no_strands                                      = ploidy_chrom(chrom);
+        if no_strands<1
+            driver_library_eligible.Copy_count(driver)  = 0;
+            continue;
+        end
         driver_copy                                     = 0;
         for strand=1:no_strands
             driver_copy                                 = driver_copy+ploidy_block{chrom,strand}(block);

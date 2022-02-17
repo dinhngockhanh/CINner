@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 ```
 
 ## Background
+This vignette illustrates how to use the program to fit driver, selection and CN event rates for a model.
+First we install the simulator...
+
 ```{r setup}
 devtools::install_github("dinhngockhanh/CancerSimulator")
 
@@ -27,8 +30,14 @@ devtools::load_all()
 devtools::document()
 ```
 
+
+
+
+
+
+
 ## Set up the model
-For this example, we examine the ABC for fitting ....
+For this example, we simulate the mutation-driven evolution of HGSOC.
 
 ```{r}
 MODEL <- 'HGSOC-BULK'

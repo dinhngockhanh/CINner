@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 
 ## Background
-This vignette illustates how to use the program to create simulations for a model.
+This vignette illustrates how to use the program to create simulations for a model.
 First we install the simulator...
 
 ```{r setup}
@@ -110,11 +110,13 @@ cat('Probability of interstitial CN-LOH                           = ',prob_CN_cn
 cat('Probability of terminal CN-LOH                               = ',prob_CN_cnloh_terminal,'\n')
 ```
 
-The focal amplification/deletion events require additional parameters for the mean length of each event:
+The focal amplification/deletion and interstitial/terminal CN-LOH events require additional parameters for the mean length of each event:
 
 ```{r}
 cat('Geometric parameter for bin length of a focal amplification  = ',prob_CN_focal_amplification_length,'\n')
 cat('Geometric parameter for bin length of a focal deletion       = ',prob_CN_focal_deletion_length,'\n')
+cat('Geometric parameter for bin length of an interstitial CN-LOH = ',prob_CN_cnloh_interstitial_length,'\n')
+cat('Geometric parameter for bin length of a terminal CN-LOH      = ',prob_CN_cnloh_terminal_length,'\n')
 ```
 
 The length of each chromosome is computed in bin counts:
@@ -151,7 +153,7 @@ package_output                <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,sta
 
 We first inspect the dynamics of the total cell population. The information is stored in entry 1 of the output package.
 
-```{r, fig.height=4 , fig.width=10}
+```{r,fig.height=4,fig.width=10}
 package_clonal_evolution      <- package_output[[1]]
 
 vec_time                      <- package_clonal_evolution[[13]]
@@ -192,24 +194,15 @@ package_sample_phylogeny      <- package_output[[3]]
 phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
 ```
 
-The CN profiles can be plotted using function `plotHeatmap` in library signals.
-We first plot the total CN profiles.
+The CN profiles can be plotted using function `plotHeatmap` in library `signals`.
+We can plot the total CN profiles, as well as the minor CN profiles.
 
-```{r}
-plotHeatmap(sample_genotype_profiles,plotcol="state",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=FALSE)
+```{r,fig.show='hold',fig.height=4,fig.width=10}
+plotHeatmap(sample_genotype_profiles,plotcol="state",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
+
+plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
 ```
 
-Then the plot of the minor CN profiles.
-
-```{r}
-plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=FALSE)
-```
-
-We can also plot the phylogeny tree of the sampled cells.
-
-```{r}
-plot(phylogeny_clustering_truth$tree,show.tip.label=FALSE)
-```
 
 
 
@@ -224,8 +217,8 @@ plot(phylogeny_clustering_truth$tree,show.tip.label=FALSE)
 We can create multiple simulations for the same model with function `TEST_SIMULATIONS_FOR_FIRST_MANUSCRIPT`. The parameter `N_simulations` dictates how many simulations are created.
 
 ```{r}
+MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
 stage_final                   <- 1
-N_simulations                 <- 1
-output                        <- TEST_SIMULATIONS_FOR_FIRST_MANUSCRIPT(MODEL,stage_final,N_simulations)
-# package_clonal_evolution      <- package_output[[1]]
+N_simulations                 <- 100
+SIMULATOR_FULL_PROGRAM_many_simulations(MODEL,stage_final,N_simulations)
 ```

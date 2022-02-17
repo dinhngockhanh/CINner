@@ -49,11 +49,10 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
         ploidy_chrom_1[chrom]   <- ploidy_chrom_1[chrom]+1
         ploidy_chrom_2[chrom]   <- ploidy_chrom_2[chrom]-1
         }
-    else { if (i_gain==2) {
+    else {if (i_gain==2){
         ploidy_chrom_2[chrom]   <- ploidy_chrom_2[chrom]+1
         ploidy_chrom_1[chrom]   <- ploidy_chrom_1[chrom]-1
-        }
-    }
+    }}
 #   Update the chromosome strand allele identities of daughter cells
     if (i_gain==1) {
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
@@ -66,7 +65,7 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
         }
         ploidy_allele_2[[chrom]]                    <- ploidy_allele_2[[chrom]][-(chrom_ploidy+1)] # Remove item from ploidy_block_2[[chrom]]
         }
-    else { if (i_gain==2) {
+    else {if (i_gain==2) {
         chrom_ploidy                                <- ploidy_chrom_2[chrom]
         ploidy_allele_2[[chrom]][[chrom_ploidy]]    <- ploidy_allele_1[[chrom]][[strand]]
         chrom_ploidy                                <- ploidy_chrom_1[chrom]
@@ -149,10 +148,12 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     genotype_list_driver_count[genotype_daughter_1]        <<- driver_count_1
     genotype_list_driver_map[[genotype_daughter_1]]        <<- driver_map_1
     if (i_gain==1) {
-        evolution_genotype_changes[[genotype_daughter_1]]  <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('missegregation',chrom,strand,1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_1]])
+        evolution_genotype_changes[[genotype_daughter_1]][[loc_end+1]]  <<- c('missegregation',chrom,strand,1)
         }
     else { if (i_gain==2) {
-        evolution_genotype_changes[[genotype_daughter_1]]  <<- c(evolution_genotype_changes[[genotype_daughter_1]],list('missegregation',chrom,strand,-1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_1]])
+        evolution_genotype_changes[[genotype_daughter_1]][[loc_end+1]]  <<- c('missegregation',chrom,strand,-1)
         }
     }
 
@@ -162,10 +163,12 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     genotype_list_driver_count[genotype_daughter_2]        <<- driver_count_2
     genotype_list_driver_map[[genotype_daughter_2]]        <<- driver_map_2
     if (i_gain==1) {
-        evolution_genotype_changes[[genotype_daughter_2]]  <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('missegregation',chrom,strand,-1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_2]])
+        evolution_genotype_changes[[genotype_daughter_2]][[loc_end+1]]  <<- c('missegregation',chrom,strand,-1)
         }
     else { if (i_gain==2) {
-        evolution_genotype_changes[[genotype_daughter_2]]  <<- c(evolution_genotype_changes[[genotype_daughter_2]],list('missegregation',chrom,strand,1))
+        loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter_2]])
+        evolution_genotype_changes[[genotype_daughter_2]][[loc_end+1]]  <<- c('missegregation',chrom,strand,1)
         }
     }
 }

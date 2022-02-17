@@ -63,11 +63,11 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react,genotype_
     driver_unique                                               <- driver_unique[driver_unique!=0]
     driver_count                                                <- length(driver_unique)
 #------------------------------------------------Output the new genotype
-    genotype_list_ploidy_chrom[[genotype_daughter]]           <<- ploidy_chrom
-    genotype_list_ploidy_allele[[genotype_daughter]]          <<- ploidy_allele
-    genotype_list_ploidy_block[[genotype_daughter]]           <<- ploidy_block
-    genotype_list_driver_count[genotype_daughter]             <<- driver_count
-    genotype_list_driver_map[[genotype_daughter]]             <<- driver_map
-    end                                                       <- length(evolution_genotype_changes[[genotype_daughter]])
-    evolution_genotype_changes[[genotype_daughter]][[end+1]]  <<- list('focal-deletion',chrom,strand,block_start,block_end)
+    genotype_list_ploidy_chrom[[genotype_daughter]]                 <<- ploidy_chrom
+    genotype_list_ploidy_allele[[genotype_daughter]]                <<- ploidy_allele
+    genotype_list_ploidy_block[[genotype_daughter]]                 <<- ploidy_block
+    genotype_list_driver_count[genotype_daughter]                   <<- driver_count
+    genotype_list_driver_map[[genotype_daughter]]                   <<- driver_map
+    loc_end                                                         <- length(evolution_genotype_changes[[genotype_daughter]])
+    evolution_genotype_changes[[genotype_daughter]][[loc_end+1]]    <<- c('focal-deletion',chrom,strand,block_start,block_end)
 }
