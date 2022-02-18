@@ -196,6 +196,7 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
                     flag_deletion                   = rand<(prob_CN_foc_del/prob_new_genotype);
                     flag_cnloh_interstitial         = rand<(prob_CN_cnloh_i/prob_new_genotype);
                     flag_cnloh_terminal             = rand<(prob_CN_cnloh_t/prob_new_genotype);
+                    vec_flag                        = [flag_drivers flag_whole_genome_duplication flag_missegregation flag_chrom_arm_missegregation flag_amplification flag_deletion flag_cnloh_interstitial flag_cnloh_terminal];
                 end
 %               Initiate the two new genotypes
                 [genotype_daughter_1,genotype_daughter_2,position_daughter_1,position_daughter_2]   = SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react);

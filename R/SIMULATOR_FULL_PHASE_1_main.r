@@ -114,9 +114,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     N_events_goal                   <- Max_events
 #-----------------------------------------------------Simulation process
     while ((T_current<T_goal)&&(N_cells_current<N_cells_goal)&&(N_events_current<N_events_goal)) {
-
-print(T_current)
-
 #       Find the Poisson propensities of event count for all clones
         rate_base_lifetime          <- func_event_rate(T_current)
         all_propensity              <- T_tau_step*rate_base_lifetime*clonal_population_current
@@ -200,6 +197,7 @@ print(T_current)
                     flag_deletion                   <- as.numeric(runif(1)<(prob_CN_foc_del/prob_new_genotype))
                     flag_cnloh_interstitial         <- as.numeric(runif(1)<(prob_CN_cnloh_i/prob_new_genotype))
                     flag_cnloh_terminal             <- as.numeric(runif(1)<(prob_CN_cnloh_t/prob_new_genotype))
+                    vec_flag                        <- c(flag_drivers,flag_whole_genome_duplication,flag_missegregation,flag_chrom_arm_missegregation,flag_amplification,flag_deletion,flag_cnloh_interstitial,flag_cnloh_terminal)
                 }
 #               Initiate the two new genotypes
                 output                              <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react)
@@ -209,27 +207,27 @@ print(T_current)
                 position_daughter_2                 <- output[[4]]
 #               Simulate new driver event
                 if (flag_drivers==1) {
-print('=========================================================DRIVER')
+# print('=========================================================DRIVER')
                     SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate whole genome duplication event
                 if (flag_whole_genome_duplication==1) {
-print('=======================================WHOLE-GENOME DUPLICATION')
+# print('=======================================WHOLE-GENOME DUPLICATION')
                     SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate missegregation event
                 if (flag_missegregation==1) {
-print('=================================================MISSEGREGATION')
+# print('=================================================MISSEGREGATION')
                     SIMULATOR_FULL_PHASE_1_CN_missegregation(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate chromosome-arm missegregation event
                 if (flag_chrom_arm_missegregation==1) {
-print('=============================================ARM-MISSEGREGATION')
+# print('=============================================ARM-MISSEGREGATION')
                     SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate focal amplification event
                 if (flag_amplification==1) {
-print('==================================================AMPLIFICATION')
+# print('==================================================AMPLIFICATION')
                     if (sample.int(2,size=1)==1) {
                         SIMULATOR_FULL_PHASE_1_CN_focal_amplification(genotype_to_react,genotype_daughter_1)
                         }
@@ -239,7 +237,7 @@ print('==================================================AMPLIFICATION')
                 }
 #               Simulate focal deletion event
                 if (flag_deletion==1) {
-print('=======================================================DELETION')
+# print('=======================================================DELETION')
                     if (sample.int(2,size=1)==1) {
                         SIMULATOR_FULL_PHASE_1_CN_focal_deletion(genotype_to_react,genotype_daughter_1)
                         }
@@ -249,7 +247,7 @@ print('=======================================================DELETION')
                 }
 #               Simulate interstitial CN-LOH event
                 if (flag_cnloh_interstitial==1) {
-print('============================================INTERSTITIAL CN-LOH')
+# print('============================================INTERSTITIAL CN-LOH')
                     if (sample.int(2,size=1)==1) {
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(genotype_to_react,genotype_daughter_1)
                     }
@@ -259,7 +257,7 @@ print('============================================INTERSTITIAL CN-LOH')
                 }
 #               Simulate terminal CN-LOH event
                 if (flag_cnloh_terminal==1) {
-print('================================================TERMINAL CN-LOH')
+# print('================================================TERMINAL CN-LOH')
                     if (sample.int(2,size=1)==1) {
                         SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(genotype_to_react,genotype_daughter_1)
                     }
