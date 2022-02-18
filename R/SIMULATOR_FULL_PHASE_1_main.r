@@ -114,6 +114,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     N_events_goal                   <- Max_events
 #-----------------------------------------------------Simulation process
     while ((T_current<T_goal)&&(N_cells_current<N_cells_goal)&&(N_events_current<N_events_goal)) {
+
+print(T_current)
+
 #       Find the Poisson propensities of event count for all clones
         rate_base_lifetime          <- func_event_rate(T_current)
         all_propensity              <- T_tau_step*rate_base_lifetime*clonal_population_current
