@@ -37,6 +37,7 @@ end.time    <- Sys.time()
 time.taken  <- end.time - start.time
 print(time.taken)
     }
+print('DONE WITH SIMULATION')
 #------------------------------------------Output the simulation package
     return(package_output)
 }
