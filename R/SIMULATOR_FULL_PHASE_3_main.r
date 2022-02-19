@@ -48,7 +48,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 TIME_COUNT=0;
-print(TIME_COUNT)
 
 
 
@@ -58,7 +57,6 @@ print(TIME_COUNT)
 
 
 
-print(i)
 if ((i%%1000)==0){
 print(TIME_COUNT)
 
