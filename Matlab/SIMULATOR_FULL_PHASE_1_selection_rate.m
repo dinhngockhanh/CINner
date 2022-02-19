@@ -28,6 +28,11 @@ function clone_selection_rate = SIMULATOR_FULL_PHASE_1_selection_rate(driver_cou
             return;
         end
     end
+%----------If driver library is empty, then viable cells have sel rate 1
+    if isempty(driver_library)
+        clone_selection_rate        = 1;
+        return;
+    end
 %------------------------------Compute selection rates for viable clones
     driver_library_copy                             = driver_library;
     driver_library_copy.Copy_WT                     = zeros(size(driver_library,1),1);

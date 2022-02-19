@@ -44,28 +44,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     vec_runif                                   <- runif(10000000)
     N_runif                                     <- 0
 #----------------------------------------Build the sample phylogeny tree
-
-
-
-TIME_COUNT=0;
-
-
-
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
 #       Get time point
         time                                    <- evolution_traj_time[i]
-
-
-
-if ((i%%1000)==0){
-print(TIME_COUNT)
-
-
-TIME_COUNT=0;
-}
-
-
-
 #       Get current total clonal population (after divisions)
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
         total_clonal_population                 <- evolution_traj_population[[i+1]]
@@ -108,13 +89,6 @@ TIME_COUNT=0;
                 next
             }
 #           For each specific division...
-
-
-
-start.time_mini <- Sys.time()
-
-
-
             for (division in 1:no_divisions) {
 #               If these genotypes are not in current nodes, move on
                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
@@ -202,15 +176,6 @@ start.time_mini <- Sys.time()
                     }
                 }}}
             }
-
-
-
-end.time_mini   <- Sys.time()
-time.taken_mini <- end.time_mini - start.time_mini
-TIME_COUNT      <- TIME_COUNT+time.taken_mini
-
-
-
         }
     }
 #   Assign original cell to be born at the beginning of clonal evolution

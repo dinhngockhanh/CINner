@@ -42,85 +42,9 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_genotype(node_list_current)       = node_genotype_current;
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
-    % for i=length(evolution_traj_divisions):-1:1
-    for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)
+    for i=length(evolution_traj_divisions):-1:1
 %       Get time point
         time                                    = evolution_traj_time(i);
-%       Get list of divisions occurring in total population
-%       Column 1:       number of divisions
-%       Column 2:       genotype mother
-%       Column 3:       genotype daughter 1
-%       Column 4:       genotype daughter 2
-        mat_division_total_population           = evolution_traj_divisions{i};
-        if isempty(mat_division_total_population)
-            continue;
-        end
-%       Get current clonal populations in total population
-        eligible_clonal_ID                      = evolution_traj_clonal_ID{i+1};
-        eligible_clonal_total_population        = evolution_traj_population{i+1};
-%       Get current clonal populations in sample
-        eligible_clonal_sample_population       = zeros(1,length(eligible_clonal_ID));
-        for clone=1:length(eligible_clonal_ID)
-            clone_ID                                    = eligible_clonal_ID(clone);
-            eligible_clonal_sample_population(clone)    = length(find(node_genotype_current==clone_ID));
-        end
-
-
-
-        if sum(eligible_clonal_sample_population)~=length(node_genotype_current)
-            print('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
-        end
-
-
-
-%       Reduce list of divisions to only clones present in sample
-        mat_division_total_population_short         = [];
-        for division=1:size(mat_division_total_population,1)
-            clonal_ID_daughter_1                    = mat_division_total_population(division,3);
-            clonal_population_daughter_1            = eligible_clonal_sample_population(find(eligible_clonal_ID==clonal_ID_daughter_1));
-
-            clonal_ID_daughter_2                    = mat_division_total_population(division,4);
-            clonal_population_daughter_2            = eligible_clonal_sample_population(find(eligible_clonal_ID==clonal_ID_daughter_2));
-
-            if (clonal_population_daughter_1>0) || (clonal_population_daughter_2>0)
-                mat_division_total_population_short = [mat_division_total_population_short;mat_division_total_population(division,:)];
-            end
-        end
-        mat_division_total_population               = mat_division_total_population_short;
-%
-        mat_division_sample                         = cell(size(mat_division_total_population,1),2);
-
-        for clone=1:length(eligible_clonal_ID)
-            clonal_ID                               = eligible_clonal_ID(clone);
-            clonal_sample_population                = eligible_clonal_sample_population(clone);
-            if
-
-
-
-
-
-        % node_list_current
-        % node_genotype_current
-
-        eligible_clonal_ID
-        eligible_clonal_total_population
-        eligible_clonal_sample_population
-        sum(eligible_clonal_sample_population)
-        length(node_genotype_current)
-
-        mat_division_total_population
-
-        mat_division_sample
-
-return
-
-
-
-
-
-
-
-
 %       Report on progress
         total_clonal_ID                         = evolution_traj_clonal_ID{i+1};
         total_clonal_population                 = evolution_traj_population{i+1};
