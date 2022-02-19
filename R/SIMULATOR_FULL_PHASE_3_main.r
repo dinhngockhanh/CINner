@@ -108,6 +108,11 @@ TIME_COUNT=0;
                 next
             }
 #           For each specific division...
+            for (division in 1:no_divisions) {
+#               If these genotypes are not in current nodes, move on
+                if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
+                    next
+                }
 
 
 
@@ -115,11 +120,6 @@ start.time_mini <- Sys.time()
 
 
 
-            for (division in 1:no_divisions) {
-#               If these genotypes are not in current nodes, move on
-                if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
-                    next
-                }
 #               Choose the first daughter node
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
                 N_runif                                                         <- N_runif+1
@@ -154,6 +154,15 @@ start.time_mini <- Sys.time()
                     node_2                                                      <- 0
                     total_clonal_population[position_daughter_2]                <- total_clonal_population[position_daughter_2]-1
                 }
+
+
+
+end.time_mini   <- Sys.time()
+time.taken_mini <- end.time_mini - start.time_mini
+TIME_COUNT      <- TIME_COUNT+time.taken_mini
+
+
+
 #               Update the nodes
                 if ((node_1==0)&&(node_2==0)) {
 #                   There is no merging....
@@ -202,15 +211,6 @@ start.time_mini <- Sys.time()
                     }
                 }}}
             }
-
-
-
-end.time_mini   <- Sys.time()
-time.taken_mini <- end.time_mini - start.time_mini
-TIME_COUNT      <- TIME_COUNT+time.taken_mini
-
-
-
         }
     }
 #   Assign original cell to be born at the beginning of clonal evolution
