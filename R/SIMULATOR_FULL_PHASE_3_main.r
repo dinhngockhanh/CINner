@@ -57,6 +57,7 @@ TIME_COUNT=0;
 
 
 
+print(i)
 if ((i%%1000)==0){
 print(TIME_COUNT)
 
