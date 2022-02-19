@@ -113,17 +113,14 @@ TIME_COUNT=0;
                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
                     next
                 }
-
-
-
-start.time_mini <- Sys.time()
-
-
-
 #               Choose the first daughter node
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
+start.time_mini <- Sys.time()
                 N_runif                                                         <- N_runif+1
                 logic_node_1                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
+end.time_mini   <- Sys.time()
+time.taken_mini <- end.time_mini - start.time_mini
+TIME_COUNT      <- TIME_COUNT+time.taken_mini
                 if (logic_node_1==1) {
                     # pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
                     N_runif                                                     <- N_runif+1
@@ -139,8 +136,12 @@ start.time_mini <- Sys.time()
                 }
 #               Choose the second daughter node
                 # logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
+start.time_mini <- Sys.time()
                 N_runif                                                         <- N_runif+1
                 logic_node_2                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
+end.time_mini   <- Sys.time()
+time.taken_mini <- end.time_mini - start.time_mini
+TIME_COUNT      <- TIME_COUNT+time.taken_mini
                 if (logic_node_2==1) {
                     # pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
                     N_runif                                                     <- N_runif+1
@@ -154,15 +155,6 @@ start.time_mini <- Sys.time()
                     node_2                                                      <- 0
                     total_clonal_population[position_daughter_2]                <- total_clonal_population[position_daughter_2]-1
                 }
-
-
-
-end.time_mini   <- Sys.time()
-time.taken_mini <- end.time_mini - start.time_mini
-TIME_COUNT      <- TIME_COUNT+time.taken_mini
-
-
-
 #               Update the nodes
                 if ((node_1==0)&&(node_2==0)) {
 #                   There is no merging....
