@@ -217,31 +217,8 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 }
 #               Simulate missegregation event
                 if (flag_missegregation==1) {
-print('=================================================MISSEGREGATION')
-
-print('~~~~~~~~~~~~~~     MOTHER CLONE:')
-print(genotype_list_ploidy_chrom[[genotype_to_react]])
-# print(genotype_list_ploidy_allele[[genotype_to_react]])
-# print(genotype_list_ploidy_block[[genotype_to_react]])
-print(genotype_list_driver_count[[genotype_to_react]])
-print(genotype_list_driver_map[[genotype_to_react]])
-
+# print('=================================================MISSEGREGATION')
                     SIMULATOR_FULL_PHASE_1_CN_missegregation(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
-
-print('~~~~~~~~~~~~~~     DAUGHTER CLONE 1:')
-print(genotype_list_ploidy_chrom[[genotype_daughter_1]])
-# print(genotype_list_ploidy_allele[[genotype_daughter_1]])
-# print(genotype_list_ploidy_block[[genotype_daughter_1]])
-print(genotype_list_driver_count[[genotype_daughter_1]])
-print(genotype_list_driver_map[[genotype_daughter_1]])
-
-print('~~~~~~~~~~~~~~     DAUGHTER CLONE 2:')
-print(genotype_list_ploidy_chrom[[genotype_daughter_2]])
-# print(genotype_list_ploidy_allele[[genotype_daughter_2]])
-# print(genotype_list_ploidy_block[[genotype_daughter_2]])
-print(genotype_list_driver_count[[genotype_daughter_2]])
-print(genotype_list_driver_map[[genotype_daughter_2]])
-
                 }
 #               Simulate chromosome-arm missegregation event
                 if (flag_chrom_arm_missegregation==1) {
