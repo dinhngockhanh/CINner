@@ -207,35 +207,36 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 position_daughter_2                 <- output[[4]]
 #               Simulate new driver event
                 if (flag_drivers==1) {
-print('=========================================================DRIVER')
-print('MOTHER CLONE:')
+# print('=========================================================DRIVER')
+                    SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
+                }
+#               Simulate whole genome duplication event
+                if (flag_whole_genome_duplication==1) {
+print('=======================================WHOLE-GENOME DUPLICATION')
+
+print('~~~~~~~~~~~~~~     MOTHER CLONE:')
 print(genotype_list_ploidy_chrom[[genotype_to_react]])
 # print(genotype_list_ploidy_allele[[genotype_to_react]])
 # print(genotype_list_ploidy_block[[genotype_to_react]])
 print(genotype_list_driver_count[[genotype_to_react]])
 print(genotype_list_driver_map[[genotype_to_react]])
 
-                    SIMULATOR_FULL_PHASE_1_drivers(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
+                    SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
 
-print('DAUGHTER CLONE 1:')
+print('~~~~~~~~~~~~~~     DAUGHTER CLONE 1:')
 print(genotype_list_ploidy_chrom[[genotype_daughter_1]])
 # print(genotype_list_ploidy_allele[[genotype_daughter_1]])
 # print(genotype_list_ploidy_block[[genotype_daughter_1]])
 print(genotype_list_driver_count[[genotype_daughter_1]])
 print(genotype_list_driver_map[[genotype_daughter_1]])
 
-print('DAUGHTER CLONE 2:')
+print('~~~~~~~~~~~~~~     DAUGHTER CLONE 2:')
 print(genotype_list_ploidy_chrom[[genotype_daughter_2]])
 # print(genotype_list_ploidy_allele[[genotype_daughter_2]])
 # print(genotype_list_ploidy_block[[genotype_daughter_2]])
 print(genotype_list_driver_count[[genotype_daughter_2]])
 print(genotype_list_driver_map[[genotype_daughter_2]])
 
-                }
-#               Simulate whole genome duplication event
-                if (flag_whole_genome_duplication==1) {
-# print('=======================================WHOLE-GENOME DUPLICATION')
-                    SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(genotype_to_react,genotype_daughter_1,genotype_daughter_2)
                 }
 #               Simulate missegregation event
                 if (flag_missegregation==1) {
