@@ -134,9 +134,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
             }
         }
 #       Report on progress
-        if(floor(T_current/365)<floor(T_next/365)){
-            cat('Event = ',N_events_current,'/',N_events_goal,';   Time = ',round(T_current/365),'/',T_goal/365,';   Population = ',N_cells_current,'/',N_cells_goal,';   Number of clones = ',N_clones,'\n')
-        }
+        # if(floor(T_current/365)<floor(T_next/365)){
+        #     cat('Event = ',N_events_current,'/',N_events_goal,';   Time = ',round(T_current/365),'/',T_goal/365,';   Population = ',N_cells_current,'/',N_cells_goal,';   Number of clones = ',N_clones,'\n')
+        # }
 #       Initialize the matrix of divisions for this step
         mat_divisions               <- c()
 #       Find all existing clones
