@@ -11,7 +11,7 @@ start.time  <- Sys.time()
         package_clonal_evolution                    <- output[[2]]
 end.time    <- Sys.time()
 time.taken  <- end.time - start.time
-time.taken
+print(time.taken)
     }
     if(stage_final>=1){
         package_output                              <- list()
@@ -25,7 +25,7 @@ start.time  <- Sys.time()
         package_output[[2]]                         <- package_sample
 end.time    <- Sys.time()
 time.taken  <- end.time - start.time
-time.taken
+print(time.taken)
     }
 #-----------------------------------Simulate the phylogeny of the sample
     if(stage_final>=3){
@@ -35,7 +35,7 @@ start.time  <- Sys.time()
         package_output[[3]]                         <- package_sample_phylogeny
 end.time    <- Sys.time()
 time.taken  <- end.time - start.time
-time.taken
+print(time.taken)
     }
 #------------------------------------------Output the simulation package
     return(package_output)
