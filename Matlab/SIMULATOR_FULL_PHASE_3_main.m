@@ -42,190 +42,269 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_genotype(node_list_current)       = node_genotype_current;
     phylogeny_deathtime(node_list_current)      = T_current;
 %----------------------------------------Build the sample phylogeny tree
-    % for i=length(evolution_traj_divisions):-1:1
-    for i=length(evolution_traj_divisions):-1:length(evolution_traj_divisions)
+    for i=length(evolution_traj_divisions):-1:1
 %       Get time point
-        time                                    = evolution_traj_time(i);
-%       Get list of divisions occurring in total population
-%       Column 1:       number of divisions
-%       Column 2:       genotype mother
-%       Column 3:       genotype daughter 1
-%       Column 4:       genotype daughter 2
-        mat_division_total_population           = evolution_traj_divisions{i};
-        if isempty(mat_division_total_population)
-            continue;
-        end
+        time                                            = evolution_traj_time(i);
 %       Get current clonal populations in total population
-        eligible_clonal_ID                      = evolution_traj_clonal_ID{i+1};
-        eligible_clonal_total_population        = evolution_traj_population{i+1};
+        eligible_clonal_ID                              = evolution_traj_clonal_ID{i+1};
+        eligible_clonal_total_population                = evolution_traj_population{i+1};
 %       Get current clonal populations in sample
-        eligible_clonal_sample_population       = zeros(1,length(eligible_clonal_ID));
+        eligible_clonal_sample_population               = zeros(1,length(eligible_clonal_ID));
         for clone=1:length(eligible_clonal_ID)
             clone_ID                                    = eligible_clonal_ID(clone);
             eligible_clonal_sample_population(clone)    = length(find(node_genotype_current==clone_ID));
         end
-
-
-
+%       Translate next clonal populations in total population as
+%       thresholds that clonal populations in sample cannot exceed
+        if i==1
+            limit_clonal_total_population               = Inf(1,length(eligible_clonal_ID));
+        else
+            limit_clonal_total_population               = zeros(1,length(eligible_clonal_ID));
+            eligible_clonal_ID_tmp                      = evolution_traj_clonal_ID{i};
+            eligible_clonal_total_population_tmp        = evolution_traj_population{i};
+            for clone=1:length(eligible_clonal_ID)
+                clone_ID                                = eligible_clonal_ID(clone);
+                loc_tmp                                 = find(eligible_clonal_ID_tmp==clone_ID);
+                if ~isempty(loc_tmp)
+                    limit_clonal_total_population(clone)= eligible_clonal_total_population_tmp(loc_tmp);
+                end
+            end
+        end
+%=======Sanity tests
         if sum(eligible_clonal_sample_population)~=length(node_genotype_current)
-            print('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
+            fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
+        elseif any(eligible_clonal_sample_population>eligible_clonal_total_population)
+            fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE ARE LARGER THAN IN TOTAL CELL POPULATION\n\n');
+            eligible_clonal_ID
+            eligible_clonal_sample_population
+            eligible_clonal_total_population
+            evolution_traj_population{i+2}
+
+            disp('~~~~~~~~~~~~~~~~~~~~~')
+
+            mat_division_total_population
+            mat_division_sample
+            mat_division_sample_clone
+
+            disp('~~~~~~~~~~~~~~~~~~~~~')
+
+            limit_clonal_total_population
+            tmp_clonal_sample_population
+            disp('----------------------------------------------------------------------------')
         end
-
-
-
-%       Reduce list of divisions to only clones present in sample
-        mat_division_total_population_short         = [];
+%=======Get list of divisions occurring in total population
+%       Column 1:       number of divisions
+%       Column 2:       genotype mother
+%       Column 3:       genotype daughter 1
+%       Column 4:       genotype daughter 2
+        mat_division_total_population                   = evolution_traj_divisions{i};
+        if isempty(mat_division_total_population)
+            continue;
+        end
+%=======Reduce list of divisions to only clones present in sample
+        mat_division_total_population_short             = [];
         for division=1:size(mat_division_total_population,1)
-            clonal_ID_daughter_1                    = mat_division_total_population(division,3);
-            clonal_population_daughter_1            = eligible_clonal_sample_population(find(eligible_clonal_ID==clonal_ID_daughter_1));
-
-            clonal_ID_daughter_2                    = mat_division_total_population(division,4);
-            clonal_population_daughter_2            = eligible_clonal_sample_population(find(eligible_clonal_ID==clonal_ID_daughter_2));
-
+            clonal_ID_daughter_1                        = mat_division_total_population(division,3);
+            clonal_population_daughter_1                = eligible_clonal_sample_population(find(eligible_clonal_ID==clonal_ID_daughter_1));
+            clonal_ID_daughter_2                        = mat_division_total_population(division,4);
+            clonal_population_daughter_2                = eligible_clonal_sample_population(find(eligible_clonal_ID==clonal_ID_daughter_2));
             if (clonal_population_daughter_1>0) || (clonal_population_daughter_2>0)
-                mat_division_total_population_short = [mat_division_total_population_short;mat_division_total_population(division,:)];
+                mat_division_total_population_short     = [mat_division_total_population_short;mat_division_total_population(division,:)];
             end
         end
-        mat_division_total_population               = mat_division_total_population_short;
-%
-        mat_division_sample                         = cell(size(mat_division_total_population,1),2);
-
-        for clone=1:length(eligible_clonal_ID)
-            clonal_ID                               = eligible_clonal_ID(clone);
-            clonal_sample_population                = eligible_clonal_sample_population(clone);
-            if
-
-
-
-
-
-        % node_list_current
-        % node_genotype_current
-
-        eligible_clonal_ID
-        eligible_clonal_total_population
-        eligible_clonal_sample_population
-        sum(eligible_clonal_sample_population)
-        length(node_genotype_current)
-
-        mat_division_total_population
-
-        mat_division_sample
-
-return
-
-
-
-
-
-
-
-
-%       Report on progress
-        total_clonal_ID                         = evolution_traj_clonal_ID{i+1};
-        total_clonal_population                 = evolution_traj_population{i+1};
-%       Get current sample clonal population (after divisions)
-        sample_clonal_population                = zeros(1,N_clones);
-        for node=1:length(node_genotype_current)
-            genotype                            = node_genotype_current(node);
-            sample_clonal_population(genotype)  = sample_clonal_population(genotype)+1;
+        mat_division_total_population                   = mat_division_total_population_short;
+        if isempty(mat_division_total_population)
+            continue;
         end
-%       Get list of eligible nodes of each genotype
-        sample_eligible_nodes                   = cell(1,N_clones);
-        for node=1:length(node_genotype_current)
-            genotype                            = node_genotype_current(node);
-            sample_eligible_nodes{genotype}     = [sample_eligible_nodes{genotype} node_list_current(node)];
-        end
-%       Get list of divisions
-        matrix_division                         = evolution_traj_divisions{i};
-%       For each type of divisions...
-        for event_type=1:size(matrix_division,1)
-%           Get number of divisions
-            no_divisions                        = matrix_division(event_type,1);
-%           Get genotype of mother
-            genotype_mother                     = matrix_division(event_type,2);
-%           Get genotype of 1st daughter
-            genotype_daughter_1                 = matrix_division(event_type,3);
-            position_daughter_1                 = find(total_clonal_ID==genotype_daughter_1);
-%           Get genotype of 2nd daughter
-            genotype_daughter_2                 = matrix_division(event_type,4);
-            position_daughter_2                 = find(total_clonal_ID==genotype_daughter_2);
-%           If daughter genotypes are not in current nodes, move on
-            if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
-                continue
+%=======One huge loop to make sure clonal populations in sample are correct
+        logic_correct                                       = 0;
+        while (logic_correct==0)
+%-----------Simulate identities of all divisions occurring in sample
+%           Row:            corresponding to mat_division_total_population
+%           Column 1:       node indices undergoing division as daughter 1
+%           Column 2:       node indices undergoing division as daughter 2
+%           Column 3:       division indices for corresponding nodes on column 1
+%           Column 4:       division indices for corresponding nodes on column 2
+            mat_division_sample                             = cell(size(mat_division_total_population,1),4);
+            for clone=1:length(eligible_clonal_ID)
+%               For every clone found in the total population...
+%               Find its clonal ID
+                clonal_ID                                   = eligible_clonal_ID(clone);
+%               Find its population in total population
+                clonal_total_population                     = eligible_clonal_total_population(clone);
+%               Find its population in sample's eligible nodes
+                clonal_sample_population                    = eligible_clonal_sample_population(clone);
+                if clonal_sample_population<=0
+                    continue;
+                end
+%               Find all division roles that this clone plays in total population
+%               Row 1:      division index (= row in mat_division_total_population)
+%               Row 2:      daughter position (= 1 or 2)
+%               Row 3:      Cell count for this division/position in total population
+%               Row 4:      Node count for this division/position in sample ------> to be done in next sections
+                mat_division_sample_clone                   = [];
+                for daughter=1:2
+                    vec_division_genotype_daughter          = mat_division_total_population(:,daughter+2);
+                    vec_division                            = find(vec_division_genotype_daughter==clonal_ID);
+                    mat_division_sample_clone_new           = [vec_division';daughter*ones(1,length(vec_division));mat_division_total_population(vec_division,1)'];
+                    mat_division_sample_clone               = [mat_division_sample_clone mat_division_sample_clone_new];
+                end
+                if isempty(mat_division_sample_clone)
+                    continue;
+                end
+%               Find total count of nodes of this clone to undergo divisions
+%               of each type, i.e. row 4 in mat_division_sample_clone
+                division_index_all                          = mat_division_sample_clone(1,:);
+                count_nodes_each_max                        = mat_division_total_population(division_index_all,1)';
+                freq                                        = sum(mat_division_sample_clone(3,:))/clonal_total_population;
+%               Find total count of nodes to undergo divisions of all types
+                count_nodes_all                             = binornd(clonal_sample_population,freq);
+%               Divide total count of nodes among different division types
+                count_nodes_each                            = mnrnd(count_nodes_all,mat_division_sample_clone(3,:)/sum(mat_division_sample_clone(3,:)));
+                mat_division_sample_clone(4,:)              = count_nodes_each;
+%               Check that node count in each position doesn't exceed limit in total population
+                if any(count_nodes_each>count_nodes_each_max)
+                    logic_correct                           = -1;
+                    break;
+                end
+%               Jump to next clone if there is no division to perform
+                if max(mat_division_sample_clone(4,:))==0
+                    continue;
+                end
+%               Simulate which nodes undergo each division type
+%               i.e. rows 1 & 2 in mat_division_sample
+                eligible_nodes                              = node_list_current(find(node_genotype_current==clonal_ID));
+                if length(eligible_nodes)==1
+                    node_indices_all                        = eligible_nodes;
+                else
+                    node_indices_all                        = randsample(eligible_nodes,count_nodes_all);
+                end
+                for division_type=1:size(mat_division_sample_clone,2)
+                    row                                     = mat_division_sample_clone(1,division_type);
+                    col                                     = mat_division_sample_clone(2,division_type);
+                    count                                   = mat_division_sample_clone(4,division_type);
+                    if count>0
+                        mat_division_sample{row,col}        = node_indices_all(1:count);
+                    end
+                    node_indices_all(1:count)               = [];
+                end
+%               Simulate the division indices for each division type
+%               i.e. rows 3 & 4 in mat_division_sample
+                for division_type=1:size(mat_division_sample_clone,2)
+                    row                                     = mat_division_sample_clone(1,division_type);
+                    col                                     = mat_division_sample_clone(2,division_type);
+                    count                                   = mat_division_sample_clone(4,division_type);
+                    if count>0
+                        count_divisions_total               = mat_division_total_population(row,1);
+                        mat_division_sample{row,col+2}      = transpose(randsample(count_divisions_total,count));
+                    end
+                end
             end
-%           For each specific division...
-            for division=1:no_divisions
-%               If these genotypes are not in current nodes, move on
-                if (sample_clonal_population(genotype_daughter_1)<=0)&&(sample_clonal_population(genotype_daughter_2)<=0)
-                    continue
+%           Redo the whole process if some node count in some position exceeded limit in total population
+            if logic_correct==-1
+                logic_correct                               = 0;
+                continue;
+            end
+%-----------Update phylogeny tree according to the division identities
+%           Save the current phylogeny in case new changes are wrong
+            hclust_row_tmp                                  = hclust_row;
+            hclust_nodes_tmp                                = hclust_nodes;
+            hclust_merge_tmp                                = hclust_merge;
+            hclust_height_tmp                               = hclust_height;
+
+            phylogeny_origin_tmp                            = phylogeny_origin;
+            phylogeny_elapsed_gens_tmp                      = phylogeny_elapsed_gens;
+            phylogeny_elapsed_genotypes_tmp                 = phylogeny_elapsed_genotypes;
+            phylogeny_genotype_tmp                          = phylogeny_genotype;
+            phylogeny_birthtime_tmp                         = phylogeny_birthtime;
+            phylogeny_deathtime_tmp                         = phylogeny_deathtime;
+
+            node_list_current_tmp                           = node_list_current;
+            node_genotype_current_tmp                       = node_genotype_current;
+%           Update phylogeny according to every division
+            for division_type=1:size(mat_division_total_population,1)
+                genotype_mother                                     = mat_division_total_population(division_type,2);
+%               Get list of nodes in positions of daughter 1 and daughter 2
+                vec_nodes_daughter_1                                = mat_division_sample{division_type,1};
+                vec_nodes_daughter_2                                = mat_division_sample{division_type,2};
+                if isempty(vec_nodes_daughter_1) && isempty(vec_nodes_daughter_2)
+                    continue;
                 end
-%               Choose the first daughter node
-                logic_node_1                                                = rand<sample_clonal_population(genotype_daughter_1)/total_clonal_population(position_daughter_1);
-                if logic_node_1==1
-                    pos_node_1                                              = randi(sample_clonal_population(genotype_daughter_1));
-                    node_1                                                  = sample_eligible_nodes{genotype_daughter_1}(pos_node_1);
-                    sample_eligible_nodes{genotype_daughter_1}(pos_node_1)  = [];
-                    sample_clonal_population(genotype_daughter_1)           = sample_clonal_population(genotype_daughter_1)-1;
-                    total_clonal_population(position_daughter_1)            = total_clonal_population(position_daughter_1)-1;
-                else
-                    node_1                                                  = 0;
-                    total_clonal_population(position_daughter_1)            = total_clonal_population(position_daughter_1)-1;
+%               Get list of division indices of daughter 1 and daughter 2
+                vec_div_indices_1                                   = mat_division_sample{division_type,3};
+                vec_div_indices_2                                   = mat_division_sample{division_type,4};
+                vec_div_indices_all                                 = unique([vec_div_indices_1 vec_div_indices_2]);
+%               Perform each division
+                for division=1:length(vec_div_indices_all)
+                    div_index                                       = vec_div_indices_all(division);
+                    loc_1                                           = find(vec_div_indices_1==div_index);
+                    loc_2                                           = find(vec_div_indices_2==div_index);
+                    if (~isempty(loc_1))&&(~isempty(loc_2))
+%                       Nodes 1 and 2 are mergning...
+                        node_1                                      = vec_nodes_daughter_1(loc_1);
+                        node_2                                      = vec_nodes_daughter_2(loc_2);
+                        node_mother                                 = min(node_list_current)-1;
+%                       Update phylogeny in hclust style
+                        hclust_row                                  = hclust_row+1;
+                        hclust_nodes(node_mother)                   = hclust_row;
+                        hclust_merge(hclust_row,:)                  = [hclust_nodes(node_1) hclust_nodes(node_2)];
+                        hclust_height(hclust_row)                   = T_current-time;
+%                       Update phylogeny in our style
+                        phylogeny_origin(node_1)                    = node_mother;
+                        phylogeny_origin(node_2)                    = node_mother;
+                        phylogeny_elapsed_gens(node_mother)         = 1;
+                        phylogeny_elapsed_genotypes{node_mother}    = [genotype_mother];
+                        phylogeny_genotype(node_mother)             = genotype_mother;
+                        phylogeny_birthtime(node_1)                 = time;
+                        phylogeny_birthtime(node_2)                 = time;
+                        phylogeny_deathtime(node_mother)            = time;
+%                       Update phylogeny records in our style
+                        pos_delete                                  = [find(node_list_current==node_1) find(node_list_current==node_2)];
+                        node_list_current(pos_delete)               = [];
+                        node_list_current                           = [node_mother node_list_current];
+                        node_genotype_current(pos_delete)           = [];
+                        node_genotype_current                       = [genotype_mother node_genotype_current];
+                    else
+%                       Either node 1 or node 2 has one more division...
+                        if (~isempty(loc_1))
+                            node_daughter                           = vec_nodes_daughter_1(loc_1);
+                        else
+                            node_daughter                           = vec_nodes_daughter_2(loc_2);
+                        end
+%                       Update phylogeny in our style
+                        phylogeny_elapsed_gens(node_daughter)       = phylogeny_elapsed_gens(node_daughter)+1;
+                        phylogeny_elapsed_genotypes{node_daughter}  = [genotype_mother phylogeny_elapsed_genotypes{node_daughter}];
+%                       Update phylogeny records in our style
+                        loc_daughter                                = find(node_list_current==node_daughter);
+                        node_genotype_current(loc_daughter)         = genotype_mother;
+                    end
                 end
-%               Choose the second daughter node
-                logic_node_2                                                = rand<sample_clonal_population(genotype_daughter_2)/total_clonal_population(position_daughter_2);
-                if logic_node_2==1
-                    pos_node_2                                              = randi(sample_clonal_population(genotype_daughter_2));
-                    node_2                                                  = sample_eligible_nodes{genotype_daughter_2}(pos_node_2);
-                    sample_eligible_nodes{genotype_daughter_2}(pos_node_2)  = [];
-                    sample_clonal_population(genotype_daughter_2)           = sample_clonal_population(genotype_daughter_2)-1;
-                    total_clonal_population(position_daughter_2)            = total_clonal_population(position_daughter_2)-1;
-                else
-                    node_2                                                  = 0;
-                    total_clonal_population(position_daughter_2)            = total_clonal_population(position_daughter_2)-1;
-                end
-%               Update the nodes
-                if (node_1==0)&&(node_2==0)
-%                   There is no merging....
-                    continue
-                elseif (node_1>0)&&(node_2==0)
-%                   There is no merging but node 1 has one more division...
-%                   Update phylogeny in our style
-                    phylogeny_elapsed_gens(node_1)                          = phylogeny_elapsed_gens(node_1)+1;
-                    phylogeny_elapsed_genotypes{node_1}                     = [genotype_mother phylogeny_elapsed_genotypes{node_1}];
-%                   Update phylogeny records in our style
-                    node_genotype_current(find(node_list_current==node_1))  = genotype_mother;
-                elseif (node_1==0)&&(node_2>0)
-%                   There is no merging but node 2 has one more division...
-%                   Update phylogeny in our style
-                    phylogeny_elapsed_gens(node_2)                          = phylogeny_elapsed_gens(node_2)+1;
-                    phylogeny_elapsed_genotypes{node_2}                     = [genotype_mother phylogeny_elapsed_genotypes{node_2}];
-%                   Update phylogeny records in our style
-                    node_genotype_current(find(node_list_current==node_2))  = genotype_mother;
-                elseif (node_1>0)&&(node_2>0)
-%                   Nodes 1 and 2 are mergning...
-                    node_mother                                             = min(node_list_current)-1;
-%                   Update phylogeny in hclust style
-                    hclust_row                                              = hclust_row+1;
-                    hclust_nodes(node_mother)                               = hclust_row;
-                    hclust_merge(hclust_row,:)                              = [hclust_nodes(node_1) hclust_nodes(node_2)];
-                    hclust_height(hclust_row)                               = T_current-time;
-%                   Update phylogeny in our style
-                    phylogeny_origin(node_1)                                = node_mother;
-                    phylogeny_origin(node_2)                                = node_mother;
-                    phylogeny_elapsed_gens(node_mother)                     = 1;
-                    phylogeny_elapsed_genotypes{node_mother}                = [genotype_mother];
-                    phylogeny_genotype(node_mother)                         = genotype_mother;
-                    phylogeny_birthtime(node_1)                             = time;
-                    phylogeny_birthtime(node_2)                             = time;
-                    phylogeny_deathtime(node_mother)                        = time;
-%                   Update phylogeny records in our style
-                    pos_delete                                              = [find(node_list_current==node_1) find(node_list_current==node_2)];
-                    node_genotype_current(pos_delete)                       = [];
-                    node_genotype_current                                   = [genotype_mother node_genotype_current];
-                    node_list_current(pos_delete)                           = [];
-                    node_list_current                                       = [node_mother node_list_current];
-                end
+            end
+%-----------Check if the clonal populations in sample satisfy conditions
+%           Find clonal populations in sample after new divisions
+            tmp_clonal_sample_population                    = zeros(1,length(eligible_clonal_ID));
+            for clone=1:length(eligible_clonal_ID)
+                clone_ID                                    = eligible_clonal_ID(clone);
+                tmp_clonal_sample_population(clone)         = length(find(node_genotype_current==clone_ID));
+            end
+%           Redo this whole step if clonal populations violate thresholds
+            if any(tmp_clonal_sample_population>limit_clonal_total_population)
+                hclust_row                                  = hclust_row_tmp;
+                hclust_nodes                                = hclust_nodes_tmp;
+                hclust_merge                                = hclust_merge_tmp;
+                hclust_height                               = hclust_height_tmp;
+
+                phylogeny_origin                            = phylogeny_origin_tmp;
+                phylogeny_elapsed_gens                      = phylogeny_elapsed_gens_tmp;
+                phylogeny_elapsed_genotypes                 = phylogeny_elapsed_genotypes_tmp;
+                phylogeny_genotype                          = phylogeny_genotype_tmp;
+                phylogeny_birthtime                         = phylogeny_birthtime_tmp;
+                phylogeny_deathtime                         = phylogeny_deathtime_tmp;
+
+                node_list_current                           = node_list_current_tmp;
+                node_genotype_current                       = node_genotype_current_tmp;
+            else
+                logic_correct                               = 1;
             end
         end
     end

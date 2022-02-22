@@ -8,7 +8,6 @@ N_sample,500,cell count,Number of cells in sequencing sample
 bound_driver,3,driver count,Maximum driver count in viable cells (cells exceeding this will die)
 bound_ploidy,10,local CN,Maximum local CN in viable cells (cells exceeding this will die)
 SFS_totalsteps,50,,Bin count in SFS data
-driver_order,,,Required trajectory for driver acquisition (blank if none)
 
 rate_driver,,per bp per cell division,Poisson rate of getting new driver mutations
 

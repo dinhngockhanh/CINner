@@ -44,28 +44,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     vec_runif                                   <- runif(10000000)
     N_runif                                     <- 0
 #----------------------------------------Build the sample phylogeny tree
-
-
-
-TIME_COUNT=0;
-
-
-
     for (i in seq(length(evolution_traj_divisions),1,-1)) {
 #       Get time point
         time                                    <- evolution_traj_time[i]
-
-
-
-if ((i%%1000)==0){
-print(TIME_COUNT)
-
-
-TIME_COUNT=0;
-}
-
-
-
 #       Get current total clonal population (after divisions)
         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
         total_clonal_population                 <- evolution_traj_population[[i+1]]
@@ -115,12 +96,8 @@ TIME_COUNT=0;
                 }
 #               Choose the first daughter node
                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
-start.time_mini <- Sys.time()
                 N_runif                                                         <- N_runif+1
                 logic_node_1                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
-end.time_mini   <- Sys.time()
-time.taken_mini <- end.time_mini - start.time_mini
-TIME_COUNT      <- TIME_COUNT+time.taken_mini
                 if (logic_node_1==1) {
                     # pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
                     N_runif                                                     <- N_runif+1
@@ -136,12 +113,8 @@ TIME_COUNT      <- TIME_COUNT+time.taken_mini
                 }
 #               Choose the second daughter node
                 # logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
-start.time_mini <- Sys.time()
                 N_runif                                                         <- N_runif+1
                 logic_node_2                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
-end.time_mini   <- Sys.time()
-time.taken_mini <- end.time_mini - start.time_mini
-TIME_COUNT      <- TIME_COUNT+time.taken_mini
                 if (logic_node_2==1) {
                     # pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
                     N_runif                                                     <- N_runif+1

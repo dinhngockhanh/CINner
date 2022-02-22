@@ -19,11 +19,13 @@
     % evolution_origin
     % evolution_genotype_changes
 function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
-    global vec_centromere_location
+    global initial_ploidy_chrom initial_ploidy_allele initial_ploidy_block
+    global initial_driver_count initial_driver_map initial_DNA_length initial_selection_rate initial_prob_new_drivers
+    global initial_clonal_ID initial_population initial_N_clones
+
     global genotype_list_ploidy_chrom genotype_list_ploidy_allele genotype_list_ploidy_block
     global genotype_list_driver_count genotype_list_driver_map genotype_list_DNA_length genotype_list_selection_rate genotype_list_prob_new_drivers
 
-    global rate_driver
     global prob_CN_whole_genome_duplication prob_CN_missegregation prob_CN_chrom_arm_missegregation prob_CN_focal_amplification prob_CN_focal_deletion prob_CN_cnloh_interstitial prob_CN_cnloh_interstitial_length prob_CN_cnloh_terminal prob_CN_cnloh_terminal_length
 
     global N_clones evolution_origin evolution_genotype_changes
@@ -31,8 +33,6 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
 
     global func_expected_population func_event_rate
     global T_start_time T_end_time Population_end Max_events
-    global N_chromosomes size_CN_block_DNA vec_CN_block_no
-    global growth_model carrying_capacity rate_selection bound_driver
 
     global T_tau_step
 %---------------------------------------------------Input CN event rates
@@ -43,66 +43,38 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     prob_CN_foc_del                             = prob_CN_focal_deletion;
     prob_CN_cnloh_i                             = prob_CN_cnloh_interstitial;
     prob_CN_cnloh_t                             = prob_CN_cnloh_terminal;
-%-----------------------------------------Set up the initial CN genotype
-%   Set up the strand count for each chromosome
-    cell_vec_ploidy_chrom                       = 2*ones(1,N_chromosomes);
-    genotype_list_ploidy_chrom                  = cell(1);
-    genotype_list_ploidy_chrom{1}               = cell_vec_ploidy_chrom;
-%   Set up the CN count for each chrosomome strand
-    cell_mat_ploidy_block                       = cell(1,1);
-    for chrom=1:N_chromosomes
-        ploidy                                  = cell_vec_ploidy_chrom(chrom);
-        no_blocks                               = vec_CN_block_no(chrom);
-        for strand=1:ploidy
-            cell_mat_ploidy_block{chrom,strand} = ones(1,no_blocks);
-        end
-    end
-    genotype_list_ploidy_block                  = cell(1);
-    genotype_list_ploidy_block{1}               = cell_mat_ploidy_block;
-%   Set up the CN allele info for each chromosome strand
-    cell_vec_ploidy_allele                      = cell(1,1);
-    for chrom=1:N_chromosomes
-        ploidy                                  = cell_vec_ploidy_chrom(chrom);
-        no_blocks                               = vec_CN_block_no(chrom);
-        for strand=1:ploidy
-            cell_vec_ploidy_allele{chrom,strand}= strand*ones(1,no_blocks);
-        end
-    end
-    genotype_list_ploidy_allele                 = cell(1);
-    genotype_list_ploidy_allele{1}              = cell_vec_ploidy_allele;
-%-------------------------------------Set up the initial driver genotype
-    cell_mat_drivers                            = [0];
-    genotype_list_driver_count                  = zeros(1,1);
-    genotype_list_driver_map                    = cell(1);
-    genotype_list_driver_map{1}                 = cell_mat_drivers;
-    genotype_list_selection_rate                = zeros(1,1);
-    genotype_list_selection_rate(1)             = SIMULATOR_FULL_PHASE_1_selection_rate(0,cell_mat_drivers,cell_vec_ploidy_chrom,cell_mat_ploidy_block);
-%--------------------------Set up the DNA length of the initial genotype
-    DNA_length                                  = 0;
-    for chrom=1:N_chromosomes
-        for strand=1:cell_vec_ploidy_chrom(chrom)
-            DNA_length                          = DNA_length+sum(cell_mat_ploidy_block{chrom,strand});
-        end
-    end
-    DNA_length                                  = size_CN_block_DNA*DNA_length;
-    genotype_list_DNA_length                    = cell(1);
-    genotype_list_DNA_length{1}                 = DNA_length;
-    genotype_list_prob_new_drivers              = 1-poisspdf(0,rate_driver*DNA_length);
+%------------------------------------Set up the initial clonal genotypes
+%   Set up the strand count for each chromosome for each clone
+    genotype_list_ploidy_chrom                  = initial_ploidy_chrom;
+%   Set up the CN count for each chrosomome strand for each clone
+    genotype_list_ploidy_block                  = initial_ploidy_block;
+%   Set up the CN allele info for each chromosome strand for each clone
+    genotype_list_ploidy_allele                 = initial_ploidy_allele;
+%   Set up the driver count for each clone
+    genotype_list_driver_count                  = initial_driver_count;
+%   Set up the driver map for each clone
+    genotype_list_driver_map                    = initial_driver_map;
+%   Set up the selection rate for each clone
+    genotype_list_selection_rate                = initial_selection_rate;
+%   Set up the DNA length for each clone
+    genotype_list_DNA_length                    = initial_DNA_length;
+%   Set up the probability of new drivers per division for each clone
+    genotype_list_prob_new_drivers              = initial_prob_new_drivers;
 %-------------------------------------Set up the clonal evolution record
-    N_clones                                    = 1;
-%   Set up the record for the clonal evolution
-    clonal_ID_current                           = [N_clones];
-    clonal_population_current                   = [1];
+    N_clones                                    = initial_N_clones;
+%   Set up the record for current clonal populations
+    clonal_ID_current                           = initial_clonal_ID;
+    clonal_population_current                   = initial_population;
     clonal_population_next                      = clonal_population_current;
+%   Set up the record for the clonal evolution
+    evolution_traj_count                        = 1;
 
-    evolution_origin                            = [0];
-    evolution_genotype_changes                  = {[]};
+    evolution_origin                            = zeros(1,length(initial_clonal_ID));
+    evolution_genotype_changes                  = cell(1,length(initial_clonal_ID));
     evolution_traj_time                         = [T_start_time];
     evolution_traj_clonal_ID                    = {clonal_ID_current};
     evolution_traj_population                   = {clonal_population_current};
     evolution_traj_divisions                    = {};
-
-    evolution_traj_count                        = 1;
 %--------------------------------------Set up counts for the simulations
 %   Current time
     T_current                                   = T_start_time;

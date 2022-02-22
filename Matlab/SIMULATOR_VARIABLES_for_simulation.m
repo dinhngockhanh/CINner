@@ -22,7 +22,12 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     global vec_SEER_age
     global T_tau_step
     global N_chromosomes size_CN_block_DNA vec_CN_block_no vec_centromere_location
-    global driver_library driver_order
+    global driver_library
+
+
+    global initial_ploidy_chrom initial_ploidy_allele initial_ploidy_block
+    global initial_driver_count initial_driver_map initial_DNA_length initial_selection_rate initial_prob_new_drivers
+    global initial_clonal_ID initial_population initial_N_clones
 %======================================================GENERAL VARIABLES
 %   T_end_time                          : Final time of simulation
 %   Population_end                      : Target for final population size
@@ -71,9 +76,12 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     filename                                = [model '-input-cancer-genes.csv'];
     TABLE_CANCER_GENES                      = readtable(filename,'Delimiter',',');
 
-
-
-
+%---Input table of CN profiles for the initial population
+    filename                                = [model '-input-initial-cn-profiles.csv'];
+    TABLE_INITIAL_COPY_NUMBER_PROFILES      = readtable(filename,'Delimiter',',');
+%---Input other information for the initial population
+    filename                                = [model '-input-initial-others.csv'];
+    TABLE_INITIAL_OTHERS                    = readtable(filename,'Delimiter',',');
 
 %---Set up individual variables from table
     age_birth                               = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'age_birth')));
@@ -111,8 +119,16 @@ function SIMULATOR_VARIABLES_for_simulation(model)
 
 
 
+
+
+
+
 %   level_purity is only for SIMULATOR_CLONAL and SIMULATOR_ODE
     level_purity                            = 1;
+
+
+
+
 
 
 
@@ -122,35 +138,127 @@ function SIMULATOR_VARIABLES_for_simulation(model)
     vec_CN_block_no                         = TABLE_CHROMOSOME_CN_INFO.Bin_count';
     vec_centromere_location                 = TABLE_CHROMOSOME_CN_INFO.Centromere_location';
 %---Set up mutational and CNA driver library (without selection rates)
-    driver_order                            = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'driver_order')));
-    if isnan(driver_order)
-        driver_order                        = {};
-    else
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-    end
     if isempty(TABLE_CANCER_GENES)
         driver_library                      = {};
     else
         driver_library                      = TABLE_CANCER_GENES;
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
-%       ...
+    end
+%-----------------------------------Set up initial state for simulations
+%   Get number of clones in the initial population
+    initial_N_clones                        = size(TABLE_INITIAL_OTHERS,1);
+    vec_header                              = TABLE_INITIAL_COPY_NUMBER_PROFILES.Properties.VariableNames;
+%---Initialize ID and population for each clone
+    initial_clonal_ID                       = [1:initial_N_clones];
+    initial_population                      = zeros(1,initial_N_clones);
+    for clone=1:initial_N_clones
+%       Get driver profile of this clone
+        loc                                 = find(TABLE_INITIAL_OTHERS.Clone==clone);
+        population                          = TABLE_INITIAL_OTHERS.Cell_count(loc);
+        initial_population(clone)           = population;
+    end
+%---Initialize the genotypes for each clone
+    initial_ploidy_chrom                    = cell(1,initial_N_clones);
+    initial_ploidy_allele                   = cell(1,initial_N_clones);
+    initial_ploidy_block                    = cell(1,initial_N_clones);
+    initial_driver_count                    = zeros(1,initial_N_clones);
+    initial_driver_map                      = cell(1,initial_N_clones);
+    initial_DNA_length                      = cell(1,initial_N_clones);
+    initial_selection_rate                  = zeros(1,initial_N_clones);
+    initial_prob_new_drivers                = zeros(1,initial_N_clones);
+%---Set up the initial clones' CN genotypes
+    for clone=1:initial_N_clones
+%       Extract mini table for the CN genotypes of this clone
+        text_clone_ID                       = ['Clone_' num2str(clone)];
+        vec_loc                             = [1 2 find(contains(vec_header,text_clone_ID))];
+        CLONE_INITIAL_COPY_NUMBER_PROFILES  = TABLE_INITIAL_COPY_NUMBER_PROFILES(:,vec_loc);
+%       Set up clone's CN genotype
+        ploidy_chrom                        = zeros(1,N_chromosomes);
+        ploidy_block                        = cell(1,1);
+        ploidy_allele                       = cell(1,1);
+        for chrom=1:N_chromosomes
+%           Get CN genotype for this chromosome
+            CHROM_COPY_NUMBER_PROFILES      = CLONE_INITIAL_COPY_NUMBER_PROFILES(find(CLONE_INITIAL_COPY_NUMBER_PROFILES.Chromosome==chrom),:);
+%           Clean CN genotype of unnecessary strands
+            vec_delete                      = [];
+            for column=3:size(CHROM_COPY_NUMBER_PROFILES,2)
+                if all(strcmp('NA',table2cell(CHROM_COPY_NUMBER_PROFILES(:,column))))
+                    vec_delete              = [vec_delete column];
+                end
+            end
+            CHROM_COPY_NUMBER_PROFILES(:,vec_delete)    = [];
+%           Update the strand count for each chromosome
+            no_strands                      = size(CHROM_COPY_NUMBER_PROFILES,2)-2;
+            ploidy_chrom(chrom)             = no_strands;
+%           Update the CN count and allele info for each chrosomome strand
+            for strand=1:no_strands
+                no_blocks                   = vec_CN_block_no(chrom);
+                strand_ploidy_block         = zeros(1,no_blocks);
+                strand_ploidy_allele        = zeros(1,no_blocks);
+                for block=1:no_blocks
+                    row                     = find(CHROM_COPY_NUMBER_PROFILES.Bin==block);
+                    col                     = strand+2;
+                    vec_allele              = CHROM_COPY_NUMBER_PROFILES{row,col}{1};
+                    strand_ploidy_block(block)              = length(vec_allele);
+                    for unit=1:length(vec_allele)
+                        strand_ploidy_allele(unit,block)    = double(vec_allele(unit))-64;
+                    end
+                end
+                ploidy_block{chrom,strand}  = strand_ploidy_block;
+                ploidy_allele{chrom,strand} = strand_ploidy_allele;
+            end
+        end
+%       Store the clone's CN profiles
+        initial_ploidy_chrom{clone}         = ploidy_chrom;
+        initial_ploidy_allele{clone}        = ploidy_allele;
+        initial_ploidy_block{clone}         = ploidy_block;
+    end
+%---Set up the initial clones' driver profiles
+    for clone=1:initial_N_clones
+%       Get driver profile of this clone
+        loc                                 = find(TABLE_INITIAL_OTHERS.Clone==clone);
+        all_drivers                         = TABLE_INITIAL_OTHERS.Drivers{loc};
+        list_drivers                        = split(all_drivers,';');
+%       Update the driver count for this clone
+        initial_driver_count(clone)   = length(list_drivers);
+%       Update the driver map for this clone
+        driver_map                          = [];
+        for driver=1:length(list_drivers)
+            driver_info                     = split(list_drivers{driver},'_');
+%           Get driver's ID, strand and unit
+            driver_ID                       = driver_info{1};
+            driver_strand                   = str2num(extractAfter(driver_info{2},'strand'));
+            driver_unit                     = str2num(extractAfter(driver_info{3},'unit'));
+%           Get driver's chromosome and block
+            driver_loc                      = find(strcmp(driver_library.Gene_ID,driver_ID));
+            driver_chrom                    = driver_library.Chromosome(driver_loc);
+            driver_block                    = driver_library.Bin(driver_loc);
+            driver_map(end+1,:)             = [driver_loc driver_chrom driver_strand driver_block driver_unit];
+        end
+        initial_driver_map{clone}           = driver_map;
+    end
+%---Set up the initial clones' DNA length
+    for clone=1:initial_N_clones
+        ploidy_chrom                        = initial_ploidy_chrom{clone};
+        ploidy_block                        = initial_ploidy_block{clone};
+        DNA_length                          = 0;
+        for chrom=1:N_chromosomes
+            for strand=1:ploidy_chrom(chrom)
+                DNA_length                  = DNA_length+sum(ploidy_block{chrom,strand});
+            end
+        end
+        DNA_length                          = size_CN_block_DNA*DNA_length;
+        prob_new_drivers                    = 1-poisspdf(0,rate_driver*DNA_length);
+        initial_DNA_length{clone}           = DNA_length;
+        initial_prob_new_drivers(clone)     = prob_new_drivers;
+    end
+%---Set up the initial clones' selection rates
+    for clone=1:initial_N_clones
+        ploidy_chrom                        = initial_ploidy_chrom{clone};
+        ploidy_block                        = initial_ploidy_block{clone};
+        driver_count                        = initial_driver_count(clone);
+        driver_map                          = initial_driver_map{clone};
+        selection_rate                      = SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block);
+        initial_selection_rate(clone)       = selection_rate;
     end
 %---Set up total population dynamics as function of age (in days)
     vec_age_in_days                         = 365*(TABLE_POPULATION_DYNAMICS.Age_in_year)';

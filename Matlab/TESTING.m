@@ -9,23 +9,36 @@ clear;
     R_folder        = [mother_folder '/vignettes'];
     path(path,R_folder);
 
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MIXTURE EXPERIMENT - PART A
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    MODEL           = 'MIXTURE-A';
+    stage_final     = 3;
+    package_output  = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEUTRAL FALLOPIAN TUBES - ONE SIMULATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    MODEL           = 'FALLOPIAN-TUBES-NEUTRAL';
-    stage_final     = 3;
-
-    package_output  = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
+    % MODEL           = 'FALLOPIAN-TUBES-NEUTRAL';
+    % stage_final     = 3;
+    % package_output  = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEUTRAL FALLOPIAN TUBES - MANY SIMULATIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % MODEL           = 'FALLOPIAN-TUBES-NEUTRAL';
-    % stage_final     = 1;
-    % N_simulations   = 100;
-    %
+    % stage_final     = 3;
+    % N_simulations   = 100000;
     % SIMULATOR_FULL_PROGRAM_many_simulations(MODEL,stage_final,N_simulations);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
