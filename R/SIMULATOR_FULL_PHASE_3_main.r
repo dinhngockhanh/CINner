@@ -150,20 +150,39 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 count_nodes_all                             <- rbinom(n=1,size=clonal_sample_population,prob=freq)
 #               Divide total count of nodes among different division types
                 count_nodes_each                            <- rmultinom(n=1,size=count_nodes_all,mat_division_sample_clone[3,]/sum(mat_division_sample_clone[3,]))
-                # mat_division_sample_clone[4,]               <- count_nodes_each
                 count_nodes_each                            <- matrix(count_nodes_each,nrow=1)
-
-print(mat_division_sample_clone)
-print(count_nodes_each)
-
                 mat_division_sample_clone                   <- rbind(mat_division_sample_clone,count_nodes_each)
-
-
-
+#               Check that node count in each position doesn't exceed limit in total population
+                if (any(count_nodes_each>count_nodes_each_max)) {
+                    logic_correct                           <- -1
+                    break
+                }
+#               Jump to next clone if there is no division to perform
+                if (max(mat_division_sample_clone[4,])==0) {
+                    next
+                }
+#               Simulate which nodes undergo each division type
+#               i.e. rows 1 & 2 in mat_division_sample
+                eligible_nodes                              <- node_list_current[which(node_genotype_current==clonal_ID)]
+                if (length(eligible_nodes)==1) {
+                    node_indices_all                        <- eligible_nodes
+                    }
+                else {
+                    node_indices_all                        <- sample(x=eligible_nodes,size=count_nodes_all,replace=FALSE)
+                }
+                for (division_type in 1:ncol(mat_division_sample_clone)) {
+                    row                                     <- mat_division_sample_clone[1,division_type]
+                    col                                     <- mat_division_sample_clone[2,division_type]
+                    count                                   <- mat_division_sample_clone[4,division_type]
+                    if (count>0) {
+                        mat_division_sample[[row]][[col]]   <- node_indices_all[1:count]
+                    }
+                    node_indices_all                        <- node_indices_all[-(1:count)]
+                }
 
 
 print('------------------------------------------')
-print(mat_division_sample_clone)
+print(mat_division_sample)
             }
 
 
