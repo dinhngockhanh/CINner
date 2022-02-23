@@ -105,6 +105,31 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                 }
             }
             CHROM_COPY_NUMBER_PROFILES      <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
+#           Update the strand count for each chromosome
+            no_strands                      <- ncol(CHROM_COPY_NUMBER_PROFILES)-2
+            ploidy_chrom[chrom]             <- no_strands
+#           Update the CN count and allele info for each chrosomome strand
+            for (strand in 1:no_strands){
+                no_blocks                   <- vec_CN_block_no[chrom]
+                strand_ploidy_block         <- rep(0,no_blocks)
+                strand_ploidy_allele        <- rep(0,no_blocks)
+                for (block in 1:no_blocks){
+                    row                     <- which(CHROM_COPY_NUMBER_PROFILES$Bin==block)
+                    col                     <- strand+2
+                    vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
+print(vec_allele)
+
+
+
+                }
+
+
+
+            }
+
+
+
+
 
 
 
