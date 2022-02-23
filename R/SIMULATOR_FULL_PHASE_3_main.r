@@ -104,14 +104,53 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         if (length(mat_division_total_population)==0) {
             next
         }
+#=======One huge loop to make sure clonal populations in sample are correct
+        logic_correct                                       <- 0
+        while (logic_correct==0) {
+#-----------Simulate identities of all divisions occurring in sample
+#           Row:            corresponding to mat_division_total_population
+#           Column 1:       node indices undergoing division as daughter 1
+#           Column 2:       node indices undergoing division as daughter 2
+#           Column 3:       division indices for corresponding nodes on column 1
+#           Column 4:       division indices for corresponding nodes on column 2
+            mat_division_sample                             <- vector("list",length=nrow(mat_division_total_population))
+            for (clone in 1:length(eligible_clonal_ID)) {
+#               For every clone found in the total population...
+#               Find its clonal ID
+                clonal_ID                                   <- eligible_clonal_ID[clone]
+#               Find its population in total population
+                clonal_total_population                     <- eligible_clonal_total_population[clone]
+#               Find its population in sample's eligible nodes
+                clonal_sample_population                    <- eligible_clonal_sample_population[clone]
+                if (clonal_sample_population<=0) {
+                    next
+                }
+#               Find all division roles that this clone plays in total population
+#               Row 1:      division index (= row in mat_division_total_population)
+#               Row 2:      daughter position (= 1 or 2)
+#               Row 3:      Cell count for this division/position in total population
+#               Row 4:      Node count for this division/position in sample ------> to be done in next sections
+                mat_division_sample_clone                   <- c()
+                for (daughter in 1:2) {
+                    vec_division_genotype_daughter          <- mat_division_total_population[,daughter+2]
+                    vec_division                            <- which(vec_division_genotype_daughter==clonal_ID)
+                    mat_division_sample_clone_new           <- rbind(vec_division,rep(daughter,length(vec_division)),mat_division_total_population[vec_division,1])
+                    mat_division_sample_clone               <- c(mat_division_sample_clone mat_division_sample_clone_new)
+                }
+                if (length(mat_division_sample_clone)==0) {
+                    next
+                }
 
 
 
-
-
-
+logic_correct<-1
 print('------------------------------------------')
-print(mat_division_total_population)
+print(mat_division_sample_clone)
+        }
+
+
+
+
 
 
 
