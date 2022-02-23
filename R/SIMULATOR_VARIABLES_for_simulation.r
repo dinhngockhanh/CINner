@@ -104,7 +104,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                     vec_delete              <- c(vec_delete,column)
                 }
             }
-            CHROM_COPY_NUMBER_PROFILES      <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
+            # CHROM_COPY_NUMBER_PROFILES      <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
 #           Update the strand count for each chromosome
             no_strands                      <- ncol(CHROM_COPY_NUMBER_PROFILES)-2
             ploidy_chrom[chrom]             <- no_strands
@@ -117,7 +117,9 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                     row                     <- which(CHROM_COPY_NUMBER_PROFILES$Bin==block)
                     col                     <- strand+2
                     vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
-print(vec_allele)
+                    if (is.na(vec_allele)){
+
+                    }
 
 
 
