@@ -85,7 +85,6 @@ end
     vec_cell_count                      = all_clones_population;
     vec_drivers                         = [];
     for clone=1:N_all_clones
-        % driver_count                    = genotype_list_driver_count(clone)
         DRIVERS                         = '';
         driver_map                      = genotype_list_driver_map{clone};
         for row=1:size(driver_map,1)

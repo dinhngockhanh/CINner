@@ -79,9 +79,35 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
 #   Output model variables - copy number state
     filename                                <- paste(model,'-input-initial-cn-profiles.csv',sep='')
     write.csv(TABLE_CLONAL_COPY_NUMBER_PROFILES,filename,row.names=FALSE)
+#---Create and output model variables - other information
+    vec_clone                               <- (1:N_all_clones)
+    vec_cell_count                          <- all_clones_population
+    vec_drivers                             <- c()
+    for (clone in 1:N_all_clones){
+        DRIVERS                             <- ''
+        driver_map                          <- genotype_list_driver_map[[clone]]
+        for (row in 1:nrow(driver_map)){
+            driver_index                    <- driver_map[row,1]
+            driver_ID                       <- driver_library$Gene_ID[driver_index]
+            driver_strand                   <- driver_map[row,3]
+            driver_unit                     <- driver_map[row,5]
+            if (DRIVERS==''){
+                DRIVERS                     <- paste(DRIVERS,';',sep='')
+            }
+            DRIVERS                         <- paste(DRIVERS,driver_ID,'_strand',driver_strand,'_unit',driver_unit)
+        }
+        vec_drivers                         <- c(vec_drivers,DRIVERS)
+    }
+#   Output model variables - other information
+    CLONAL_OTHERS                           <- data.frame(vec_clone,vec_cell_count,vec_drivers)
+    colnames(CLONAL_OTHERS)                 <- c('Clone','Cell_count','Drivers')
+    filename                                <- paste(model,'-input-initial-others.csv',sep='')
+    write.csv(CLONAL_OTHERS,filename,row.names=FALSE)
 
 
-print(TABLE_CLONAL_COPY_NUMBER_PROFILES)
+print(vec_drivers)
+
+print(CLONAL_OTHERS)
 
 
 }
