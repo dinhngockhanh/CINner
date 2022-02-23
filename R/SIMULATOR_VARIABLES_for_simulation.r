@@ -71,7 +71,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #       Get driver profile of this clone
         loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
         population                          <- TABLE_INITIAL_OTHERS$Cell_count[loc]
-        initial_population[loc]             <- population
+        initial_population[loc]             <<- population
     }
 #---Initialize the genotypes for each clone
     initial_ploidy_chrom                    <<- vector('list',length=initial_N_clones)
@@ -91,6 +91,8 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     assign('initial_DNA_length',initial_DNA_length,envir=.GlobalEnv)
     assign('initial_selection_rate',initial_selection_rate,envir=.GlobalEnv)
     assign('initial_prob_new_drivers',initial_prob_new_drivers,envir=.GlobalEnv)
+    assign('initial_clonal_ID',initial_clonal_ID,envir=.GlobalEnv)
+    assign('initial_population',initial_population,envir=.GlobalEnv)
 #---Set up the initial clones' CN genotypes
     for (clone in 1:initial_N_clones){
 #       Extract mini table for the CN genotypes of this clone
@@ -147,7 +149,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         initial_ploidy_block[[clone]]       <<- ploidy_block
     }
 #---Set up the initial clones' driver profiles
-print(TABLE_INITIAL_OTHERS)
     for (clone in 1:initial_N_clones){
 #       Get driver profile of this clone
         loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
@@ -202,33 +203,6 @@ print(TABLE_INITIAL_OTHERS)
         selection_rate                      <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block)
         initial_selection_rate[clone]       <- selection_rate
     }
-
-
-
-
-
-
-
-
-
-print(initial_DNA_length)
-print(initial_prob_new_drivers)
-print(initial_selection_rate)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #---Set up total population dynamics as function of age (in days)
     for (i in 1:ncol(TABLE_POPULATION_DYNAMICS)) {
         assign(colnames(TABLE_POPULATION_DYNAMICS)[i],TABLE_POPULATION_DYNAMICS[,i],envir=.GlobalEnv)

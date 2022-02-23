@@ -27,6 +27,25 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     prob_CN_foc_del                             <- prob_CN_focal_deletion
     prob_CN_cnloh_i                             <- prob_CN_cnloh_interstitial
     prob_CN_cnloh_t                             <- prob_CN_cnloh_terminal
+
+
+
+print(initial_clonal_ID)
+print(initial_population)
+print(initial_N_clones)
+
+
+
+
+
+
+
+
+
+
+
+
+
 #-----------------------------------------Set up the initial CN genotype
 #   Set up the strand count for each chromosome
     cell_vec_ploidy_chrom                       <- rep(2,N_chromosomes)

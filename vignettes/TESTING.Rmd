@@ -19,13 +19,13 @@ devtools::document()
 
 ```{r}
 print('================================================================================   PART A')
-# MODEL                         <- 'MIXTURE-A'
-MODEL                         <- 'MIXTURE-C'
+MODEL                         <- 'MIXTURE-A'
+# MODEL                         <- 'MIXTURE-C'
 stage_final                   <- 3
 
-SIMULATOR_VARIABLES_for_simulation(MODEL)
+# SIMULATOR_VARIABLES_for_simulation(MODEL)
 
-# package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 ```
 
 
