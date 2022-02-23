@@ -63,7 +63,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #-----------------------------------Set up initial state for simulations
 #   Get number of clones in the initial population
     initial_N_clones                        <<- nrow(TABLE_INITIAL_OTHERS)
-    vec_header                              <- names(TABLE_INITIAL_OTHERS)
+    vec_header                              <- names(TABLE_INITIAL_COPY_NUMBER_PROFILES)
 #---Initialize ID and population for each clone
     initial_clonal_ID                       <<- 1:initial_N_clones
     initial_population                      <<- rep(0,initial_N_clones)
@@ -74,7 +74,23 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         initial_population[loc]             <- population
     }
 
+#---Initialize the genotypes for each clone
+    initial_ploidy_chrom                    <- vector('list',length=initial_N_clones)
+    initial_ploidy_allele                   <- vector('list',length=initial_N_clones)
+    initial_ploidy_block                    <- vector('list',length=initial_N_clones)
+    initial_driver_count                    <- rep(0,initial_N_clones)
+    initial_driver_map                      <- vector('list',length=initial_N_clones)
+    initial_DNA_length                      <- vector('list',length=initial_N_clones)
+    initial_selection_rate                  <- rep(0,initial_N_clones)
+    initial_prob_new_drivers                <- rep(0,initial_N_clones)
+#---Set up the initial clones' CN genotypes
+    for (clone in 1:initial_N_clones){
+#       Extract mini table for the CN genotypes of this clone
+        text_clone_ID                       <- paste('Clone_',clone,sep='')
+        # vec_loc                             <- c(1,2,which())
 
+
+    }
 
 
 
