@@ -42,7 +42,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
     # for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions)-1,-1)) {
+    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions),-1)) {
 #       Get time point
         time                                            <- evolution_traj_time[i]
 #       Get current clonal populations in total population
@@ -54,12 +54,33 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             clone_ID                                    <- eligible_clonal_ID[clone]
             eligible_clonal_sample_population[clone]    <- length(which(node_genotype_current==clone_ID))
         }
+#       Translate next clonal populations in total population as
+#       thresholds that clonal populations in sample cannot exceed
+        if (i==1) {
+            limit_clonal_total_population               <- rep(Inf,length(eligible_clonal_ID))
+            }
+        else {
+            limit_clonal_total_population               <- rep(0,length(eligible_clonal_ID))
+            eligible_clonal_ID_tmp                      <- evolution_traj_clonal_ID[[i]]
+            eligible_clonal_total_population_tmp        <- evolution_traj_population[[i]]
+            for (clone=1:length(eligible_clonal_ID)) {
+                clone_ID                                <- eligible_clonal_ID[clone]
+                loc_tmp                                 <- which(eligible_clonal_ID_tmp==clone_ID)
+                if (length(loc_tmp))!=0) {
+                    limit_clonal_total_population[clone]<- eligible_clonal_total_population_tmp[loc_tmp]
+                }
+            }
+        }
+
+
+
+
+
+
+
 
 print('------------------------------------------')
-print(time)
-print(eligible_clonal_ID)
-print(eligible_clonal_total_population)
-print(eligible_clonal_sample_population)
+print(limit_clonal_total_population)
 
 
 
