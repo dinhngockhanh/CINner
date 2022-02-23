@@ -256,7 +256,7 @@ if ((i%%1000)==0){
 #                       Update phylogeny in hclust style
                         hclust_row                                  <- hclust_row+1
                         hclust_nodes[node_mother]                   <- hclust_row
-                        hclust_merge[hclust_row,]                   <- c(hclust_nodes(node_1),hclust_nodes(node_2))
+                        hclust_merge[hclust_row,]                   <- c(hclust_nodes[node_1],hclust_nodes[node_2])
                         hclust_height[hclust_row]                   <- T_current-time
 #                       Update phylogeny in our style
                         phylogeny_origin[node_1]                    <- node_mother
