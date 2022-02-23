@@ -91,10 +91,10 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
             driver_ID                       <- driver_library$Gene_ID[driver_index]
             driver_strand                   <- driver_map[row,3]
             driver_unit                     <- driver_map[row,5]
-            if (DRIVERS==''){
+            if (DRIVERS!=''){
                 DRIVERS                     <- paste(DRIVERS,';',sep='')
             }
-            DRIVERS                         <- paste(DRIVERS,driver_ID,'_strand',driver_strand,'_unit',driver_unit)
+            DRIVERS                         <- paste(DRIVERS,driver_ID,'_strand',driver_strand,'_unit',driver_unit,sep='')
         }
         vec_drivers                         <- c(vec_drivers,DRIVERS)
     }

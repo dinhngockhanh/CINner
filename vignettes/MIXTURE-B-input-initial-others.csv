@@ -1,4 +1,4 @@
-Clone,Cell_count,Drivers
-1,10,TP53_strand1_unit1
-2,189,TP53_strand1_unit1
-3,1,TP53_strand1_unit1
+"Clone","Cell_count","Drivers"
+1,140,"; TP53 _strand 1 _unit 1"
+2,59,"; TP53 _strand 1 _unit 1"
+3,1,"; TP53 _strand 1 _unit 1"
