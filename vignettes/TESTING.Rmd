@@ -14,18 +14,14 @@ devtools::document()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MIXTURE EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%---Part A: start from one cell with one mutated TP53, otherwise
-%   following HGSOC-BULK setup, then sample 200 cells at the end
-
 ```{r}
 print('================================================================================   PART A')
 MODEL                         <- 'MIXTURE-A'
-# MODEL                         <- 'MIXTURE-C'
 stage_final                   <- 3
-
-# SIMULATOR_VARIABLES_for_simulation(MODEL)
-
 package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+print('================================================================================   PREPARE INITIAL STATE FOR EXPERIMENTS B AND C')
+MODEL_NEW                     <- 'MIXTURE-B'
+EXTRA_build_model_variables_from_sample(MODEL_NEW,package_output_A)
 ```
 
 
