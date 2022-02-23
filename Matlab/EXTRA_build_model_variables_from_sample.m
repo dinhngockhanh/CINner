@@ -18,7 +18,6 @@ function EXTRA_build_model_variables_from_sample(model,folder_name,package_outpu
 %---Find all unique clones in sample
     all_clones_ID                       = unique(sample_clone_ID);
     all_clones_population               = histc(sample_clone_ID,all_clones_ID);
-
     N_all_clones                        = length(all_clones_ID);
 %---Create and output model variables - copy number state
     TABLE_CLONAL_COPY_NUMBER_PROFILES   = [];
@@ -30,9 +29,9 @@ function EXTRA_build_model_variables_from_sample(model,folder_name,package_outpu
         bin_count                       = vec_CN_block_no(chrom);
         vec_chrom                       = [vec_chrom chrom*ones(1,bin_count)];
         vec_bin                         = [vec_bin [1:bin_count]];
-        TABLE_CLONAL_COPY_NUMBER_PROFILES   = num2cell([vec_chrom' vec_bin']);
-        HEADER_CLONAL_COPY_NUMBER_PROFILES  = ["Chromosome","Bin"];
     end
+    TABLE_CLONAL_COPY_NUMBER_PROFILES   = num2cell([vec_chrom' vec_bin']);
+    HEADER_CLONAL_COPY_NUMBER_PROFILES  = ["Chromosome","Bin"];
 %   Update table of CN profiles with each clone found in sample
     for clone=1:N_all_clones
         clone_ID                    = all_clones_ID(clone);
