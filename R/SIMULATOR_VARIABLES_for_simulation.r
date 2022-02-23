@@ -98,12 +98,13 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #           Get CN genotype for this chromosome
             CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==chrom,]
 #           Clean CN genotype of unnecessary strands
-            # vec_delete                      <- c()
-            # for (column in 3:nrow(CHROM_COPY_NUMBER_PROFILES)){
-            #     if (all(grepl('NA',CHROM_COPY_NUMBER_PROFILES[,column]))){
-            #         vec_delete              <- c(vec_delete,column)
-            #     }
-            # }
+            vec_delete                      <- c()
+            for (column in 3:nrow(CHROM_COPY_NUMBER_PROFILES)){
+                # if (all(grepl('NA',CHROM_COPY_NUMBER_PROFILES[,column]))){
+                if (all(is.nan(CHROM_COPY_NUMBER_PROFILES[,column]))){
+                    vec_delete              <- c(vec_delete,column)
+                }
+            }
 
 
 
