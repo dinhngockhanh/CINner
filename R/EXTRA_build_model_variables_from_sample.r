@@ -59,6 +59,8 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
 # if (unit_count!=1){
 #     print()
 # }
+print(unit_count)
+print(ploidy_allele[[chrom]][[strand]])
                     if (a==''){
                         allele      <- 'NA'
                     }
@@ -68,7 +70,7 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
                     TABLE_CLONE_CURRENT[N_row,strand]   <- 'NA'
                 }
             }
-print(TABLE_CLONE_CURRENT)
+# print(TABLE_CLONE_CURRENT)
 
 
         }
