@@ -100,16 +100,11 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #           Clean CN genotype of unnecessary strands
             vec_delete                      <- c()
             for (column in 3:ncol(CHROM_COPY_NUMBER_PROFILES)){
-
-# print(unique(CHROM_COPY_NUMBER_PROFILES[,column]))
-# print()
-
-                # if (all(grepl('NA',CHROM_COPY_NUMBER_PROFILES[,column]))){
                 if (all(is.na(CHROM_COPY_NUMBER_PROFILES[,column]))){
                     vec_delete              <- c(vec_delete,column)
                 }
             }
-
+            CHROM_COPY_NUMBER_PROFILES      <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
 
 
 
