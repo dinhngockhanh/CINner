@@ -181,8 +181,8 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
                     count                                   = mat_division_sample_clone(4,division_type);
                     if count>0
                         mat_division_sample{row,col}        = node_indices_all(1:count);
+                        node_indices_all(1:count)           = [];
                     end
-                    node_indices_all(1:count)               = [];
                 end
 %               Simulate the division indices for each division type
 %               i.e. rows 3 & 4 in mat_division_sample

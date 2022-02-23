@@ -113,7 +113,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #           Column 2:       node indices undergoing division as daughter 2
 #           Column 3:       division indices for corresponding nodes on column 1
 #           Column 4:       division indices for corresponding nodes on column 2
-            mat_division_sample                             <- vector("list",length=nrow(mat_division_total_population))
+
+
+
+            mat_division_sample                             <- vector("list",length=(4*nrow(mat_division_total_population)))
             for (clone in 1:length(eligible_clonal_ID)) {
 #               For every clone found in the total population...
 #               Find its clonal ID
@@ -175,9 +178,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     col                                     <- mat_division_sample_clone[2,division_type]
                     count                                   <- mat_division_sample_clone[4,division_type]
                     if (count>0) {
-                        mat_division_sample[[row]][[col]]   <- node_indices_all[1:count]
+
+                        ind                                 <- (row-1)*4+col
+                        mat_division_sample[[ind]]          <- node_indices_all[1:count]
+                        node_indices_all                    <- node_indices_all[-(1:count)]                        
                     }
-                    node_indices_all                        <- node_indices_all[-(1:count)]
                 }
 
 
