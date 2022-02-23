@@ -15,6 +15,8 @@ devtools::document()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ```{r}
+for(i in 1:100){
+      
 print('================================================================================   PART A')
 MODEL                         <- 'MIXTURE-A'
 stage_final                   <- 3
@@ -32,6 +34,8 @@ print('=========================================================================
 MODEL                         <- 'MIXTURE-C'
 stage_final                   <- 3
 package_output_B              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+
+}
 ```
 
 

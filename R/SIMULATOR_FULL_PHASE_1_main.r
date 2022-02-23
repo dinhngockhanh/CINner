@@ -28,15 +28,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     prob_CN_cnloh_i                             <- prob_CN_cnloh_interstitial
     prob_CN_cnloh_t                             <- prob_CN_cnloh_terminal
 #------------------------------------Set up the initial clonal genotypes
-
-
-print(initial_N_clones)
-print(initial_driver_count)
-print(initial_driver_map)
-print(initial_clonal_ID)
-print(initial_population)
-
-
 #   Set up the strand count for each chromosome for each clone
     genotype_list_ploidy_chrom                  <<- initial_ploidy_chrom
     assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
