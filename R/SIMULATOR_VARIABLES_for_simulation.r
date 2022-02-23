@@ -1,10 +1,3 @@
-#' Input variables to simulate a cancer model
-#'
-#' @param model Name of model.
-#' @return Nothing.
-#' @examples
-#' SIMULATOR_VARIABLES_for_simulation("FALLOPIAN-TUBES-NEUTRAL")
-#' @export
 #=============================SET ALL PARAMETERS REQUIRED FOR SIMULATION
 SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #--------------------------------------Set up variables for cancer model
@@ -25,6 +18,12 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     else{
         TABLE_CANCER_GENES                  <- data.frame()
     }
+#---Input table of CN profiles for the initial population
+    filename                                <- paste(model,'-input-initial-cn-profiles.csv',sep='')
+    TABLE_INITIAL_COPY_NUMBER_PROFILES      <- read.table(filename,header=TRUE,sep=',')
+#---Input other information for the initial population
+    filename                                <- paste(model,'-input-initial-others.csv',sep='')
+    TABLE_INITIAL_OTHERS                    <- read.table(filename,header=TRUE,sep=',')
 #---Set up individual variables from table
     for (i in 1:nrow(TABLE_VARIABLES)) {
         assign(TABLE_VARIABLES[i,1],TABLE_VARIABLES[i,2],envir=.GlobalEnv)
@@ -34,8 +33,16 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 
 
 
+
+
+
+
 #   level_purity is only for SIMULATOR_CLONAL and SIMULATOR_ODE
     level_purity                            <<- 1
+
+
+
+
 
 
 
@@ -46,13 +53,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     }
     vec_CN_block_no                         <<- Bin_count
     vec_centromere_location                 <<- Centromere_location
-#---Set up mutational and CNA driver order
-    # if (is.na(driver_order)){
-    #     driver_order                        <<- list()
-    # }
-    # else{
-    #
-    # }
 #---Set up mutational and CNA driver library (without selection rates)
     if(length(TABLE_CANCER_GENES)==0){
         driver_library                      <<- data.frame()
@@ -60,6 +60,18 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     else{
         driver_library                      <<- TABLE_CANCER_GENES
     }
+#-----------------------------------Set up initial state for simulations
+#   Get number of clones in the initial population
+    initial_N_clones                        <<- nrow(TABLE_INITIAL_OTHERS)
+    vec_header                              <- names(TABLE_INITIAL_OTHERS)
+
+
+
+print(initial_N_clones)
+print(vec_header)
+
+
+
 #---Set up total population dynamics as function of age (in days)
     for (i in 1:ncol(TABLE_POPULATION_DYNAMICS)) {
         assign(colnames(TABLE_POPULATION_DYNAMICS)[i],TABLE_POPULATION_DYNAMICS[,i],envir=.GlobalEnv)

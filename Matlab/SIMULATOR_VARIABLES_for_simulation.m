@@ -75,14 +75,12 @@ function SIMULATOR_VARIABLES_for_simulation(model)
 %---Input table of mutational and CNA genes
     filename                                = [model '-input-cancer-genes.csv'];
     TABLE_CANCER_GENES                      = readtable(filename,'Delimiter',',');
-
 %---Input table of CN profiles for the initial population
     filename                                = [model '-input-initial-cn-profiles.csv'];
     TABLE_INITIAL_COPY_NUMBER_PROFILES      = readtable(filename,'Delimiter',',');
 %---Input other information for the initial population
     filename                                = [model '-input-initial-others.csv'];
     TABLE_INITIAL_OTHERS                    = readtable(filename,'Delimiter',',');
-
 %---Set up individual variables from table
     age_birth                               = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'age_birth')));
     age_end                                 = TABLE_VARIABLES.Value(find(strcmp(TABLE_VARIABLES.Variable,'age_end')));
