@@ -18,10 +18,13 @@ devtools::document()
 %   following HGSOC-BULK setup, then sample 200 cells at the end
 
 ```{r}
-disp('================================================================================   PART A')
+print('================================================================================   PART A')
 MODEL                         <- 'MIXTURE-A'
 stage_final                   <- 3
-package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+
+SIMULATOR_VARIABLES_for_simulation(MODEL)
+
+# package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 ```
 
 

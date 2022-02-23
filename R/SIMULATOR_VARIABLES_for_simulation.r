@@ -64,11 +64,37 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #   Get number of clones in the initial population
     initial_N_clones                        <<- nrow(TABLE_INITIAL_OTHERS)
     vec_header                              <- names(TABLE_INITIAL_OTHERS)
+#---Initialize ID and population for each clone
+    initial_clonal_ID                       <<- 1:initial_N_clones
+    initial_population                      <<- rep(0,initial_N_clones)
+    for (clone in 1:initial_N_clones){
+#       Get driver profile of this clone
+        loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
+        population                          <- TABLE_INITIAL_OTHERS$Cell_count[loc]
+        initial_population[loc]             <- population
+    }
+
+
+
+
+
+
+
+
 
 
 
 print(initial_N_clones)
 print(vec_header)
+print(initial_population)
+
+
+
+
+
+
+
+
 
 
 
