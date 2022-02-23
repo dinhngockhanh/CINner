@@ -146,11 +146,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 division_index_all                          <- mat_division_sample_clone[1,]
                 count_nodes_each_max                        <- mat_division_total_population[division_index_all,1]
                 freq                                        <- sum(mat_division_sample_clone[3,])/clonal_total_population
-#               Find total count of nodes to undergo divisions of all types
-                count_nodes_all                             <- rbinom(n=1,size=clonal_sample_population,prob=freq)
-#               Divide total count of nodes among different division types
-                count_nodes_each                            <- rmultinom(n=1,size=count_nodes_all,mat_division_sample_clone[3,]/sum(mat_division_sample_clone[3,]))
-                mat_division_sample_clone[4,]               <- count_nodes_each
+# #               Find total count of nodes to undergo divisions of all types
+#                 count_nodes_all                             <- rbinom(n=1,size=clonal_sample_population,prob=freq)
+# #               Divide total count of nodes among different division types
+#                 count_nodes_each                            <- rmultinom(n=1,size=count_nodes_all,mat_division_sample_clone[3,]/sum(mat_division_sample_clone[3,]))
+#                 mat_division_sample_clone[4,]               <- count_nodes_each
 
 
 
@@ -158,6 +158,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 print('------------------------------------------')
+print(division_index_all)
+print(count_nodes_each_max)
+print(freq)
 print(mat_division_sample_clone)
             }
 
