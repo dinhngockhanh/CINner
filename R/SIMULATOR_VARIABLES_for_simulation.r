@@ -101,10 +101,11 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
             vec_delete                      <- c()
             for (column in 3:ncol(CHROM_COPY_NUMBER_PROFILES)){
 
-print(unique(CHROM_COPY_NUMBER_PROFILES[,column]))
+# print(unique(CHROM_COPY_NUMBER_PROFILES[,column]))
+# print()
 
-                if (all(grepl('NA',CHROM_COPY_NUMBER_PROFILES[,column]))){
-                # if (all(is.nan(CHROM_COPY_NUMBER_PROFILES[,c(column)]))){
+                # if (all(grepl('NA',CHROM_COPY_NUMBER_PROFILES[,column]))){
+                if (all(is.na(CHROM_COPY_NUMBER_PROFILES[,column]))){
                     vec_delete              <- c(vec_delete,column)
                 }
             }
