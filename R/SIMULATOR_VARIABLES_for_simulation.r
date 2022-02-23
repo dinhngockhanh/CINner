@@ -73,7 +73,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         population                          <- TABLE_INITIAL_OTHERS$Cell_count[loc]
         initial_population[loc]             <- population
     }
-
 #---Initialize the genotypes for each clone
     initial_ploidy_chrom                    <<- vector('list',length=initial_N_clones)
     initial_ploidy_allele                   <<- vector('list',length=initial_N_clones)
@@ -83,15 +82,15 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     initial_DNA_length                      <<- vector('list',length=initial_N_clones)
     initial_selection_rate                  <<- rep(0,initial_N_clones)
     initial_prob_new_drivers                <<- rep(0,initial_N_clones)
-    assign('initial_N_clones',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_ploidy_allele',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_ploidy_block',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_driver_count',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_driver_map',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_DNA_length',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_selection_rate',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-    assign('initial_prob_new_drivers',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_N_clones',initial_N_clones,envir=.GlobalEnv)
+    assign('initial_ploidy_chrom',initial_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_ploidy_allele',initial_ploidy_allele,envir=.GlobalEnv)
+    assign('initial_ploidy_block',initial_ploidy_block,envir=.GlobalEnv)
+    assign('initial_driver_count',initial_driver_count,envir=.GlobalEnv)
+    assign('initial_driver_map',initial_driver_map,envir=.GlobalEnv)
+    assign('initial_DNA_length',initial_DNA_length,envir=.GlobalEnv)
+    assign('initial_selection_rate',initial_selection_rate,envir=.GlobalEnv)
+    assign('initial_prob_new_drivers',initial_prob_new_drivers,envir=.GlobalEnv)
 #---Set up the initial clones' CN genotypes
     for (clone in 1:initial_N_clones){
 #       Extract mini table for the CN genotypes of this clone
