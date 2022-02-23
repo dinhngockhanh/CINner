@@ -104,7 +104,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                     vec_delete              <- c(vec_delete,column)
                 }
             }
-            # CHROM_COPY_NUMBER_PROFILES      <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
+            CHROM_COPY_NUMBER_PROFILES      <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
 #           Update the strand count for each chromosome
             no_strands                      <- ncol(CHROM_COPY_NUMBER_PROFILES)-2
             ploidy_chrom[chrom]             <- no_strands
@@ -112,23 +112,25 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
             for (strand in 1:no_strands){
                 no_blocks                   <- vec_CN_block_no[chrom]
                 strand_ploidy_block         <- rep(0,no_blocks)
-                strand_ploidy_allele        <- rep(0,no_blocks)
+                strand_ploidy_allele        <- matrix(rep(0,no_blocks),nrow=1)
                 for (block in 1:no_blocks){
                     row                     <- which(CHROM_COPY_NUMBER_PROFILES$Bin==block)
                     col                     <- strand+2
                     vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
                     if (is.na(vec_allele)){
-
+                        strand_ploidy_block[block]              <- 0
+                    }else{
+                        strand_ploidy_block[block]              <- nchar(vec_allele)
+                        for (unit in 1:nchar(vec_allele)){
+                            strand_ploidy_allele[unit,block]    <- utf8ToInt(substr(vec_allele,unit,unit))-64
+                        }
                     }
-
-
-
                 }
-
-
-
+                ploidy_block[[chrom]][[strand]]     <- strand_ploidy_block
+                ploidy_allele[[chrom]][[strand]]    <- strand_ploidy_allele
             }
-
+print(ploidy_block)
+print(ploidy_allele)
 
 
 
@@ -138,8 +140,8 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         }
 
 
-print(CHROM_COPY_NUMBER_PROFILES)
-print(vec_delete)
+# print(CHROM_COPY_NUMBER_PROFILES)
+# print(vec_delete)
 
     }
 
