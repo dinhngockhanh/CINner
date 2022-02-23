@@ -221,7 +221,7 @@ function SIMULATOR_VARIABLES_for_simulation(model)
         all_drivers                         = TABLE_INITIAL_OTHERS.Drivers{loc};
         list_drivers                        = split(all_drivers,';');
 %       Update the driver count for this clone
-        initial_driver_count(clone)   = length(list_drivers);
+        initial_driver_count(clone)         = length(list_drivers);
 %       Update the driver map for this clone
         driver_map                          = [];
         for driver=1:length(list_drivers)

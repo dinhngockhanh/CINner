@@ -75,14 +75,23 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     }
 
 #---Initialize the genotypes for each clone
-    initial_ploidy_chrom                    <- vector('list',length=initial_N_clones)
-    initial_ploidy_allele                   <- vector('list',length=initial_N_clones)
-    initial_ploidy_block                    <- vector('list',length=initial_N_clones)
-    initial_driver_count                    <- rep(0,initial_N_clones)
-    initial_driver_map                      <- vector('list',length=initial_N_clones)
-    initial_DNA_length                      <- vector('list',length=initial_N_clones)
-    initial_selection_rate                  <- rep(0,initial_N_clones)
-    initial_prob_new_drivers                <- rep(0,initial_N_clones)
+    initial_ploidy_chrom                    <<- vector('list',length=initial_N_clones)
+    initial_ploidy_allele                   <<- vector('list',length=initial_N_clones)
+    initial_ploidy_block                    <<- vector('list',length=initial_N_clones)
+    initial_driver_count                    <<- rep(0,initial_N_clones)
+    initial_driver_map                      <<- vector('list',length=initial_N_clones)
+    initial_DNA_length                      <<- vector('list',length=initial_N_clones)
+    initial_selection_rate                  <<- rep(0,initial_N_clones)
+    initial_prob_new_drivers                <<- rep(0,initial_N_clones)
+    assign('initial_N_clones',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_ploidy_allele',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_ploidy_block',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_driver_count',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_driver_map',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_DNA_length',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_selection_rate',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+    assign('initial_prob_new_drivers',genotype_list_ploidy_chrom,envir=.GlobalEnv)
 #---Set up the initial clones' CN genotypes
     for (clone in 1:initial_N_clones){
 #       Extract mini table for the CN genotypes of this clone
@@ -93,8 +102,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         ploidy_chrom                        <- rep(0,N_chromosomes)
         ploidy_block                        <- list()
         ploidy_allele                       <- list()
-        # for (chrom in 1:N_chromosomes){
-        for (chrom in 1:1){
+        for (chrom in 1:N_chromosomes){
             ploidy_block[[chrom]]           <- list()
             ploidy_allele[[chrom]]          <- list()
 #           Get CN genotype for this chromosome
@@ -131,22 +139,22 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                 ploidy_block[[chrom]][[strand]]     <- strand_ploidy_block
                 ploidy_allele[[chrom]][[strand]]    <- strand_ploidy_allele
             }
-print(ploidy_block)
-print(ploidy_allele)
-
-
-
-
-
-
         }
+#       Store the clone's CN profiles
+        initial_ploidy_chrom[[clone]]       <<- ploidy_chrom
+        initial_ploidy_allele[[clone]]      <<- ploidy_allele
+        initial_ploidy_block[[clone]]       <<- ploidy_block
+    }
+#---Set up the initial clones' driver profiles
+    for (clone in 1:initial_N_clones){
+#       Get driver profile of this clone
+        loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
+        all_drivers                         <- TABLE_INITIAL_OTHERS$Drivers[loc]
 
+print(all_drivers)
 
-# print(CHROM_COPY_NUMBER_PROFILES)
-# print(vec_delete)
 
     }
-
 
 
 
