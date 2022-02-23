@@ -41,10 +41,17 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_genotype[node_list_current]       <- node_genotype_current
     phylogeny_deathtime[node_list_current]      <- T_current
 #----------------------------------------Build the sample phylogeny tree
-    # for (i in seq(length(evolution_traj_divisions),1,-1)) {
-    for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions),-1)) {
+    for (i in seq(length(evolution_traj_divisions),1,-1)) {
+    # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions),-1)) {
 #       Get time point
         time                                            <- evolution_traj_time[i]
+
+
+if ((i%%1000)==0){
+    print(time)
+}
+
+
 #       Get current clonal populations in total population
         eligible_clonal_ID                              <- evolution_traj_clonal_ID[[i+1]]
         eligible_clonal_total_population                <- evolution_traj_population[[i+1]]
@@ -113,9 +120,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #           Column 2:       node indices undergoing division as daughter 2
 #           Column 3:       division indices for corresponding nodes on column 1
 #           Column 4:       division indices for corresponding nodes on column 2
-
-
-
+#-----------Translation for R: linearized into vector:
+#           Entries (1:4)   corresponds to row 1
+#           Entries (5:8)   corresponds to row 2
+#           ...
             mat_division_sample                             <- vector("list",length=(4*nrow(mat_division_total_population)))
             for (clone in 1:length(eligible_clonal_ID)) {
 #               For every clone found in the total population...
@@ -193,159 +201,124 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                         col                                 <- col+2
                         ind                                 <- (row-1)*4+col
                         count_divisions_total               <- mat_division_total_population[row,1]
-                        mat_division_sample[[ind]]          <- sample(x=count_divisions_total,size=count,replace=FALSE)                        
+                        mat_division_sample[[ind]]          <- sample(x=count_divisions_total,size=count,replace=FALSE)
                     }
                 }
-
-print('------------------------------------------')
-print(mat_division_sample)
             }
+#           Redo the whole process if some node count in some position exceeded limit in total population
+            if (logic_correct==-1) {
+                logic_correct                               <- 0
+                next
+            }
+#-----------Update phylogeny tree according to the division identities
+#           Save the current phylogeny in case new changes are wrong
+            hclust_row_tmp                                  <- hclust_row
+            hclust_nodes_tmp                                <- hclust_nodes
+            hclust_merge_tmp                                <- hclust_merge
+            hclust_height_tmp                               <- hclust_height
 
+            phylogeny_origin_tmp                            <- phylogeny_origin
+            phylogeny_elapsed_gens_tmp                      <- phylogeny_elapsed_gens
+            phylogeny_elapsed_genotypes_tmp                 <- phylogeny_elapsed_genotypes
+            phylogeny_genotype_tmp                          <- phylogeny_genotype
+            phylogeny_birthtime_tmp                         <- phylogeny_birthtime
+            phylogeny_deathtime_tmp                         <- phylogeny_deathtime
 
+            node_list_current_tmp                           <- node_list_current
+            node_genotype_current_tmp                       <- node_genotype_current
+#           Update phylogeny according to every division
+            for (division_type in 1:nrow(mat_division_total_population)) {
+                genotype_mother                                     <- mat_division_total_population[division_type,2]
+#               Get list of nodes in positions of daughter 1 and daughter 2
+                ind_1                                               <- (division_type-1)*4+1
+                vec_nodes_daughter_1                                <- mat_division_sample[[ind_1]]
+                ind_2                                               <- (division_type-1)*4+2
+                vec_nodes_daughter_2                                <- mat_division_sample[[ind_2]]
+                if ((length(vec_nodes_daughter_1)==0) && (length(vec_nodes_daughter_2)==0)) {
+                    next
+                }
+#               Get list of division indices of daughter 1 and daughter 2
+                ind_1                                               <- (division_type-1)*4+3
+                vec_div_indices_1                                   <- mat_division_sample[[ind_1]]
+                ind_2                                               <- (division_type-1)*4+4
+                vec_div_indices_2                                   <- mat_division_sample[[ind_2]]
+                vec_div_indices_all                                 <- unique(c(vec_div_indices_1,vec_div_indices_2))
+#               Perform each division
+                for (division in 1:length(vec_div_indices_all)) {
+                    div_index                                       <- vec_div_indices_all[division]
+                    loc_1                                           <- which(vec_div_indices_1==div_index)
+                    loc_2                                           <- which(vec_div_indices_2==div_index)
+                    if ((length(loc_1)!=0)&&(length(loc_2)!=0)) {
+#                       Nodes 1 and 2 are mergning...
+                        node_1                                      <- vec_nodes_daughter_1[loc_1]
+                        node_2                                      <- vec_nodes_daughter_2[loc_2]
+                        node_mother                                 <- min(node_list_current)-1
+#                       Update phylogeny in hclust style
+                        hclust_row                                  <- hclust_row+1
+                        hclust_nodes[node_mother]                   <- hclust_row
+                        hclust_merge[hclust_row,]                   <- c(hclust_nodes(node_1),hclust_nodes(node_2))
+                        hclust_height[hclust_row]                   <- T_current-time
+#                       Update phylogeny in our style
+                        phylogeny_origin[node_1]                    <- node_mother
+                        phylogeny_origin[node_2]                    <- node_mother
+                        phylogeny_elapsed_gens[node_mother]         <- 1
+                        phylogeny_elapsed_genotypes[[node_mother]]  <- c(genotype_mother)
+                        phylogeny_genotype[node_mother]             <- genotype_mother
+                        phylogeny_birthtime[node_1]                 <- time
+                        phylogeny_birthtime[node_2]                 <- time
+                        phylogeny_deathtime[node_mother]            <- time
+#                       Update phylogeny records in our style
+                        pos_delete                                  <- c(which(node_list_current==node_1),which(node_list_current==node_2))
+                        node_list_current                           <- node_list_current[-pos_delete]
+                        node_list_current                           <- c(node_mother,node_list_current)
+                        node_genotype_current                       <- node_genotype_current[-pos_delete]
+                        node_genotype_current                       <- c(genotype_mother,node_genotype_current)
+                    }
+                    else {
+#                       Either node 1 or node 2 has one more division...
+                        if (length(loc_1)!=0) {
+                            node_daughter                           <- vec_nodes_daughter_1[loc_1]
+                            }
+                        else {
+                            node_daughter                           <- vec_nodes_daughter_2[loc_2]
+                        }
+#                       Update phylogeny in our style
+                        phylogeny_elapsed_gens[node_daughter]       <- phylogeny_elapsed_gens[node_daughter]+1
+                        phylogeny_elapsed_genotypes[[node_daughter]]<- c(genotype_mother,phylogeny_elapsed_genotypes[[node_daughter]])
+#                       Update phylogeny records in our style
+                        loc_daughter                                <- which(node_list_current==node_daughter)
+                        node_genotype_current[loc_daughter]         <- genotype_mother
+                    }
+                }
+            }
+#-----------Check if the clonal populations in sample satisfy conditions
+#           Find clonal populations in sample after new divisions
+            tmp_clonal_sample_population                            <- rep(0,length(eligible_clonal_ID))
+            for (clone=1:length(eligible_clonal_ID)) {
+                clone_ID                                            <- eligible_clonal_ID[clone]
+                tmp_clonal_sample_population[clone]                 <- length(which(node_genotype_current==clone_ID))
+            }
+#           Redo this whole step if clonal populations violate thresholds
+            if (any(tmp_clonal_sample_population>limit_clonal_total_population)) {
+                hclust_row                                  <- hclust_row_tmp
+                hclust_nodes                                <- hclust_nodes_tmp
+                hclust_merge                                <- hclust_merge_tmp
+                hclust_height                               <- hclust_height_tmp
 
-logic_correct<-1
+                phylogeny_origin                            <- phylogeny_origin_tmp
+                phylogeny_elapsed_gens                      <- phylogeny_elapsed_gens_tmp
+                phylogeny_elapsed_genotypes                 <- phylogeny_elapsed_genotypes_tmp
+                phylogeny_genotype                          <- phylogeny_genotype_tmp
+                phylogeny_birthtime                         <- phylogeny_birthtime_tmp
+                phylogeny_deathtime                         <- phylogeny_deathtime_tmp
+
+                node_list_current                           <- node_list_current_tmp
+                node_genotype_current                       <- node_genotype_current_tmp
+                }
+            else {
+                logic_correct                               <- 1
+            }
         }
-
-
-
-
-
-
-
-
-
-
-
-# #       Get current total clonal population (after divisions)
-#         total_clonal_ID                         <- evolution_traj_clonal_ID[[i+1]]
-#         total_clonal_population                 <- evolution_traj_population[[i+1]]
-# #       Get current sample clonal population (after divisions)
-#         sample_clonal_population                <- rep(0,length=N_clones)
-#         for (node in 1:length(node_genotype_current)) {
-#             genotype                            <- node_genotype_current[node]
-#             sample_clonal_population[genotype]  <- sample_clonal_population[genotype]+1
-#         }
-# #       Get list of eligible nodes of each genotype
-#         sample_eligible_nodes                   <- vector("list",length=N_clones)
-#         for (node in 1:length(node_genotype_current)) {
-#             genotype                            <- node_genotype_current[node]
-#             sample_eligible_nodes[[genotype]]   <- c(sample_eligible_nodes[[genotype]], node_list_current[node])
-#         }
-# #       Get list of divisions
-#         matrix_division                         <- evolution_traj_divisions[[i]]
-#         if (is.null(matrix_division)){
-#             next
-#         }
-# #       Redo runif vector if necessary
-#         if (N_runif>=length(vec_runif)-4*sum(matrix_division[,1])){
-#             vec_runif                           <- runif(10000000)
-#             N_runif                             <- 0
-#         }
-# #       For each type of divisions...
-#         for (event_type in 1:nrow(matrix_division)) {
-# #           Get number of divisions
-#             no_divisions                        <- matrix_division[event_type,1]
-# #           Get genotype of mother
-#             genotype_mother                     <- matrix_division[event_type,2]
-# #           Get genotype of 1st daughter
-#             genotype_daughter_1                 <- matrix_division[event_type,3]
-#             position_daughter_1                 <- which(total_clonal_ID==genotype_daughter_1)
-# #           Get genotype of 2nd daughter
-#             genotype_daughter_2                 <- matrix_division[event_type,4]
-#             position_daughter_2                 <- which(total_clonal_ID==genotype_daughter_2)
-# #           If daughter genotypes are not in current nodes, move on
-#             if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
-#                 next
-#             }
-# #           For each specific division...
-#             for (division in 1:no_divisions) {
-# #               If these genotypes are not in current nodes, move on
-#                 if ((sample_clonal_population[genotype_daughter_1]<=0)&&(sample_clonal_population[genotype_daughter_2]<=0)) {
-#                     next
-#                 }
-# #               Choose the first daughter node
-#                 # logic_node_1                                                    <- runif(1)<sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1]
-#                 N_runif                                                         <- N_runif+1
-#                 logic_node_1                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_1]/total_clonal_population[position_daughter_1])
-#                 if (logic_node_1==1) {
-#                     # pos_node_1                                                  <- sample.int(sample_clonal_population[genotype_daughter_1],size=1)
-#                     N_runif                                                     <- N_runif+1
-#                     pos_node_1                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_1])
-#                     node_1                                                      <- sample_eligible_nodes[[genotype_daughter_1]][pos_node_1]
-#                     sample_eligible_nodes[[genotype_daughter_1]]                <- sample_eligible_nodes[[genotype_daughter_1]][-pos_node_1]
-#                     sample_clonal_population[genotype_daughter_1]               <- sample_clonal_population[genotype_daughter_1]-1
-#                     total_clonal_population[position_daughter_1]                <- total_clonal_population[position_daughter_1]-1
-#                 }
-#                 else {
-#                     node_1                                                      <- 0
-#                     total_clonal_population[position_daughter_1]                <- total_clonal_population[position_daughter_1]-1
-#                 }
-# #               Choose the second daughter node
-#                 # logic_node_2                                                    <- runif(1)<sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2]
-#                 N_runif                                                         <- N_runif+1
-#                 logic_node_2                                                    <- vec_runif[N_runif]<(sample_clonal_population[genotype_daughter_2]/total_clonal_population[position_daughter_2])
-#                 if (logic_node_2==1) {
-#                     # pos_node_2                                                  <- sample.int(sample_clonal_population[genotype_daughter_2],size=1)
-#                     N_runif                                                     <- N_runif+1
-#                     pos_node_2                                                  <- ceiling(vec_runif[N_runif]*sample_clonal_population[genotype_daughter_2])
-#                     node_2                                                      <- sample_eligible_nodes[[genotype_daughter_2]][pos_node_2]
-#                     sample_eligible_nodes[[genotype_daughter_2]]                <- sample_eligible_nodes[[genotype_daughter_2]][-pos_node_2]
-#                     sample_clonal_population[genotype_daughter_2]               <- sample_clonal_population[genotype_daughter_2]-1
-#                     total_clonal_population[position_daughter_2]                <- total_clonal_population[position_daughter_2]-1
-#                     }
-#                 else {
-#                     node_2                                                      <- 0
-#                     total_clonal_population[position_daughter_2]                <- total_clonal_population[position_daughter_2]-1
-#                 }
-# #               Update the nodes
-#                 if ((node_1==0)&&(node_2==0)) {
-# #                   There is no merging....
-#                     next
-#                     }
-#                 else { if ((node_1>0)&&(node_2==0)) {
-# #                   There is no merging but node 1 has one more division...
-# #                   Update phylogeny in our style
-#                     phylogeny_elapsed_gens[node_1]                          <- phylogeny_elapsed_gens[node_1]+1
-#                     phylogeny_elapsed_genotypes[[node_1]]                   <- c(genotype_mother, phylogeny_elapsed_genotypes[[node_1]])
-# #                   Update phylogeny records in our style
-#                     node_genotype_current[which(node_list_current==node_1)] <- genotype_mother
-#                     }
-#                 else { if ((node_1==0)&&(node_2>0)) {
-# #                   There is no merging but node 2 has one more division...
-# #                   Update phylogeny in our style
-#                     phylogeny_elapsed_gens[node_2]                          <- phylogeny_elapsed_gens[node_2]+1
-#                     phylogeny_elapsed_genotypes[[node_2]]                   <- c(genotype_mother, phylogeny_elapsed_genotypes[[node_2]])
-# #                   Update phylogeny records in our style
-#                     node_genotype_current[which(node_list_current==node_2)] <- genotype_mother
-#                     }
-#                 else { if ((node_1>0)&&(node_2>0)) {
-# #                   Nodes 1 and 2 are mergning...
-#                     node_mother                                             <- min(node_list_current)-1
-# #                   Update phylogeny in hclust style
-#                     hclust_row                                              <- hclust_row+1
-#                     hclust_nodes[node_mother]                               <- hclust_row
-#                     hclust_merge[hclust_row,1]                              <- hclust_nodes[node_1]
-#                     hclust_merge[hclust_row,2]                              <- hclust_nodes[node_2]
-#                     hclust_height[hclust_row]                               <- T_current-time
-# #                   Update phylogeny in our style
-#                     phylogeny_origin[node_1]                                <- node_mother
-#                     phylogeny_origin[node_2]                                <- node_mother
-#                     phylogeny_elapsed_gens[node_mother]                     <- 1
-#                     phylogeny_elapsed_genotypes[[node_mother]]              <- c(genotype_mother)
-#                     phylogeny_genotype[node_mother]                         <- genotype_mother
-#                     phylogeny_birthtime[node_1]                             <- time
-#                     phylogeny_birthtime[node_2]                             <- time
-#                     phylogeny_deathtime[node_mother]                        <- time
-# #                   Update phylogeny records in our style
-#                     pos_delete                                              <- c(which(node_list_current==node_1),which(node_list_current==node_2))
-#                     node_genotype_current                                   <- node_genotype_current[-pos_delete]
-#                     node_genotype_current                                   <- c(genotype_mother, node_genotype_current)
-#                     node_list_current                                       <- node_list_current[-pos_delete]
-#                     node_list_current                                       <- c(node_mother, node_list_current)
-#                     }
-#                 }}}
-#             }
-#         }
     }
 
 
