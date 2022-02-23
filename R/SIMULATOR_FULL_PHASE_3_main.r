@@ -142,10 +142,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 }
 
 
-
-logic_correct<-1
 print('------------------------------------------')
 print(mat_division_sample_clone)
+            }
+
+
+
+logic_correct<-1
         }
 
 
