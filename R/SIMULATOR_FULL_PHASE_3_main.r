@@ -1,5 +1,5 @@
 #==============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
-SIMULATOR_FULL_PHASE_3_main_OLD <- function(package_clonal_evolution,package_sample) {
+SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample) {
 #---------------------------------------------Input the clonal evolution
     T_current                                   <- package_clonal_evolution[[1]]
     N_clones                                    <- package_clonal_evolution[[4]]
@@ -45,13 +45,6 @@ SIMULATOR_FULL_PHASE_3_main_OLD <- function(package_clonal_evolution,package_sam
     # for (i in seq(length(evolution_traj_divisions),length(evolution_traj_divisions),-1)) {
 #       Get time point
         time                                            <- evolution_traj_time[i]
-
-
-if ((i%%1000)==0){
-    print(time)
-}
-
-
 #       Get current clonal populations in total population
         eligible_clonal_ID                              <- evolution_traj_clonal_ID[[i+1]]
         eligible_clonal_total_population                <- evolution_traj_population[[i+1]]
