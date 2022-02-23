@@ -320,88 +320,83 @@ if ((i%%1000)==0){
             }
         }
     }
-
-
-
-
-
-# #   Assign original cell to be born at the beginning of clonal evolution
-#     phylogeny_birthtime[1]                          <- evolution_traj_time[1]
-# #-----------------------------------------Reorder the nodes for plotting
-# #---Find an order on all nodes of the phylogeny in our style
-# #   Find number of progeny of each node
-#     progeny_count                                   <- rep(0,2*N_sample-1)
-#     progeny_count[N_sample:(2*N_sample-1)]          <- 1
-#     for (node in (2*N_sample-1):2){
-#         mother_node                                 <- phylogeny_origin[node]
-#         progeny_count[mother_node]                  <- progeny_count[mother_node]+progeny_count[node]
-#     }
-# #   Reorder the sample phylogeny tree based on progeny counts
-#     phylogeny_order                                 <- rep(0,2*N_sample-1)
-#     phylogeny_order[1]                              <- 1
-#     for (node in 1:(2*N_sample-1)){
-#         vec_daughter_nodes                          <- which(phylogeny_origin==node)
-#         if (length(vec_daughter_nodes)==2){
-#             daughter_node_1                         <- vec_daughter_nodes[1]
-#             progeny_count_1                         <- progeny_count[daughter_node_1]
-#             daughter_node_2                         <- vec_daughter_nodes[2]
-#             progeny_count_2                         <- progeny_count[daughter_node_2]
-#             if (progeny_count_1<progeny_count_2){
-#                 phylogeny_order[daughter_node_1]    <- phylogeny_order[node]
-#                 phylogeny_order[daughter_node_2]    <- phylogeny_order[node]+progeny_count_1
-#             }
-#             else{
-#                 phylogeny_order[daughter_node_1]    <- phylogeny_order[node]+progeny_count_2
-#                 phylogeny_order[daughter_node_2]    <- phylogeny_order[node]
-#             }
-#         }
-#     }
-# #---Extract the order for phylogeny in hclust style
-#     hclust_order_inverse                            <- phylogeny_order[N_sample:(2*N_sample-1)]
-#     hclust_order                                    <- rep(0,N_sample)
-#     for (i_cell in 1:N_sample){
-#         loc                                         <- hclust_order_inverse[i_cell]
-#         hclust_order[loc]                           <- i_cell
-#     }
-# #------------------------------------------------Create clustering table
-# #   Change clone ID from genotype index in simulation to [A,B,C,...]
-#     sample_clone_ID_numeric                         <- sample_clone_ID
-#     sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
-#     sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
-#     sample_clone_ID_letters                         <- c()
-#     for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
-#         clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
-#         clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
-#         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
-#         sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
-#     }
-# #   Create clustering table
-#     hclust_clustering                               <- data.frame(sample_cell_ID,sample_clone_ID_letters)
-#     names(hclust_clustering)                        <- c('cell_id','clone_id')
-# #--------------------------------Create phylogeny object in hclust style
-# #   Create phylogeny object in hclust style
-#     phylogeny_hclust                                <- list()
-#     phylogeny_hclust$merge                          <- hclust_merge
-#     phylogeny_hclust$height                         <- hclust_height
-#     phylogeny_hclust$order                          <- hclust_order
-#     phylogeny_hclust$labels                         <- sample_cell_ID
-#     class(phylogeny_hclust)                         <- "hclust"
-# #---------------------------------Create phylogeny object in phylo style
-# #   Create phylogeny object in phylo style
-#     phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
-# #   Create object containing both phylo-style tree and clustering
-#     phylogeny_clustering_truth                      <- list()
-#     phylogeny_clustering_truth$tree                 <- phylogeny_phylo
-#     phylogeny_clustering_truth$clustering           <- hclust_clustering
-# #---------------------------------Output package of data from simulation
-#     output                                          <- list()
-#     output[[1]]                                     <- phylogeny_clustering_truth
-#     output[[2]]                                     <- phylogeny_origin
-#     output[[3]]                                     <- phylogeny_elapsed_gens
-#     output[[4]]                                     <- phylogeny_elapsed_genotypes
-#     output[[5]]                                     <- phylogeny_genotype
-#     output[[6]]                                     <- phylogeny_birthtime
-#     output[[7]]                                     <- phylogeny_deathtime
-#     output[[8]]                                     <- phylogeny_order
-#     return(output)
+#   Assign original cell to be born at the beginning of clonal evolution
+    phylogeny_birthtime[1]                                  <- evolution_traj_time[1]
+#-----------------------------------------Reorder the nodes for plotting
+#---Find an order on all nodes of the phylogeny in our style
+#   Find number of progeny of each node
+    progeny_count                                   <- rep(0,2*N_sample-1)
+    progeny_count[N_sample:(2*N_sample-1)]          <- 1
+    for (node in (2*N_sample-1):2){
+        mother_node                                 <- phylogeny_origin[node]
+        progeny_count[mother_node]                  <- progeny_count[mother_node]+progeny_count[node]
+    }
+#   Reorder the sample phylogeny tree based on progeny counts
+    phylogeny_order                                 <- rep(0,2*N_sample-1)
+    phylogeny_order[1]                              <- 1
+    for (node in 1:(2*N_sample-1)){
+        vec_daughter_nodes                          <- which(phylogeny_origin==node)
+        if (length(vec_daughter_nodes)==2){
+            daughter_node_1                         <- vec_daughter_nodes[1]
+            progeny_count_1                         <- progeny_count[daughter_node_1]
+            daughter_node_2                         <- vec_daughter_nodes[2]
+            progeny_count_2                         <- progeny_count[daughter_node_2]
+            if (progeny_count_1<progeny_count_2){
+                phylogeny_order[daughter_node_1]    <- phylogeny_order[node]
+                phylogeny_order[daughter_node_2]    <- phylogeny_order[node]+progeny_count_1
+            }
+            else{
+                phylogeny_order[daughter_node_1]    <- phylogeny_order[node]+progeny_count_2
+                phylogeny_order[daughter_node_2]    <- phylogeny_order[node]
+            }
+        }
+    }
+#---Extract the order for phylogeny in hclust style
+    hclust_order_inverse                            <- phylogeny_order[N_sample:(2*N_sample-1)]
+    hclust_order                                    <- rep(0,N_sample)
+    for (i_cell in 1:N_sample){
+        loc                                         <- hclust_order_inverse[i_cell]
+        hclust_order[loc]                           <- i_cell
+    }
+#------------------------------------------------Create clustering table
+#   Change clone ID from genotype index in simulation to [A,B,C,...]
+    sample_clone_ID_numeric                         <- sample_clone_ID
+    sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
+    sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
+    sample_clone_ID_letters                         <- c()
+    for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
+        clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
+        clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
+        vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
+        sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
+    }
+#   Create clustering table
+    hclust_clustering                               <- data.frame(sample_cell_ID,sample_clone_ID_letters)
+    names(hclust_clustering)                        <- c('cell_id','clone_id')
+#--------------------------------Create phylogeny object in hclust style
+#   Create phylogeny object in hclust style
+    phylogeny_hclust                                <- list()
+    phylogeny_hclust$merge                          <- hclust_merge
+    phylogeny_hclust$height                         <- hclust_height
+    phylogeny_hclust$order                          <- hclust_order
+    phylogeny_hclust$labels                         <- sample_cell_ID
+    class(phylogeny_hclust)                         <- "hclust"
+#---------------------------------Create phylogeny object in phylo style
+#   Create phylogeny object in phylo style
+    phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
+#   Create object containing both phylo-style tree and clustering
+    phylogeny_clustering_truth                      <- list()
+    phylogeny_clustering_truth$tree                 <- phylogeny_phylo
+    phylogeny_clustering_truth$clustering           <- hclust_clustering
+#---------------------------------Output package of data from simulation
+    output                                          <- list()
+    output[[1]]                                     <- phylogeny_clustering_truth
+    output[[2]]                                     <- phylogeny_origin
+    output[[3]]                                     <- phylogeny_elapsed_gens
+    output[[4]]                                     <- phylogeny_elapsed_genotypes
+    output[[5]]                                     <- phylogeny_genotype
+    output[[6]]                                     <- phylogeny_birthtime
+    output[[7]]                                     <- phylogeny_deathtime
+    output[[8]]                                     <- phylogeny_order
+    return(output)
 }
