@@ -294,7 +294,7 @@ if ((i%%1000)==0){
 #-----------Check if the clonal populations in sample satisfy conditions
 #           Find clonal populations in sample after new divisions
             tmp_clonal_sample_population                            <- rep(0,length(eligible_clonal_ID))
-            for (clone=1:length(eligible_clonal_ID)) {
+            for (clone in 1:length(eligible_clonal_ID)) {
                 clone_ID                                            <- eligible_clonal_ID[clone]
                 tmp_clonal_sample_population[clone]                 <- length(which(node_genotype_current==clone_ID))
             }
