@@ -22,7 +22,7 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
     N_all_clones                        <- length(all_clones_ID)
 #---Create and output model variables - copy number state
     TABLE_CLONAL_COPY_NUMBER_PROFILES   <- data.frame()
-    HEADER_CLONAL_COPY_NUMBER_PROFILES  <- c()
+    # HEADER_CLONAL_COPY_NUMBER_PROFILES  <- c()
 #   Initialize table of CN profiles with chromosome and bin positions
     vec_chrom                           <- c()
     vec_bin                             <- c()
@@ -33,7 +33,49 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
     }
     TABLE_CLONAL_COPY_NUMBER_PROFILES   <- data.frame(vec_chrom,vec_bin)
     colnames(TABLE_CLONAL_COPY_NUMBER_PROFILES) <- c('Chromosome','Bin')
+#   Update table of CN profiles with each clone found in sample
+    for (clone in 1:N_all_clones){
+        clone_ID                    <- all_clones_ID[clone]
+#       Get the CN profile of this clone
+        ploidy_chrom                <- genotype_list_ploidy_chrom[[clone_ID]]
+        ploidy_block                <- genotype_list_ploidy_block[[clone_ID]]
+        ploidy_allele               <- genotype_list_ploidy_allele[[clone_ID]]
+#       Find maximum strand count for any chromosome
+        max_no_strands              <- max(ploidy_chrom)
+#       Translate CN profile of this clone into table
+        TABLE_CLONE_CURRENT         <- data.frame()
+        N_row                       <- 0
+        for (chrom in 1:N_chromosomes){
+            no_strands              <- ploidy_chrom[chrom]
+            bin_count               <- vec_CN_block_no[chrom]
+            for (bin in 1:bin_count){
+                N_row               <- N_row+1
+                for (strand in 1:no_strands){
+                    unit_count      <- ploidy_block[[chrom]][[strand]][bin]
+                    allele          <- ''
+                    for (unit in 1:unit_count){
+                        allele      <- paste(allele,intToUtf8(ploidy_allele[[chrom]][[strand]][unit,bin]+64),sep='')
+                    }
+# if (unit_count!=1){
+#     print()
+# }
+                    if (a==''){
+                        allele      <- 'NA'
+                    }
+                    TABLE_CLONE_CURRENT[N_row,strand]   <- allele
+                }
+                for (strand in (no_strands+1):max_no_strand){
+                    TABLE_CLONE_CURRENT[N_row,strand]   <- 'NA'
+                }
+            }
+print(TABLE_CLONE_CURRENT)
 
+
+        }
+
+
+
+    }
 
 
 
