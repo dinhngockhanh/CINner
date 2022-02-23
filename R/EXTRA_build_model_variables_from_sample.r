@@ -55,14 +55,7 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
                     allele          <- ''
                     for (unit in 1:unit_count){
                         allele      <- paste(allele,intToUtf8(ploidy_allele[[chrom]][[strand]][unit,bin]+64),sep='')
-                    }
-# if (unit_count!=1){
-#     print()
-# }
-print('+++++++++++++++++++++++')
-print(ploidy_allele[[chrom]][[strand]][unit,bin])
-print(intToUtf8(ploidy_allele[[chrom]][[strand]][unit,bin]+64))
-                    if (a==''){
+                    if (allele==''){
                         allele      <- 'NA'
                     }
                     TABLE_CLONE_CURRENT[N_row,strand]   <- allele
@@ -71,12 +64,14 @@ print(intToUtf8(ploidy_allele[[chrom]][[strand]][unit,bin]+64))
                     TABLE_CLONE_CURRENT[N_row,strand]   <- 'NA'
                 }
             }
-# print(TABLE_CLONE_CURRENT)
-
-
         }
-
-
+        vec_header                  <- c()
+        for (strand in 1:max_no_strands){
+            vec_header              <- c(vec_header,paste('Clone_',clone,'_strand_',strand,sep=''))
+        }
+        colnames(TABLE_CLONE_CURRENT)   <- vec_header
+print(TABLE_CLONE_CURRENT)
+        TABLE_CLONAL_COPY_NUMBER_PROFILES<- cbind(TABLE_CLONAL_COPY_NUMBER_PROFILES,TABLE_CLONE_CURRENT)
 
     }
 
