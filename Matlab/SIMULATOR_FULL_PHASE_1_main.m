@@ -68,7 +68,6 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     clonal_population_next                      = clonal_population_current;
 %   Set up the record for the clonal evolution
     evolution_traj_count                        = 1;
-
     evolution_origin                            = zeros(1,length(initial_clonal_ID));
     evolution_genotype_changes                  = cell(1,length(initial_clonal_ID));
     evolution_traj_time                         = [T_start_time];

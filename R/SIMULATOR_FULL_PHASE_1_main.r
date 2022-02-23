@@ -27,100 +27,51 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     prob_CN_foc_del                             <- prob_CN_focal_deletion
     prob_CN_cnloh_i                             <- prob_CN_cnloh_interstitial
     prob_CN_cnloh_t                             <- prob_CN_cnloh_terminal
-
-
-
-print(initial_clonal_ID)
-print(initial_population)
-print(initial_N_clones)
-
-
-
-
-
-
-
-
-
-
-
-
-
-#-----------------------------------------Set up the initial CN genotype
-#   Set up the strand count for each chromosome
-    cell_vec_ploidy_chrom                       <- rep(2,N_chromosomes)
-    genotype_list_ploidy_chrom                  <<- list()
-    genotype_list_ploidy_chrom[[1]]             <<- cell_vec_ploidy_chrom
+#------------------------------------Set up the initial clonal genotypes
+#   Set up the strand count for each chromosome for each clone
+    genotype_list_ploidy_chrom                  <<- initial_ploidy_chrom
     assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
-#   Set up the CN count for each chrosomome strand
-    cell_mat_ploidy_block                       <- list()
-    for(chrom in 1:N_chromosomes){
-        ploidy                                  <- cell_vec_ploidy_chrom[chrom]
-        no_blocks                               <- vec_CN_block_no[chrom]
-        cell_mat_ploidy_block[[chrom]]          <- list()
-        for(strand in 1:ploidy){
-            cell_mat_ploidy_block[[chrom]][[strand]]    <- rep(1,no_blocks)
-        }
-    }
-    genotype_list_ploidy_block                  <<- list()
-    genotype_list_ploidy_block[[1]]             <<- cell_mat_ploidy_block
+#   Set up the CN count for each chrosomome strand for each clone
+    genotype_list_ploidy_block                  <<- initial_ploidy_block
     assign('genotype_list_ploidy_block',genotype_list_ploidy_block,envir=.GlobalEnv)
-#   Set up the CN allele info for each chromosome strand
-    cell_vec_ploidy_allele                      <- list()
-    for(chrom in 1:N_chromosomes){
-        ploidy                                  <- cell_vec_ploidy_chrom[chrom]
-        no_blocks                               <- vec_CN_block_no[chrom]
-        cell_vec_ploidy_allele[[chrom]]         <- list()
-        for(strand in 1:ploidy){
-            cell_vec_ploidy_allele[[chrom]][[strand]]   <- matrix(rep(strand,no_blocks),nrow=1)
-        }
-    }
-    genotype_list_ploidy_allele                 <<- list()
-    genotype_list_ploidy_allele[[1]]            <<- cell_vec_ploidy_allele
+#   Set up the CN allele info for each chromosome strand for each clone
+    genotype_list_ploidy_allele                 <<- initial_ploidy_allele
     assign('genotype_list_ploidy_allele',genotype_list_ploidy_allele,envir=.GlobalEnv)
-#-------------------------------------Set up the initial driver genotype
-    cell_mat_drivers                            <- matrix(0,nrow=1)
-    genotype_list_driver_count                  <<- matrix(0,1,1)
-    genotype_list_driver_map                    <<- list()
-    genotype_list_driver_map[[1]]               <<- cell_mat_drivers
-    genotype_list_selection_rate                <<- matrix(0,1,1)
-    genotype_list_selection_rate[1]             <<- SIMULATOR_FULL_PHASE_1_selection_rate(0,cell_mat_drivers,cell_vec_ploidy_chrom,cell_mat_ploidy_block)
+#   Set up the driver count for each clone
+    genotype_list_driver_count                  <<- initial_driver_count
     assign('genotype_list_driver_count',genotype_list_driver_count,envir=.GlobalEnv)
+#   Set up the driver map for each clone
+    genotype_list_driver_map                    <<- initial_driver_map
     assign('genotype_list_driver_map',genotype_list_driver_map,envir=.GlobalEnv)
+#   Set up the selection rate for each clone
+    genotype_list_selection_rate                <<- initial_selection_rate
     assign('genotype_list_selection_rate',genotype_list_selection_rate,envir=.GlobalEnv)
-#--------------------------Set up the DNA length of the initial genotype
-    DNA_length                                  <- 0
-    for (chrom in 1:N_chromosomes) {
-        for (strand in 1:cell_vec_ploidy_chrom[chrom]) {
-            DNA_length                          <- DNA_length+sum(cell_mat_ploidy_block[[chrom]][[strand]])
-        }
-    }
-    DNA_length                                  <- size_CN_block_DNA*DNA_length
-    genotype_list_DNA_length                    <<- list(DNA_length)
-    genotype_list_prob_new_drivers              <<- 1-dpois(x=0,lambda=rate_driver*DNA_length)
+#   Set up the DNA length for each clone
+    genotype_list_DNA_length                    <<- initial_DNA_length
     assign('genotype_list_DNA_length',genotype_list_DNA_length,envir=.GlobalEnv)
+#   Set up the probability of new drivers per division for each clone
+    genotype_list_prob_new_drivers              <<- initial_prob_new_drivers
     assign('genotype_list_prob_new_drivers',genotype_list_prob_new_drivers,envir=.GlobalEnv)
 #-------------------------------------Set up the clonal evolution record
-    N_clones                                    <<- 1
+    N_clones                                    <<- initial_N_clones
     assign('N_clones',N_clones,envir=.GlobalEnv)
-#   Set up the record for the clonal evolution
-    clonal_ID_current                           <<- c(N_clones)
-    clonal_population_current                   <<- c(1)
+#   Set up the record for current clonal populations
+    clonal_ID_current                           <<- initial_clonal_ID
+    clonal_population_current                   <<- initial_population
     clonal_population_next                      <<- clonal_population_current
     assign('clonal_ID_current',clonal_ID_current,envir=.GlobalEnv)
     assign('clonal_population_current',clonal_population_current,envir=.GlobalEnv)
     assign('clonal_population_next',clonal_population_next,envir=.GlobalEnv)
-
-    evolution_origin                            <<- c(0)
-    evolution_genotype_changes                  <<- list(c())
+#   Set up the record for the clonal evolution
+    evolution_traj_count                        <- 1
+    evolution_origin                            <<- rep(0,length(initial_clonal_ID))
+    evolution_genotype_changes                  <<- vector('list',length=length(initial_clonal_ID))
     evolution_traj_time                         <- c(T_start_time)
     evolution_traj_clonal_ID                    <- list(clonal_ID_current)
     evolution_traj_population                   <- list(clonal_population_current)
     evolution_traj_divisions                    <- list()
     assign('evolution_origin',evolution_origin,envir=.GlobalEnv)
     assign('evolution_genotype_changes',evolution_genotype_changes,envir=.GlobalEnv)
-
-    evolution_traj_count                        <- 1
 #--------------------------------------Set up counts for the simulations
 #   Current time
     T_current                       <- T_start_time
