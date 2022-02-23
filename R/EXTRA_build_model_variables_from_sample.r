@@ -59,8 +59,9 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
 # if (unit_count!=1){
 #     print()
 # }
-print(unit_count)
-print(ploidy_allele[[chrom]][[strand]])
+print('+++++++++++++++++++++++')
+print(ploidy_allele[[chrom]][[strand]][unit,bin])
+print(intToUtf8(ploidy_allele[[chrom]][[strand]][unit,bin]+64))
                     if (a==''){
                         allele      <- 'NA'
                     }
