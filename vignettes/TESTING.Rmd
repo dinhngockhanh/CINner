@@ -19,7 +19,8 @@ devtools::document()
 
 ```{r}
 print('================================================================================   PART A')
-MODEL                         <- 'MIXTURE-A'
+# MODEL                         <- 'MIXTURE-A'
+MODEL                         <- 'MIXTURE-C'
 stage_final                   <- 3
 
 SIMULATOR_VARIABLES_for_simulation(MODEL)

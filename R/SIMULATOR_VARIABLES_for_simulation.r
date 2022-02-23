@@ -87,7 +87,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     for (clone in 1:initial_N_clones){
 #       Extract mini table for the CN genotypes of this clone
         text_clone_ID                       <- paste('Clone_',clone,sep='')
-        vec_loc                             <- c(1,2,which(grepl(text_clone_ID,vec_header)))
+        vec_loc                             <- c(1,2,grep(text_clone_ID,vec_header))
         CLONE_INITIAL_COPY_NUMBER_PROFILES  <- TABLE_INITIAL_COPY_NUMBER_PROFILES[,vec_loc]
 #       Set up clone's CN genotype
         ploidy_chrom                        <- rep(0,N_chromosomes)
@@ -97,12 +97,21 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         for (chrom in 1:1){
 #           Get CN genotype for this chromosome
             CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==chrom,]
+#           Clean CN genotype of unnecessary strands
+            vec_delete                      <- c()
+            for (column in 3:nrow(CHROM_COPY_NUMBER_PROFILES)){
+                if (all(grepl('NA',CHROM_COPY_NUMBER_PROFILES[,column]))){
+                    vec_delete              <- c(vec_delete,column)
+                }
+            }
+
+
 
 
         }
 
 
-
+print(CHROM_COPY_NUMBER_PROFILES)
 
 
     }
@@ -115,7 +124,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 
 
 
-print(CHROM_COPY_NUMBER_PROFILES)
 
 
 
