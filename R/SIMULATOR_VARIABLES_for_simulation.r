@@ -114,7 +114,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                 }
             }
             if (length(vec_delete)>0){
-                CHROM_COPY_NUMBER_PROFILES  <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]                
+                CHROM_COPY_NUMBER_PROFILES  <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
             }
 #           Update the strand count for each chromosome
             no_strands                      <- ncol(CHROM_COPY_NUMBER_PROFILES)-2
@@ -147,21 +147,37 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         initial_ploidy_block[[clone]]       <<- ploidy_block
     }
 #---Set up the initial clones' driver profiles
-
-print(TABLE_INITIAL_OTHERS)
-
     for (clone in 1:initial_N_clones){
 #       Get driver profile of this clone
         loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
         all_drivers                         <- TABLE_INITIAL_OTHERS$Drivers[loc]
+        list_drivers                        <- strsplit(all_drivers,';')
+        list_drivers                        <- list_drivers[[1]]
+#       Update the driver count for this clone
+        initial_driver_count[clone]         <<- length(list_drivers)
+#       Update the driver map for this clone
+        driver_map                          <- c()
+        for (driver in 1:length(list_drivers)){
+            driver_info                     <- strsplit(list_drivers[driver],'_')
+            driver_info                     <- driver_info[[1]]
+#           Get driver's ID, strand and unit
+            driver_ID                       <- driver_info[1]
+            driver_strand                   <- strtoi(sub('.*strand','',driver_info[2]))
+            driver_unit                     <- strtoi(sub('.*unit','',driver_info[3]))
+#           Get driver's chromosome and block
+            driver_loc                      <- which(driver_library$Gene_ID==driver_ID)
+            driver_chrom                    <- driver_library$Chromosome[driver_loc]
+            driver_block                    <- driver_library$Bin[driver_loc]
+            driver_map                      <- rbind(driver_map,c(driver_loc,driver_chrom,driver_strand,driver_block,driver_unit))
+        }
+        initial_driver_map[[clone]]         <<- driver_map
 
-print(all_drivers)
 
-print(TABLE_INITIAL_OTHERS)
 
 
     }
-
+print(initial_driver_count)
+print(initial_driver_map)
 
 
 
