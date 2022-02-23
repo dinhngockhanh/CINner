@@ -151,6 +151,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #               Divide total count of nodes among different division types
                 count_nodes_each                            <- rmultinom(n=1,size=count_nodes_all,mat_division_sample_clone[3,]/sum(mat_division_sample_clone[3,]))
                 # mat_division_sample_clone[4,]               <- count_nodes_each
+                count_nodes_each                            <- matrix(count_nodes_each,nrow=1)
+
+print(mat_division_sample_clone)
+print(count_nodes_each)
+
                 mat_division_sample_clone                   <- rbind(mat_division_sample_clone,count_nodes_each)
 
 
