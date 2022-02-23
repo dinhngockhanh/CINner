@@ -69,17 +69,16 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
                 }
             }
         }
-        vec_header                      <- c()
+        vec_header                          <- c()
         for (strand in 1:max_no_strands){
-            vec_header                  <- c(vec_header,paste('Clone_',clone,'_strand_',strand,sep=''))
+            vec_header                      <- c(vec_header,paste('Clone_',clone,'_strand_',strand,sep=''))
         }
-        colnames(TABLE_CLONE_CURRENT)   <- vec_header
-print(TABLE_CLONE_CURRENT)
-        TABLE_CLONAL_COPY_NUMBER_PROFILES<- cbind(TABLE_CLONAL_COPY_NUMBER_PROFILES,TABLE_CLONE_CURRENT)
-
+        colnames(TABLE_CLONE_CURRENT)       <- vec_header
+        TABLE_CLONAL_COPY_NUMBER_PROFILES   <- cbind(TABLE_CLONAL_COPY_NUMBER_PROFILES,TABLE_CLONE_CURRENT)
     }
-
-
+#   Output model variables - copy number state
+    filename                                <- paste(model,'-input-initial-cn-profiles.csv',sep='')
+    write.csv(TABLE_CLONAL_COPY_NUMBER_PROFILES,filename,row.names=FALSE)
 
 
 print(TABLE_CLONAL_COPY_NUMBER_PROFILES)
