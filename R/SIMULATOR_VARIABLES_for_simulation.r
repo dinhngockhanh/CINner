@@ -95,6 +95,8 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         ploidy_allele                       <- list()
         # for (chrom in 1:N_chromosomes){
         for (chrom in 1:1){
+            ploidy_block[[chrom]]           <- list()
+            ploidy_allele[[chrom]]          <- list()
 #           Get CN genotype for this chromosome
             CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==chrom,]
 #           Clean CN genotype of unnecessary strands
