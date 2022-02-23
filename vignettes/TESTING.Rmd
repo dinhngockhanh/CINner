@@ -22,6 +22,16 @@ package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,sta
 print('================================================================================   PREPARE INITIAL STATE FOR EXPERIMENTS B AND C')
 MODEL_NEW                     <- 'MIXTURE-B'
 EXTRA_build_model_variables_from_sample(MODEL_NEW,package_output_A)
+MODEL_NEW                     <- 'MIXTURE-C'
+EXTRA_build_model_variables_from_sample(MODEL_NEW,package_output_A)
+print('================================================================================   PART B')
+MODEL                         <- 'MIXTURE-B'
+stage_final                   <- 3
+package_output_B              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+print('================================================================================   PART C')
+MODEL                         <- 'MIXTURE-C'
+stage_final                   <- 3
+package_output_B              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 ```
 
 

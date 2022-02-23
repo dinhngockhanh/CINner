@@ -99,6 +99,7 @@ end
         end
         vec_drivers                     = [vec_drivers string(DRIVERS)];
     end
+%   Output model variables - other information
     CLONAL_OTHERS                       = table(vec_clone',vec_cell_count',vec_drivers','VariableNames',["Clone","Cell_count","Drivers"]);
     filename                            = [folder_name model '-input-initial-others.csv'];
     writetable(CLONAL_OTHERS,filename);
