@@ -201,7 +201,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         driver_count                        <- initial_driver_count[clone]
         driver_map                          <- initial_driver_map[[clone]]
         selection_rate                      <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block)
-        initial_selection_rate[clone]       <- selection_rate
+        initial_selection_rate[clone]       <<- selection_rate
     }
 #---Set up total population dynamics as function of age (in days)
     for (i in 1:ncol(TABLE_POPULATION_DYNAMICS)) {
