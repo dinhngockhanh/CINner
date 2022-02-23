@@ -152,6 +152,10 @@ print(TABLE_INITIAL_OTHERS)
 #       Get driver profile of this clone
         loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
         all_drivers                         <- TABLE_INITIAL_OTHERS$Drivers[loc]
+        if (is.na(all_drivers)){
+            initial_driver_count[clone]     <- 0
+            initial_driver_map[[clone]]     <- matrix(0,nrow=1)   
+        }
         list_drivers                        <- strsplit(all_drivers,';')
         list_drivers                        <- list_drivers[[1]]
 #       Update the driver count for this clone
