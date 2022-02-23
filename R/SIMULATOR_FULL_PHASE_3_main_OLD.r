@@ -1,5 +1,5 @@
 #==============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
-SIMULATOR_FULL_PHASE_3_main_OLD <- function(package_clonal_evolution,package_sample) {
+SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample) {
 #---------------------------------------------Input the clonal evolution
     T_current                                   <- package_clonal_evolution[[1]]
     N_clones                                    <- package_clonal_evolution[[4]]
