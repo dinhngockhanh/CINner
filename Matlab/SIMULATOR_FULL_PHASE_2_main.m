@@ -5,6 +5,7 @@ function package_sample = SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
                                                                         tstart_total=tic;
 %---------------------------------------------Input the clonal evolution
     T_current                       = package_clonal_evolution{1};
+    N_cells_current                 = package_clonal_evolution{2};
     N_clones                        = package_clonal_evolution{4};
     genotype_list_ploidy_chrom      = package_clonal_evolution{5};
     genotype_list_ploidy_block      = package_clonal_evolution{6};
@@ -13,6 +14,10 @@ function package_sample = SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
     evolution_traj_divisions        = package_clonal_evolution{14};
     evolution_traj_clonal_ID        = package_clonal_evolution{15};
     evolution_traj_population       = package_clonal_evolution{16};
+
+    if isinf(N_sample)
+        N_sample                    = N_cells_current;
+    end
 %-------------------------------Find a random sample of final population
     final_clonal_ID                 = evolution_traj_clonal_ID{end};
     final_clonal_population         = evolution_traj_population{end};

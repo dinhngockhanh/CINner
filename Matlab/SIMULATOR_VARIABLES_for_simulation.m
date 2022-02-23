@@ -198,9 +198,13 @@ function SIMULATOR_VARIABLES_for_simulation(model)
                     row                     = find(CHROM_COPY_NUMBER_PROFILES.Bin==block);
                     col                     = strand+2;
                     vec_allele              = CHROM_COPY_NUMBER_PROFILES{row,col}{1};
-                    strand_ploidy_block(block)              = length(vec_allele);
-                    for unit=1:length(vec_allele)
-                        strand_ploidy_allele(unit,block)    = double(vec_allele(unit))-64;
+                    if strcmp('NA',vec_allele)
+                        strand_ploidy_block(block)              = 0;
+                    else
+                        strand_ploidy_block(block)              = length(vec_allele);
+                        for unit=1:length(vec_allele)
+                            strand_ploidy_allele(unit,block)    = double(vec_allele(unit))-64;
+                        end
                     end
                 end
                 ploidy_block{chrom,strand}  = strand_ploidy_block;

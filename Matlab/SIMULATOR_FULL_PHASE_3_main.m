@@ -75,22 +75,18 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
             fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
         elseif any(eligible_clonal_sample_population>eligible_clonal_total_population)
             fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE ARE LARGER THAN IN TOTAL CELL POPULATION\n\n');
-            eligible_clonal_ID
-            eligible_clonal_sample_population
-            eligible_clonal_total_population
-            evolution_traj_population{i+2}
-
-            disp('~~~~~~~~~~~~~~~~~~~~~')
-
-            mat_division_total_population
-            mat_division_sample
-            mat_division_sample_clone
-
-            disp('~~~~~~~~~~~~~~~~~~~~~')
-
-            limit_clonal_total_population
-            tmp_clonal_sample_population
-            disp('----------------------------------------------------------------------------')
+            % eligible_clonal_ID
+            % eligible_clonal_sample_population
+            % eligible_clonal_total_population
+            % evolution_traj_population{i+2}
+            % disp('~~~~~~~~~~~~~~~~~~~~~')
+            % mat_division_total_population
+            % mat_division_sample
+            % mat_division_sample_clone
+            % disp('~~~~~~~~~~~~~~~~~~~~~')
+            % limit_clonal_total_population
+            % tmp_clonal_sample_population
+            % disp('----------------------------------------------------------------------------')
         end
 %=======Get list of divisions occurring in total population
 %       Column 1:       number of divisions
@@ -309,7 +305,36 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
         end
     end
 %   Assign original cell to be born at the beginning of clonal evolution
-    phylogeny_birthtime(1)                          = evolution_traj_time(1);
+    phylogeny_birthtime(1)                                  = evolution_traj_time(1);
+
+
+
+
+
+    % hclust_row
+    % hclust_nodes
+    % hclust_labels
+    %
+    % hclust_merge
+    % hclust_height
+    %
+    % phylogeny_origin
+    % phylogeny_elapsed_gens
+    % phylogeny_elapsed_genotypes
+    % phylogeny_genotype
+    % phylogeny_birthtime
+    % phylogeny_deathtime
+    %
+    % node_genotype_current
+    %
+    % node_list_current
+
+
+
+
+
+
+
 %-----------------------------------------Reorder the nodes for plotting
 %---Find an order on all nodes of the phylogeny in our style
 %   Find number of progeny of each node

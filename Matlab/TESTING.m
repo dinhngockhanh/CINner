@@ -17,12 +17,37 @@ clear;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MIXTURE EXPERIMENT - PART A
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MIXTURE EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    MODEL           = 'MIXTURE-A';
-    stage_final     = 3;
-    package_output  = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
+%---Part A: start from one cell with one mutated TP53, otherwise
+%   following HGSOC-BULK setup, then sample 200 cells at the end
+    fprintf('================================================================================   PART A\n');
+    MODEL               = 'MIXTURE-A';
+    stage_final         = 3;
+    package_output_A    = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
+%---Part A-bis: produce variable files for parts B & C from sampled cells
+    fprintf('================================================================================   PREPARE INITIAL STATE FOR EXPERIMENTS B AND C\n');
+    MODEL_NEW           = 'MIXTURE-B';
+    FOLDER              = [R_folder '/'];
+    EXTRA_build_model_variables_from_sample(MODEL_NEW,FOLDER,package_output_A)
+    MODEL_NEW           = 'MIXTURE-C';
+    FOLDER              = [R_folder '/'];
+    EXTRA_build_model_variables_from_sample(MODEL_NEW,FOLDER,package_output_A)
+%---Part B: start from 200 cells sampled from part A, under constant
+%   population, no new drivers/CN, and neutral evolution
+    fprintf('================================================================================   PART B\n');
+    MODEL               = 'MIXTURE-B';
+    stage_final         = 3;
+    package_output_B    = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
+%---Part C: start from 200 cells sampled from part A, under constant
+%   population, no new drivers/CN, and selective evolution under same
+%   selection assumtions as in Part A
+    fprintf('================================================================================   PART C\n');
+    MODEL               = 'MIXTURE-C';
+    stage_final         = 3;
+    package_output_B    = SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final);
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEUTRAL FALLOPIAN TUBES - ONE SIMULATION

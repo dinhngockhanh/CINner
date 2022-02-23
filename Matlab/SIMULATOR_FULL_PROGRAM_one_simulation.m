@@ -18,6 +18,7 @@ toc
 disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   SAMPLING')
 tic
         package_sample                              = SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution);
+        package_output{2}                           = package_sample;
 toc
     end
 %-----------------------------------Simulate the phylogeny of the sample
@@ -25,6 +26,7 @@ toc
 disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   SAMPLE PHYLOGENY')
 tic
         package_sample_phylogeny                    = SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample);
+        package_output{3}                           = package_sample_phylogeny;
 toc
     end
 disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   DONE WITH SIMULATION')
