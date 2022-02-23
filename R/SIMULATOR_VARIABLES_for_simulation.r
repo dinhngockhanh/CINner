@@ -88,7 +88,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #       Extract mini table for the CN genotypes of this clone
         text_clone_ID                       <- paste('Clone_',clone,sep='')
         vec_loc                             <- c(1,2,which(grepl(text_clone_ID,vec_header)))
-
+        CLONE_INITIAL_COPY_NUMBER_PROFILES  <- TABLE_INITIAL_COPY_NUMBER_PROFILES[,vec_loc]
 
 
 
@@ -106,7 +106,7 @@ print(initial_N_clones)
 print(vec_header)
 print(initial_population)
 print(vec_loc)
-
+print(CLONE_INITIAL_COPY_NUMBER_PROFILES)
 
 
 
