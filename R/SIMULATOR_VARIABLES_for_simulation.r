@@ -138,9 +138,11 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                             strand_ploidy_allele[unit,block]    <- 0
                         }else{
                         for (unit in 1:nchar(vec_allele)){
+if (unit>nchar(vec_allele)){
 print('~~~~~~~')
 print(vec_allele)
 print(unit)
+}
                             strand_ploidy_allele[unit,block]    <- utf8ToInt(substr(vec_allele,unit,unit))-64
                         }}
                     }
