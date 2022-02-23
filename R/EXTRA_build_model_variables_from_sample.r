@@ -64,7 +64,7 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
                     }
                     TABLE_CLONE_CURRENT[N_row,strand]   <- allele
                 }
-                for (strand in (no_strands+1):max_no_strand){
+                for (strand in (no_strands+1):max_no_strands){
                     TABLE_CLONE_CURRENT[N_row,strand]   <- 'NA'
                 }
             }
