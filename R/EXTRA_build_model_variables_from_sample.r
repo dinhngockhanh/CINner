@@ -29,7 +29,7 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
     for (chrom in 1:N_chromosomes){
         bin_count                       <- vec_CN_block_no[chrom]
         vec_chrom                       <- c(vec_chrom,rep(chrom,bin_count))
-        vec_bin                         <- c(vec_bin (1:bin_count))
+        vec_bin                         <- c(vec_bin,(1:bin_count))
     }
     TABLE_CLONAL_COPY_NUMBER_PROFILES   <- data.frame(vec_chrom,vec_bin)
     colnames(TABLE_CLONAL_COPY_NUMBER_PROFILES) <- c('Chromosome','Bin')
