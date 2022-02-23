@@ -103,11 +103,4 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
     colnames(CLONAL_OTHERS)                 <- c('Clone','Cell_count','Drivers')
     filename                                <- paste(model,'-input-initial-others.csv',sep='')
     write.csv(CLONAL_OTHERS,filename,row.names=FALSE)
-
-
-print(vec_drivers)
-
-print(CLONAL_OTHERS)
-
-
 }
