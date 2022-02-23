@@ -147,6 +147,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         initial_ploidy_block[[clone]]       <<- ploidy_block
     }
 #---Set up the initial clones' driver profiles
+print(TABLE_INITIAL_OTHERS)
     for (clone in 1:initial_N_clones){
 #       Get driver profile of this clone
         loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
