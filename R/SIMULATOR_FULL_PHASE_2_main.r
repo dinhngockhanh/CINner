@@ -15,6 +15,10 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     if (N_sample==Inf){
         N_sample                    <- N_cells_current
     }
+
+print(N_sample)
+print(N_cells_current)
+
 #-------------------------------Find a random sample of final population
     final_clonal_ID                 <- tail(evolution_traj_clonal_ID,1)[[1]]
     final_clonal_population         <- tail(evolution_traj_population,1)[[1]]
