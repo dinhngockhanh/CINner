@@ -177,14 +177,43 @@ print(TABLE_INITIAL_OTHERS)
             driver_map                      <- rbind(driver_map,c(driver_loc,driver_chrom,driver_strand,driver_block,driver_unit))
         }
         initial_driver_map[[clone]]         <<- driver_map
-
-
-
-
     }
-print(initial_driver_count)
-print(initial_driver_map)
+#---Set up the initial clones' DNA length
+    for (clone in 1:initial_N_clones){
+        ploidy_chrom                        <- initial_ploidy_chrom[[clone]]
+        ploidy_block                        <- initial_ploidy_block[[clone]]
+        DNA_length                          <- 0
+        for (chrom in 1:N_chromosomes) {
+            for (strand in 1:ploidy_chrom[chrom]) {
+                DNA_length                  <- DNA_length+sum(ploidy_block[[chrom]][[strand]])
+            }
+        }
+        DNA_length                          <- size_CN_block_DNA*DNA_length
+        prob_new_drivers                    <- 1-dpois(x=0,lambda=rate_driver*DNA_length)
+        initial_DNA_length[[clone]]         <<- DNA_length
+        initial_prob_new_drivers[clone]     <<- prob_new_drivers
+    }
+#---Set up the initial clones' selection rates
+    for (clone in 1:initial_N_clones){
+        ploidy_chrom                        <- initial_ploidy_chrom[[clone]]
+        ploidy_block                        <- initial_ploidy_block[[clone]]
+        driver_count                        <- initial_driver_count[clone]
+        driver_map                          <- initial_driver_map[[clone]]
+        selection_rate                      <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block)
+        initial_selection_rate[clone]       <- selection_rate
+    }
 
+
+
+
+
+
+
+
+
+print(initial_DNA_length)
+print(initial_prob_new_drivers)
+print(initial_selection_rate)
 
 
 
