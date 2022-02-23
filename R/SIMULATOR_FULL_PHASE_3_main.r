@@ -72,7 +72,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             }
         }
 #=======Sanity tests
-        if (sum(eligible_clonal_sample_population)~=length(node_genotype_current)) {
+        if (sum(eligible_clonal_sample_population)!=length(node_genotype_current)) {
             fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
             }
         else { if (any(eligible_clonal_sample_population>eligible_clonal_total_population)) {
