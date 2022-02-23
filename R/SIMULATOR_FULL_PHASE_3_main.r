@@ -66,7 +66,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             for (clone in 1:length(eligible_clonal_ID)) {
                 clone_ID                                <- eligible_clonal_ID[clone]
                 loc_tmp                                 <- which(eligible_clonal_ID_tmp==clone_ID)
-                if (length(loc_tmp))!=0) {
+                if (length(loc_tmp)!=0) {
                     limit_clonal_total_population[clone]<- eligible_clonal_total_population_tmp[loc_tmp]
                 }
             }
