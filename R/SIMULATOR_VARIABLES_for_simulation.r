@@ -113,7 +113,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 
 
 print(CHROM_COPY_NUMBER_PROFILES)
-
+print(vec_delete)
 
     }
 
