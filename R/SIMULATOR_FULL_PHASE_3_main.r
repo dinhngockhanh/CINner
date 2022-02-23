@@ -134,7 +134,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 for (daughter in 1:2) {
                     vec_division_genotype_daughter          <- mat_division_total_population[,daughter+2]
                     vec_division                            <- which(vec_division_genotype_daughter==clonal_ID)
-                    mat_division_sample_clone_new           <- cbind(matrix(vec_division,ncol=1),matrix(rep(daughter,length(vec_division)),ncol=1),matrix(mat_division_total_population[vec_division,1],ncol=1))
+                    mat_division_sample_clone_new           <- rbind(matrix(vec_division,nrow=1),matrix(rep(daughter,length(vec_division)),nrow=1),matrix(mat_division_total_population[vec_division,1],nrow=1))
                     # mat_division_sample_clone_new           <- cbind(vec_division,rep(daughter,length(vec_division)),mat_division_total_population[vec_division,1])
                     mat_division_sample_clone               <- cbind(mat_division_sample_clone,mat_division_sample_clone_new)
                 }
@@ -143,7 +143,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 }
 
 
+
+
+
+
 print('------------------------------------------')
+print(mat_division_sample_clone_new)
 print(mat_division_sample_clone)
             }
 
