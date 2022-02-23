@@ -153,6 +153,8 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 
 print(all_drivers)
 
+print(TABLE_INITIAL_OTHERS)
+
 
     }
 
