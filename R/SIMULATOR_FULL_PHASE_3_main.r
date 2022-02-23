@@ -71,8 +71,39 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 }
             }
         }
+#=======Sanity tests
+        if (sum(eligible_clonal_sample_population)~=length(node_genotype_current)) {
+            fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
+            }
+        else { if (any(eligible_clonal_sample_population>eligible_clonal_total_population)) {
+            cat('\nERROR: CLONAL POPULATIONS IN SAMPLE ARE LARGER THAN IN TOTAL CELL POPULATION\n\n')
+            print(eligible_clonal_ID)
+            print(eligible_clonal_sample_population)
+            print(eligible_clonal_total_population)
+            print(evolution_traj_population[[i+2]])
 
+            cat('~~~~~~~~~~~~~~~~~~~~~')
 
+            print(mat_division_total_population)
+            print(mat_division_sample)
+            print(mat_division_sample_clone)
+
+            cat('~~~~~~~~~~~~~~~~~~~~~')
+
+            print(limit_clonal_total_population)
+            print(tmp_clonal_sample_population)
+            cat('----------------------------------------------------------------------------')
+            }
+        }
+#=======Get list of divisions occurring in total population
+#       Column 1:       number of divisions
+#       Column 2:       genotype mother
+#       Column 3:       genotype daughter 1
+#       Column 4:       genotype daughter 2
+        mat_division_total_population                   <- evolution_traj_divisions[[i]]
+        if (length(mat_division_total_population)==0) {
+            next
+        }
 
 
 
@@ -80,7 +111,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 print('------------------------------------------')
-print(limit_clonal_total_population)
+print(mat_division_total_population)
 
 
 
