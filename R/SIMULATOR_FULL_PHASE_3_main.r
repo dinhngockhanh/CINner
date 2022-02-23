@@ -165,7 +165,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     next
                 }
 #               Simulate which nodes undergo each division type
-#               i.e. rows 1 & 2 in mat_division_sample
+#               i.e. columns 1 & 2 in mat_division_sample
                 eligible_nodes                              <- node_list_current[which(node_genotype_current==clonal_ID)]
                 if (length(eligible_nodes)==1) {
                     node_indices_all                        <- eligible_nodes
@@ -178,13 +178,24 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                     col                                     <- mat_division_sample_clone[2,division_type]
                     count                                   <- mat_division_sample_clone[4,division_type]
                     if (count>0) {
-
                         ind                                 <- (row-1)*4+col
                         mat_division_sample[[ind]]          <- node_indices_all[1:count]
-                        node_indices_all                    <- node_indices_all[-(1:count)]                        
+                        node_indices_all                    <- node_indices_all[-(1:count)]
                     }
                 }
-
+#               Simulate the division indices for each division type
+#               i.e. columns 3 & 4 in mat_division_sample
+                for (division_type in 1:ncol(mat_division_sample_clone)) {
+                    row                                     <- mat_division_sample_clone[1,division_type]
+                    col                                     <- mat_division_sample_clone[2,division_type]
+                    count                                   <- mat_division_sample_clone[4,division_type]
+                    if (count>0) {
+                        col                                 <- col+2
+                        ind                                 <- (row-1)*4+col
+                        count_divisions_total               <- mat_division_total_population[row,1]
+                        mat_division_sample[[ind]]          <- sample(x=count_divisions_total,size=count,replace=FALSE)                        
+                    }
+                }
 
 print('------------------------------------------')
 print(mat_division_sample)

@@ -168,7 +168,7 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
                     continue;
                 end
 %               Simulate which nodes undergo each division type
-%               i.e. rows 1 & 2 in mat_division_sample
+%               i.e. columns 1 & 2 in mat_division_sample
                 eligible_nodes                              = node_list_current(find(node_genotype_current==clonal_ID));
                 if length(eligible_nodes)==1
                     node_indices_all                        = eligible_nodes;
@@ -185,7 +185,7 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
                     end
                 end
 %               Simulate the division indices for each division type
-%               i.e. rows 3 & 4 in mat_division_sample
+%               i.e. columns 3 & 4 in mat_division_sample
                 for division_type=1:size(mat_division_sample_clone,2)
                     row                                     = mat_division_sample_clone(1,division_type);
                     col                                     = mat_division_sample_clone(2,division_type);
