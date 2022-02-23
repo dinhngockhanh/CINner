@@ -12,9 +12,17 @@ EXTRA_build_model_variables_from_sample <- function(model,package_output){
     genotype_list_driver_map            <- package_clonal_evolution[[9]]
 
     sample_clone_ID                     <- package_sample[[3]]
+#----------------------Output CN-driver profiles as model variable files
+#---Find all unique clones in sample
+    all_clones_ID                       <- unique(sample_clone_ID)
+    all_clones_population               <- rep(0,length(all_clones_ID))
+    for (i in 1:length(all_clones_ID)){
+        all_clones_population[i]        <- length(which(sample_clone_ID==all_clones_ID[i]))
+    }
 
 
-print(genotype_list_driver_count)
+print(all_clones_ID)
+print(all_clones_population)
 
 
 }
