@@ -355,6 +355,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     end                                             <- length(progeny_count)
     progeny_count[(end-N_sample+1):end]             <- 1
 
+print(end)
+
+print(N_sample)
+
 print(progeny_count)
 
     for (node in length(progeny_count):1){
