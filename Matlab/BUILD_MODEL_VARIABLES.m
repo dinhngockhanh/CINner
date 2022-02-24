@@ -166,7 +166,7 @@ clear;
 %---Make changes to variables
     N_sample                                        = Inf;
     age_birth                                       = 0;
-    age_end                                         = 10;
+    age_end                                         = 1;
 
     rate_driver                                     = 0;
 
@@ -269,7 +269,7 @@ clear;
 %---Make changes to variables
     N_sample                                        = Inf;
     age_birth                                       = 0;
-    age_end                                         = 10;
+    age_end                                         = 1;
 
     rate_driver                                     = 0;
 

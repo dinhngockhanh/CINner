@@ -101,9 +101,7 @@ function package_sample = SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
         cell_genotype_profile       = sample_genotype_unique_profile{i_clone};
 %       Add column for cell ID
         cell_ID                     = ['Sample-Library-' num2str(i_cell) '-' num2str(i_cell)];
-
         sample_cell_ID{i_cell}      = cell_ID;
-
         vec_cell_id                 = cell(size(cell_genotype_profile,1),1);
         vec_cell_id(:)              = {cell_ID};
         cell_genotype_profile.cell_id   = vec_cell_id;

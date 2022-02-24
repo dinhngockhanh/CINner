@@ -1,6 +1,6 @@
 Variable,Value,Unit,Note
 age_birth,0,year,Age when simulation starts with 1 normal cell
-age_end,10,year,Age when simulation stops
+age_end,1,year,Age when simulation stops
 Population_end,Inf,cell count,Condition for ending simulation (Inf if no condition)
 Max_events,Inf,event count,Condition for ending simulation (Inf if no condition)
 cell_lifespan,7,day,Lifespan of one cell
