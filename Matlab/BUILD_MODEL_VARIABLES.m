@@ -164,7 +164,7 @@ clear;
     model_new                                       = 'MIXTURE-B';
 %===Make changes to model variables
 %---Make changes to variables
-    N_sample                                        = Inf;
+    N_sample                                        = 100;
     age_birth                                       = 0;
     age_end                                         = 1;
 
@@ -267,7 +267,7 @@ clear;
     model_new                                       = 'MIXTURE-C';
 %===Make changes to model variables
 %---Make changes to variables
-    N_sample                                        = Inf;
+    N_sample                                        = 100;
     age_birth                                       = 0;
     age_end                                         = 1;
 
