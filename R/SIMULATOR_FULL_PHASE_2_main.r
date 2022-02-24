@@ -110,32 +110,25 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             sample_genotype_profile <- rbind(sample_genotype_profile,cell_genotype_profile)
         }
     }
-
-
-
-# print(sample_genotype_profile)
-# print(sample_cell_ID)
-print(sample_clone_ID)
-
-sample_clone_ID_numeric                         <- sample_clone_ID
-sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
-sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
-sample_clone_ID_letters                         <- c()
-for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
-    clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
-    clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
-    vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
-    sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
-}
-
-print(sample_clone_ID_letters)
-
-
-
+#--------------------------Give each clone a character index (A,B,C,...)
+    sample_clone_ID_numeric                         <- sample_clone_ID
+    sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
+    sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
+    table_clone_ID_vs_letters                       <- data.frame(sample_clone_ID_unique_numeric,sample_clone_ID_unique_letters)
+    colnames(table_clone_ID_vs_letters)             <- c('Clone_ID_number','Clone_ID_letter')
+    sample_clone_ID_letters                         <- c()
+    for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
+        clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
+        clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
+        vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
+        sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
+    }
 #---------------------------------Output package of data from simulation
     output                                  <- list()
     output[[1]]                             <- sample_genotype_profile
     output[[2]]                             <- sample_cell_ID
     output[[3]]                             <- sample_clone_ID
+    output[[4]]                             <- sample_clone_ID_letters
+    output[[5]]                             <- table_clone_ID_vs_letters
     return(output)
 }

@@ -13,6 +13,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #-------------------------------------------------------Input the sample
     sample_cell_ID                              <- package_sample[[2]]
     sample_clone_ID                             <- package_sample[[3]]
+    sample_clone_ID_letters                     <- package_sample[[4]]
 #-----------------------------------Initialize phylogeny in hclust style
 #   Initialize information to build phylogeny in hclust style
     hclust_row                                  <- 0
@@ -352,18 +353,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         hclust_order[loc]                           <- i_cell
     }
 #------------------------------------------------Create clustering table
-#   Change clone ID from genotype index in simulation to [A,B,C,...]
-    sample_clone_ID_numeric                         <- sample_clone_ID
-    sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
-    sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
-    sample_clone_ID_letters                         <- c()
-    for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
-        clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
-        clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
-        vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
-        sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
-    }
-#   Create clustering table
     hclust_clustering                               <- data.frame(sample_cell_ID,sample_clone_ID_letters)
     names(hclust_clustering)                        <- c('cell_id','clone_id')
 #--------------------------------Create phylogeny object in hclust style

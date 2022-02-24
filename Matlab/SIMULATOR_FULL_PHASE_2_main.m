@@ -114,10 +114,30 @@ function package_sample = SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
             sample_genotype_profile = [sample_genotype_profile;cell_genotype_profile];
         end
     end
+%--------------------------Give each clone a character index (A,B,C,...)
+    sample_clone_ID_numeric                         = sample_clone_ID;
+    sample_clone_ID_unique_numeric                  = unique(sample_clone_ID_numeric);
+    sample_clone_ID_unique_letters                  = {};
+    for i=1:length(sample_clone_ID_unique_numeric)
+        sample_clone_ID_unique_letters{i}           = char(i + 64);
+    end
+    table_clone_ID_vs_letters                       = table(sample_clone_ID_unique_numeric',sample_clone_ID_unique_letters','VariableNames',["Clone_ID_number","Clone_ID_letter"]);
+    sample_clone_ID_letters                         = cell(1,length(sample_clone_ID_numeric));
+    for i_clone=1:length(sample_clone_ID_unique_numeric)
+        clone_ID_numeric                            = sample_clone_ID_unique_numeric(i_clone);
+        clone_ID_letters                            = sample_clone_ID_unique_letters{i_clone};
+        vec_cell_ID                                 = find(sample_clone_ID_numeric==clone_ID_numeric);
+        for i_cell=1:length(vec_cell_ID)
+            cell_ID                                 = vec_cell_ID(i_cell);
+            sample_clone_ID_letters{cell_ID}        = clone_ID_letters;
+        end
+    end
 %---------------------------------Output package of data from simulation
     package_sample{1}               = sample_genotype_profile;
     package_sample{2}               = sample_cell_ID;
     package_sample{3}               = sample_clone_ID;
+    package_sample{4}               = sample_clone_ID_letters;
+    package_sample{5}               = table_clone_ID_vs_letters;
                                                                         % fprintf('******************************************************************************************\n');
                                                                         % fprintf('* PHASE 2 (SAMPLE PHYLOGENY) - total runtime  =  %ds\n*\n',round(runtime_total));
                                                                         % fprintf('******************************************************************************************\n');

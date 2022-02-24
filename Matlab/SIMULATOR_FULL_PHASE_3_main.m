@@ -14,6 +14,7 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
 %-------------------------------------------------------Input the sample
     sample_cell_ID                              = package_sample{2};
     sample_clone_ID                             = package_sample{3};
+    sample_clone_ID_letters                     = package_sample{4};
 %-----------------------------------Initialize phylogeny in hclust style
 %   Initialize information to build phylogeny in hclust style
     hclust_row                                  = 0;
@@ -371,23 +372,6 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
         hclust_order(loc)                           = i_cell;
     end
 %------------------------------------------------Create clustering table
-%   Change clone ID from genotype index in simulation to [A,B,C,...]
-    sample_clone_ID_numeric                         = sample_clone_ID;
-    sample_clone_ID_unique_numeric                  = unique(sample_clone_ID_numeric);
-    sample_clone_ID_unique_letters                  = {};
-    for i=1:length(sample_clone_ID_unique_numeric)
-        sample_clone_ID_unique_letters{i}           = char(i + 64);
-    end
-    sample_clone_ID_letters                         = cell(1,length(sample_clone_ID_numeric));
-    for i_clone=1:length(sample_clone_ID_unique_numeric)
-        clone_ID_numeric                            = sample_clone_ID_unique_numeric(i_clone);
-        clone_ID_letters                            = sample_clone_ID_unique_letters{i_clone};
-        vec_cell_ID                                 = find(sample_clone_ID_numeric==clone_ID_numeric);
-        for i_cell=1:length(vec_cell_ID)
-            cell_ID                                 = vec_cell_ID(i_cell);
-            sample_clone_ID_letters{cell_ID}        = clone_ID_letters;
-        end
-    end
 %   Create clustering table
     hclust_clustering                               = table(sample_cell_ID',sample_clone_ID_letters','VariableNames',["cell_id","clone_id"]);
 %--------------------------------Create phylogeny object in hclust style
