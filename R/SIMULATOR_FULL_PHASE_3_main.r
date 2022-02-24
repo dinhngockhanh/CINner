@@ -357,11 +357,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     for (node in length(progeny_count):1){
         mother_node                                 <- phylogeny_origin[node]
         if (mother_node>0){
-            progeny_count[mother_node]              <- progeny_count[mother_node]+progeny_count[node]
 
 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-print(node)
-print(mother_node)
+print(progeny_count[mother_node])
+
+            progeny_count[mother_node]              <- progeny_count[mother_node]+progeny_count[node]
 print(progeny_count[node])
 print(progeny_count[mother_node])
 
