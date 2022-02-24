@@ -358,13 +358,9 @@ print(phylogeny_origin)
 #   Find number of progeny of each node
     progeny_count                                   <- rep(1,length(phylogeny_origin))
     end                                             <- length(progeny_count)
-    progeny_count[end-N_sample+1:end]               <- 1
+    progeny_count[(end-N_sample+1):end]             <- 1
     for (node in length(progeny_count):1){
         mother_node                                 <- phylogeny_origin[node]
-
-print(node)
-print(mother_node)
-
         if (mother_node>0){
             progeny_count[mother_node]              <- progeny_count[mother_node]+progeny_count[node]
         }
