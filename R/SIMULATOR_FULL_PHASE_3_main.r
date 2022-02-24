@@ -405,41 +405,30 @@ print(sample_clone_ID_letters)
 
 print(hclust_clustering)
 
-#--------------------------------Create phylogeny object in hclust style
-#   Create phylogeny object in hclust style
-    phylogeny_hclust                                <- list()
-    phylogeny_hclust$merge                          <- hclust_merge
-    phylogeny_hclust$height                         <- hclust_height
-    phylogeny_hclust$order                          <- hclust_order
-    phylogeny_hclust$labels                         <- sample_cell_ID
-    class(phylogeny_hclust)                         <- "hclust"
-#---------------------------------Create phylogeny object in phylo style
-#   Create phylogeny object in phylo style
-    phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
-#   Create object containing both phylo-style tree and clustering
-    phylogeny_clustering_truth                      <- list()
-    phylogeny_clustering_truth$tree                 <- phylogeny_phylo
-    phylogeny_clustering_truth$clustering           <- hclust_clustering
-#---------------------------------Output package of data from simulation
-print(hclust_clustering)
-
-
-
-
-
-
-
-
-
-
-    output                                          <- list()
-    output[[1]]                                     <- phylogeny_clustering_truth
-    output[[2]]                                     <- phylogeny_origin
-    output[[3]]                                     <- phylogeny_elapsed_gens
-    output[[4]]                                     <- phylogeny_elapsed_genotypes
-    output[[5]]                                     <- phylogeny_genotype
-    output[[6]]                                     <- phylogeny_birthtime
-    output[[7]]                                     <- phylogeny_deathtime
-    output[[8]]                                     <- phylogeny_order
-    return(output)
+# #--------------------------------Create phylogeny object in hclust style
+# #   Create phylogeny object in hclust style
+#     phylogeny_hclust                                <- list()
+#     phylogeny_hclust$merge                          <- hclust_merge
+#     phylogeny_hclust$height                         <- hclust_height
+#     phylogeny_hclust$order                          <- hclust_order
+#     phylogeny_hclust$labels                         <- sample_cell_ID
+#     class(phylogeny_hclust)                         <- "hclust"
+# #---------------------------------Create phylogeny object in phylo style
+# #   Create phylogeny object in phylo style
+#     phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
+# #   Create object containing both phylo-style tree and clustering
+#     phylogeny_clustering_truth                      <- list()
+#     phylogeny_clustering_truth$tree                 <- phylogeny_phylo
+#     phylogeny_clustering_truth$clustering           <- hclust_clustering
+# #---------------------------------Output package of data from simulation
+#     output                                          <- list()
+#     output[[1]]                                     <- phylogeny_clustering_truth
+#     output[[2]]                                     <- phylogeny_origin
+#     output[[3]]                                     <- phylogeny_elapsed_gens
+#     output[[4]]                                     <- phylogeny_elapsed_genotypes
+#     output[[5]]                                     <- phylogeny_genotype
+#     output[[6]]                                     <- phylogeny_birthtime
+#     output[[7]]                                     <- phylogeny_deathtime
+#     output[[8]]                                     <- phylogeny_order
+#     return(output)
 }
