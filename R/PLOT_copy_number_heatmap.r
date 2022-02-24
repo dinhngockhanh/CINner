@@ -8,5 +8,9 @@ PLOT_copy_number_heatmap <- function(package_simulation,phylo,plotcol,reorderclu
         phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
     }
 #--------------------------------------------Plot heatmap of CN profiles
+
+sample_genotype_profiles
+phylogeny_clustering_truth
+
     plotHeatmap(sample_genotype_profiles,plotcol,clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters,plottree)
 }
