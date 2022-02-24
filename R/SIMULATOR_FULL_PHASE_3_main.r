@@ -362,6 +362,7 @@ print(phylogeny_origin)
     for (node in length(progeny_count):1){
         mother_node                                 <- phylogeny_origin[node]
 
+print(node)
 print(mother_node)
 
         if (mother_node>0){
