@@ -82,30 +82,13 @@ phylogeny_clustering_truth_C  <- package_sample_phylogeny_C[[1]]
 MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
 stage_final                   <- 3
 
-
-
 package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
-package_sample                <- package_simulation[[2]]
-sample_genotype_profiles      <- package_sample[[1]]
 
-
-
-head(sample_genotype_profiles)
-
-
-
-# vec_time_plot                 <- seq(from=0,to=80*365,by=365)
 PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,80,by=1),unit='year')
 
+PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol="state",reorderclusters=TRUE,plottree=TRUE)
 
-
-
-# package_sample_phylogeny      <- package_simulation[[3]]
-# phylogeny_clustering_truth    <- package_sample_phylogeny[[1]]
-#
-# plotHeatmap(sample_genotype_profiles,plotcol="state",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
-#
-# plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
+PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol="Min",reorderclusters=TRUE,plottree=TRUE)
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
