@@ -414,11 +414,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_clustering_truth$tree                 <- phylogeny_phylo
     phylogeny_clustering_truth$clustering           <- hclust_clustering
 #---------------------------------Output package of data from simulation
-print(hclust_merge)
-print(hclust_height)
-print(hclust_order)
-print(sort(hclust_order))
-print(sample_cell_ID)
+print(hclust_clustering)
 
 
 
