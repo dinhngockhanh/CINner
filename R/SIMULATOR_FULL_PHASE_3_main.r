@@ -327,10 +327,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #   Merge all unmerged nodes together at first time point
     if (list_unmerged_nodes>=2){
         for (i in 2:list_unmerged_nodes){
-            node                                                <- list_unmerged_nodes[i]
-            hclust_row                                          <- hclust_row+1
-            hclust_merge[hclust_row,]                           <- c(hclust_nodes[node_anchor],hclust_nodes[node])
-            hclust_height[hclust_row]                           <- T_current
+            node                                            <- list_unmerged_nodes[i]
+            hclust_row                                      <- hclust_row+1
+            hclust_merge[hclust_row,]                       <- c(hclust_nodes[node_anchor],hclust_nodes[node])
+            hclust_height[hclust_row]                       <- T_current
         }
     }
 #---Complete the phylogeny in our style
@@ -339,18 +339,14 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #   Delete unnecessary nodes
     phylogeny_origin                                        <- phylogeny_origin-N_unnecessary_nodes
     phylogeny_origin[list_unmerged_nodes]                   <- 0
-    phylogeny_origin                                        <- phylogeny_origin[-list_unnecessary_nodes]
-    phylogeny_elapsed_gens                                  <- phylogeny_elapsed_gens[-list_unnecessary_nodes]
-    phylogeny_elapsed_genotypes                             <- phylogeny_elapsed_genotypes[-list_unnecessary_nodes]
-    phylogeny_genotype                                      <- phylogeny_genotype[-list_unnecessary_nodes]
-    phylogeny_birthtime                                     <- phylogeny_birthtime[-list_unnecessary_nodes]
-    phylogeny_deathtime                                     <- phylogeny_deathtime[-list_unnecessary_nodes]
-
-
-
-
-print(phylogeny_origin)
-
+    if (length(list_unnecessary_nodes)>0){
+        phylogeny_origin                                    <- phylogeny_origin[-list_unnecessary_nodes]
+        phylogeny_elapsed_gens                              <- phylogeny_elapsed_gens[-list_unnecessary_nodes]
+        phylogeny_elapsed_genotypes                         <- phylogeny_elapsed_genotypes[-list_unnecessary_nodes]
+        phylogeny_genotype                                  <- phylogeny_genotype[-list_unnecessary_nodes]
+        phylogeny_birthtime                                 <- phylogeny_birthtime[-list_unnecessary_nodes]
+        phylogeny_deathtime                                 <- phylogeny_deathtime[-list_unnecessary_nodes]
+    }
 #-----------------------------------------Reorder the nodes for plotting
     list_roots                                      <- list_unmerged_nodes-N_unnecessary_nodes
 #---Find an order on all nodes of the phylogeny in our style
