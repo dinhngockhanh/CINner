@@ -394,7 +394,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 print(hclust_order)
-pritn(sort(hclust_order))
+print(sort(hclust_order))
 
 
 
