@@ -322,6 +322,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     list_unmerged_nodes                                     <- which(phylogeny_origin==0 & hclust_nodes!=0)
     list_unnecessary_nodes                                  <- which(phylogeny_origin==0 & hclust_nodes==0)
     N_unnecessary_nodes                                     <- length(list_unnecessary_nodes)
+
+print(list_unmerged_nodes)
+print(list_unnecessary_nodes)
+print(phylogeny_origin)
+
 #---Complete the phylogeny in hclust style
     node_anchor                                             <- list_unmerged_nodes[1]
 #   Merge all unmerged nodes together at first time point
