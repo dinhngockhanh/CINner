@@ -326,7 +326,7 @@ print('STEP 1')
 #---Complete the phylogeny in hclust style
     node_anchor                                             <- list_unmerged_nodes[1]
 #   Merge all unmerged nodes together at first time point
-    if (list_unmerged_nodes>=2){
+    if (length(list_unmerged_nodes)>=2){
         for (i in 2:list_unmerged_nodes){
             node                                            <- list_unmerged_nodes[i]
             hclust_row                                      <- hclust_row+1
