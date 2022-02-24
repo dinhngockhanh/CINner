@@ -347,6 +347,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         phylogeny_birthtime                                 <- phylogeny_birthtime[-list_unnecessary_nodes]
         phylogeny_deathtime                                 <- phylogeny_deathtime[-list_unnecessary_nodes]
     }
+
+
+print(phylogeny_origin)
+
+
 #-----------------------------------------Reorder the nodes for plotting
     list_roots                                      <- list_unmerged_nodes-N_unnecessary_nodes
 #---Find an order on all nodes of the phylogeny in our style
