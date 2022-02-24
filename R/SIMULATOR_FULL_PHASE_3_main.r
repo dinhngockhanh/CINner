@@ -396,15 +396,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         hclust_order[loc]                           <- i_cell
     }
 #------------------------------------------------Create clustering table
-
-print(sample_cell_ID)
-print(sample_clone_ID_letters)
-
     hclust_clustering                               <- data.frame(sample_cell_ID,sample_clone_ID_letters)
     names(hclust_clustering)                        <- c('cell_id','clone_id')
-
-print(hclust_clustering)
-
 #--------------------------------Create phylogeny object in hclust style
 #   Create phylogeny object in hclust style
     phylogeny_hclust                                <- list()
