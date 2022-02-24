@@ -354,22 +354,15 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     progeny_count                                   <- rep(1,length(phylogeny_origin))
     end                                             <- length(progeny_count)
     progeny_count[(end-N_sample+1):end]             <- 1
+
+print(progeny_count)
+
     for (node in length(progeny_count):1){
         mother_node                                 <- phylogeny_origin[node]
         if (mother_node>0){
-
-print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-print(progeny_count[mother_node])
-
             progeny_count[mother_node]              <- progeny_count[mother_node]+progeny_count[node]
-print(progeny_count[node])
-print(progeny_count[mother_node])
-
         }
     }
-print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-print(phylogeny_origin)
-print(progeny_count)
 
 #   Reorder the sample phylogeny tree based on progeny counts
     phylogeny_order                                 <- rep(0,length(phylogeny_origin))
