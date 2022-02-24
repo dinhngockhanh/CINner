@@ -1,5 +1,8 @@
 #==============PLOT TOTAL POPULATION SIZE - SIMULATION VS INPUT DYNAMICS
-PLOT_total_population_vs_input <- function(package_simulation,MODEL,vec_time_plot){
+PLOT_total_population_vs_input <- function(package_simulation,MODEL,vec_time_plot,unit){
+    if (unit=='year'){
+        vec_time_plot               <- 365*vec_time_plot
+    }
 #------------------------Find total population dynamics from input model
     SIMULATOR_VARIABLES_for_simulation(MODEL)
     vec_cell_count_exp_plot         <- func_expected_population(vec_time_plot)
@@ -16,7 +19,10 @@ PLOT_total_population_vs_input <- function(package_simulation,MODEL,vec_time_plo
         vec_cell_count_sim_plot[i]  <- sum(vec_clonal_populations[[loc]])
     }
 #-------Plot total population dynamics - simulation vs input expectation
-    df                            <- data.frame(vec_time_plot,vec_cell_count_sim_plot,vec_cell_count_exp_plot)
+    if (unit=='year'){
+        vec_time_plot               <- vec_time_plot/365
+    }
+    df                              <- data.frame(vec_time_plot,vec_cell_count_sim_plot,vec_cell_count_exp_plot)
     ggplot(df,aes(vec_time_plot)) +
           geom_line(aes(y=vec_cell_count_exp_plot),colour="red") +
           geom_point(aes(y=vec_cell_count_sim_plot),colour="blue") +

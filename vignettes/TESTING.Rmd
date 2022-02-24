@@ -94,8 +94,8 @@ head(sample_genotype_profiles)
 
 
 
-vec_time_plot                 <- seq(from=0,to=80*365,by=365)
-PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot)
+# vec_time_plot                 <- seq(from=0,to=80*365,by=365)
+PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,80,by=1),unit='year')
 
 
 
