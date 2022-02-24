@@ -113,9 +113,22 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 
 
 
-print(sample_genotype_profile)
-print(sample_cell_ID)
+# print(sample_genotype_profile)
+# print(sample_cell_ID)
 print(sample_clone_ID)
+
+sample_clone_ID_numeric                         <- sample_clone_ID
+sample_clone_ID_unique_numeric                  <- unique(sample_clone_ID_numeric)
+sample_clone_ID_unique_letters                  <- LETTERS[as.numeric(1:length(sample_clone_ID_unique_numeric))]
+sample_clone_ID_letters                         <- c()
+for (i_clone in 1:length(sample_clone_ID_unique_numeric)){
+    clone_ID_numeric                            <- sample_clone_ID_unique_numeric[i_clone]
+    clone_ID_letters                            <- sample_clone_ID_unique_letters[i_clone]
+    vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
+    sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
+}
+
+print(sample_clone_ID_letters)
 
 
 
