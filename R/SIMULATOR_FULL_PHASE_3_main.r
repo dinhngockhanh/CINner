@@ -318,7 +318,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 #--------------------------------------------Complete the unmerged nodes
-print('STEP 1')
 #   Find all unmerged nodes
     list_unmerged_nodes                                     <- which(phylogeny_origin==0 & hclust_nodes!=0)
     list_unnecessary_nodes                                  <- which(phylogeny_origin==0 & hclust_nodes==0)
@@ -335,7 +334,6 @@ print('STEP 1')
         }
     }
 #---Complete the phylogeny in our style
-print('STEP 2')
 #   Merge all unmerged nodes together at first time point
     phylogeny_birthtime[list_unmerged_nodes]                <- evolution_traj_time[1]
 #   Delete unnecessary nodes
@@ -350,7 +348,6 @@ print('STEP 2')
         phylogeny_deathtime                                 <- phylogeny_deathtime[-list_unnecessary_nodes]
     }
 #-----------------------------------------Reorder the nodes for plotting
-print('STEP 3')
     list_roots                                      <- list_unmerged_nodes-N_unnecessary_nodes
 #---Find an order on all nodes of the phylogeny in our style
 #   Find number of progeny of each node
@@ -364,7 +361,6 @@ print('STEP 3')
         }
     }
 #   Reorder the sample phylogeny tree based on progeny counts
-print('STEP 4')
     phylogeny_order                                 <- rep(0,length(phylogeny_origin))
     phylogeny_order[list_roots]                     <- 1
     for (node in 0:length(progeny_count)){
@@ -393,7 +389,6 @@ print('STEP 4')
         }
     }
 #---Extract the order for phylogeny in hclust style
-print('STEP 5')
     hclust_order_inverse                            <- phylogeny_order[(length(phylogeny_order)-N_sample+1):length(phylogeny_order)]
     hclust_order                                    <- rep(0,N_sample)
     for (i_cell in 1:N_sample){
@@ -401,7 +396,6 @@ print('STEP 5')
         hclust_order[loc]                           <- i_cell
     }
 #------------------------------------------------Create clustering table
-print('STEP 6')
     hclust_clustering                               <- data.frame(sample_cell_ID,sample_clone_ID_letters)
     names(hclust_clustering)                        <- c('cell_id','clone_id')
 #--------------------------------Create phylogeny object in hclust style
@@ -413,7 +407,6 @@ print('STEP 6')
     phylogeny_hclust$labels                         <- sample_cell_ID
     class(phylogeny_hclust)                         <- "hclust"
 #---------------------------------Create phylogeny object in phylo style
-print('STEP 7')
 #   Create phylogeny object in phylo style
     phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
 #   Create object containing both phylo-style tree and clustering
@@ -421,7 +414,21 @@ print('STEP 7')
     phylogeny_clustering_truth$tree                 <- phylogeny_phylo
     phylogeny_clustering_truth$clustering           <- hclust_clustering
 #---------------------------------Output package of data from simulation
-print('STEP 8')
+print(hclust_merge)
+print(hclust_height)
+print(hclust_order)
+print(sort(hclust_order))
+print(sample_cell_ID)
+
+
+
+
+
+
+
+
+
+
     output                                          <- list()
     output[[1]]                                     <- phylogeny_clustering_truth
     output[[2]]                                     <- phylogeny_origin
