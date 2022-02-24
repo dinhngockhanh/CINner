@@ -86,9 +86,9 @@ package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,sta
 
 PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,80,by=1),unit='year')
 
-PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol="state")
+PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
 
-PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol="Min")
+PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='min_copy')
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
