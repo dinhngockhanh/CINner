@@ -18,6 +18,7 @@ devtools::document()
 # for(i in 1:100){
 # print(paste('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   SIMULATION ',i,sep=''))
 
+
 print('================================================================================   PART A')
 MODEL                         <- 'MIXTURE-A'
 stage_final                   <- 3
@@ -41,7 +42,10 @@ stage_final                   <- 3
 package_output_C              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 
 # PLOT_copy_number_heatmap(package_output_C,phylo='true',plotcol='total_copy')
-}
+
+
+
+# }
 ```
 
 
