@@ -360,7 +360,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             progeny_count[mother_node]              <- progeny_count[mother_node]+progeny_count[node]
         }
     }
-
+print(phylogeny_origin)
 print(progeny_count)
 
 #   Reorder the sample phylogeny tree based on progeny counts
