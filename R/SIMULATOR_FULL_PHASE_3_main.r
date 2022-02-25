@@ -415,15 +415,6 @@ hclust_node_anchor<-hclust_node_anchor+1
     phylogeny_hclust$order                          <- hclust_order
     phylogeny_hclust$labels                         <- sample_cell_ID
     class(phylogeny_hclust)                         <- "hclust"
-
-
-print(hclust_merge)
-print(hclust_height)
-print(hclust_order)
-
-plot(phylogeny_hclust)
-
-
 #---------------------------------Create phylogeny object in phylo style
 #   Create phylogeny object in phylo style
     phylogeny_phylo                                 <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)

@@ -10,8 +10,6 @@ PLOT_copy_number_heatmap <- function(package_simulation,phylo,plotcol,reorderclu
     }
 #--------------------------------------------Plot heatmap of CN profiles
     if (plotcol=='total_copy'){
-        # plotHeatmap(sample_genotype_profiles,plotcol="state",tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
-
         plotHeatmap(sample_genotype_profiles,plotcol="state",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
     }else{if (plotcol=='min_copy'){
         plotHeatmap(sample_genotype_profiles,plotcol="Min",clusters=phylogeny_clustering_truth$clustering,tree=phylogeny_clustering_truth$tree,reorderclusters=TRUE,plottree=TRUE)
