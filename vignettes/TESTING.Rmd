@@ -24,7 +24,7 @@ MODEL                         <- 'MIXTURE-A'
 stage_final                   <- 3
 package_output_A              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 
-PLOT_copy_number_heatmap(package_output_A,phylo='true',plotcol='total_copy')
+# PLOT_copy_number_heatmap(package_output_A,phylo='true',plotcol='total_copy')
 print('================================================================================   PREPARE INITIAL STATE FOR EXPERIMENTS B AND C')
 MODEL_NEW                     <- 'MIXTURE-B'
 EXTRA_build_model_variables_from_sample(MODEL_NEW,package_output_A)
