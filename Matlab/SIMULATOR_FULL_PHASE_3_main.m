@@ -76,18 +76,6 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
             fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
         elseif any(eligible_clonal_sample_population>eligible_clonal_total_population)
             fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE ARE LARGER THAN IN TOTAL CELL POPULATION\n\n');
-            % eligible_clonal_ID
-            % eligible_clonal_sample_population
-            % eligible_clonal_total_population
-            % evolution_traj_population{i+2}
-            % disp('~~~~~~~~~~~~~~~~~~~~~')
-            % mat_division_total_population
-            % mat_division_sample
-            % mat_division_sample_clone
-            % disp('~~~~~~~~~~~~~~~~~~~~~')
-            % limit_clonal_total_population
-            % tmp_clonal_sample_population
-            % disp('----------------------------------------------------------------------------')
         end
 %=======Get list of divisions occurring in total population
 %       Column 1:       number of divisions
@@ -305,21 +293,21 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
             end
         end
     end
-
-
-
 %--------------------------------------------Complete the unmerged nodes
+%-----------------------------i.e. there is more than one ancestral cell
 %   Find all unmerged nodes
     list_unmerged_nodes                                     = find(phylogeny_origin==0 & hclust_nodes~=0);
     list_unnecessary_nodes                                  = find(phylogeny_origin==0 & hclust_nodes==0);
     N_unnecessary_nodes                                     = length(list_unnecessary_nodes);
 %---Complete the phylogeny in hclust style
     node_anchor                                             = list_unmerged_nodes(1);
+    hclust_node_anchor                                      = hclust_nodes(node_anchor);
 %   Merge all unmerged nodes together at first time point
     for i=2:list_unmerged_nodes
         node                                                = list_unmerged_nodes(i);
         hclust_row                                          = hclust_row+1;
-        hclust_merge(hclust_row,:)                          = [hclust_nodes(node_anchor) hclust_nodes(node)];
+        hclust_merge(hclust_row,:)                          = [hclust_node_anchor hclust_nodes(node)];
+        hclust_node_anchor                                  = hclust_node_anchor+1;
         hclust_height(hclust_row)                           = T_current;
     end
 %---Complete the phylogeny in our style
@@ -334,82 +322,59 @@ function package_sample_phylogeny = SIMULATOR_FULL_PHASE_3_main(package_clonal_e
     phylogeny_genotype(list_unnecessary_nodes)              = [];
     phylogeny_birthtime(list_unnecessary_nodes)             = [];
     phylogeny_deathtime(list_unnecessary_nodes)             = [];
-
-
-
-    % hclust_row
-    % hclust_nodes
-    % hclust_labels
-    %
-    % hclust_merge
-    % hclust_height
-    %
-    % phylogeny_origin
-    % phylogeny_elapsed_gens
-    % phylogeny_elapsed_genotypes
-    % phylogeny_genotype
-    % phylogeny_birthtime
-    % phylogeny_deathtime
-    %
-    % node_genotype_current
-    %
-    % node_list_current
-
-
-
 %-----------------------------------------Reorder the nodes for plotting
-    list_roots                                      = list_unmerged_nodes-N_unnecessary_nodes;
+    list_roots                                              = list_unmerged_nodes-N_unnecessary_nodes;
 %---Find an order on all nodes of the phylogeny in our style
 %   Find number of progeny of each node
-    progeny_count                                   = zeros(1,length(phylogeny_origin));
-    progeny_count(end-N_sample+1:end)               = 1;
+    progeny_count                                           = zeros(1,length(phylogeny_origin));
+    progeny_count(end-N_sample+1:end)                       = 1;
     for node=length(progeny_count):-1:1
-        mother_node                                 = phylogeny_origin(node);
+        mother_node                                         = phylogeny_origin(node);
         if mother_node>0
-            progeny_count(mother_node)              = progeny_count(mother_node)+progeny_count(node);
+            progeny_count(mother_node)                      = progeny_count(mother_node)+progeny_count(node);
         end
     end
 %   Reorder the sample phylogeny tree based on progeny counts
-    phylogeny_order                                 = zeros(1,length(phylogeny_origin));
-    phylogeny_order(list_roots)                     = 1;
+    phylogeny_order                                         = zeros(1,length(phylogeny_origin));
+    phylogeny_order(list_roots)                             = 1;
     for node=0:length(progeny_count)
-        vec_daughter_nodes                          = find(phylogeny_origin==node);
-        vec_progeny_counts                          = progeny_count(vec_daughter_nodes);
-        [vec_progeny_counts,vec_order]              = sort(vec_progeny_counts);
-        vec_daughter_nodes                          = vec_daughter_nodes(vec_order);
+        vec_daughter_nodes                                  = find(phylogeny_origin==node);
+        vec_progeny_counts                                  = progeny_count(vec_daughter_nodes);
+        [vec_progeny_counts,vec_order]                      = sort(vec_progeny_counts);
+        vec_daughter_nodes                                  = vec_daughter_nodes(vec_order);
         for i=1:length(vec_daughter_nodes)
-            daughter_node                           = vec_daughter_nodes(i);
-            progeny_count_extra                     = sum(vec_progeny_counts(1:i-1));
+            daughter_node                                   = vec_daughter_nodes(i);
+            progeny_count_extra                             = sum(vec_progeny_counts(1:i-1));
             if node==0
-                phylogeny_order(daughter_node)      = phylogeny_order(daughter_node)+progeny_count_extra;
+                phylogeny_order(daughter_node)              = phylogeny_order(daughter_node)+progeny_count_extra;
             else
-                phylogeny_order(daughter_node)      = phylogeny_order(node)+progeny_count_extra;
+                phylogeny_order(daughter_node)              = phylogeny_order(node)+progeny_count_extra;
             end
         end
     end
 %---Extract the order for phylogeny in hclust style
-    hclust_order_inverse                            = phylogeny_order(end-N_sample+1:end);
-    hclust_order                                    = zeros(1,N_sample);
+    hclust_order_inverse                                    = phylogeny_order(end-N_sample+1:end);
+    hclust_order                                            = zeros(1,N_sample);
     for i_cell=1:N_sample
-        loc                                         = hclust_order_inverse(i_cell);
-        hclust_order(loc)                           = i_cell;
+        loc                                                 = hclust_order_inverse(i_cell);
+        hclust_order(loc)                                   = i_cell;
     end
 %------------------------------------------------Create clustering table
-    hclust_clustering                               = table(sample_cell_ID',sample_clone_ID_letters','VariableNames',["cell_id","clone_id"]);
+    hclust_clustering                                       = table(sample_cell_ID',sample_clone_ID_letters','VariableNames',["cell_id","clone_id"]);
 %--------------------------------Create phylogeny object in hclust style
 %   Create phylogeny object in hclust style
-    phylogeny_hclust{1}                             = hclust_merge;
-    phylogeny_hclust{2}                             = hclust_height;
-    phylogeny_hclust{3}                             = hclust_labels;
-    phylogeny_hclust{4}                             = hclust_order;
-    phylogeny_hclust{5}                             = hclust_clustering;
+    phylogeny_hclust{1}                                     = hclust_merge;
+    phylogeny_hclust{2}                                     = hclust_height;
+    phylogeny_hclust{3}                                     = hclust_labels;
+    phylogeny_hclust{4}                                     = hclust_order;
+    phylogeny_hclust{5}                                     = hclust_clustering;
 %---------------------------------Output package of data from simulation
-    package_sample_phylogeny{1}                     = phylogeny_hclust;
-    package_sample_phylogeny{2}                     = phylogeny_origin;
-    package_sample_phylogeny{3}                     = phylogeny_elapsed_gens;
-    package_sample_phylogeny{4}                     = phylogeny_elapsed_genotypes;
-    package_sample_phylogeny{5}                     = phylogeny_genotype;
-    package_sample_phylogeny{6}                     = phylogeny_birthtime;
-    package_sample_phylogeny{7}                     = phylogeny_deathtime;
-    package_sample_phylogeny{8}                     = phylogeny_order;
+    package_sample_phylogeny{1}                             = phylogeny_hclust;
+    package_sample_phylogeny{2}                             = phylogeny_origin;
+    package_sample_phylogeny{3}                             = phylogeny_elapsed_gens;
+    package_sample_phylogeny{4}                             = phylogeny_elapsed_genotypes;
+    package_sample_phylogeny{5}                             = phylogeny_genotype;
+    package_sample_phylogeny{6}                             = phylogeny_birthtime;
+    package_sample_phylogeny{7}                             = phylogeny_deathtime;
+    package_sample_phylogeny{8}                             = phylogeny_order;
 end
