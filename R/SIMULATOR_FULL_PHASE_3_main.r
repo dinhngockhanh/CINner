@@ -325,12 +325,19 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #---Complete the phylogeny in hclust style
     node_anchor                                             <- list_unmerged_nodes[1]
 #   Merge all unmerged nodes together at first time point
+
+TEST                                                        <- 0
+
     if (length(list_unmerged_nodes)>=2){
         for (i in 2:length(list_unmerged_nodes)){
             node                                            <- list_unmerged_nodes[i]
             hclust_row                                      <- hclust_row+1
             hclust_merge[hclust_row,]                       <- c(hclust_nodes[node_anchor],hclust_nodes[node])
             hclust_height[hclust_row]                       <- T_current
+
+hclust_height[hclust_row]                       <- T_current+TEST*0.001
+TEST<-TEST+1
+
         }
     }
 #---Complete the phylogeny in our style
