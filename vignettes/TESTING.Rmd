@@ -32,7 +32,7 @@ package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,sta
 
 
 
-# PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
+PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
 # PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='min_copy')
 ```
 
