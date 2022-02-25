@@ -324,12 +324,17 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     N_unnecessary_nodes                                     <- length(list_unnecessary_nodes)
 #---Complete the phylogeny in hclust style
     node_anchor                                             <- list_unmerged_nodes[1]
+
+hclust_node_anchor<-hclust_nodes[node_anchor]
+
 #   Merge all unmerged nodes together at first time point
     if (length(list_unmerged_nodes)>=2){
         for (i in 2:length(list_unmerged_nodes)){
             node                                            <- list_unmerged_nodes[i]
             hclust_row                                      <- hclust_row+1
-            hclust_merge[hclust_row,]                       <- c(hclust_nodes[node_anchor],hclust_nodes[node])
+            # hclust_merge[hclust_row,]                       <- c(hclust_nodes[node_anchor],hclust_nodes[node])
+hclust_merge[hclust_row,]                       <- c(hclust_node_anchor,hclust_nodes[node])
+hclust_node_anchor<-hclust_node_anchor+1
             hclust_height[hclust_row]                       <- T_current
         }
     }
@@ -347,6 +352,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         phylogeny_birthtime                                 <- phylogeny_birthtime[-list_unnecessary_nodes]
         phylogeny_deathtime                                 <- phylogeny_deathtime[-list_unnecessary_nodes]
     }
+
+
+
+
 #-----------------------------------------Reorder the nodes for plotting
     list_roots                                      <- list_unmerged_nodes-N_unnecessary_nodes
 #---Find an order on all nodes of the phylogeny in our style
