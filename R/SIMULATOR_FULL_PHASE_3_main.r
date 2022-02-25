@@ -397,6 +397,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
     plot(phylogeny_hclust)
 
+    spellman.dend <- as.dendrogram(phylogeny_hclust)
+
 
 
 
