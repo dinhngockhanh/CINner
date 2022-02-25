@@ -13,6 +13,30 @@ devtools::document()
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEUTRAL FALLOPIAN TUBES - ONE SIMULATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+```{r,fig.height=4,fig.width=10}
+MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
+stage_final                   <- 3
+
+package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+
+
+
+# PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+
+# PLOT_clonal_evolution(package_simulation,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+
+# PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
+# PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='min_copy')
+```
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MIXTURE EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -46,30 +70,6 @@ package_output_C              <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,sta
 PLOT_copy_number_heatmap(package_output_C,phylo='true',plotcol='total_copy')
 
 PLOT_copy_number_heatmap(package_output_C,phylo='true',plotcol='min_copy')
-```
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEUTRAL FALLOPIAN TUBES - ONE SIMULATION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-```{r,fig.height=4,fig.width=10}
-MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
-stage_final                   <- 3
-
-package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
-
-
-
-PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,84,by=1),unit='year')
-
-
-
-PLOT_clonal_evolution(package_simulation,vec_time_plot=seq(0,84,by=1),unit='year')
-
-
-
-PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
-PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='min_copy')
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
