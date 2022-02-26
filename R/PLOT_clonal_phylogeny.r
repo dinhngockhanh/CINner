@@ -10,4 +10,6 @@ PLOT_clonal_phylogeny <- function(package_simulation){
 
     ape::edgelabels(text='A-haha',edge=i)
 
+    ape::tiplabels()
+
 }

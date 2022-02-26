@@ -16,7 +16,7 @@ devtools::document()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEUTRAL FALLOPIAN TUBES - ONE SIMULATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-```{r,fig.height=4,fig.width=10}
+```{r,fig.height=7,fig.width=10}
 MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
 stage_final                   <- 3
 
