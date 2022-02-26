@@ -403,6 +403,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
     vec_leaves_genotype             <- phylogeny_genotype[(length(phylogeny_genotype)-N_sample+1):length(phylogeny_genotype)]
 
+print('+++++++++++++++++++++++++')
+print(vec_leaves_genotype)
+print(unique(vec_leaves_genotype))
+
     for (clone in 1:length(sample_clone_ID)){
         clone_ID                    <- sample_clone_ID[clone]
 
@@ -410,7 +414,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 print('------------------------')
 print(clone_ID)
-print(vec_clone_leaves)
+# print(vec_clone_leaves)
 
     }
 
