@@ -475,19 +475,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         node_MRCA_mother                    <- phylogeny_origin[node_MRCA]
         node_MRCA_mother_genotype           <- phylogeny_genotype[node_MRCA_mother]
         clone_origin                        <- 0
-print('-------------------------')
-print(clone)
-print(node_MRCA_mother_genotype)
         for (clone_mother in 1:length(clone_phylogeny_labels)){
-print('~~~')
-print(node_MRCA_mother_genotype)
-print(clone_phylogeny_genotypes[[clone_mother]])
-print(is.element(node_MRCA_mother_genotype,clone_phylogeny_genotypes[[clone_mother]]))
             if (is.element(node_MRCA_mother_genotype,clone_phylogeny_genotypes[[clone_mother]])){
                 clone_origin                <- clone_mother
             }
         }
-        clone_phylogeny_origin[clone]       <- 0
+        clone_phylogeny_origin[clone]       <- clone_origin
 
     }
 
