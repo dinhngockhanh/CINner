@@ -543,10 +543,18 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_hclust_merge                  <- matrix(0,nrow=(N_sample_clones-1),ncol=2)
         clone_hclust_height                 <- rep(0,1,N_sample_clones-1)
 #       Reorder clones according to their birth times
-        vec_order                           <- sort(clone_phylogeny_birthtime,decreasing=TRUE,index.return=TRUE)
+        # vec_order                           <- sort(clone_phylogeny_birthtime,decreasing=TRUE,index.return=TRUE)
+        # vec_order                           <- vec_order$ix
+        tmp_birthtime                       <- clone_phylogeny_birthtime
+        tmp_birthtime[which(clone_phylogeny_origin==0)] <- -Inf
+        vec_order                           <- sort(tmp_birthtime,decreasing=TRUE,index.return=TRUE)
+        vec_birthtime_order                 <- vec_order$x
         vec_order                           <- vec_order$ix
 #-------Build the sample clone phylogeny tree
         for (i in 1:(length(vec_order)-1)){
+            if (vec_birthtime_order[i]==-Inf){
+                next
+            }
             clone_daughter                          <- vec_order[i]
             clone_mother                            <- clone_phylogeny_origin[clone_daughter]
             clone_hclust_row                        <- clone_hclust_row+1
@@ -556,6 +564,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 print('++++++++++++++++')
 print(clone_daughter)
 print(clone_hclust_nodes)
+print(tmp_birthtime)
 
         }
 
