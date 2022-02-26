@@ -531,19 +531,19 @@ print(progeny_count)
 
 
 
-                                    print('Clone labels:')
+                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_labels:')
 print(clone_phylogeny_labels)
-                                    print('Clone ID:')
+                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_ID:')
 print(clone_phylogeny_ID)
 # print(clone_phylogeny_cell_MRCA)
-                                    print('Clone birth time:')
+                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
 print(clone_phylogeny_birthtime)
-                                    print('Clone elapsed genotypes:')
+                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
 print(clone_phylogeny_genotypes)
-                                    print('Clone mother:')
+                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
 print(clone_phylogeny_origin)
 
-                                    print('HCLUST:')
+                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HCLUST:')
 print(clone_hclust_merge)
 print(clone_hclust_height)
 
