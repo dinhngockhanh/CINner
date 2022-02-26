@@ -418,13 +418,35 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             node_mother             <- phylogeny_origin[node]
             vec_potential_MRCA      <- c(vec_potential_MRCA,node)
         }
+#       Find MRCA node for all cell leaves belonging in this clone
+        if (length(vec_clone_leaves)==1){
+            node_MRCA               <- vec_clone_leaves
+        }else{
+            node_MRCA               <- vec_potential_MRCA[1]
+            for (i in 2:length(vec_clone_leaves)){
+                node                <- vec_clone_leaves[i]
+                while (is.element(node,vec_potential_MRCA)==FALSE){
+                    node            <- phylogeny_origin[node]
+                }
+                if (which(vec_potential_MRCA==node_MRCA)<which(vec_potential_MRCA==node)){
+                    node_MRCA       <- node
+                }
+
+            }
+        }
+
 
 
 
 
 print('---------------------------------------------------------------')
 print(clone_phylogeny_labels[clone])
+print('List of potential MRCA nodes:')
 print(vec_potential_MRCA)
+print('MRCA node:')
+print(node_MRCA)
+print('Age of MRCA node:')
+print(phylogeny_deathtime(node_MRCA)/365)
     }
 
 
