@@ -409,12 +409,22 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_ID                    <- clone_phylogeny_ID[clone]
 #       Get node indices for cell leaves belonging in this clone
         vec_clone_leaves            <- which(vec_leaves_genotype==clone_ID)
+#       Get list of all potential MRCA nodes for these cell leaves
+        node                        <- vec_clone_leaves[1]
+        node_mother                 <- phylogeny_origin[node]
+        vec_potential_MRCA          <- [node]
+        while (node_mother>0){
+            node                    <- node_mother
+            node_mother             <- phylogeny_origin[node]
+            vec_potential_MRCA      <- c(vec_potential_MRCA,node)
+        }
 
 
-print('------------------------')
+
+
+print('---------------------------------------------------------------')
 print(clone_phylogeny_labels[clone])
-print(max(vec_clone_leaves))
-print(length(phylogeny_genotype))
+print(vec_potential_MRCA)
     }
 
 
