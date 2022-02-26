@@ -6,8 +6,8 @@ PLOT_clonal_phylogeny <- function(package_simulation){
     i       <- ape::which.edge(clone_phylogeny_phylo, c("A"))
 
 
-    ape::plot.phylo(clone_phylogeny_phylo)
-    # ape::edgelabels()
+    ape::plot.phylo(clone_phylogeny_phylo,direction="downward")
+
     ape::edgelabels(text='A-haha',edge=i)
 
 }
