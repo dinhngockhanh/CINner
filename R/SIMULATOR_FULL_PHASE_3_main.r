@@ -441,13 +441,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_genotypes             <- c()
         for (i in 1:length(vec_clone_leaves)){
             node                    <- vec_clone_leaves[i]
-            # while (1){
-            while ((node>0) & (phylogeny_birthtime[node]>=phylogeny_birthtime[node_MRCA])){
-            # while ((node>0) & (phylogeny_birthtime[node]>=phylogeny_birthtime[node_MRCA])){
-            # while ((which(vec_potential_MRCA==node)<=(which(vec_potential_MRCA==node_MRCA))) & (node>0)){
+            while (phylogeny_birthtime[node]>=phylogeny_birthtime[node_MRCA]){
                 clone_genotypes     <- sort(unique(c(clone_genotypes,phylogeny_elapsed_genotypes[[node]])))
                 node                <- phylogeny_origin[node]
-print(node)
+                if (node==0){
+                    break
+                }
             }
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
