@@ -465,14 +465,15 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #---Find which clones merge into which clones
     clone_phylogeny_origin                  <- rep(0,length(clone_phylogeny_labels))
     for (clone in 1:length(clone_phylogeny_labels)){
+        node_MRCA                           <- clone_phylogeny_cell_MRCA[clone]
+        node_MRCA_mother                    <- phylogeny_origin[node_MRCA]
 #       For clones present from the beginning...
-        if (clone_phylogeny_birthtime[clone]==evolution_traj_time[1]){
+        if (node_MRCA_mother==0){
+        # if (clone_phylogeny_birthtime[clone]==evolution_traj_time[1]){
             clone_phylogeny_origin[clone]   <- 0
             next
         }
 #       For clones born within simulation time...
-        node_MRCA                           <- clone_phylogeny_cell_MRCA[clone]
-        node_MRCA_mother                    <- phylogeny_origin[node_MRCA]
         node_MRCA_mother_genotype           <- phylogeny_genotype[node_MRCA_mother]
         clone_origin                        <- 0
         for (clone_mother in 1:length(clone_phylogeny_labels)){
