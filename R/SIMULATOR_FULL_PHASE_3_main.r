@@ -403,7 +403,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     dim(x)<-c(10,10)
     groups<-sample(c("red","blue"), 10, replace=TRUE)
 
-    x.clust<-as.dendrogram(hclust(dist(x)))
+    # x.clust<-as.dendrogram(hclust(dist(x)))
 
     local({
       colLab <<- function(n) {
@@ -419,7 +419,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
       i <- 0
     })
 
-    x.clust.dend <- dendrapply(x.clust, colLab)
+    x.clust.dend <- dendrapply(dend, colLab)
+
+
+    # x.clust.dend <- dendrapply(x.clust, colLab)
     plot(x.clust.dend)
 
 
