@@ -481,6 +481,39 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             }
         }
         clone_phylogeny_origin[clone]       <- clone_origin
+    }
+#---Build the clone phylogeny in hclust style
+    if (length(clone_phylogeny_labels)==1){
+        clone_hclust_merge                  <- c()
+        clone_hclust_height                 <- c()
+    }else{
+        N_sample_clones                     <- length(clone_phylogeny_labels)
+
+
+
+#       Initialize information to build clone phylogeny
+        clone_hclust_row                    <- 0
+        # clone_hclust_nodes                                          <- rep(0,1,2*N_sample_clones-1)
+        # clone_hclust_nodes[N_sample_clones:(2*N_sample_clones-1)]   <- (-1:-N_sample_clones)
+        clone_hclust_nodes                  <- -1:-N_sample_clones
+        clone_hclust_labels                 <- clone_phylogeny_labels
+#       Initialize actual clone phylogeny in hclust style
+        clone_hclust_merge                  <- matrix(0,nrow=(N_sample_clones-1),ncol=2)
+        clone_hclust_height                 <- rep(0,1,N_sample_clones-1)
+#       Reorder clones according to their birth times
+        vec_order                           <- sort(clone_phylogeny_birthtime,decreasing=TRUE,index.return=TRUE)
+        vec_order                           <- vec_order$ix
+#       Build the sample clone phylogeny tree
+        for (i in 1:(length(vec_order)-1)){
+            clone_daughter                          <- vec_order[i]
+            clone_mother                            <- clone_phylogeny_origin[clone_daughter]
+
+            clone_hclust_row                        <- clone_hclust_row+1
+            clone_hclust_merge[clone_hclust_row,]   <- c(clone_hclust_nodes[clone_daughter],clone_hclust_nodes[clone_mother])
+            clone_hclust_height[clone_hclust_row]   <- clone_phylogeny_birthtime[clone_daughter]
+            clone_hclust_nodes[clone_mother]        <- clone_hclust_row
+        }
+
 
     }
 
@@ -488,18 +521,21 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-print('Clone labels:')
-print(clone_phylogeny_labels)
-print('Clone ID:')
-print(clone_phylogeny_ID)
-# print(clone_phylogeny_cell_MRCA)
-print('Clone birth time:')
-print(clone_phylogeny_birthtime)
-print('Clone elapsed genotypes:')
-print(clone_phylogeny_genotypes)
-print('Clone mother:')
-print(clone_phylogeny_origin)
+#                                     print('Clone labels:')
+# print(clone_phylogeny_labels)
+#                                     print('Clone ID:')
+# print(clone_phylogeny_ID)
+# # print(clone_phylogeny_cell_MRCA)
+#                                     print('Clone birth time:')
+# print(clone_phylogeny_birthtime)
+#                                     print('Clone elapsed genotypes:')
+# print(clone_phylogeny_genotypes)
+#                                     print('Clone mother:')
+# print(clone_phylogeny_origin)
 
+
+print(clone_hclust_merge)
+print(clone_hclust_height)
 
 
 
