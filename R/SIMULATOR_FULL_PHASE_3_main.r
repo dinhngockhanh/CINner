@@ -514,7 +514,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 #---Reorder the clone nodes for plotting
-    list_roots                                              <- find(clone_phylogeny_origin==0)
+    list_roots                                              <- which(clone_phylogeny_origin==0)
 #   Find number of progeny of each clone node
     progeny_count                                           <- rep(1,N_sample_clones)
     for (node in 1:N_sample_clones){
