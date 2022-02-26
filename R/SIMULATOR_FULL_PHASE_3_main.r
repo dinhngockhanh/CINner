@@ -428,13 +428,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             for (i in 2:length(vec_clone_leaves)){
                 node                        <- vec_clone_leaves[i]
                 while (is.element(node,vec_potential_MRCA)==FALSE){
-print('~~~~~')
-print(node)
-print(vec_potential_MRCA)
                     node                    <- phylogeny_origin[node]
-print('~~~~~')
-print(node)
-print(vec_potential_MRCA)
                 }
                 if (which(vec_potential_MRCA==node_MRCA)<which(vec_potential_MRCA==node)){
                     node_MRCA               <- node
@@ -514,6 +508,16 @@ print(vec_potential_MRCA)
             clone_hclust_nodes[clone_mother]        <- clone_hclust_row
         }
     }
+#---
+    clone_phylogeny_hclust                                        <- list()
+    clone_phylogeny_hclust$merge                                  <- clone_hclust_merge
+    clone_phylogeny_hclust$height                                 <- clone_hclust_height
+    clone_phylogeny_hclust$order                                  <- 1:N_sample_clones
+    clone_phylogeny_hclust$labels                                 <- clone_hclust_labels
+    class(phylogeny_hclust)                                 <- "hclust"
+
+    plot(phylogeny_hclust)
+
 
 
 
