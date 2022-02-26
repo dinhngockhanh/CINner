@@ -454,9 +454,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             }
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
-
-print(phylogeny_elapsed_genotypes[[node_MRCA]])
-
     }
 print(clone_phylogeny_labels)
 # clone_phylogeny_ID
