@@ -446,7 +446,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 if (node==node_MRCA){
                     vec_more_genotypes  <- vec_more_genotypes[-which(vec_more_genotypes==vec_more_genotypes[1])]
                 }
-                clone_genotypes     <- sort(unique(c(clone_genotypes,phylogeny_elapsed_genotypes[[node]])))
+                clone_genotypes     <- sort(unique(c(clone_genotypes,vec_more_genotypes)))
                 node                <- phylogeny_origin[node]
                 if (node==0){
                     break
