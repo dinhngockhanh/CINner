@@ -3,5 +3,5 @@ PLOT_clonal_phylogeny <- function(package_simulation){
     package_sample_phylogeny        <- package_simulation[[3]]
     clone_phylogeny_phylo           <- package_sample_phylogeny[[2]]
 
-    plot(clone_phylogeny_phylo)
+    plot(clone_phylogeny_phylo,direction = "rightwards")
 }
