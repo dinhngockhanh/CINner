@@ -481,11 +481,16 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
+print('Clone labels:')
 print(clone_phylogeny_labels)
-# print(clone_phylogeny_ID)
+print('Clone ID:')
+print(clone_phylogeny_ID)
 # print(clone_phylogeny_cell_MRCA)
+print('Clone birth time:')
 print(clone_phylogeny_birthtime)
+print('Clone elapsed genotypes:')
 print(clone_phylogeny_genotypes)
+print('Clone mother:')
 print(clone_phylogeny_origin)
 
 
