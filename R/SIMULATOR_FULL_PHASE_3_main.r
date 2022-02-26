@@ -580,5 +580,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     output[[7]]                                             <- phylogeny_birthtime
     output[[8]]                                             <- phylogeny_deathtime
     output[[9]]                                             <- phylogeny_order
+
+    output[[10]]                                            <- clone_phylogeny_labels
+    output[[11]]                                            <- clone_phylogeny_ID
+    output[[12]]                                            <- clone_phylogeny_cell_MRCA
+    output[[13]]                                            <- clone_phylogeny_birthtime
+    output[[14]]                                            <- clone_phylogeny_genotypes
+    output[[15]]                                            <- clone_phylogeny_origin
     return(output)
 }
