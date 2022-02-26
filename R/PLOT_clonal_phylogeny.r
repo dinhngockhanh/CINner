@@ -8,7 +8,7 @@ PLOT_clonal_phylogeny <- function(package_simulation){
 
     ape::plot.phylo(clone_phylogeny_phylo,direction="downward")
 
-    ape::edgelabels(text=TeX(r'(Using $\LaTeX$ for plotting in base graphics!)', bold=TRUE)),edge=i)
+    ape::edgelabels(text=TeX(r'(Using $\LaTeX$ for plotting in base graphics!)', bold=TRUE),edge=i)
 
     # ape::tiplabels()
 
