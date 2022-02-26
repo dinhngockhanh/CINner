@@ -471,6 +471,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             genotype_ancestor               <- phylogeny_genotype[node_ancestor]
             clone_origin                    <- -1
             for (clone_mother in 1:length(clone_phylogeny_labels)){
+                if (clone_mother==clone){
+                    next
+                }
                 if (is.element(genotype_ancestor,clone_phylogeny_genotypes[[clone_mother]])){
                     clone_origin            <- clone_mother
                 }
