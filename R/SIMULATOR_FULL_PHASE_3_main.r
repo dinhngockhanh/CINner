@@ -482,7 +482,14 @@ print('###############')
 print(node_MRCA_mother_genotype)
 print(clone_phylogeny_genotypes[[clone_mother]])
 print(clone_mother)
-                clone_origin                <- clone_mother
+
+                if (clone_mother==clone){
+                    clone_origin            <- 0
+                }else{
+                    clone_origin            <- clone_mother
+
+                }
+
             }
         }
         clone_phylogeny_origin[clone]       <- clone_origin
