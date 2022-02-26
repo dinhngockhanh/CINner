@@ -478,6 +478,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             if (clone_origin==-1){
                 clone_origin                <- 0
             }
+            node_ancestor                   <- phylogeny_origin[node_ancestor]
         }
         clone_phylogeny_origin[clone]       <- clone_origin
 
