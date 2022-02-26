@@ -510,7 +510,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
             clone_hclust_row                        <- clone_hclust_row+1
             clone_hclust_merge[clone_hclust_row,]   <- c(clone_hclust_nodes[clone_daughter],clone_hclust_nodes[clone_mother])
-            clone_hclust_height[clone_hclust_row]   <- clone_phylogeny_birthtime[clone_daughter]
+            clone_hclust_height[clone_hclust_row]   <- T_current-clone_phylogeny_birthtime[clone_daughter]
             clone_hclust_nodes[clone_mother]        <- clone_hclust_row
         }
 
