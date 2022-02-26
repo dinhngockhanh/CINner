@@ -586,7 +586,10 @@ print(clone_phylogeny_ID)
                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
 print(clone_phylogeny_birthtime)
                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
-print(clone_phylogeny_genotypes)
+for (i=1:length(clone_phylogeny_labels)){
+    print(clone_phylogeny_labels[i])
+    print(clone_phylogeny_genotypes[[i]])
+}
                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
 print(clone_phylogeny_origin)
 
