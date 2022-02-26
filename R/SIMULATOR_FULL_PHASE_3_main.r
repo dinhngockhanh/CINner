@@ -13,6 +13,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     sample_cell_ID                                          <- package_sample[[2]]
     sample_clone_ID                                         <- package_sample[[3]]
     sample_clone_ID_letters                                 <- package_sample[[4]]
+    table_clone_ID_vs_letters                               <- package_sample[[5]]
     N_sample_clone                                          <- length(sample_clone_ID)
 #-----------------------------------Initialize phylogeny in hclust style
 #   Initialize information to build phylogeny in hclust style
@@ -397,6 +398,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 #-------------------------------
+print(table_clone_ID_vs_letters)
 # sample_clone_ID
     clone_phylogeny_labels          <- sample_clone_ID_letters
     clone_phylogeny_cell_MRCA       <- rep(0,length(clone_phylogeny_labels))
