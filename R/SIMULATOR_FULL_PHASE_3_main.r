@@ -478,6 +478,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         for (clone_mother in 1:length(clone_phylogeny_labels)){
             if (is.element(node_MRCA_mother_genotype,clone_phylogeny_genotypes[[clone_mother]])){
 print('###############')
+print(node_MRCA_mother_genotype)
+print(clone_phylogeny_genotypes[[clone_mother]])
 print(clone_mother)
                 clone_origin                <- clone_mother
             }
