@@ -400,12 +400,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #-------------------------------
     clone_phylogeny_labels          <- table_clone_ID_vs_letters$Clone_ID_letter
     clone_phylogeny_ID              <- table_clone_ID_vs_letters$Clone_ID_number
+#---Find cell MRCA node, merge time and genotypes for each clone
     clone_phylogeny_cell_MRCA       <- rep(0,length(clone_phylogeny_labels))
     clone_phylogeny_merge_time      <- rep(0,length(clone_phylogeny_labels))
+    clone_phylogeny_genotypes       <- vector("list",length=length(clone_phylogeny_labels))
 
     vec_leaves_genotype                                             <- phylogeny_genotype
     vec_leaves_genotype[1:(length(phylogeny_genotype)-N_sample)]    <- -1
-
     for (clone in 1:length(clone_phylogeny_ID)){
         clone_ID                    <- clone_phylogeny_ID[clone]
 #       Get node indices for cell leaves belonging in this clone
@@ -432,19 +433,25 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 if (which(vec_potential_MRCA==node_MRCA)<which(vec_potential_MRCA==node)){
                     node_MRCA       <- node
                 }
-
             }
         }
         clone_phylogeny_cell_MRCA[clone]    <- node_MRCA
         clone_phylogeny_merge_time[clone]   <- phylogeny_birthtime[node_MRCA]
-
-
+#       Find all genotypes of this clone
+        clone_genotypes             <- c()
+        for (i in 1:length(vec_clone_leaves)){
+            node                    <- vec_clone_leaves[i]
+            while (which(vec_potential_MRCA==node)<=which(vec_potential_MRCA==node_MRCA)){
+                clone_genotypes     <- unique(c(clone_genotypes,phylogeny_elapsed_genotypes[[node]]))
+            }
+        }
+        clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
     }
 print(clone_phylogeny_labels)
 # clone_phylogeny_ID
 # clone_phylogeny_cell_MRCA
 print(clone_phylogeny_merge_time)
-
+print(clone_phylogeny_genotypes)
 
 
 
