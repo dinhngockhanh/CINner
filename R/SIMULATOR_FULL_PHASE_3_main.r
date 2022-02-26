@@ -596,7 +596,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         print(clone_hclust_merge)
         print(clone_hclust_height)
 
-        plot(clone_phylogeny_hclust)
+
+        clone_phylogeny_phylo                                         <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
+        plot(clone_phylogeny_phylo)
     }
 
 
