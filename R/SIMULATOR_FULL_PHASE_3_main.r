@@ -564,7 +564,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
                 progeny_count[mother_node]          <- progeny_count[mother_node]+progeny_count[node]
             }
         }
-        print(progeny_count)
+        # print(progeny_count)
 
 
 #-------
@@ -587,7 +587,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         print(clone_phylogeny_birthtime)
                                                                         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
         for (i in 1:length(clone_phylogeny_labels)){
-            print(paste(clone_phylogeny_labels[i],'      ',clone_phylogeny_genotypes[[i]],sep=''))
+            print(paste(clone_phylogeny_labels[i],':      ',clone_phylogeny_genotypes[[i]],sep=''))
         }
                                                                         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
         print(clone_phylogeny_origin)
@@ -596,8 +596,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         print(clone_hclust_merge)
         print(clone_hclust_height)
 
-        plot(clone_phylogeny_hclust)
-
+        # plot(clone_phylogeny_hclust)
     }
 
 
