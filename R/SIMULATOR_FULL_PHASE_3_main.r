@@ -442,7 +442,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         for (i in 1:length(vec_clone_leaves)){
             node                    <- vec_clone_leaves[i]
 
-
+print('-----------------------------------')
+print(node)
+print(phylogeny_birthtime[node])
+print(phylogeny_birthtime[node_MRCA])
             while (phylogeny_birthtime[node]>=phylogeny_birthtime[node_MRCA]){
             # while ((which(vec_potential_MRCA==node)<=(which(vec_potential_MRCA==node_MRCA))) & (node>0)){
 # print('-----------------------------------')
