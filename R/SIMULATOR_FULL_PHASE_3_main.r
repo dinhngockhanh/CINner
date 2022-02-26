@@ -401,6 +401,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_phylogeny_labels          <- table_clone_ID_vs_letters$Clone_ID_letter
     clone_phylogeny_ID              <- table_clone_ID_vs_letters$Clone_ID_number
     clone_phylogeny_cell_MRCA       <- rep(0,length(clone_phylogeny_labels))
+    clone_phylogeny_merge_time      <- rep(0,length(clone_phylogeny_labels))
 
     vec_leaves_genotype                                             <- phylogeny_genotype
     vec_leaves_genotype[1:(length(phylogeny_genotype)-N_sample)]    <- -1
@@ -434,24 +435,15 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
             }
         }
+        clone_phylogeny_cell_MRCA[clone]    <- node_MRCA
+        clone_phylogeny_merge_time[clone]   <- phylogeny_birthtime[node_MRCA]
 
 
-
-
-
-print('---------------------------------------------------------------')
-print(clone_phylogeny_labels[clone])
-print('List of potential MRCA nodes:')
-print(vec_potential_MRCA)
-print('MRCA node:')
-print(node_MRCA)
-print('Age of MRCA node:')
-print(phylogeny_birthtime[node_MRCA]/365)
     }
-
-
-
-
+clone_phylogeny_labels
+# clone_phylogeny_ID
+# clone_phylogeny_cell_MRCA
+clone_phylogeny_merge_time
 
 
 
