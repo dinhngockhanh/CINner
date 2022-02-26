@@ -441,7 +441,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_genotypes             <- c()
         for (i in 1:length(vec_clone_leaves)){
             node                    <- vec_clone_leaves[i]
-            while ((which(vec_potential_MRCA==node)<=which(vec_potential_MRCA==node_MRCA)) & (node>0)){
+            while ((which(vec_potential_MRCA==node)<=(which(vec_potential_MRCA==node_MRCA))) & (node>0)){
 print('-----------------------------------')
 print(node)
 print(node_MRCA)
