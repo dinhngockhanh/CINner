@@ -397,57 +397,57 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-#-------------------------------
-    clone_phylogeny_labels          <- table_clone_ID_vs_letters$Clone_ID_letter
-    clone_phylogeny_ID              <- table_clone_ID_vs_letters$Clone_ID_number
+#-----------------------------------------Build the clone phylogeny tree
+    clone_phylogeny_labels                  <- table_clone_ID_vs_letters$Clone_ID_letter
+    clone_phylogeny_ID                      <- table_clone_ID_vs_letters$Clone_ID_number
 #---Find cell MRCA node, merge time and genotypes for each clone
-    clone_phylogeny_cell_MRCA       <- rep(0,length(clone_phylogeny_labels))
-    clone_phylogeny_merge_time      <- rep(0,length(clone_phylogeny_labels))
-    clone_phylogeny_genotypes       <- vector("list",length=length(clone_phylogeny_labels))
+    clone_phylogeny_cell_MRCA               <- rep(0,length(clone_phylogeny_labels))
+    clone_phylogeny_birthtime               <- rep(0,length(clone_phylogeny_labels))
+    clone_phylogeny_genotypes               <- vector("list",length=length(clone_phylogeny_labels))
 
     vec_leaves_genotype                                             <- phylogeny_genotype
     vec_leaves_genotype[1:(length(phylogeny_genotype)-N_sample)]    <- -1
     for (clone in 1:length(clone_phylogeny_ID)){
-        clone_ID                    <- clone_phylogeny_ID[clone]
+        clone_ID                            <- clone_phylogeny_ID[clone]
 #       Get node indices for cell leaves belonging in this clone
-        vec_clone_leaves            <- which(vec_leaves_genotype==clone_ID)
+        vec_clone_leaves                    <- which(vec_leaves_genotype==clone_ID)
 #       Get list of all potential MRCA nodes for these cell leaves
-        node                        <- vec_clone_leaves[1]
-        node_mother                 <- phylogeny_origin[node]
-        vec_potential_MRCA          <- c(node)
+        node                                <- vec_clone_leaves[1]
+        node_mother                         <- phylogeny_origin[node]
+        vec_potential_MRCA                  <- c(node)
         while (node_mother>0){
-            node                    <- node_mother
-            node_mother             <- phylogeny_origin[node]
-            vec_potential_MRCA      <- c(vec_potential_MRCA,node)
+            node                            <- node_mother
+            node_mother                     <- phylogeny_origin[node]
+            vec_potential_MRCA              <- c(vec_potential_MRCA,node)
         }
 #       Find MRCA node for all cell leaves belonging in this clone
         if (length(vec_clone_leaves)==1){
-            node_MRCA               <- vec_clone_leaves
+            node_MRCA                       <- vec_clone_leaves
         }else{
-            node_MRCA               <- vec_potential_MRCA[1]
+            node_MRCA                       <- vec_potential_MRCA[1]
             for (i in 2:length(vec_clone_leaves)){
-                node                <- vec_clone_leaves[i]
+                node                        <- vec_clone_leaves[i]
                 while (is.element(node,vec_potential_MRCA)==FALSE){
-                    node            <- phylogeny_origin[node]
+                    node                    <- phylogeny_origin[node]
                 }
                 if (which(vec_potential_MRCA==node_MRCA)<which(vec_potential_MRCA==node)){
-                    node_MRCA       <- node
+                    node_MRCA               <- node
                 }
             }
         }
         clone_phylogeny_cell_MRCA[clone]    <- node_MRCA
-        clone_phylogeny_merge_time[clone]   <- phylogeny_birthtime[node_MRCA]
+        clone_phylogeny_birthtime[clone]    <- phylogeny_birthtime[node_MRCA]
 #       Find all genotypes of this clone (except genotypes from mother clone)
-        clone_genotypes             <- c()
+        clone_genotypes                     <- c()
         for (i in 1:length(vec_clone_leaves)){
-            node                    <- vec_clone_leaves[i]
+            node                            <- vec_clone_leaves[i]
             while (phylogeny_birthtime[node]>=phylogeny_birthtime[node_MRCA]){
-                vec_more_genotypes  <- phylogeny_elapsed_genotypes[[node]]
+                vec_more_genotypes          <- phylogeny_elapsed_genotypes[[node]]
                 if (node==node_MRCA){
-                    vec_more_genotypes  <- vec_more_genotypes[-which(vec_more_genotypes==vec_more_genotypes[1])]
+                    vec_more_genotypes      <- vec_more_genotypes[-which(vec_more_genotypes==vec_more_genotypes[1])]
                 }
-                clone_genotypes     <- sort(unique(c(clone_genotypes,vec_more_genotypes)))
-                node                <- phylogeny_origin[node]
+                clone_genotypes             <- sort(unique(c(clone_genotypes,vec_more_genotypes)))
+                node                        <- phylogeny_origin[node]
                 if (node==0){
                     break
                 }
@@ -455,11 +455,38 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
     }
+#---Find which clones merge into which clones
+    clone_phylogeny_origin                  <- rep(0,length(clone_phylogeny_labels))
+    for (clone in 1:length(clone_phylogeny_labels)){
+#       For clones present from the beginning...
+        if (clone_phylogeny_birthtime[clone]==evolution_traj_time[1]){
+            clone_phylogeny_origin[clone]   <- 0
+            next
+        }
+#       For clones born within simulation time...
+        node_MRCA                           <- clone_phylogeny_cell_MRCA[clone]
+        node_MRCA_mother                    <- phylogeny_origin[node_MRCA]
+        node_MRCA_mother_genotype           <- phylogeny_genotype[node_MRCA_mother]
+        clone_origin                        <- 0
+        for (clone_mother in 1:length(clone_phylogeny_labels)){
+            if (is.element(node_MRCA_mother_genotype,clone_phylogeny_genotypes[[clone_mother]])){
+                clone_origin                <- clone_mother
+            }
+        }
+        clone_phylogeny_origin[clone]       <- 0
+
+    }
+
+
+
+
+
 print(clone_phylogeny_labels)
-# clone_phylogeny_ID
-# clone_phylogeny_cell_MRCA
-print(clone_phylogeny_merge_time)
+# print(clone_phylogeny_ID)
+# print(clone_phylogeny_cell_MRCA)
+print(clone_phylogeny_birthtime)
 print(clone_phylogeny_genotypes)
+print(clone_phylogeny_origin)
 
 
 
