@@ -8,8 +8,8 @@ PLOT_clonal_phylogeny <- function(package_simulation){
 
     ape::plot.phylo(clone_phylogeny_phylo,direction="downward")
 
-    ape::edgelabels(text='A-haha',edge=i)
+    ape::edgelabels(text='A-haha\\Also-haha',edge=i)
 
-    ape::tiplabels()
+    # ape::tiplabels()
 
 }
