@@ -17,10 +17,12 @@ devtools::document()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ```{r,fig.height=4,fig.width=10}
-MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
-stage_final                   <- 3
+for (i in 1:100){
+      MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
+      stage_final                   <- 3
 
-package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+      package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
+}
 
 
 

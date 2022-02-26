@@ -528,6 +528,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     if (length(clone_phylogeny_labels)==1){
         clone_hclust_merge                  <- c()
         clone_hclust_height                 <- c()
+
+        clone_phylogeny_hclust              <- list()
     }else{
         N_sample_clones                     <- length(clone_phylogeny_labels)
 #       Initialize information to build clone phylogeny
@@ -565,7 +567,15 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         print(progeny_count)
 
 
+#-------
+        clone_phylogeny_hclust                                        <- list()
+        clone_phylogeny_hclust$merge                                  <- clone_hclust_merge
+        clone_phylogeny_hclust$height                                 <- clone_hclust_height
+        clone_phylogeny_hclust$order                                  <- 1:N_sample_clones
+        clone_phylogeny_hclust$labels                                 <- clone_hclust_labels
+        class(clone_phylogeny_hclust)                                 <- "hclust"
 
+        plot(clone_phylogeny_hclust)
 
     }
 
@@ -588,6 +598,7 @@ print(clone_phylogeny_birthtime)
                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
 for (i in 1:length(clone_phylogeny_labels)){
     print(clone_phylogeny_labels[i])
+    print(':::::::::::::')
     print(clone_phylogeny_genotypes[[i]])
 }
                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
@@ -598,15 +609,7 @@ print(clone_hclust_merge)
 print(clone_hclust_height)
 
 
-#---
-    clone_phylogeny_hclust                                        <- list()
-    clone_phylogeny_hclust$merge                                  <- clone_hclust_merge
-    clone_phylogeny_hclust$height                                 <- clone_hclust_height
-    clone_phylogeny_hclust$order                                  <- 1:N_sample_clones
-    clone_phylogeny_hclust$labels                                 <- clone_hclust_labels
-    class(clone_phylogeny_hclust)                                 <- "hclust"
 
-    plot(clone_phylogeny_hclust)
 
 
 #---------------------------------Create phylogeny object in phylo style
