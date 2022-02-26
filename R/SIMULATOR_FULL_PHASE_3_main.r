@@ -462,8 +462,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
     }
-
-
 #   Add ROOT clones if not present in final sample
     vec_root_nodes                          <- which(phylogeny_origin==0)
     vec_root_genotypes                      <- phylogeny_genotype[vec_root_nodes]
@@ -476,7 +474,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             }
         }
         if (logic==0){
-print('ADDED ANOTHER ROOT CLONE')
             i_clone                             <- length(clone_phylogeny_labels)+1
             clone_phylogeny_labels[i_clone]     <- paste('ROOT_',root,sep='')
             clone_phylogeny_ID[i_clone]         <- root_genotype
@@ -485,19 +482,6 @@ print('ADDED ANOTHER ROOT CLONE')
             clone_phylogeny_genotypes[[i_clone]]<- c(root_genotype)
         }
     }
-
-
-
-
-
-    # clone_phylogeny_labels
-    # clone_phylogeny_ID
-    # clone_phylogeny_cell_MRCA
-    # clone_phylogeny_birthtime
-    # clone_phylogeny_genotypes
-
-
-
 #---Find which clones merge into which clones
     clone_phylogeny_origin                  <- rep(0,length(clone_phylogeny_labels))
     for (clone in 1:length(clone_phylogeny_labels)){
@@ -520,48 +504,6 @@ print('ADDED ANOTHER ROOT CLONE')
             node_ancestor                   <- phylogeny_origin[node_ancestor]
         }
         clone_phylogeny_origin[clone]       <- clone_origin
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#         node_MRCA                           <- clone_phylogeny_cell_MRCA[clone]
-#         node_MRCA_mother                    <- phylogeny_origin[node_MRCA]
-# #       For clones present from the beginning...
-#         if (node_MRCA_mother==0){
-#         # if (clone_phylogeny_birthtime[clone]==evolution_traj_time[1]){
-#             clone_phylogeny_origin[clone]   <- 0
-#             next
-#         }
-# #       For clones born within simulation time...
-#         node_MRCA_mother_genotype           <- phylogeny_genotype[node_MRCA_mother]
-#         clone_origin                        <- 0
-#         for (clone_mother in 1:length(clone_phylogeny_labels)){
-#             if (is.element(node_MRCA_mother_genotype,clone_phylogeny_genotypes[[clone_mother]])){
-#                                                                         print('###############')
-#                                                                         print(node_MRCA_mother_genotype)
-#                                                                         print(clone_phylogeny_genotypes[[clone_mother]])
-#                                                                         print(clone_mother)
-#
-#                 if (clone_mother==clone){
-#                     clone_origin            <- 0
-#                 }else{
-#                     clone_origin            <- clone_mother
-#
-#                 }
-#
-#             }
-#         }
-#         clone_phylogeny_origin[clone]       <- clone_origin
     }
 #---Build the clone phylogeny in hclust style
     if (length(clone_phylogeny_labels)==1){
@@ -579,8 +521,6 @@ print('ADDED ANOTHER ROOT CLONE')
         clone_hclust_merge                  <- matrix(0,nrow=(N_sample_clones-1),ncol=2)
         clone_hclust_height                 <- rep(0,1,N_sample_clones-1)
 #       Reorder clones according to their birth times
-        # vec_order                           <- sort(clone_phylogeny_birthtime,decreasing=TRUE,index.return=TRUE)
-        # vec_order                           <- vec_order$ix
         tmp_birthtime                       <- clone_phylogeny_birthtime
         tmp_birthtime[which(clone_phylogeny_origin==0)] <- -Inf
         vec_order                           <- sort(tmp_birthtime,decreasing=TRUE,index.return=TRUE)
@@ -597,88 +537,19 @@ print('ADDED ANOTHER ROOT CLONE')
             clone_hclust_merge[clone_hclust_row,]   <- c(clone_hclust_nodes[clone_daughter],clone_hclust_nodes[clone_mother])
             clone_hclust_height[clone_hclust_row]   <- T_current-clone_phylogeny_birthtime[clone_daughter]
             clone_hclust_nodes[clone_mother]        <- clone_hclust_row
-print('++++++++++++++++')
-print(clone_daughter)
-print(clone_hclust_nodes)
-print(tmp_birthtime)
-
         }
-
-
-
-#-------Reorder the clone nodes for plotting
-        list_roots                                  <- which(clone_phylogeny_origin==0)
-#       Find number of progeny of each clone node
-        progeny_count                               <- rep(1,N_sample_clones)
-        for (node in 1:N_sample_clones){
-            mother_node                             <- clone_phylogeny_origin[node]
-            if (mother_node>0){
-                progeny_count[mother_node]          <- progeny_count[mother_node]+progeny_count[node]
-            }
-        }
-        # print(progeny_count)
-
-
-#-------
-        clone_phylogeny_hclust                                        <- list()
-        clone_phylogeny_hclust$merge                                  <- clone_hclust_merge
-        clone_phylogeny_hclust$height                                 <- clone_hclust_height
-        clone_phylogeny_hclust$order                                  <- 1:N_sample_clones
-        clone_phylogeny_hclust$labels                                 <- clone_hclust_labels
-        class(clone_phylogeny_hclust)                                 <- "hclust"
-
-
-
-
-                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_labels:')
-        print(clone_phylogeny_labels)
-                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_ID:')
-        print(clone_phylogeny_ID)
-        # print(clone_phylogeny_cell_MRCA)
-                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
-        print(clone_phylogeny_birthtime)
-                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
-        for (i in 1:length(clone_phylogeny_labels)){
-            print(paste(clone_phylogeny_labels[i],':      ',clone_phylogeny_genotypes[[i]],sep=''))
-        }
-                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
-        print(clone_phylogeny_origin)
-
-                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HCLUST:')
-        print(clone_hclust_merge)
-        print(clone_hclust_height)
-
-
-        clone_phylogeny_phylo                                         <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
-        plot(clone_phylogeny_phylo)
+        clone_phylogeny_hclust                      <- list()
+        clone_phylogeny_hclust$merge                <- clone_hclust_merge
+        clone_phylogeny_hclust$height               <- clone_hclust_height
+        clone_phylogeny_hclust$order                <- 1:N_sample_clones
+        clone_phylogeny_hclust$labels               <- clone_hclust_labels
+        class(clone_phylogeny_hclust)               <- "hclust"
     }
 
 
 
 
 
-
-
-
-
-
-#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_labels:')
-# print(clone_phylogeny_labels)
-#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_ID:')
-# print(clone_phylogeny_ID)
-# # print(clone_phylogeny_cell_MRCA)
-#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
-# print(clone_phylogeny_birthtime)
-#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
-# for (i in 1:length(clone_phylogeny_labels)){
-#     print(paste(clone_phylogeny_labels[i],'      ',clone_phylogeny_genotypes[[i]],sep=''))
-# }
-#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
-# print(clone_phylogeny_origin)
-#
-#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HCLUST:')
-# print(clone_hclust_merge)
-# print(clone_hclust_height)
 
 
 
@@ -691,15 +562,23 @@ print(tmp_birthtime)
     phylogeny_clustering_truth                              <- list()
     phylogeny_clustering_truth$tree                         <- phylogeny_phylo
     phylogeny_clustering_truth$clustering                   <- hclust_clustering
+#   Create clone phylogeny object in phylo style
+    if (length(clone_phylogeny_hclust)>0){
+        clone_phylogeny_phylo                               <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
+    }else{
+        clone_phylogeny_phylo                               <- list()
+    }
 #---------------------------------Output package of data from simulation
     output                                                  <- list()
     output[[1]]                                             <- phylogeny_clustering_truth
-    output[[2]]                                             <- phylogeny_origin
-    output[[3]]                                             <- phylogeny_elapsed_gens
-    output[[4]]                                             <- phylogeny_elapsed_genotypes
-    output[[5]]                                             <- phylogeny_genotype
-    output[[6]]                                             <- phylogeny_birthtime
-    output[[7]]                                             <- phylogeny_deathtime
-    output[[8]]                                             <- phylogeny_order
+    output[[2]]                                             <- clone_phylogeny_phylo
+
+    output[[3]]                                             <- phylogeny_origin
+    output[[4]]                                             <- phylogeny_elapsed_gens
+    output[[5]]                                             <- phylogeny_elapsed_genotypes
+    output[[6]]                                             <- phylogeny_genotype
+    output[[7]]                                             <- phylogeny_birthtime
+    output[[8]]                                             <- phylogeny_deathtime
+    output[[9]]                                             <- phylogeny_order
     return(output)
 }

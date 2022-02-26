@@ -17,16 +17,19 @@ devtools::document()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ```{r,fig.height=4,fig.width=10}
-for (i in 1:100){
-      MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
-      stage_final                   <- 3
+MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
+stage_final                   <- 3
 
-      package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
-}
+package_simulation            <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL,stage_final)
 
 
 
-# PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,84,by=1),unit='year')
+
+PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+
+PLOT_clonal_phylogeny(package_simulation)
 
 
 
