@@ -477,6 +477,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_origin                        <- 0
         for (clone_mother in 1:length(clone_phylogeny_labels)){
             if (is.element(node_MRCA_mother_genotype,clone_phylogeny_genotypes[[clone_mother]])){
+print('###############')
+print(clone_mother)
                 clone_origin                <- clone_mother
             }
         }
@@ -498,7 +500,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #       Reorder clones according to their birth times
         vec_order                           <- sort(clone_phylogeny_birthtime,decreasing=TRUE,index.return=TRUE)
         vec_order                           <- vec_order$ix
-#       Build the sample clone phylogeny tree
+#-------Build the sample clone phylogeny tree
         for (i in 1:(length(vec_order)-1)){
             clone_daughter                          <- vec_order[i]
             clone_mother                            <- clone_phylogeny_origin[clone_daughter]
