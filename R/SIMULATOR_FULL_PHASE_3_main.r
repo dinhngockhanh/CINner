@@ -447,6 +447,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             # while ((which(vec_potential_MRCA==node)<=(which(vec_potential_MRCA==node_MRCA))) & (node>0)){
                 clone_genotypes     <- sort(unique(c(clone_genotypes,phylogeny_elapsed_genotypes[[node]])))
                 node                <- phylogeny_origin[node]
+print(node)
             }
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes

@@ -4,7 +4,9 @@ age_end,84,year,Age when simulation stops
 Population_end,Inf,cell count,Condition for ending simulation (Inf if no condition)
 Max_events,Inf,event count,Condition for ending simulation (Inf if no condition)
 cell_lifespan,7,day,Lifespan of one cell
+
 N_sample,100,cell count,Number of cells in sequencing sample (Inf if sampling every cell)
+
 bound_driver,3,driver count,Maximum driver count in viable cells (cells exceeding this will die)
 bound_ploidy,10,local CN,Maximum local CN in viable cells (cells exceeding this will die)
 SFS_totalsteps,50,,Bin count in SFS data
