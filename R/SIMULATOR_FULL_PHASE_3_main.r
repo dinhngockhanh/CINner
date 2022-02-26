@@ -395,13 +395,26 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-    plot(phylogeny_hclust)
 
-    spellman.dend <- as.dendrogram(phylogeny_hclust)
 
-    print(spellman.dend)
-    print(nleaves(spellman.dend))
-    print(nnodes(spellman.dend))
+    dend    <- as.dendrogram(phylogeny_hclust)
+
+    local({colLab <<- function(n) {
+        if(is.leaf(n)) {
+            a                   <- attributes(n)
+            i                   <<- i+1
+            attr(n,"edgePar")   <- c(a$nodePar, list(col = mycols[i], lab.font= i%%3))
+            }
+            n
+        }
+        mycols  <- groups
+        i       <- 0
+    })
+
+dend <- dendrapply(dend, colLab)
+plot(dend)
+
+
 
 
 
