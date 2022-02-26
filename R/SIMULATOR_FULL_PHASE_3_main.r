@@ -443,6 +443,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             node                    <- vec_clone_leaves[i]
             while (which(vec_potential_MRCA==node)<=which(vec_potential_MRCA==node_MRCA)){
                 clone_genotypes     <- unique(c(clone_genotypes,phylogeny_elapsed_genotypes[[node]]))
+                node                <- phylogeny_origin[node]
             }
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
