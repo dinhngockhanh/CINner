@@ -458,6 +458,10 @@ print(phylogeny_birthtime[node_MRCA])
 
                 clone_genotypes     <- unique(c(clone_genotypes,phylogeny_elapsed_genotypes[[node]]))
                 node                <- phylogeny_origin[node]
+
+print('-----------------------------------')
+print(node)
+
             }
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
