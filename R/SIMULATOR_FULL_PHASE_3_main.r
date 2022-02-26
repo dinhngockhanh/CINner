@@ -396,34 +396,25 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
+#-------------------------------
+# sample_clone_ID
+    clone_phylogeny_labels          <- sample_clone_ID_letters
+    clone_phylogeny_cell_MRCA       <- rep(0,length(clone_phylogeny_labels))
 
-    dend    <- as.dendrogram(phylogeny_hclust)
+    vec_leaves_genotype             <- phylogeny_genotype[(length(phylogeny_genotype)-N_sample+1):length(phylogeny_genotype)]
 
-    x<-1:100
-    dim(x)<-c(10,10)
-    groups<-sample(c("red","blue"), 10, replace=TRUE)
+    for (clone in 1:length(sample_clone_ID)){
+        clone_ID                    <- sample_clone_ID[clone]
 
-    # x.clust<-as.dendrogram(hclust(dist(x)))
+        vec_clone_leaves            <- which(vec_leaves_genotype==clone_ID)
 
-    local({
-      colLab <<- function(n) {
-        if(is.leaf(n)) {
-          a <- attributes(n)
-          i <<- i+1
-          attr(n, "edgePar") <-
-            c(a$nodePar, list(col = mycols[i], lab.font= i%%3))
-        }
-        n
-      }
-      mycols <- groups
-      i <- 0
-    })
+print(vec_clone_leaves)
 
-    x.clust.dend <- dendrapply(dend, colLab)
+    }
 
 
-    # x.clust.dend <- dendrapply(x.clust, colLab)
-    plot(x.clust.dend)
+
+
 
 
 
