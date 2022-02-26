@@ -428,7 +428,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             for (i in 2:length(vec_clone_leaves)){
                 node                        <- vec_clone_leaves[i]
                 while (is.element(node,vec_potential_MRCA)==FALSE){
+print('~~~~~')
+print(node)
+print(vec_potential_MRCA)
                     node                    <- phylogeny_origin[node]
+print('~~~~~')
+print(node)
+print(vec_potential_MRCA)
                 }
                 if (which(vec_potential_MRCA==node_MRCA)<which(vec_potential_MRCA==node)){
                     node_MRCA               <- node
@@ -488,13 +494,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_hclust_height                 <- c()
     }else{
         N_sample_clones                     <- length(clone_phylogeny_labels)
-
-
-
 #       Initialize information to build clone phylogeny
         clone_hclust_row                    <- 0
-        # clone_hclust_nodes                                          <- rep(0,1,2*N_sample_clones-1)
-        # clone_hclust_nodes[N_sample_clones:(2*N_sample_clones-1)]   <- (-1:-N_sample_clones)
         clone_hclust_nodes                  <- -1:-N_sample_clones
         clone_hclust_labels                 <- clone_phylogeny_labels
 #       Initialize actual clone phylogeny in hclust style
@@ -507,14 +508,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         for (i in 1:(length(vec_order)-1)){
             clone_daughter                          <- vec_order[i]
             clone_mother                            <- clone_phylogeny_origin[clone_daughter]
-
             clone_hclust_row                        <- clone_hclust_row+1
             clone_hclust_merge[clone_hclust_row,]   <- c(clone_hclust_nodes[clone_daughter],clone_hclust_nodes[clone_mother])
             clone_hclust_height[clone_hclust_row]   <- T_current-clone_phylogeny_birthtime[clone_daughter]
             clone_hclust_nodes[clone_mother]        <- clone_hclust_row
         }
-
-
     }
 
 
