@@ -5,6 +5,7 @@ devtools::install_github("dinhngockhanh/CancerSimulator")
 library(ggplot2)
 library(signals)
 library(dendextend)
+library(latex2exp)
 
 library(CancerSimulator)
 
