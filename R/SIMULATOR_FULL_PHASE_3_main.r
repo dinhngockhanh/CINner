@@ -438,8 +438,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_phylogeny_cell_MRCA[clone]    <- node_MRCA
         clone_phylogeny_birthtime[clone]    <- phylogeny_birthtime[node_MRCA]
 #       Find all genotypes of this clone (except genotypes from mother clone)
-        # clone_genotypes                     <- c(clone_phylogeny_ID[clone])
-        clone_genotypes                     <- c()
+        clone_genotypes                     <- c(clone_phylogeny_ID[clone])
+        # clone_genotypes                     <- c()
         for (i in 1:length(vec_clone_leaves)){
             node                            <- vec_clone_leaves[i]
             while (phylogeny_birthtime[node]>=phylogeny_birthtime[node_MRCA]){
