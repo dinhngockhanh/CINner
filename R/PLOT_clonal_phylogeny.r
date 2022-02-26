@@ -7,5 +7,5 @@ PLOT_clonal_phylogeny <- function(package_simulation){
 
 
     ape::plot.phylo(clone_phylogeny_phylo)
-    edgelabels()
+    ape::edgelabels()
 }
