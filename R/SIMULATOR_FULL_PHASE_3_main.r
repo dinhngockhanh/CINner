@@ -575,6 +575,27 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_phylogeny_hclust$labels                                 <- clone_hclust_labels
         class(clone_phylogeny_hclust)                                 <- "hclust"
 
+
+
+
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_labels:')
+        print(clone_phylogeny_labels)
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_ID:')
+        print(clone_phylogeny_ID)
+        # print(clone_phylogeny_cell_MRCA)
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
+        print(clone_phylogeny_birthtime)
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
+        for (i in 1:length(clone_phylogeny_labels)){
+            print(paste(clone_phylogeny_labels[i],'      ',clone_phylogeny_genotypes[[i]],sep=''))
+        }
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
+        print(clone_phylogeny_origin)
+
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HCLUST:')
+        print(clone_hclust_merge)
+        print(clone_hclust_height)
+
         plot(clone_phylogeny_hclust)
 
     }
@@ -588,23 +609,23 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_labels:')
-print(clone_phylogeny_labels)
-                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_ID:')
-print(clone_phylogeny_ID)
-# print(clone_phylogeny_cell_MRCA)
-                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
-print(clone_phylogeny_birthtime)
-                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
-for (i in 1:length(clone_phylogeny_labels)){
-    print(paste(clone_phylogeny_labels[i],'      ',clone_phylogeny_genotypes[[i]],sep=''))
-}
-                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
-print(clone_phylogeny_origin)
-
-                                    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HCLUST:')
-print(clone_hclust_merge)
-print(clone_hclust_height)
+#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_labels:')
+# print(clone_phylogeny_labels)
+#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_ID:')
+# print(clone_phylogeny_ID)
+# # print(clone_phylogeny_cell_MRCA)
+#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_birthtime:')
+# print(clone_phylogeny_birthtime)
+#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_genotypes:')
+# for (i in 1:length(clone_phylogeny_labels)){
+#     print(paste(clone_phylogeny_labels[i],'      ',clone_phylogeny_genotypes[[i]],sep=''))
+# }
+#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~clone_phylogeny_origin:')
+# print(clone_phylogeny_origin)
+#
+#                                     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HCLUST:')
+# print(clone_hclust_merge)
+# print(clone_hclust_height)
 
 
 
