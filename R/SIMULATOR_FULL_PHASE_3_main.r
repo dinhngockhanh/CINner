@@ -462,6 +462,42 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         }
         clone_phylogeny_genotypes[[clone]]  <- clone_genotypes
     }
+
+
+#   Add ROOT clones if not present in final sample
+    vec_root_nodes                          <- which(phylogeny_origin==0)
+    vec_root_genotypes                      <- phylogeny_genotype(vec_root_nodes)
+    for (root in 1:length(vec_root_nodes)){
+        root_genotype                       <- vec_root_genotypes[root]
+        logic                               <- 0
+        for (clone in 1:length(clone_phylogeny_genotypes)){
+            if (is.element(root_genotype,clone_phylogeny_genotypes[[clone]])){
+                logic                       <- 1
+            }
+        }
+        if (logic==0){
+print('ADDED ANOTHER ROOT CLONE')
+            i_clone                             <- length(clone_phylogeny_labels)+1
+            clone_phylogeny_labels[i_clone]     <- paste('ROOT_',root,sep='')
+            clone_phylogeny_ID[i_clone]         <- root_genotype
+            clone_phylogeny_cell_MRCA[i_clone]  <- vec_root_nodes[root]
+            clone_phylogeny_birthtime[i_clone]  <- phylogeny_birthtime[vec_root_nodes[root]]
+            clone_phylogeny_genotypes[[i_clone]]<- c(root_genotype)
+        }
+    }
+
+
+
+
+
+    # clone_phylogeny_labels          
+    # clone_phylogeny_ID
+    # clone_phylogeny_cell_MRCA
+    # clone_phylogeny_birthtime
+    # clone_phylogeny_genotypes
+
+
+
 #---Find which clones merge into which clones
     clone_phylogeny_origin                  <- rep(0,length(clone_phylogeny_labels))
     for (clone in 1:length(clone_phylogeny_labels)){
