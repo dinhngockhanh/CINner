@@ -446,7 +446,7 @@ print(vec_potential_MRCA)
 print('MRCA node:')
 print(node_MRCA)
 print('Age of MRCA node:')
-print(phylogeny_deathtime(node_MRCA)/365)
+print(phylogeny_deathtime[node_MRCA]/365)
     }
 
 
