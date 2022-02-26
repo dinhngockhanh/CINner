@@ -509,23 +509,30 @@ print(clone_mother)
             clone_hclust_height[clone_hclust_row]   <- T_current-clone_phylogeny_birthtime[clone_daughter]
             clone_hclust_nodes[clone_mother]        <- clone_hclust_row
         }
-    }
 
 
 
-
-
-#---Reorder the clone nodes for plotting
-    list_roots                                              <- which(clone_phylogeny_origin==0)
-#   Find number of progeny of each clone node
-    progeny_count                                           <- rep(1,N_sample_clones)
-    for (node in 1:N_sample_clones){
-        mother_node                                         <- clone_phylogeny_origin[node]
-        if (mother_node>0){
-            progeny_count[mother_node]                      <- progeny_count[mother_node]+progeny_count[node]
+#-------Reorder the clone nodes for plotting
+        list_roots                                  <- which(clone_phylogeny_origin==0)
+#       Find number of progeny of each clone node
+        progeny_count                               <- rep(1,N_sample_clones)
+        for (node in 1:N_sample_clones){
+            mother_node                             <- clone_phylogeny_origin[node]
+            if (mother_node>0){
+                progeny_count[mother_node]          <- progeny_count[mother_node]+progeny_count[node]
+            }
         }
+        print(progeny_count)
+
+
+
+
     }
-print(progeny_count)
+
+
+
+
+
 
 
 
