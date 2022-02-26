@@ -407,12 +407,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
     for (clone in 1:length(clone_phylogeny_ID)){
         clone_ID                    <- clone_phylogeny_ID[clone]
-
+#       Get node indices for cell leaves belonging in this clone
         vec_clone_leaves            <- which(vec_leaves_genotype==clone_ID)
 
 
 print('------------------------')
-print(vec_clone_leaves)
+print(clone_phylogeny_labels[clone])
 print(max(vec_clone_leaves))
 print(length(phylogeny_genotype))
     }
