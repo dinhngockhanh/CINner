@@ -412,7 +412,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #       Get list of all potential MRCA nodes for these cell leaves
         node                        <- vec_clone_leaves[1]
         node_mother                 <- phylogeny_origin[node]
-        vec_potential_MRCA          <- [node]
+        vec_potential_MRCA          <- c(node)
         while (node_mother>0){
             node                    <- node_mother
             node_mother             <- phylogeny_origin[node]
