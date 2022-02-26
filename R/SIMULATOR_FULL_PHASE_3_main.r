@@ -440,10 +440,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
     }
-clone_phylogeny_labels
+print(clone_phylogeny_labels)
 # clone_phylogeny_ID
 # clone_phylogeny_cell_MRCA
-clone_phylogeny_merge_time
+print(clone_phylogeny_merge_time)
 
 
 
