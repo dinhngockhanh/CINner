@@ -514,9 +514,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_phylogeny_hclust$height                                 <- clone_hclust_height
     clone_phylogeny_hclust$order                                  <- 1:N_sample_clones
     clone_phylogeny_hclust$labels                                 <- clone_hclust_labels
-    class(phylogeny_hclust)                                 <- "hclust"
+    class(clone_phylogeny_hclust)                                 <- "hclust"
 
-    plot(phylogeny_hclust)
+    plot(clone_phylogeny_hclust)
 
 
 
