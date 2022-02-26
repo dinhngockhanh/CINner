@@ -399,20 +399,28 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
     dend    <- as.dendrogram(phylogeny_hclust)
 
-    local({colLab <<- function(n) {
+    x<-1:100
+    dim(x)<-c(10,10)
+    groups<-sample(c("red","blue"), 10, replace=TRUE)
+
+    x.clust<-as.dendrogram(hclust(dist(x)))
+
+    local({
+      colLab <<- function(n) {
         if(is.leaf(n)) {
-            a                   <- attributes(n)
-            i                   <<- i+1
-            attr(n,"edgePar")   <- c(a$nodePar, list(col = mycols[i], lab.font= i%%3))
-            }
-            n
+          a <- attributes(n)
+          i <<- i+1
+          attr(n, "edgePar") <-
+            c(a$nodePar, list(col = mycols[i], lab.font= i%%3))
         }
-        mycols  <- groups
-        i       <- 0
+        n
+      }
+      mycols <- groups
+      i <- 0
     })
 
-dend <- dendrapply(dend, colLab)
-plot(dend)
+    x.clust.dend <- dendrapply(x.clust, colLab)
+    plot(x.clust.dend)
 
 
 
