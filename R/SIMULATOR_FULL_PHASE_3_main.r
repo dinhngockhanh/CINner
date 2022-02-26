@@ -402,17 +402,19 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_phylogeny_ID              <- table_clone_ID_vs_letters$Clone_ID_number
     clone_phylogeny_cell_MRCA       <- rep(0,length(clone_phylogeny_labels))
 
-    vec_leaves_genotype             <- phylogeny_genotype[(length(phylogeny_genotype)-N_sample+1):length(phylogeny_genotype)]
-
+    vec_leaves_genotype                                             <- phylogeny_genotype[(length(phylogeny_genotype)-N_sample+1):length(phylogeny_genotype)]
+    vec_leaves_genotype[1:(length(phylogeny_genotype)-N_sample)]    <- -1
 
     for (clone in 1:length(clone_phylogeny_ID)){
         clone_ID                    <- clone_phylogeny_ID[clone]
 
         vec_clone_leaves            <- which(vec_leaves_genotype==clone_ID)
 
+
 print('------------------------')
 print(vec_clone_leaves)
-
+print(max(vec_clone_leaves))
+print(length(phylogeny_genotype))
     }
 
 
