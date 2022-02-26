@@ -408,6 +408,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
         vec_clone_leaves            <- which(vec_leaves_genotype==clone_ID)
 
+print('------------------------')
+print(clone_ID)
 print(vec_clone_leaves)
 
     }
