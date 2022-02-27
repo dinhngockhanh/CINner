@@ -493,6 +493,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
             for (i in 1:length(clone_node_list_current)){
                 clone                                               <- clone_node_list_current[i]
+
+print('==========================')
+print(clone_phylogeny_elapsed_genotypes[[clone]])
+print(clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
+print(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))
+
+
                 if ((clone!=clone_node_mother) & (length(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))>0)){
 
 print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
