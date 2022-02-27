@@ -392,6 +392,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_hclust$order                                  <- hclust_order
     phylogeny_hclust$labels                                 <- sample_cell_ID
     class(phylogeny_hclust)                                 <- "hclust"
+#---------------------------------Create phylogeny object in phylo style
+#   Create phylogeny object in phylo style
+    phylogeny_phylo                                         <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
+#   Create object containing both phylo-style tree and clustering
+    phylogeny_clustering_truth                              <- list()
+    phylogeny_clustering_truth$tree                         <- phylogeny_phylo
+    phylogeny_clustering_truth$clustering                   <- hclust_clustering
 
 
 
@@ -428,17 +435,17 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     for (hclust_mother_cell_node in 1:nrow(hclust_merge)){
     # for (hclust_mother_cell_node in 1:1){
 #       Get daughter cells' indices in hclust style
-        hclust_daughter_cell_nodes                          <- hclust_merge[hclust_mother_cell_node,]
+        hclust_daughter_cell_nodes                                  <- hclust_merge[hclust_mother_cell_node,]
 #       Translate into daughter cells' indices in our style
-        phylogeny_daughter_cell_nodes                       <- which(is.element(hclust_nodes,hclust_daughter_cell_nodes))
+        phylogeny_daughter_cell_nodes                               <- which(is.element(hclust_nodes,hclust_daughter_cell_nodes))
 #       Find daughter cells' genotypes
-        genotype_daughter_cell_nodes                        <- phylogeny_genotype[phylogeny_daughter_cell_nodes]
+        genotype_daughter_cell_nodes                                <- phylogeny_genotype[phylogeny_daughter_cell_nodes]
 #       Find daughter cells' indices in clone hclust
-        clone_phylogeny_daughter_nodes                      <- rep(0,length(genotype_daughter_cell_nodes))
+        clone_phylogeny_daughter_nodes                              <- rep(0,length(genotype_daughter_cell_nodes))
         for (cell in 1:length(genotype_daughter_cell_nodes)){
             for (clone in 1:length(clone_phylogeny_elapsed_genotypes)){
                 if (is.element(genotype_daughter_cell_nodes[cell],clone_phylogeny_elapsed_genotypes[[clone]])){
-                    clone_phylogeny_daughter_nodes[cell]    <- clone
+                    clone_phylogeny_daughter_nodes[cell]            <- clone
                 }
             }
         }
@@ -447,69 +454,61 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 # print(genotype_daughter_cell_nodes)
 # print(clone_phylogeny_daughter_nodes)
 #       Update clone phylogeny...
-        cell_node_1                                         <- phylogeny_daughter_cell_nodes[1]
-        cell_node_2                                         <- phylogeny_daughter_cell_nodes[2]
-        clone_node_1                                        <- clone_phylogeny_daughter_nodes[1]
-        clone_node_2                                        <- clone_phylogeny_daughter_nodes[2]
+        cell_node_1                                                 <- phylogeny_daughter_cell_nodes[1]
+        cell_node_2                                                 <- phylogeny_daughter_cell_nodes[2]
+        clone_node_1                                                <- clone_phylogeny_daughter_nodes[1]
+        clone_node_2                                                <- clone_phylogeny_daughter_nodes[2]
         if (clone_node_1==clone_node_2){
 #           If the cell merging happens within the same clone...
-            clone_node_mother                               <- clone_node_1
+            clone_node_mother                                       <- clone_node_1
 #           Update collection of genotypes for this clone
-            daughter_elapsed_genotypes                      <- unique(c(phylogeny_elapsed_genotypes[[cell_node_1]],phylogeny_elapsed_genotypes[[cell_node_2]]))
+            daughter_elapsed_genotypes                              <- unique(c(phylogeny_elapsed_genotypes[[cell_node_1]],phylogeny_elapsed_genotypes[[cell_node_2]]))
             clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_mother]],daughter_elapsed_genotypes))
         }else{
 #           If the cell merging happens between different clones...
-            cell_node_mother                                <- phylogeny_origin[cell_node_1]
-            genotype_mother                                 <- phylogeny_genotype[cell_node_mother]
-            clone_node_mother                               <- min(clone_node_list_current)-1
+            cell_node_mother                                        <- phylogeny_origin[cell_node_1]
+            genotype_mother                                         <- phylogeny_genotype[cell_node_mother]
+            clone_node_mother                                       <- min(clone_node_list_current)-1
 #           Update clone phylogeny in hclust style
-            clone_hclust_row                                <- clone_hclust_row+1
-            clone_hclust_nodes[clone_node_mother]           <- clone_hclust_row
-            clone_hclust_merge[clone_hclust_row,]           <- c(clone_hclust_nodes[clone_node_1],clone_hclust_nodes[clone_node_2])
-            clone_hclust_height[clone_hclust_row]           <- hclust_height[hclust_mother_cell_node]
+            clone_hclust_row                                        <- clone_hclust_row+1
+            clone_hclust_nodes[clone_node_mother]                   <- clone_hclust_row
+            clone_hclust_merge[clone_hclust_row,]                   <- c(clone_hclust_nodes[clone_node_1],clone_hclust_nodes[clone_node_2])
+            clone_hclust_height[clone_hclust_row]                   <- hclust_height[hclust_mother_cell_node]
 #           Update phylogeny in our style
-            clone_phylogeny_origin[clone_node_1]            <- clone_node_mother
-            clone_phylogeny_origin[clone_node_2]            <- clone_node_mother
-            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- phylogeny_elapsed_genotypes[[cell_node_mother]]
+            clone_phylogeny_origin[clone_node_1]                    <- clone_node_mother
+            clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
+            # clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- phylogeny_elapsed_genotypes[[cell_node_mother]]
 
             clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],phylogeny_elapsed_genotypes[[cell_node_1]]))
-            clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_mother)
+            # clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_mother)
             clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_2]],phylogeny_elapsed_genotypes[[cell_node_2]]))
-            clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_mother)
+            # clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_mother)
 
-            clone_phylogeny_genotype[clone_node_mother]     <- genotype_mother
-            clone_phylogeny_birthtime[clone_node_1]         <- T_current-hclust_height[hclust_mother_cell_node]
-            clone_phylogeny_birthtime[clone_node_2]         <- T_current-hclust_height[hclust_mother_cell_node]
-            clone_phylogeny_deathtime[clone_node_mother]    <- T_current-hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- setdiff(phylogeny_elapsed_genotypes[[cell_node_mother]],c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],clone_phylogeny_elapsed_genotypes[[clone_node_2]]))
+
+            clone_phylogeny_genotype[clone_node_mother]             <- genotype_mother
+            clone_phylogeny_birthtime[clone_node_1]                 <- T_current-hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_birthtime[clone_node_2]                 <- T_current-hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_deathtime[clone_node_mother]            <- T_current-hclust_height[hclust_mother_cell_node]
 #           Update clone phylogeny records in our style
-            pos_delete                                      <- c(which(clone_node_list_current==cell_node_1),which(node_list_current==cell_node_2))
-            clone_node_list_current                         <- clone_node_list_current[-pos_delete]
-            clone_node_list_current                           <- c(clone_node_mother,clone_node_list_current)
+            pos_delete                                              <- c(which(clone_node_list_current==cell_node_1),which(node_list_current==cell_node_2))
+            clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
+            clone_node_list_current                                 <- c(clone_node_mother,clone_node_list_current)
         }
     }
-
-    clone_phylogeny_hclust                      <- list()
-    clone_phylogeny_hclust$merge                <- clone_hclust_merge
-    clone_phylogeny_hclust$height               <- clone_hclust_height
-    clone_phylogeny_hclust$order                <- 1:N_clones
-    clone_phylogeny_hclust$labels               <- clone_hclust_labels
-    class(clone_phylogeny_hclust)               <- "hclust"
+#--------------------------Create clone phylogeny object in hclust style
+    clone_phylogeny_hclust                                          <- list()
+    clone_phylogeny_hclust$merge                                    <- clone_hclust_merge
+    clone_phylogeny_hclust$height                                   <- clone_hclust_height
+    clone_phylogeny_hclust$order                                    <- 1:N_clones
+    clone_phylogeny_hclust$labels                                   <- clone_hclust_labels
+    class(clone_phylogeny_hclust)                                   <- "hclust"
 #---------------------------------Create phylogeny object in phylo style
 #   Create phylogeny object in phylo style
-    phylogeny_phylo                                         <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
-#   Create object containing both phylo-style tree and clustering
-    phylogeny_clustering_truth                              <- list()
-    phylogeny_clustering_truth$tree                         <- phylogeny_phylo
-    phylogeny_clustering_truth$clustering                   <- hclust_clustering
-#   Create clone phylogeny object in phylo style
-    if (length(clone_phylogeny_hclust)>0){
-        clone_phylogeny_phylo                               <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
-    }else{
-        clone_phylogeny_phylo                               <- list()
-    }
+    clone_phylogeny_phylo                                           <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
 
 
-    
+
 
                                                                         print('clone_hclust_labels:')
 print(clone_hclust_labels)
