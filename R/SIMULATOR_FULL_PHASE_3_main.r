@@ -425,18 +425,15 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_phylogeny_deathtime[node]                     <- T_current
     }
 #   Build the clone phylogeny tree
-    # for (hclust_mother_cell_node in 1:nrow(hclust_merge)){
-    for (hclust_mother_cell_node in 1:1){
+    for (hclust_mother_cell_node in 1:nrow(hclust_merge)){
+    # for (hclust_mother_cell_node in 1:1){
 #       Get daughter cells' indices in hclust style
         hclust_daughter_cell_nodes                          <- hclust_merge[hclust_mother_cell_node,]
 #       Translate into daughter cells' indices in our style
-print(hclust_daughter_cell_nodes)
         phylogeny_daughter_cell_nodes                       <- which(is.element(hclust_nodes,hclust_daughter_cell_nodes))
 #       Find daughter cells' genotypes
-print(phylogeny_daughter_cell_nodes)
         genotype_daughter_cell_nodes                        <- phylogeny_genotype[phylogeny_daughter_cell_nodes]
 #       Find daughter cells' indices in clone hclust
-print(genotype_daughter_cell_nodes)
         clone_phylogeny_daughter_nodes                      <- rep(0,length(genotype_daughter_cell_nodes))
         for (cell in 1:length(genotype_daughter_cell_nodes)){
             for (clone in 1:length(clone_phylogeny_elapsed_genotypes)){
@@ -445,7 +442,10 @@ print(genotype_daughter_cell_nodes)
                 }
             }
         }
-print(clone_phylogeny_daughter_nodes)
+# print(hclust_daughter_cell_nodes)
+# print(phylogeny_daughter_cell_nodes)
+# print(genotype_daughter_cell_nodes)
+# print(clone_phylogeny_daughter_nodes)
 #       Update clone phylogeny...
         cell_node_1                                         <- phylogeny_daughter_cell_nodes[1]
         cell_node_2                                         <- phylogeny_daughter_cell_nodes[2]
@@ -487,6 +487,29 @@ print(clone_phylogeny_daughter_nodes)
             clone_node_list_current                           <- c(clone_node_mother,clone_node_list_current)
         }
     }
+
+    clone_phylogeny_hclust                      <- list()
+    clone_phylogeny_hclust$merge                <- clone_hclust_merge
+    clone_phylogeny_hclust$height               <- clone_hclust_height
+    clone_phylogeny_hclust$order                <- 1:N_clones
+    clone_phylogeny_hclust$labels               <- clone_hclust_labels
+    class(clone_phylogeny_hclust)               <- "hclust"
+#---------------------------------Create phylogeny object in phylo style
+#   Create phylogeny object in phylo style
+    phylogeny_phylo                                         <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
+#   Create object containing both phylo-style tree and clustering
+    phylogeny_clustering_truth                              <- list()
+    phylogeny_clustering_truth$tree                         <- phylogeny_phylo
+    phylogeny_clustering_truth$clustering                   <- hclust_clustering
+#   Create clone phylogeny object in phylo style
+    if (length(clone_phylogeny_hclust)>0){
+        clone_phylogeny_phylo                               <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
+    }else{
+        clone_phylogeny_phylo                               <- list()
+    }
+
+
+
 
 
 #                                                                         print('clone_phylogeny_labels:')
@@ -693,19 +716,19 @@ print(clone_phylogeny_birthtime)
 
 
 
-#---------------------------------Create phylogeny object in phylo style
-#   Create phylogeny object in phylo style
-    phylogeny_phylo                                         <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
-#   Create object containing both phylo-style tree and clustering
-    phylogeny_clustering_truth                              <- list()
-    phylogeny_clustering_truth$tree                         <- phylogeny_phylo
-    phylogeny_clustering_truth$clustering                   <- hclust_clustering
-#   Create clone phylogeny object in phylo style
-    if (length(clone_phylogeny_hclust)>0){
-        clone_phylogeny_phylo                               <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
-    }else{
-        clone_phylogeny_phylo                               <- list()
-    }
+# #---------------------------------Create phylogeny object in phylo style
+# #   Create phylogeny object in phylo style
+#     phylogeny_phylo                                         <- ape::as.phylo(phylogeny_hclust,use.labels=TRUE)
+# #   Create object containing both phylo-style tree and clustering
+#     phylogeny_clustering_truth                              <- list()
+#     phylogeny_clustering_truth$tree                         <- phylogeny_phylo
+#     phylogeny_clustering_truth$clustering                   <- hclust_clustering
+# #   Create clone phylogeny object in phylo style
+#     if (length(clone_phylogeny_hclust)>0){
+#         clone_phylogeny_phylo                               <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
+#     }else{
+#         clone_phylogeny_phylo                               <- list()
+#     }
 #---------------------------------Output package of data from simulation
     output                                                  <- list()
     output[[1]]                                             <- phylogeny_clustering_truth
