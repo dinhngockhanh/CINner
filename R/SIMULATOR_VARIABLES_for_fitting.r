@@ -46,4 +46,7 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
         driver_library$s_rate_WT[row]   <<- s_normalization
         driver_library$s_rate_MUT[row]  <<- s_normalization*(1+driver_sel_rate)
     }
+
+print(rate_driver)
+
 }

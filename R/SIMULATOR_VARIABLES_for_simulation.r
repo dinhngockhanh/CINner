@@ -196,10 +196,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
             }
         }
         DNA_length                          <- size_CN_block_DNA*DNA_length
-
-print(rate_driver)
-print(DNA_length)
-
         prob_new_drivers                    <- 1-dpois(x=0,lambda=rate_driver*DNA_length)
         initial_DNA_length[[clone]]         <<- DNA_length
         initial_prob_new_drivers[clone]     <<- prob_new_drivers
