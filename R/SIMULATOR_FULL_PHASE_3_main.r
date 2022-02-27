@@ -531,8 +531,8 @@ print(clone_node_genotype_current)
                 if (length(which(clone_node_genotype_current==unique_genotypes_current[i]))>1){
                     genotype_resolve                                        <- unique_genotypes_current[i]
                     vec_clone_nodes                                         <- which(clone_node_genotype_current==genotype_resolve)
-                    clone_node_1                                            <- vec_clone_nodes[1]
-                    clone_node_2                                            <- vec_clone_nodes[2]
+                    clone_node_1                                            <- clone_node_list_current[vec_clone_nodes[1]]
+                    clone_node_2                                            <- clone_node_list_current[vec_clone_nodes[2]]
 
                     clone_node_mother                                       <- min(clone_node_list_current)-1
 
