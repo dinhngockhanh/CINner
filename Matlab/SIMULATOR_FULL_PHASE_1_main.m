@@ -43,6 +43,15 @@ function [flag_success,package_clonal_evolution] = SIMULATOR_FULL_PHASE_1_main()
     prob_CN_foc_del                             = prob_CN_focal_deletion;
     prob_CN_cnloh_i                             = prob_CN_cnloh_interstitial;
     prob_CN_cnloh_t                             = prob_CN_cnloh_terminal;
+
+print(prob_CN_WGD)
+print(prob_CN_misseg)
+print(prob_CN_arm_misseg)
+print(prob_CN_foc_amp)
+print(prob_CN_foc_del)
+print(prob_CN_cnloh_i)
+print(prob_CN_cnloh_t)
+
 %------------------------------------Set up the initial clonal genotypes
 %   Set up the strand count for each chromosome for each clone
     genotype_list_ploidy_chrom                  = initial_ploidy_chrom;
