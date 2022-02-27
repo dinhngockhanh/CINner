@@ -498,13 +498,27 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             clone_phylogeny_birthtime[clone_node_2]                 <- T_current-hclust_height[hclust_mother_cell_node]
             clone_phylogeny_deathtime[clone_node_mother]            <- T_current-hclust_height[hclust_mother_cell_node]
 #           Update clone phylogeny records in our style
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~BEFORE MERGING:')
+print(clone_node_list_current)
+print(clone_node_genotype_current)
+
             pos_delete                                              <- c(which(clone_node_list_current==clone_node_1),which(clone_node_list_current==clone_node_2))
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DURING MERGING:')
+print(clone_node_1)
+print(clone_node_2)
 
             clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
             clone_node_list_current                                 <- c(clone_node_mother,clone_node_list_current)
 
             clone_node_genotype_current                             <- clone_node_genotype_current[-pos_delete]
             clone_node_genotype_current                             <- c(genotype_mother,clone_node_genotype_current)
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AFTER MERGING:')
+print(clone_node_list_current)
+print(clone_node_genotype_current)
+
         }
     }
 
