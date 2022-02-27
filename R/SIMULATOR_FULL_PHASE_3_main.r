@@ -425,10 +425,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_phylogeny_deathtime                               <- rep(0,length=2*N_clones-1)
 #   Initialize the current list of nodes in the clone phylogeny
     clone_node_list_current                                 <- N_clones:(2*N_clones-1)
-
-print('??????????????????????????')
-print(clone_node_list_current)
-
 #   Initialize data for leaves of clone phylogeny
     for (node in N_clones:(2*N_clones-1)){
         clone_phylogeny_elapsed_genotypes[[node]]           <- clone_phylogeny_ID[node-N_clones+1]
@@ -506,6 +502,10 @@ print(clone_node_list_current)
                 if ((clone!=clone_node_mother) & (length(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))>0)){
 
 print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
+for (i in 1:length(clone_phylogeny_elapsed_genotypes)){
+    print(paste(i,':   ',clone_phylogeny_elapsed_genotypes[[i]],sep=''))
+}
+
 
                     elapsed_genotypes_grandmother                   <- intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
                     genotype_grandmother                            <- elapsed_genotypes_grandmother[length(elapsed_genotypes_grandmother)]
@@ -574,7 +574,9 @@ print(unique(phylogeny_genotype))
 print(clone_phylogeny_origin)
                                                                         print('')
                                                                         print('clone_phylogeny_elapsed_genotypes:')
-print(clone_phylogeny_elapsed_genotypes)
+for (i in 1:length(clone_phylogeny_elapsed_genotypes)){
+    print(paste(i,':   ',clone_phylogeny_elapsed_genotypes[[i]],sep=''))
+}
                                                                         print('~~~~~~~~~~~~~~~~~~~~~~~~~~')
                                                                         print('clone_phylogeny_birthtime:')
 print(clone_phylogeny_birthtime)
