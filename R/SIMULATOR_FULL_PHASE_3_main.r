@@ -456,6 +456,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         clone_phylogeny_daughter_nodes[1]                           <- clone_node_list_current[loc_1]
         loc_2                                                       <- which(clone_node_genotype_current==genotype_daughter_cell_nodes[2])
         clone_phylogeny_daughter_nodes[2]                           <- clone_node_list_current[loc_2]
+
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~')
+print(genotype_daughter_cell_nodes)
+print(clone_node_genotype_current)
+print(clone_phylogeny_daughter_nodes)
+
 #       Update clone phylogeny...
         cell_node_1                                                 <- phylogeny_daughter_cell_nodes[1]
         cell_node_2                                                 <- phylogeny_daughter_cell_nodes[2]
