@@ -461,6 +461,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 print('~~~~~~~~~~~~~~~~~~~~~~~~~')
 print(genotype_daughter_cell_nodes)
 print(clone_node_genotype_current)
+print(clone_node_list_current)
 print(clone_phylogeny_daughter_nodes)
 
 #       Update clone phylogeny...
