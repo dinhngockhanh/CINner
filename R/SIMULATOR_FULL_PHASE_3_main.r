@@ -491,7 +491,35 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-            # for (i in 1:length(clone_node_list_current))
+            for (i in 1:length(clone_node_list_current)){
+                clone                                               <- clone_node_list_current[i]
+                if ((clone!=clone_node_mother) & (length(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]])))){
+                    elapsed_genotypes_grandmother                   <- intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
+                    genotype_grandmother                            <- elapsed_genotypes_grandmother[length(elapsed_genotypes_grandmother)]
+                    clone_node_grandmother                          <- min(clone_node_list_current)-1
+
+                    clone_hclust_row                                <- clone_hclust_row+1
+                    clone_hclust_nodes[clone_node_grandmother]      <- clone_hclust_row
+                    clone_hclust_merge[clone_hclust_row,]           <- c(clone_hclust_nodes[clone_node_mother],clone_hclust_nodes[clone])
+                    clone_hclust_height[clone_hclust_row]           <- hclust_height[hclust_mother_cell_node]
+
+                    clone_phylogeny_origin[clone_node_mother]       <- clone_node_grandmother
+                    clone_phylogeny_origin[clone]                   <- clone_node_grandmother
+                    clone_phylogeny_elapsed_genotypes[[clone_node_grandmother]] <- unique(elapsed_genotypes_grandmother)
+
+                    clone_phylogeny_elapsed_genotypes[[clone_node_mother]]      <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_mother]],elapsed_genotypes_grandmother)
+                    clone_phylogeny_elapsed_genotypes[[clone]]                  <- setdiff(clone_phylogeny_elapsed_genotypes[[clone]],elapsed_genotypes_grandmother)
+
+                    clone_phylogeny_genotype[clone_node_grandmother]            <- genotype_grandmother
+                    clone_phylogeny_birthtime[clone_node_mother]                <- T_current-hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_birthtime[clone]                            <- T_current-hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_deathtime[clone_node_grandmother]           <- T_current-hclust_height[hclust_mother_cell_node]
+
+                    pos_delete                                              <- c(which(clone_node_list_current==clone),which(clone_node_list_current==clone_node_mother))
+                    clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
+                    clone_node_list_current                                 <- c(clone_node_grandmother,clone_node_list_current)
+                }
+            }
 
 
 
