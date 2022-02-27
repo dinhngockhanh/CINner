@@ -555,10 +555,11 @@ print(clone_phylogeny_ID)
 
                                                                         print('phylogeny_genotype[clone_phylogeny_cell_MRCA]:')
 print(phylogeny_genotype[clone_phylogeny_cell_MRCA])
+# print(clone_phylogeny_cell_MRCA)
 
                                                                         print('clone_phylogeny_origin:')
-print(clone_phylogeny_origin)
-# print(clone_phylogeny_cell_MRCA)
+print(LETTERS[clone_phylogeny_origin+1])
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~')
                                                                         print('clone_phylogeny_birthtime:')
 print(clone_phylogeny_birthtime)
                                                                         print('clone_phylogeny_genotypes:')
