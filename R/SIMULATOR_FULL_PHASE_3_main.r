@@ -589,17 +589,20 @@ print(clone_phylogeny_deathtime)
 
 
 
-
-#--------------------------Create clone phylogeny object in hclust style
-    clone_phylogeny_hclust                                          <- list()
-    clone_phylogeny_hclust$merge                                    <- clone_hclust_merge
-    clone_phylogeny_hclust$height                                   <- clone_hclust_height
-    clone_phylogeny_hclust$order                                    <- 1:N_clones
-    clone_phylogeny_hclust$labels                                   <- clone_hclust_labels
-    class(clone_phylogeny_hclust)                                   <- "hclust"
-#---------------------------------Create phylogeny object in phylo style
-#   Create phylogeny object in phylo style
-    clone_phylogeny_phylo                                           <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
+#---------------------------Create clone phylogeny object in phylo style
+    if (N_clones==1){
+#       Create clone phylogeny object in hclust style
+        clone_phylogeny_hclust                              <- list()
+        clone_phylogeny_hclust$merge                        <- clone_hclust_merge
+        clone_phylogeny_hclust$height                       <- clone_hclust_height
+        clone_phylogeny_hclust$order                        <- 1:N_clones
+        clone_phylogeny_hclust$labels                       <- clone_hclust_labels
+        class(clone_phylogeny_hclust)                       <- "hclust"
+#       Create clone phylogeny object in phylo style
+        clone_phylogeny_phylo                               <- ape::as.phylo(clone_phylogeny_hclust,use.labels=TRUE)
+    }else{
+        clone_phylogeny_phylo                               <- list()
+    }
 #---------------------------------Output package of data from simulation
     output                                                  <- list()
     output[[1]]                                             <- phylogeny_clustering_truth
