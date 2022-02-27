@@ -477,14 +477,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #           Update phylogeny in our style
             clone_phylogeny_origin[clone_node_1]                    <- clone_node_mother
             clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
-            # clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- phylogeny_elapsed_genotypes[[cell_node_mother]]
+            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- phylogeny_elapsed_genotypes[[cell_node_mother]]
 
             clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],phylogeny_elapsed_genotypes[[cell_node_1]]))
-            # clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_mother)
+            clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_mother)
             clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_2]],phylogeny_elapsed_genotypes[[cell_node_2]]))
-            # clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_mother)
-
-            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- setdiff(phylogeny_elapsed_genotypes[[cell_node_mother]],c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],clone_phylogeny_elapsed_genotypes[[clone_node_2]]))
+            clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_mother)
 
             clone_phylogeny_genotype[clone_node_mother]             <- genotype_mother
             clone_phylogeny_birthtime[clone_node_1]                 <- T_current-hclust_height[hclust_mother_cell_node]
