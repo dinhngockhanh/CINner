@@ -547,7 +547,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     }
 
 
-print(hclust_nodes)
+
 #                                                                         print('clone_phylogeny_labels:')
 # print(clone_phylogeny_labels)
                                                                         print('clone_phylogeny_ID:')
@@ -571,7 +571,8 @@ for (i in 1:length(clone_phylogeny_genotypes)){
     print(paste(clone_phylogeny_labels[i],':         ',clone_phylogeny_genotypes[[i]]))
 }
 # clone_phylogeny_genotypes
-
+print(hclust_merge)
+print(hclust_height)
 
 
 
