@@ -27,15 +27,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     prob_CN_foc_del                             <- prob_CN_focal_deletion
     prob_CN_cnloh_i                             <- prob_CN_cnloh_interstitial
     prob_CN_cnloh_t                             <- prob_CN_cnloh_terminal
-
-    print(prob_CN_WGD)
-    print(prob_CN_misseg)
-    print(prob_CN_arm_misseg)
-    print(prob_CN_foc_amp)
-    print(prob_CN_foc_del)
-    print(prob_CN_cnloh_i)
-    print(prob_CN_cnloh_t)
-
 #------------------------------------Set up the initial clonal genotypes
 #   Set up the strand count for each chromosome for each clone
     genotype_list_ploidy_chrom                  <<- initial_ploidy_chrom
@@ -146,6 +137,10 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 }
             }
             N_events_current        <- N_events_current+count_new_events
+
+print(prob_division)
+print(prob_new_genotype)
+
             count_event_types       <- rmultinom(n=1,size=count_new_events,prob=c((1-prob_division), prob_division*(1-prob_new_genotype), prob_division*prob_new_genotype))
             count_deaths            <- count_event_types[1]
             count_div_old           <- count_event_types[2]
