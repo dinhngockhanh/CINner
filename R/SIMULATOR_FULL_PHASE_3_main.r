@@ -491,6 +491,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
+print('??????????????????????????')
+print(clone_node_list_current)
+
             for (i in 1:length(clone_node_list_current)){
                 clone                                               <- clone_node_list_current[i]
 
