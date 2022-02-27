@@ -532,6 +532,11 @@ for (i in 1:length(clone_phylogeny_elapsed_genotypes)){
                     clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
                     clone_node_list_current                                 <- c(clone_node_grandmother,clone_node_list_current)
 
+print('AFTER EMERGENCY:')
+for (i in 1:length(clone_phylogeny_elapsed_genotypes)){
+print(paste(i,':   ',clone_phylogeny_elapsed_genotypes[[i]],sep=''))
+}
+
                     break
                 }
             }
