@@ -489,24 +489,15 @@ print(clone_node_list_current)
             clone_phylogeny_birthtime[clone_node_2]                 <- T_current-hclust_height[hclust_mother_cell_node]
             clone_phylogeny_deathtime[clone_node_mother]            <- T_current-hclust_height[hclust_mother_cell_node]
 #           Update clone phylogeny records in our style
-print('??????????????????????????---1')
-print(clone_node_list_current)
             pos_delete                                              <- c(which(clone_node_list_current==clone_node_1),which(clone_node_list_current==clone_node_2))
-print(pos_delete)
             clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
-print(clone_node_list_current)
             clone_node_list_current                                 <- c(clone_node_mother,clone_node_list_current)
-
-
-
-print('??????????????????????????---2')
-print(clone_node_list_current)
-
             for (i in 1:length(clone_node_list_current)){
                 clone                                               <- clone_node_list_current[i]
 
 if (clone!=clone_node_mother){
 print('==========================')
+print(clone_node_list_current)
 print(clone_phylogeny_elapsed_genotypes[[clone]])
 print(clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
 print(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))
