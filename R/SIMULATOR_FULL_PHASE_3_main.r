@@ -439,16 +439,14 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         hclust_daughter_cell_nodes                                  <- hclust_merge[hclust_mother_cell_node,]
 #       Translate into daughter cells' indices in our style
         phylogeny_daughter_cell_nodes                               <- which(is.element(hclust_nodes,hclust_daughter_cell_nodes))
+
+        if (length(phylogeny_daughter_cell_nodes)==1){
+            next
+        }
+
 #       Find daughter cells' genotypes
         genotype_daughter_cell_nodes                                <- phylogeny_genotype[phylogeny_daughter_cell_nodes]
 #       Find daughter cells' indices in clone hclust
-
-print('--------------------------------')
-print(hclust_daughter_cell_nodes)
-print(phylogeny_daughter_cell_nodes)
-print(genotype_daughter_cell_nodes)
-print(clone_node_genotype_current)
-
         clone_phylogeny_daughter_nodes                              <- rep(0,length(genotype_daughter_cell_nodes))
         loc_1                                                       <- which(clone_node_genotype_current==genotype_daughter_cell_nodes[1])
         clone_phylogeny_daughter_nodes[1]                           <- clone_node_list_current[loc_1]
