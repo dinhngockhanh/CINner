@@ -325,6 +325,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     phylogeny_origin                                        <- phylogeny_origin-N_unnecessary_nodes
     phylogeny_origin[list_unmerged_nodes]                   <- 0
     if (length(list_unnecessary_nodes)>0){
+        hclust_nodes                                        <- hclust_nodes[-list_unnecessary_nodes]
+
         phylogeny_origin                                    <- phylogeny_origin[-list_unnecessary_nodes]
         phylogeny_elapsed_gens                              <- phylogeny_elapsed_gens[-list_unnecessary_nodes]
         phylogeny_elapsed_genotypes                         <- phylogeny_elapsed_genotypes[-list_unnecessary_nodes]
@@ -572,7 +574,7 @@ for (i in 1:length(clone_phylogeny_genotypes)){
 }
 # clone_phylogeny_genotypes
 print(hclust_merge)
-print(hclust_height)
+print(hclust_nodes)
 
 
 
