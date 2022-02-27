@@ -416,6 +416,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_phylogeny_genotype                                <- rep(0,length=2*N_clones-1)
     clone_phylogeny_birthtime                               <- rep(0,length=2*N_clones-1)
     clone_phylogeny_deathtime                               <- rep(0,length=2*N_clones-1)
+#   Initialize the current list of nodes in the clone phylogeny
+    clone_node_list_current                                 <- N_clones:(2*N_clones-1)
 #   Initialize data for leaves of clone phylogeny
     for (node in N_clones:(2*N_clones-1)){
         clone_phylogeny_elapsed_genotypes[[node]]           <- clone_phylogeny_ID[node-N_clones+1]
@@ -435,39 +437,82 @@ print(phylogeny_daughter_cell_nodes)
         genotype_daughter_cell_nodes                        <- phylogeny_genotype[phylogeny_daughter_cell_nodes]
 #       Find daughter cells' indices in clone hclust
 print(genotype_daughter_cell_nodes)
-        clone_hclust_daughter_cell_nodes                    <- rep(0,length(genotype_daughter_cell_nodes))
+        clone_phylogeny_daughter_nodes                      <- rep(0,length(genotype_daughter_cell_nodes))
         for (cell in 1:length(genotype_daughter_cell_nodes)){
             for (clone in 1:length(clone_phylogeny_elapsed_genotypes)){
                 if (is.element(genotype_daughter_cell_nodes[cell],clone_phylogeny_elapsed_genotypes[[clone]])){
-                    clone_hclust_daughter_cell_nodes[cell]  <- clone
+                    clone_phylogeny_daughter_nodes[cell]    <- clone
                 }
             }
         }
-print(clone_hclust_daughter_cell_nodes)
+print(clone_phylogeny_daughter_nodes)
+#       Update clone phylogeny...
+        cell_node_1                                         <- phylogeny_daughter_cell_nodes[1]
+        cell_node_2                                         <- phylogeny_daughter_cell_nodes[2]
+        clone_node_1                                        <- clone_phylogeny_daughter_nodes[1]
+        clone_node_2                                        <- clone_phylogeny_daughter_nodes[2]
+        if (clone_node_1==clone_node_2){
+#           If the cell merging happens within the same clone...
+            clone_node_mother                               <- clone_node_1
+#           Update collection of genotypes for this clone
+            daughter_elapsed_genotypes                      <- unique(c(phylogeny_elapsed_genotypes[[cell_node_1]],phylogeny_elapsed_genotypes[[cell_node_2]]))
+            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_mother]],daughter_elapsed_genotypes))
+        }else{
+#           If the cell merging happens between different clones...
+            cell_node_mother                                <- phylogeny_origin[cell_node_1]
+            genotype_mother                                 <- phylogeny_genotype[cell_node_mother]
+            clone_node_mother                               <- min(clone_node_list_current)-1
+#           Update clone phylogeny in hclust style
+            clone_hclust_row                                <- clone_hclust_row+1
+            clone_hclust_nodes[clone_node_mother]           <- clone_hclust_row
+            clone_hclust_merge[clone_hclust_row,]           <- c(clone_hclust_nodes[clone_node_1],clone_hclust_nodes[clone_node_2])
+            clone_hclust_height[clone_hclust_row]           <- hclust_height[hclust_mother_cell_node]
+#           Update phylogeny in our style
+            clone_phylogeny_origin[clone_node_1]            <- clone_node_mother
+            clone_phylogeny_origin[clone_node_2]            <- clone_node_mother
+            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- phylogeny_elapsed_genotypes[[cell_node_mother]]
 
+            clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],phylogeny_elapsed_genotypes[[cell_node_1]]))
+            clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_mother)
+            clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_2]],phylogeny_elapsed_genotypes[[cell_node_2]]))
+            clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_mother)
 
-
-# #       Update clone phylogeny...
-#         if (clone_hclust_daughter_cell_nodes[1]==clone_hclust_daughter_cell_nodes[2]){
-# #           If the cell merging happens within the same clone...
-#
-#
-#
-#         }else{
-# #           If the cell merging happens between different clones...
-#
-#
-#
-#
-#         }
-
-
-
-
+            clone_phylogeny_genotype[clone_node_mother]     <- genotype_mother
+            clone_phylogeny_birthtime[clone_node_1]         <- T_current-hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_birthtime[clone_node_2]         <- T_current-hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_deathtime[clone_node_mother]    <- T_current-hclust_height[hclust_mother_cell_node]
+#           Update clone phylogeny records in our style
+            pos_delete                                      <- c(which(clone_node_list_current==cell_node_1),which(node_list_current==cell_node_2))
+            clone_node_list_current                         <- clone_node_list_current[-pos_delete]
+            clone_node_list_current                           <- c(clone_node_mother,clone_node_list_current)
+        }
     }
 
 
-
+#                                                                         print('clone_phylogeny_labels:')
+# print(clone_phylogeny_labels)
+                                                                        print('clone_phylogeny_ID:')
+print(clone_phylogeny_ID)
+#                                                                         print('')
+#                                                                         print('phylogeny_genotype[clone_phylogeny_cell_MRCA]:')
+# print(phylogeny_genotype[clone_phylogeny_cell_MRCA])
+# print(clone_phylogeny_cell_MRCA)
+                                                                        print('')
+                                                                        print('clone_phylogeny_origin:')
+print(clone_phylogeny_labels)
+print(clone_phylogeny_origin)
+# tmp=clone_phylogeny_origin
+# tmp[which(tmp==0)] <- 26
+# print(LETTERS[tmp])
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                                                                        print('clone_phylogeny_birthtime:')
+print(clone_phylogeny_birthtime)
+#                                                                         print('')
+#                                                                         print('clone_phylogeny_genotypes:')
+# for (i in 1:length(clone_phylogeny_genotypes)){
+#     print(paste(clone_phylogeny_labels[i],':         ',clone_phylogeny_genotypes[[i]]))
+# }
+# clone_phylogeny_genotypes
 
 
 # #-----------------------------------------Build the clone phylogeny tree
@@ -644,8 +689,6 @@ print(clone_hclust_daughter_cell_nodes)
 #     print(paste(clone_phylogeny_labels[i],':         ',clone_phylogeny_genotypes[[i]]))
 # }
 # # clone_phylogeny_genotypes
-print(hclust_merge)
-print(hclust_nodes)
 
 
 
