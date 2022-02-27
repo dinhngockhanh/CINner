@@ -495,18 +495,18 @@ print(clone_node_list_current)
             for (i in 1:length(clone_node_list_current)){
                 clone                                               <- clone_node_list_current[i]
 
-if (clone!=clone_node_mother){
-print('==========================')
-print(clone_node_list_current)
-print(clone_phylogeny_elapsed_genotypes[[clone]])
-print(clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
-print(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))
-}
+# if (clone!=clone_node_mother){
+# print('==========================')
+# print(clone_node_list_current)
+# print(clone_phylogeny_elapsed_genotypes[[clone]])
+# print(clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
+# print(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))
+# }
 
 
                 if ((clone!=clone_node_mother) & (length(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))>0)){
 
-print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
+# print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
 
                     elapsed_genotypes_grandmother                   <- intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
                     genotype_grandmother                            <- elapsed_genotypes_grandmother[length(elapsed_genotypes_grandmother)]
@@ -532,6 +532,8 @@ print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
                     pos_delete                                              <- c(which(clone_node_list_current==clone),which(clone_node_list_current==clone_node_mother))
                     clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
                     clone_node_list_current                                 <- c(clone_node_grandmother,clone_node_list_current)
+
+                    break
                 }
             }
 
