@@ -747,7 +747,7 @@ print(clone_phylogeny_birthtime)
     output[[11]]                                            <- clone_phylogeny_ID
     # output[[12]]                                            <- clone_phylogeny_cell_MRCA
     output[[13]]                                            <- clone_phylogeny_birthtime
-    output[[14]]                                            <- clone_phylogeny_genotypes
+    # output[[14]]                                            <- clone_phylogeny_genotypes
     output[[15]]                                            <- clone_phylogeny_origin
     return(output)
 }
