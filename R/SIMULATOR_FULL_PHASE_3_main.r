@@ -511,7 +511,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 
 
 
-
+print(clone_hclust_merge)
+print(clone_hclust_height)
 #                                                                         print('clone_phylogeny_labels:')
 # print(clone_phylogeny_labels)
                                                                         print('clone_phylogeny_ID:')
@@ -744,7 +745,7 @@ print(clone_phylogeny_birthtime)
 
     output[[10]]                                            <- clone_phylogeny_labels
     output[[11]]                                            <- clone_phylogeny_ID
-    output[[12]]                                            <- clone_phylogeny_cell_MRCA
+    # output[[12]]                                            <- clone_phylogeny_cell_MRCA
     output[[13]]                                            <- clone_phylogeny_birthtime
     output[[14]]                                            <- clone_phylogeny_genotypes
     output[[15]]                                            <- clone_phylogeny_origin
