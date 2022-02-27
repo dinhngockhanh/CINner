@@ -520,6 +520,71 @@ print(clone_node_list_current)
 print(clone_node_genotype_current)
 
         }
+
+
+
+#       Create another clone merging if there are repeated genotypes in the current records
+        if (length(unique(clone_node_genotype_current))<length(clone_node_genotype_current)){
+#           Find the genotype that has to be resolved
+            unique_genotypes_current                                        <- unique(clone_node_genotype_current)
+            for (i in 1:length(unique_genotypes_current)){
+                if (length(which(clone_node_genotype_current==unique_genotypes_current[i]))>1){
+                    genotype_resolve                                        <- unique_genotypes_current[i]
+                    vec_clone_nodes                                         <- which(clone_node_genotype_current==genotype_resolve)
+                    clone_node_1                                            <- vec_clone_nodes[1]
+                    clone_node_2                                            <- vec_clone_nodes[2]
+
+                    clone_node_mother                                       <- min(clone_node_list_current)-1
+
+                    clone_hclust_row                                        <- clone_hclust_row+1
+                    clone_hclust_nodes[clone_node_mother]                   <- clone_hclust_row
+                    clone_hclust_merge[clone_hclust_row,]                   <- c(clone_hclust_nodes[clone_node_1],clone_hclust_nodes[clone_node_2])
+                    clone_hclust_height[clone_hclust_row]                   <- hclust_height[hclust_mother_cell_node]
+
+                    clone_phylogeny_origin[clone_node_1]                    <- clone_node_mother
+                    clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
+                    clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- genotype_resolve
+
+                    clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_resolve)
+                    clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_resolve)
+
+                    clone_phylogeny_genotype[clone_node_mother]             <- genotype_resolve
+
+                    clone_phylogeny_birthtime[clone_node_1]                 <- T_current-hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_birthtime[clone_node_2]                 <- T_current-hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_deathtime[clone_node_mother]            <- T_current-hclust_height[hclust_mother_cell_node]
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~BEFORE MERGING BECAUSE OF REPEATED GENOTYPES:')
+print(clone_node_list_current)
+print(clone_node_genotype_current)
+
+                    pos_delete                                              <- c(which(clone_node_list_current==clone_node_1),which(clone_node_list_current==clone_node_2))
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DURING MERGING BECAUSE OF REPEATED GENOTYPES:')
+print(clone_node_1)
+print(clone_node_2)
+
+                    clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
+                    clone_node_list_current                                 <- c(clone_node_mother,clone_node_list_current)
+
+                    clone_node_genotype_current                             <- clone_node_genotype_current[-pos_delete]
+                    clone_node_genotype_current                             <- c(genotype_mother,clone_node_genotype_current)
+
+print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AFTER MERGING BECAUSE OF REPEATED GENOTYPES:')
+print(clone_node_list_current)
+print(clone_node_genotype_current)
+
+                    break
+                }
+            }
+
+
+        }
+
+
+
+
+
     }
 
 
