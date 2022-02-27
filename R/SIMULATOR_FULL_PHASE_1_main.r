@@ -50,6 +50,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     genotype_list_DNA_length                    <<- initial_DNA_length
     assign('genotype_list_DNA_length',genotype_list_DNA_length,envir=.GlobalEnv)
 #   Set up the probability of new drivers per division for each clone
+
+print(initial_prob_new_drivers)
+
     genotype_list_prob_new_drivers              <<- initial_prob_new_drivers
     assign('genotype_list_prob_new_drivers',genotype_list_prob_new_drivers,envir=.GlobalEnv)
 #-------------------------------------Set up the clonal evolution record
@@ -124,9 +127,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #           Find probability of new genotype
             DNA_length              <- genotype_list_DNA_length[[clone_to_react]]
             prob_new_drivers        <- genotype_list_prob_new_drivers[clone_to_react]
-
-print(prob_new_drivers)
-
             prob_new_genotype       <- 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_CN_cnloh_i)*(1-prob_CN_cnloh_t)*(1-prob_new_drivers)
 #           Find number of events
             prop                    <- all_propensity[i]
