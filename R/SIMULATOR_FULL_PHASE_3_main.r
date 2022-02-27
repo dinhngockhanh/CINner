@@ -560,7 +560,9 @@ print(phylogeny_genotype[clone_phylogeny_cell_MRCA])
                                                                         print('clone_phylogeny_origin:')
 print(clone_phylogeny_labels)
 print(clone_phylogeny_origin)
-print(LETTERS[clone_phylogeny_origin])
+tmp=clone_phylogeny_origin
+tmp[which(tmp==0)] <- 26
+print(LETTERS[tmp])
                                                                         print('~~~~~~~~~~~~~~~~~~~~~~~~~~')
                                                                         print('clone_phylogeny_birthtime:')
 print(clone_phylogeny_birthtime)
