@@ -491,7 +491,7 @@ print(clone_node_list_current)
 #           Update clone phylogeny records in our style
 print('??????????????????????????---1')
 print(clone_node_list_current)
-            pos_delete                                              <- c(which(clone_node_list_current==cell_node_1),which(clone_node_list_current==cell_node_2))
+            pos_delete                                              <- c(which(clone_node_list_current==clone_node_1),which(clone_node_list_current==clone_node_2))
 print(pos_delete)
             clone_node_list_current                                 <- clone_node_list_current[-pos_delete]
 print(clone_node_list_current)
