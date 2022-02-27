@@ -547,7 +547,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     }
 
 
-
+print(hclust_nodes)
 #                                                                         print('clone_phylogeny_labels:')
 # print(clone_phylogeny_labels)
                                                                         print('clone_phylogeny_ID:')
