@@ -477,7 +477,7 @@ print(clone_phylogeny_daughter_nodes)
 #           Update collection of genotypes for this clone
             daughter_elapsed_genotypes                              <- unique(c(phylogeny_elapsed_genotypes[[cell_node_1]],phylogeny_elapsed_genotypes[[cell_node_2]]))
 
-            clone_node_genotype_current[clone_node_mother]          <- genotype_mother
+            clone_node_genotype_current[loc_1]                      <- genotype_mother
 
             clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_mother]],daughter_elapsed_genotypes))
         }else{
