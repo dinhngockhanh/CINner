@@ -425,6 +425,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_phylogeny_deathtime                               <- rep(0,length=2*N_clones-1)
 #   Initialize the current list of nodes in the clone phylogeny
     clone_node_list_current                                 <- N_clones:(2*N_clones-1)
+
+print('??????????????????????????')
+print(clone_node_list_current)
+
 #   Initialize data for leaves of clone phylogeny
     for (node in N_clones:(2*N_clones-1)){
         clone_phylogeny_elapsed_genotypes[[node]]           <- clone_phylogeny_ID[node-N_clones+1]
