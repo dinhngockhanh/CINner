@@ -124,6 +124,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #           Find probability of new genotype
             DNA_length              <- genotype_list_DNA_length[[clone_to_react]]
             prob_new_drivers        <- genotype_list_prob_new_drivers[clone_to_react]
+
+print(prob_new_drivers)
+
             prob_new_genotype       <- 1-(1-prob_CN_WGD)*(1-prob_CN_misseg)*(1-prob_CN_arm_misseg)*(1-prob_CN_foc_amp)*(1-prob_CN_foc_del)*(1-prob_CN_cnloh_i)*(1-prob_CN_cnloh_t)*(1-prob_new_drivers)
 #           Find number of events
             prop                    <- all_propensity[i]
@@ -137,10 +140,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
                 }
             }
             N_events_current        <- N_events_current+count_new_events
-
-print(prob_division)
-print(prob_new_genotype)
-
             count_event_types       <- rmultinom(n=1,size=count_new_events,prob=c((1-prob_division), prob_division*(1-prob_new_genotype), prob_division*prob_new_genotype))
             count_deaths            <- count_event_types[1]
             count_div_old           <- count_event_types[2]
