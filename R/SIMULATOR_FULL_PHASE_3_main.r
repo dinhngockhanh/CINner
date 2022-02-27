@@ -466,7 +466,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             clone_node_mother                                       <- min(clone_node_list_current)-1
 #           Update clone phylogeny in hclust style
 
-print(clone_hclust_row)
+print(paste('---',clone_hclust_row,'---',nrow(clone_hclust_merge),sep=''))
 
             clone_hclust_row                                        <- clone_hclust_row+1
             clone_hclust_nodes[clone_node_mother]                   <- clone_hclust_row
