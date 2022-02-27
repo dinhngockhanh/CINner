@@ -14,10 +14,8 @@ end.time    <- Sys.time()
 time.taken  <- end.time - start.time
 print(time.taken)
     }
-
     package_output                                  <- list()
     package_output[[1]]                             <- package_clonal_evolution
-
 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   SAMPLING')
 start.time  <- Sys.time()
     package_sample                                  <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
@@ -25,7 +23,6 @@ start.time  <- Sys.time()
 end.time    <- Sys.time()
 time.taken  <- end.time - start.time
 print(time.taken)
-
 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   SAMPLE PHYLOGENY')
 start.time  <- Sys.time()
     package_sample_phylogeny                        <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample)
@@ -33,10 +30,7 @@ start.time  <- Sys.time()
 end.time    <- Sys.time()
 time.taken  <- end.time - start.time
 print(time.taken)
-
 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   DONE WITH SIMULATION')
-
-
-# print(package_clonal_evolution)
-
+#------------------------------------------Output the simulation package
+    return(package_output)
 }
