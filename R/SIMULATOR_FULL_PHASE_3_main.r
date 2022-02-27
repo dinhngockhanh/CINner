@@ -437,7 +437,6 @@ print(clone_node_list_current)
     }
 #   Build the clone phylogeny tree
     for (hclust_mother_cell_node in 1:nrow(hclust_merge)){
-    # for (hclust_mother_cell_node in 1:1){
 #       Get daughter cells' indices in hclust style
         hclust_daughter_cell_nodes                                  <- hclust_merge[hclust_mother_cell_node,]
 #       Translate into daughter cells' indices in our style
@@ -506,7 +505,7 @@ print(clone_node_list_current)
 
                 if ((clone!=clone_node_mother) & (length(intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]]))>0)){
 
-# print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
+print(paste('EMERGENCY - CLONE ',clone,' AND CLONE ',clone_node_mother,sep=''))
 
                     elapsed_genotypes_grandmother                   <- intersect(clone_phylogeny_elapsed_genotypes[[clone]],clone_phylogeny_elapsed_genotypes[[clone_node_mother]])
                     genotype_grandmother                            <- elapsed_genotypes_grandmother[length(elapsed_genotypes_grandmother)]
