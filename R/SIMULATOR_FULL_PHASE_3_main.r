@@ -451,11 +451,15 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
         cell_node_1                                                 <- phylogeny_daughter_cell_nodes[1]
         cell_node_2                                                 <- phylogeny_daughter_cell_nodes[2]
         cell_node_mother                                            <- phylogeny_origin[cell_node_1]
-        genotype_mother                                             <- phylogeny_genotype[cell_node_mother]
         clone_node_1                                                <- clone_phylogeny_daughter_nodes[1]
         clone_node_2                                                <- clone_phylogeny_daughter_nodes[2]
         if (clone_node_1==clone_node_2){
 #           If the cell merging happens within the same clone...
+            if (cell_node_mother>0){
+                genotype_mother                                     <- phylogeny_genotype[cell_node_mother]
+            }else{
+                genotype_mother                                     <- phylogeny_genotype[cell_node_1]
+            }
             clone_node_mother                                       <- clone_node_1
 #           Update collection of genotypes for this clone
             daughter_elapsed_genotypes                              <- unique(c(phylogeny_elapsed_genotypes[[cell_node_1]],phylogeny_elapsed_genotypes[[cell_node_2]]))
@@ -465,8 +469,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_mother]],daughter_elapsed_genotypes))
         }else{
 #           If the cell merging happens between different clones...
-            # cell_node_mother                                        <- phylogeny_origin[cell_node_1]
-            # genotype_mother                                         <- phylogeny_genotype[cell_node_mother]
+            genotype_mother                                         <- phylogeny_genotype[cell_node_mother]
             clone_node_mother                                       <- min(clone_node_list_current)-1
 #           Update clone phylogeny in hclust style
             clone_hclust_row                                        <- clone_hclust_row+1
