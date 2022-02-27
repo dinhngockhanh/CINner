@@ -590,7 +590,7 @@ print(clone_phylogeny_deathtime)
 
 
 #---------------------------Create clone phylogeny object in phylo style
-    if (N_clones==1){
+    if (N_clones>1){
 #       Create clone phylogeny object in hclust style
         clone_phylogeny_hclust                              <- list()
         clone_phylogeny_hclust$merge                        <- clone_hclust_merge
