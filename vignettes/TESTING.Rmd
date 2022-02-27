@@ -42,6 +42,49 @@ PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SELECTION OF BULK HGSOC - ONE SIMULATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+```{r}
+MODEL <- 'HGSOC-BULK'
+SIMULATOR_VARIABLES_for_simulation(MODEL)
+
+parameter_set                                         <- list()
+parameter_set$vec_selection_rates                     <- rep(0.05,nrow(driver_library))
+parameter_set$rate_driver                             <- 1e-16
+parameter_set$prob_CN_whole_genome_duplication        <- 1e-6
+parameter_set$prob_CN_missegregation                  <- 1e-6
+parameter_set$prob_CN_chrom_arm_missegregation        <- 1e-6
+parameter_set$prob_CN_focal_amplification             <- 1e-6
+parameter_set$prob_CN_focal_deletion                  <- 1e-6
+parameter_set$prob_CN_cnloh_interstitial              <- 1e-6
+parameter_set$prob_CN_cnloh_terminal                  <- 1e-6
+parameter_set$prob_CN_focal_amplification_length      <- 0.1
+parameter_set$prob_CN_focal_deletion_length           <- 0.1
+parameter_set$prob_CN_cnloh_interstitial_length       <- 0.1
+parameter_set$prob_CN_cnloh_terminal_length           <- 0.1
+
+package_simulation            <- ABC_one_simulation(MODEL,parameter_set)
+
+
+
+PLOT_total_population_vs_input(package_simulation,MODEL,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+
+PLOT_clonal_phylogeny(package_simulation)
+
+
+
+PLOT_clonal_evolution(package_simulation,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+
+PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='total_copy')
+# PLOT_copy_number_heatmap(package_simulation,phylo='true',plotcol='min_copy')
+```
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MIXTURE EXPERIMENT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -86,32 +129,6 @@ MODEL                         <- 'FALLOPIAN-TUBES-NEUTRAL'
 stage_final                   <- 1
 N_simulations                 <- 100
 SIMULATOR_FULL_PROGRAM_many_simulations(MODEL,stage_final,N_simulations)
-```
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SELECTION OF BULK HGSOC - ONE SIMULATION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-```{r}
-MODEL <- 'HGSOC-BULK'
-SIMULATOR_VARIABLES_for_simulation(MODEL)
-
-parameter_set                                         <- list()
-parameter_set$vec_selection_rates                     <- rep(0.05,nrow(driver_library))
-parameter_set$rate_driver                             <- 1e-16
-parameter_set$prob_CN_whole_genome_duplication        <- 1e-6
-parameter_set$prob_CN_missegregation                  <- 1e-6
-parameter_set$prob_CN_chrom_arm_missegregation        <- 1e-6
-parameter_set$prob_CN_focal_amplification             <- 1e-6
-parameter_set$prob_CN_focal_deletion                  <- 1e-6
-parameter_set$prob_CN_cnloh_interstitial              <- 1e-6
-parameter_set$prob_CN_cnloh_terminal                  <- 1e-6
-parameter_set$prob_CN_focal_amplification_length      <- 0.1
-parameter_set$prob_CN_focal_deletion_length           <- 0.1
-parameter_set$prob_CN_cnloh_interstitial_length       <- 0.1
-parameter_set$prob_CN_cnloh_terminal_length           <- 0.1
-
-ABC_one_simulation(MODEL,parameter_set)
 ```
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
