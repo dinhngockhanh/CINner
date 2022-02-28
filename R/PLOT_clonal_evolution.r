@@ -13,6 +13,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     package_sample_phylogeny                        <- package_simulation[[3]]
     package_clone_phylogeny                         <- package_sample_phylogeny[[4]]
     clone_phylogeny_labels                          <- package_clone_phylogeny[[1]]
+    clone_phylogeny_origin                          <- package_clone_phylogeny[[3]]
     clone_phylogeny_genotype                        <- package_clone_phylogeny[[4]]
     clone_hclust_nodes                              <- package_clone_phylogeny[[7]]
     clone_hclust_merge                              <- package_clone_phylogeny[[8]]
@@ -23,7 +24,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 
 
 
-print('PLOT CLONAL EVOLUTION ........')
 #----------------------------Build the genotype list for each clone node
     clone_phylogeny_all_genotypes                                       <- vector('list',length=length(clone_phylogeny_genotype))
 #   Initialize genotype lists for clone leaves
@@ -57,9 +57,6 @@ print('PLOT CLONAL EVOLUTION ........')
         loc                                     <- which.min(abs(evolution_traj_time-time))
         vec_clonal_ID                           <- evolution_traj_clonal_ID[[loc]]
         vec_clonal_population                   <- evolution_traj_population[[loc]]
-
-print(vec_clonal_ID)
-
         for (col in 1:length(clone_phylogeny_all_genotypes)){
             vec_loc                             <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[col]]))
             if (length(vec_loc)==0){
@@ -68,8 +65,23 @@ print(vec_clonal_ID)
             table_clonal_populations[row,col]   <- sum(vec_clonal_population[vec_loc])
         }
     }
+#--------------------------------------------------Find clonal parentage
+    vec_clonal_parentage                        <- clone_phylogeny_origin
 
 
+#----------------------------------------------Plot the clonal evolution
+    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot)
+
+    fish    <- layoutClones(fish)
+
+    fishPlot(fish,shape="spline",title.btm="Sample1",cex.title=0.5)
+    # vlines=c(0,150),vlab=c("day 0","day 150"))
+
+
+
+# vec_time_plot
+# vec_clonal_parentage
+# table_clonal_populations
 
 
 
