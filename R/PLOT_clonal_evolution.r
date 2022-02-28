@@ -88,7 +88,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         clone_mother                                <- vec_clonal_parentage[clone_daughter]
         while (clone_mother>0){
             table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]
-            clone_mother                            <- clone_phylogeny_origin[clone_mother]
+            clone_mother                            <- vec_clonal_parentage[clone_mother]
         }
     }
 
