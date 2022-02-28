@@ -419,7 +419,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_hclust_height                                     <- rep(0,1,N_clones-1)
 #---Initialize clone phylogeny in our style
     clone_phylogeny_origin                                  <- rep(0,length=2*N_clones-1)
-    clone_phylogeny_elapsed_genotypes                       <- vector("list",length=2*N_clones-1)
     clone_phylogeny_genotype                                <- rep(0,length=2*N_clones-1)
     clone_phylogeny_birthtime                               <- rep(0,length=2*N_clones-1)
     clone_phylogeny_deathtime                               <- rep(0,length=2*N_clones-1)
@@ -429,7 +428,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     clone_node_list_current                                 <- N_clones:(2*N_clones-1)
 #   Initialize data for leaves of clone phylogeny
     for (node in N_clones:(2*N_clones-1)){
-        clone_phylogeny_elapsed_genotypes[[node]]           <- clone_phylogeny_ID[node-N_clones+1]
         clone_phylogeny_genotype[node]                      <- clone_phylogeny_ID[node-N_clones+1]
         clone_phylogeny_deathtime[node]                     <- T_current
     }
@@ -470,8 +468,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             daughter_elapsed_genotypes                              <- unique(c(phylogeny_elapsed_genotypes[[cell_node_1]],phylogeny_elapsed_genotypes[[cell_node_2]]))
 
             clone_node_genotype_current[loc_1]                      <- genotype_mother
-
-            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_mother]],daughter_elapsed_genotypes))
         }else{
 #           If the cell merging happens between different clones...
             genotype_mother                                         <- phylogeny_genotype[cell_node_mother]
@@ -485,21 +481,14 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             clone_phylogeny_origin[clone_node_1]                    <- clone_node_mother
             clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
 
-print('------------------')
-print(cell_node_1)
-print(cell_node_2)
-print(cell_node_mother)
-
-print(clone_node_1)
-print(clone_node_2)
-print(clone_node_mother)
-
-            clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(phylogeny_elapsed_genotypes[[cell_node_mother]])
-
-            clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],phylogeny_elapsed_genotypes[[cell_node_1]]))
-            clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_mother)
-            clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_2]],phylogeny_elapsed_genotypes[[cell_node_2]]))
-            clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_mother)
+# print('------------------')
+# print(cell_node_1)
+# print(cell_node_2)
+# print(cell_node_mother)
+#
+# print(clone_node_1)
+# print(clone_node_2)
+# print(clone_node_mother)
 
             clone_phylogeny_genotype[clone_node_mother]             <- genotype_mother
 
@@ -537,10 +526,6 @@ print(clone_node_mother)
 
                     clone_phylogeny_origin[clone_node_1]                    <- clone_node_mother
                     clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
-                    clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- genotype_resolve
-
-                    clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_1]],genotype_resolve)
-                    clone_phylogeny_elapsed_genotypes[[clone_node_2]]       <- setdiff(clone_phylogeny_elapsed_genotypes[[clone_node_2]],genotype_resolve)
 
                     clone_phylogeny_genotype[clone_node_mother]             <- genotype_resolve
 
@@ -590,7 +575,6 @@ print(clone_node_mother)
         clone_hclust_nodes                                  <- clone_hclust_nodes[-list_unnecessary_nodes]
 
         clone_phylogeny_origin                              <- clone_phylogeny_origin[-list_unnecessary_nodes]
-        clone_phylogeny_elapsed_genotypes                   <- clone_phylogeny_elapsed_genotypes[-list_unnecessary_nodes]
         clone_phylogeny_genotype                            <- clone_phylogeny_genotype[-list_unnecessary_nodes]
         clone_phylogeny_birthtime                           <- clone_phylogeny_birthtime[-list_unnecessary_nodes]
         clone_phylogeny_deathtime                           <- clone_phylogeny_deathtime[-list_unnecessary_nodes]
@@ -617,11 +601,6 @@ print(unique(phylogeny_genotype))
                                                                         print('')
                                                                         print('clone_phylogeny_origin:')
 print(clone_phylogeny_origin)
-                                                                        print('')
-                                                                        print('clone_phylogeny_elapsed_genotypes:')
-for (i in 1:length(clone_phylogeny_elapsed_genotypes)){
-    print(paste(i,':   ',clone_phylogeny_elapsed_genotypes[[i]],sep=''))
-}
                                                                         print('~~~~~~~~~~~~~~~~~~~~~~~~~~')
                                                                         print('clone_phylogeny_birthtime:')
 print(clone_phylogeny_birthtime)
@@ -667,9 +646,8 @@ print(clone_phylogeny_deathtime)
     output[[10]]                                            <- clone_phylogeny_labels
     output[[11]]                                            <- clone_phylogeny_ID
     output[[12]]                                            <- clone_phylogeny_origin
-    output[[13]]                                            <- clone_phylogeny_elapsed_genotypes
-    output[[14]]                                            <- clone_phylogeny_genotype
-    output[[15]]                                            <- clone_phylogeny_birthtime
-    output[[16]]                                            <- clone_phylogeny_deathtime
+    output[[13]]                                            <- clone_phylogeny_genotype
+    output[[14]]                                            <- clone_phylogeny_birthtime
+    output[[15]]                                            <- clone_phylogeny_deathtime
     return(output)
 }
