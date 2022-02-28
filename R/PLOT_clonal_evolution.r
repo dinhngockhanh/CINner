@@ -51,7 +51,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]]<- setdiff(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]],mother_genotypes)
     }
 #---------------------------------Find clonal populations as time series
-    table_clonal_populations                    <- matrix(0,nrow=length(vec_time_plot),ncol=length(clone_phylogeny_all_genotypes))
+    table_clonal_populations                    <- matrix(0,nrow=length(clone_phylogeny_all_genotypes),ncol=length(vec_time_plot))
     for (col in 1:length(vec_time_plot)){
         time                                    <- vec_time_plot[col]
         loc                                     <- which.min(abs(evolution_traj_time-time))
