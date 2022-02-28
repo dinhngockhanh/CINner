@@ -100,12 +100,14 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         table_clonal_populations[row,]          <- vec_row
     }
 
-
+print('-----------------------------------------')
 print(vec_time_plot)
-
+print('-----------------------------------------')
 print(vec_clonal_parentage)
-
+print('-----------------------------------------')
 print(table_clonal_populations)
+print('-----------------------------------------')
+print(table_clonal_populations_tmp)
 #----------------------------------------------Plot the clonal evolution
     if (unit=='year'){
         vec_time_plot               <- vec_time_plot/365
