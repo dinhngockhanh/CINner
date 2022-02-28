@@ -30,7 +30,21 @@ print('PLOT CLONAL EVOLUTION ........')
         }
         clone_phylogeny_all_genotypes[[clone]]      <- all_genotypes
     }
-
+#   Update genotype lists with information from clone hclust
+    for (clone_hclust_mother_node in 1:nrow(clone_hclust_merge)){
+#       Find mother clone node's index in phylogeny our style
+        clone_phylogeny_mother_node                 <- which(is.element(clone_hclust_nodes,clone_hclust_mother_node))
+#       Find daughter clone nodes' indices in phylogeny our style
+        vec_clone_hclust_daughter_nodes             <- clone_hclust_merge[clone_hclust_mother_node,]
+        vec_clone_phylogeny_daughter_nodes          <- which(is.element(clone_hclust_nodes,vec_clone_hclust_daughter_nodes))
+#       Update genotype lists for the 3 clone nodes
+        clone_phylogeny_daughter_node_1             <- vec_clone_phylogeny_daughter_nodes[[1]]
+        clone_phylogeny_daughter_node_2             <- vec_clone_phylogeny_daughter_nodes[[2]]
+        mother_genotypes                            <- intersect(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]],clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]])
+        clone_phylogeny_all_genotypes[[clone_phylogeny_mother_node]]    <- mother_genotypes
+        clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]]<- setdiff(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]],mother_genotypes)
+        clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]]<- setdiff(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]],mother_genotypes)
+    }
 
 
 
