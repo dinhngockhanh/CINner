@@ -92,7 +92,13 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         }
     }
 
-
+#-------------Quality control
+    for (row in 1:nrow(table_clonal_populations)){
+        vec_row                                 <- table_clonal_populations[row,]
+        vec_fix                                 <- which(vec_row>100)
+        vec_row[vec_fix]                        <- 100
+        table_clonal_populations[row,]          <- vec_row
+    }
 
 
 print(vec_time_plot)
