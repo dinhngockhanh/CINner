@@ -79,7 +79,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 #-----------------Scale the clonal populations to match total population
     max_total_population                        <- max(vec_total_populations)
     for (col in 1:length(vec_time_plot)){
-        table_clonal_populations[,col]          <- 100*table_clonal_populations[,col]/max_total_population
+        table_clonal_populations[,col]          <- 99*table_clonal_populations[,col]/max_total_population
     }
 #---------------Conform clonal populations to nested format of fish plot
     table_clonal_populations_tmp                <- table_clonal_populations
@@ -87,7 +87,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     for (clone_daughter in 1:length(clone_phylogeny_all_genotypes)){
         clone_mother                                <- vec_clonal_parentage[clone_daughter]
         while (clone_mother>0){
-            table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]
+            table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]+0.01
             clone_mother                            <- vec_clonal_parentage[clone_mother]
         }
     }
