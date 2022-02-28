@@ -57,12 +57,13 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         loc                                     <- which.min(abs(evolution_traj_time-time))
         vec_clonal_ID                           <- evolution_traj_clonal_ID[[loc]]
         vec_clonal_population                   <- evolution_traj_population[[loc]]
+        total_clonal_population                 <- sum(vec_clonal_population)
         for (row in 1:length(clone_phylogeny_all_genotypes)){
             vec_loc                             <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[row]]))
             if (length(vec_loc)==0){
                 next
             }
-            table_clonal_populations[row,col]   <- sum(vec_clonal_population[vec_loc])
+            table_clonal_populations[row,col]   <- 100*sum(vec_clonal_population[vec_loc])/total_clonal_population
         }
     }
 #--------------------------------------------------Find clonal parentage
