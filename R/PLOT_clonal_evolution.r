@@ -19,11 +19,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     clone_hclust_merge                              <- package_clone_phylogeny[[8]]
 
     N_clones                                        <- length(clone_phylogeny_labels)
-
-
-
-
-
 #----------------------------Build the genotype list for each clone node
     clone_phylogeny_all_genotypes                                       <- vector('list',length=length(clone_phylogeny_genotype))
 #   Initialize genotype lists for clone leaves
@@ -51,88 +46,76 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]]<- setdiff(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]],mother_genotypes)
     }
 #---------------------------------Find clonal populations as time series
-    table_clonal_populations                    <- matrix(0,nrow=length(clone_phylogeny_all_genotypes),ncol=length(vec_time_plot))
-    vec_total_populations                       <- rep(0,length=length(vec_time_plot))
+    table_clonal_populations                                            <- matrix(0,nrow=length(clone_phylogeny_all_genotypes),ncol=length(vec_time_plot))
+    vec_total_populations                                               <- rep(0,length=length(vec_time_plot))
     for (col in 1:length(vec_time_plot)){
-        time                                    <- vec_time_plot[col]
-        loc                                     <- which.min(abs(evolution_traj_time-time))
-        vec_clonal_ID                           <- evolution_traj_clonal_ID[[loc]]
-        vec_clonal_population                   <- evolution_traj_population[[loc]]
-        total_clonal_population                 <- sum(vec_clonal_population)
+        time                                                            <- vec_time_plot[col]
+        loc                                                             <- which.min(abs(evolution_traj_time-time))
+        vec_clonal_ID                                                   <- evolution_traj_clonal_ID[[loc]]
+        vec_clonal_population                                           <- evolution_traj_population[[loc]]
+        total_clonal_population                                         <- sum(vec_clonal_population)
         for (row in 1:length(clone_phylogeny_all_genotypes)){
-            vec_loc                             <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[row]]))
+            vec_loc                                                     <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[row]]))
             if (length(vec_loc)==0){
                 next
             }
-            table_clonal_populations[row,col]   <- sum(vec_clonal_population[vec_loc])
+            table_clonal_populations[row,col]                           <- sum(vec_clonal_population[vec_loc])
         }
-        vec_total_populations[col]              <- total_clonal_population
+        vec_total_populations[col]                                      <- total_clonal_population
     }
 #--------------------------------------------------Find clonal parentage
-    vec_clonal_parentage                        <- clone_phylogeny_origin
+    vec_clonal_parentage                                                <- clone_phylogeny_origin
 #----------------------------------------Add a clone for other genotypes
-    table_clonal_populations                    <- rbind(rep(0,length=length(vec_time_plot)),table_clonal_populations)
+    table_clonal_populations                                            <- rbind(rep(0,length=length(vec_time_plot)),table_clonal_populations)
     for (col in 1:length(vec_time_plot)){
-        table_clonal_populations[1,col]         <- vec_total_populations[col]-sum(table_clonal_populations[,col])
+        table_clonal_populations[1,col]                                 <- vec_total_populations[col]-sum(table_clonal_populations[,col])
     }
-    vec_clonal_parentage                        <- c(0,(vec_clonal_parentage+1))
-
-
-
+    vec_clonal_parentage                                                <- c(0,(vec_clonal_parentage+1))
 #----------------------------------------------Remove unnecessary clones
+#-----------------------------------------i.e. clones that are always 0%
 #   Find unnecessary clones
-    vec_unnecessary_clones                      <- c()
+    vec_unnecessary_clones                                              <- c()
     for (clone in 1:nrow(table_clonal_populations)){
         if (all(table_clonal_populations[clone,]==0)){
-            vec_unnecessary_clones              <- c(vec_unnecessary_clones,clone)
+            vec_unnecessary_clones                                      <- c(vec_unnecessary_clones,clone)
         }
     }
 #   Rewire clones to new mother clones
     for (clone_daughter in 1:length(vec_clonal_parentage)){
-        clone_mother                            <- vec_clonal_parentage[clone_daughter]
+        clone_mother                                                    <- vec_clonal_parentage[clone_daughter]
         while ((clone_mother!=0) & (is.element(clone_mother,vec_unnecessary_clones))){
-            clone_mother                        <- vec_clonal_parentage[clone_mother]
+            clone_mother                                                <- vec_clonal_parentage[clone_mother]
         }
-        vec_clonal_parentage[clone_daughter]    <- clone_mother
+        vec_clonal_parentage[clone_daughter]                            <- clone_mother
     }
 #   Remove unnecessary clones from existence
-    table_clonal_populations                    <- table_clonal_populations[-vec_unnecessary_clones,]
-    vec_clonal_parentage                        <- vec_clonal_parentage[-vec_unnecessary_clones]
-
-
-
+    table_clonal_populations                                            <- table_clonal_populations[-vec_unnecessary_clones,]
+    vec_clonal_parentage                                                <- vec_clonal_parentage[-vec_unnecessary_clones]
 #-----------------Scale the clonal populations to match total population
-    max_total_population                        <- max(vec_total_populations)
+    max_total_population                                                <- max(vec_total_populations)
     for (col in 1:length(vec_time_plot)){
-        table_clonal_populations[,col]          <- 99*table_clonal_populations[,col]/max_total_population
+#       Total population size can only go up to 90% to have leeway with
+#       numerical errors
+        table_clonal_populations[,col]                                  <- 99*table_clonal_populations[,col]/max_total_population
     }
 #---------------Conform clonal populations to nested format of fish plot
-    table_clonal_populations_tmp                <- table_clonal_populations
-
+    table_clonal_populations_tmp                                        <- table_clonal_populations
     for (clone_daughter in 1:length(vec_clonal_parentage)){
-        clone_mother                                <- vec_clonal_parentage[clone_daughter]
+        clone_mother                                                    <- vec_clonal_parentage[clone_daughter]
         while (clone_mother>0){
-            table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]+0.001
-            clone_mother                            <- vec_clonal_parentage[clone_mother]
+#           Add in 0.001 to offset potential numerical errors to make
+#           sure mother clone always has more than sum of daughter clones
+            table_clonal_populations[clone_mother,]                     <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]+0.001
+            clone_mother                                                <- vec_clonal_parentage[clone_mother]
         }
     }
-
-#-------------Quality control
+#----------Final check to make sure total population doesn't exceed 100%
     for (row in 1:nrow(table_clonal_populations)){
         vec_row                                 <- table_clonal_populations[row,]
         vec_fix                                 <- which(vec_row>100)
         vec_row[vec_fix]                        <- 100
         table_clonal_populations[row,]          <- vec_row
     }
-
-# print('-----------------------------------------')
-# print(vec_time_plot)
-# print('-----------------------------------------')
-# print(vec_clonal_parentage)
-# print('-----------------------------------------')
-# print(table_clonal_populations)
-# print('-----------------------------------------')
-# print(table_clonal_populations_tmp)
 #----------------------------------------------Plot the clonal evolution
     if (unit=='year'){
         vec_time_plot               <- vec_time_plot/365
@@ -142,18 +125,11 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 
     fish    <- layoutClones(fish)
 
-    fishPlot(fish,shape="spline",title.btm="Sample1",cex.title=0.5)
+    # fishPlot(fish,shape="spline",title.btm="Sample1",cex.title=0.5)
+
+    fishPlot(fish,shape="spline")
+
     # vlines=c(0,150),vlab=c("day 0","day 150"))
-
-
-
-
-
-# print(clone_hclust_merge)
-
-
-    # print(clone_phylogeny_genotype)
-
 
 
 }
