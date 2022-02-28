@@ -52,6 +52,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     }
 #---------------------------------Find clonal populations as time series
     table_clonal_populations                    <- matrix(0,nrow=length(clone_phylogeny_all_genotypes),ncol=length(vec_time_plot))
+    vec_total_populations                       <- rep(0,length=length(vec_time_plot))
     for (col in 1:length(vec_time_plot)){
         time                                    <- vec_time_plot[col]
         loc                                     <- which.min(abs(evolution_traj_time-time))
@@ -65,6 +66,20 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
             }
             table_clonal_populations[row,col]   <- 100*sum(vec_clonal_population[vec_loc])/total_clonal_population
         }
+        vec_total_populations[col]              <- total_clonal_population
+    }
+#--------------------------------------------------Find clonal parentage
+    vec_clonal_parentage                        <- clone_phylogeny_origin
+#----------------------------------------Add a clone for other genotypes
+    table_clonal_populations                    <- rbind(rep(0,length=length(vec_time_plot)),table_clonal_populations)
+    for (col in 1:length(vec_time_plot)){
+        table_clonal_populations[1,col]         <- vec_total_populations[col]-sum(table_clonal_populations[,col])
+    }
+    vec_clonal_parentage                        <- c(0,(vec_clonal_parentage+1))
+#-----------------Scale the clonal populations to match total population
+    max_total_population                        <- max(vec_total_populations)
+    for (col in 1:length(vec_time_plot)){
+        table_clonal_populations[,col]          <- (sum(table_clonal_populations[,col])/max_total_population)*table_clonal_populations[,col]
     }
 #---------Conform clonal populations as time series to fish requirements
     for (clone_daughter in length(clone_phylogeny_all_genotypes):1){
@@ -74,8 +89,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         }
         table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations[clone_daughter,]
     }
-#--------------------------------------------------Find clonal parentage
-    vec_clonal_parentage                        <- clone_phylogeny_origin
 
 print(vec_time_plot)
 
