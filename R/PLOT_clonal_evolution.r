@@ -91,6 +91,7 @@ print(table_clonal_populations)
     }
 
 print('Step 3:')
+print(vec_total_populations)
 print(table_clonal_populations)
 
 #---------Conform clonal populations as time series to fish requirements
