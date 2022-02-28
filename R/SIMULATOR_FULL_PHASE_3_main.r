@@ -576,7 +576,7 @@ print(clone_node_mother)
             clone_node                                      <- list_unmerged_nodes[i]
             clone_hclust_row                                <- clone_hclust_row+1
             clone_hclust_merge[clone_hclust_row,]           <- c(clone_hclust_node_anchor,clone_hclust_nodes[clone_node])
-            clone_hclust_node_anchor                        <- clone_hclust_node_anchor+1
+            clone_hclust_node_anchor                        <- clone_hclust_row
             clone_hclust_height[clone_hclust_row]           <- T_current
         }
     }
