@@ -551,6 +551,56 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             }
         }
     }
+#---Reorder the clone nodes for plotting
+    list_roots                                          <- which(clone_phylogeny_origin==0)
+#   Find number of progeny of each clone node
+    progeny_count                                           <- rep(0,length(clone_phylogeny_origin))
+    end                                                     <- length(progeny_count)
+    progeny_count[(end-N_clones+1):end]                     <- 1
+    for (node in length(progeny_count):1){
+        mother_node                                         <- clone_phylogeny_origin[node]
+        if (mother_node>0){
+            progeny_count[mother_node]                      <- progeny_count[mother_node]+progeny_count[node]
+        }
+    }
+#   Reorder the sample phylogeny tree based on progeny counts
+    clone_phylogeny_order                                   <- rep(0,length(clone_phylogeny_origin))
+    clone_phylogeny_order[list_roots]                       <- 1
+    for (node in 0:length(progeny_count)){
+        vec_daughter_nodes                                  <- which(clone_phylogeny_origin==node)
+        if (length(vec_daughter_nodes)==0){
+            next
+        }
+        vec_progeny_counts                                  <- progeny_count[vec_daughter_nodes]
+        tmp                                                 <- sort(vec_progeny_counts,index.return=TRUE)
+        vec_progeny_counts                                  <- tmp$x
+        vec_order                                           <- tmp$ix
+        vec_daughter_nodes                                  <- vec_daughter_nodes[vec_order]
+        for (i in 1:length(vec_daughter_nodes)){
+            daughter_node                                   <- vec_daughter_nodes[i]
+            if (i>1){
+                progeny_count_extra                         <- sum(vec_progeny_counts[1:i-1])
+            }else{
+                progeny_count_extra                         <- 0
+            }
+            if (node==0){
+                clone_phylogeny_order[daughter_node]        <- clone_phylogeny_order[daughter_node]+progeny_count_extra
+            }
+            else{
+                clone_phylogeny_order[daughter_node]        <- clone_phylogeny_order[node]+progeny_count_extra
+            }
+        }
+    }
+#   Extract the order for phylogeny in hclust style
+    clone_hclust_order_inverse                              <- clone_phylogeny_order[(length(clone_phylogeny_order)-N_clones+1):length(clone_phylogeny_order)]
+    clone_hclust_order                                      <- rep(0,N_clones)
+    for (i_cell in 1:N_sample){
+        loc                                                 <- clone_hclust_order_inverse[i_cell]
+        clone_hclust_order[loc]                             <- i_cell
+    }
+
+
+
 
                                                                         print('clone_hclust_labels:')
 print(clone_hclust_labels)
@@ -595,7 +645,7 @@ print(clone_phylogeny_deathtime)
         clone_phylogeny_hclust                              <- list()
         clone_phylogeny_hclust$merge                        <- clone_hclust_merge
         clone_phylogeny_hclust$height                       <- clone_hclust_height
-        clone_phylogeny_hclust$order                        <- 1:N_clones
+        clone_phylogeny_hclust$order                        <- clone_hclust_order
         clone_phylogeny_hclust$labels                       <- clone_hclust_labels
         class(clone_phylogeny_hclust)                       <- "hclust"
 #       Create clone phylogeny object in phylo style
