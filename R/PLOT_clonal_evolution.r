@@ -86,10 +86,10 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 
     for (clone_daughter in 1:length(clone_phylogeny_all_genotypes)){
         clone_mother                            <- clone_phylogeny_origin[clone_daughter]
-        if (clone_mother==0){
-            next
+        while (clone_mother>0){
+            table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]
+            clone_mother                            <- clone_phylogeny_origin[clone_mother]
         }
-        table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]
     }
 
 
