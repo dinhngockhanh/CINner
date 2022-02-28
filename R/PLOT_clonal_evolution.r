@@ -73,7 +73,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 #----------------------------------------Add a clone for other genotypes
     table_clonal_populations                    <- rbind(rep(0,length=length(vec_time_plot)),table_clonal_populations)
     for (col in 1:length(vec_time_plot)){
-        table_clonal_populations[1,col]         <- vec_total_populations[col]-sum(table_clonal_populations[,col])
+        table_clonal_populations[1,col]         <- 100-sum(table_clonal_populations[,col])
     }
     vec_clonal_parentage                        <- c(0,(vec_clonal_parentage+1))
 #-----------------Scale the clonal populations to match total population
