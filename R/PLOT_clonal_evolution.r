@@ -52,13 +52,13 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     }
 #---------------------------------Find clonal populations as time series
     table_clonal_populations                    <- matrix(0,nrow=length(vec_time_plot),ncol=length(clone_phylogeny_all_genotypes))
-    for (row in 1:length(vec_time_plot)){
-        time                                    <- vec_time_plot[row]
+    for (col in 1:length(vec_time_plot)){
+        time                                    <- vec_time_plot[col]
         loc                                     <- which.min(abs(evolution_traj_time-time))
         vec_clonal_ID                           <- evolution_traj_clonal_ID[[loc]]
         vec_clonal_population                   <- evolution_traj_population[[loc]]
-        for (col in 1:length(clone_phylogeny_all_genotypes)){
-            vec_loc                             <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[col]]))
+        for (row in 1:length(clone_phylogeny_all_genotypes)){
+            vec_loc                             <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[row]]))
             if (length(vec_loc)==0){
                 next
             }
