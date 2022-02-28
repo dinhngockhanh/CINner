@@ -556,7 +556,16 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #   Find number of progeny of each clone node
     progeny_count                                           <- rep(0,length(clone_phylogeny_origin))
     end                                                     <- length(progeny_count)
-    progeny_count[(end-N_clones+1):end]                     <- 1
+    # progeny_count[(end-N_clones+1):end]                     <- 1
+
+    for (clone in 1:N_clones){
+        N_clone_cells                                       <- length(which(sample_clone_ID==clone_phylogeny_ID[clone]))
+        progeny_count[length(progeny_count)-N_clones+clone] <- N_clone_cells
+    }
+
+
+
+
     for (node in length(progeny_count):1){
         mother_node                                         <- clone_phylogeny_origin[node]
         if (mother_node>0){
