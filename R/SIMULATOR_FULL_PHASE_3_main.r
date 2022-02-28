@@ -486,8 +486,13 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
             clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
 
 print('------------------')
-print(clone_node_mother)
+print(cell_node_1)
+print(cell_node_2)
 print(cell_node_mother)
+
+print(clone_node_1)
+print(clone_node_2)
+print(clone_node_mother)
 
             clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(phylogeny_elapsed_genotypes[[cell_node_mother]])
 
