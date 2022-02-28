@@ -19,13 +19,24 @@ print('PLOT CLONAL EVOLUTION ........')
     clone_phylogeny_all_genotypes                   <- vector('list',length=length(clone_phylogeny_genotype))
 #   Initialize genotype lists for clone leaves
     for (clone in length(clone_phylogeny_genotype):(length(clone_phylogeny_genotype)-N_clones+1)){
-        clone_phylogeny_all_genotypes[[clone]]      <- clone_phylogeny_genotype[clone]
+        all_genotypes                               <- clone_phylogeny_genotype[clone]
+        while (all_genotypes[1]!=0){
+            ancestor_genotype                       <- evolution_origin[all_genotypes[1]]
+            all_genotypes                           <- c(ancestor_genotype,all_genotypes)
+        }
+        clone_phylogeny_all_genotypes[[clone]]      <- all_genotypes
     }
+
+
+
+
+
+
 
 print(clone_phylogeny_all_genotypes)
 
 
-    print(clone_phylogeny_genotype)
+    # print(clone_phylogeny_genotype)
 
 
 
