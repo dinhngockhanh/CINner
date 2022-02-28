@@ -83,6 +83,10 @@ print(vec_clonal_parentage)
 
 print(table_clonal_populations)
 #----------------------------------------------Plot the clonal evolution
+    if (unit=='year'){
+        vec_time_plot               <- vec_time_plot/365
+    }
+
     fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot)
 
     fish    <- layoutClones(fish)
