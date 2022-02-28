@@ -66,6 +66,14 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
             table_clonal_populations[row,col]   <- 100*sum(vec_clonal_population[vec_loc])/total_clonal_population
         }
     }
+#---------Conform clonal populations as time series to fish requirements
+    for (clone_daughter in 1:length(clone_phylogeny_all_genotypes)){
+        clone_mother                            <- clone_phylogeny_origin[clone_daughter]
+        if (clone_mother==0){
+            next
+        }
+        table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations[clone_daughter,]
+    }
 #--------------------------------------------------Find clonal parentage
     vec_clonal_parentage                        <- clone_phylogeny_origin
 
