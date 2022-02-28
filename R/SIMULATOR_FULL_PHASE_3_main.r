@@ -567,9 +567,34 @@ print(clone_node_mother)
     list_unmerged_nodes                                     <- which(clone_phylogeny_origin==0 & clone_hclust_nodes!=0)
     list_unnecessary_nodes                                  <- which(clone_phylogeny_origin==0 & clone_hclust_nodes==0)
     N_unnecessary_nodes                                     <- length(list_unnecessary_nodes)
+#   Complete the phylogeny in hclust style
+    node_anchor                                             <- list_unmerged_nodes[1]
+    clone_hclust_node_anchor                                <- clone_hclust_nodes[node_anchor]
+#   Merge all unmerged nodes together at first time point
+    if (length(list_unmerged_nodes)>=2){
+        for (i in 2:length(list_unmerged_nodes)){
+            clone_node                                      <- list_unmerged_nodes[i]
+            clone_hclust_row                                <- clone_hclust_row+1
+            clone_hclust_merge[clone_hclust_row,]           <- c(clone_hclust_node_anchor,clone_hclust_nodes[clone_node])
+            clone_hclust_node_anchor                        <- clone_hclust_node_anchor+1
+            clone_hclust_height[clone_hclust_row]           <- T_current
+        }
+    }
+#   Complete the phylogeny in our style
+#   Merge all unmerged nodes together at first time point
+    clone_phylogeny_birthtime[list_unmerged_nodes]          <- evolution_traj_time[1]
+#   Delete unnecessary nodes
+    clone_phylogeny_origin                                  <- clone_phylogeny_origin-N_unnecessary_nodes
+    clone_phylogeny_origin[list_unmerged_nodes]             <- 0
+    if (length(list_unnecessary_nodes)>0){
+        clone_hclust_nodes                                  <- clone_hclust_nodes[-list_unnecessary_nodes]
 
-    print(list_unmerged_nodes)
-    print(list_unnecessary_nodes)
+        clone_phylogeny_origin                              <- clone_phylogeny_origin[-list_unnecessary_nodes]
+        clone_phylogeny_elapsed_genotypes                   <- clone_phylogeny_elapsed_genotypes[-list_unnecessary_nodes]
+        clone_phylogeny_genotype                            <- clone_phylogeny_genotype[-list_unnecessary_nodes]
+        clone_phylogeny_birthtime                           <- clone_phylogeny_birthtime[-list_unnecessary_nodes]
+        clone_phylogeny_deathtime                           <- clone_phylogeny_deathtime[-list_unnecessary_nodes]
+    }
 
 
 
