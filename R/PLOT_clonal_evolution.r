@@ -68,7 +68,11 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 #--------------------------------------------------Find clonal parentage
     vec_clonal_parentage                        <- clone_phylogeny_origin
 
+print(vec_time_plot)
 
+print(vec_clonal_parentage)
+
+print(table_clonal_populations)
 #----------------------------------------------Plot the clonal evolution
     fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot)
 
@@ -79,16 +83,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 
 
 
-# vec_time_plot
-# vec_clonal_parentage
-# table_clonal_populations
 
-
-
-
-print(clone_phylogeny_all_genotypes)
-
-print(table_clonal_populations)
 
 # print(clone_hclust_merge)
 
