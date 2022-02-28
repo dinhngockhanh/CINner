@@ -68,10 +68,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         }
         vec_total_populations[col]              <- total_clonal_population
     }
-
-print('Step 1:')
-print(table_clonal_populations)
-
 #--------------------------------------------------Find clonal parentage
     vec_clonal_parentage                        <- clone_phylogeny_origin
 #----------------------------------------Add a clone for other genotypes
@@ -80,20 +76,11 @@ print(table_clonal_populations)
         table_clonal_populations[1,col]         <- vec_total_populations[col]-sum(table_clonal_populations[,col])
     }
     vec_clonal_parentage                        <- c(0,(vec_clonal_parentage+1))
-
-print('Step 2:')
-print(table_clonal_populations)
-
 #-----------------Scale the clonal populations to match total population
     max_total_population                        <- max(vec_total_populations)
     for (col in 1:length(vec_time_plot)){
-        table_clonal_populations[,col]          <- 100*(vec_total_populations[col]/max_total_population)*table_clonal_populations[,col]
+        table_clonal_populations[,col]          <- 100*table_clonal_populations[,col]/max_total_population
     }
-
-print('Step 3:')
-print(vec_total_populations)
-print(table_clonal_populations)
-
 #---------Conform clonal populations as time series to fish requirements
     for (clone_daughter in length(clone_phylogeny_all_genotypes):1){
         clone_mother                            <- clone_phylogeny_origin[clone_daughter]
@@ -102,8 +89,6 @@ print(table_clonal_populations)
         }
         table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations[clone_daughter,]
     }
-
-print('Step 4:')
 
 print(vec_time_plot)
 
