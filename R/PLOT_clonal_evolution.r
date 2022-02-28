@@ -55,6 +55,8 @@ print('PLOT CLONAL EVOLUTION ........')
         vec_clonal_ID                           <- evolution_traj_clonal_ID[[loc]]
         vec_clonal_population                   <- evolution_traj_population[[loc]]
 
+print(vec_clonal_ID)
+
         for (col in 1:length(clone_phylogeny_all_genotypes)){
             vec_loc                             <- which(is.element(vec_clonal_ID,clone_phylogeny_all_genotypes[[col]]))
             if (length(vec_loc)==0){

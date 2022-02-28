@@ -34,7 +34,7 @@ devtools::document()
       PLOT_clonal_phylogeny(package_simulation)
 
 
-      PLOT_clonal_evolution(package_simulation,vec_time_plot=seq(0,84,by=1),unit='year')
+      PLOT_clonal_evolution(package_simulation,vec_time_plot=seq(0,84,by=2),unit='year')
 # }
 ```
 
