@@ -5,8 +5,12 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     evolution_origin                                <- package_clonal_evolution[[11]]
 #---------------------------------------------Input the clonal phylogeny
     package_sample_phylogeny                        <- package_simulation[[3]]
-    clone_phylogeny_labels                          <- package_sample_phylogeny[[10]]
-    clone_phylogeny_genotype                        <- package_sample_phylogeny[[13]]
+    package_clone_phylogeny                         <- package_sample_phylogeny[[4]]
+
+    clone_phylogeny_labels                          <- package_clone_phylogeny[[1]]
+    clone_phylogeny_genotype                        <- package_clone_phylogeny[[4]]
+    clone_hclust_nodes                              <- package_clone_phylogeny[[7]]
+    clone_hclust_merge                              <- package_clone_phylogeny[[8]]
 
     N_clones                                        <- length(clone_phylogeny_labels)
 
@@ -34,6 +38,10 @@ print('PLOT CLONAL EVOLUTION ........')
 
 
 print(clone_phylogeny_all_genotypes)
+
+print(clone_hclust_nodes)
+
+print(clone_hclust_merge)
 
 
     # print(clone_phylogeny_genotype)

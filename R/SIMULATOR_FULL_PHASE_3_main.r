@@ -635,19 +635,29 @@ print(clone_phylogeny_deathtime)
     output[[1]]                                             <- phylogeny_clustering_truth
     output[[2]]                                             <- clone_phylogeny_phylo
 
-    output[[3]]                                             <- phylogeny_origin
-    output[[4]]                                             <- phylogeny_elapsed_gens
-    output[[5]]                                             <- phylogeny_elapsed_genotypes
-    output[[6]]                                             <- phylogeny_genotype
-    output[[7]]                                             <- phylogeny_birthtime
-    output[[8]]                                             <- phylogeny_deathtime
-    output[[9]]                                             <- phylogeny_order
+    package_cell_phylogeny                                  <- list()
+    package_cell_phylogeny[[1]]                             <- phylogeny_origin
+    package_cell_phylogeny[[2]]                             <- phylogeny_elapsed_gens
+    package_cell_phylogeny[[3]]                             <- phylogeny_elapsed_genotypes
+    package_cell_phylogeny[[4]]                             <- phylogeny_genotype
+    package_cell_phylogeny[[5]]                             <- phylogeny_birthtime
+    package_cell_phylogeny[[6]]                             <- phylogeny_deathtime
+    package_cell_phylogeny[[7]]                             <- phylogeny_order
 
-    output[[10]]                                            <- clone_phylogeny_labels
-    output[[11]]                                            <- clone_phylogeny_ID
-    output[[12]]                                            <- clone_phylogeny_origin
-    output[[13]]                                            <- clone_phylogeny_genotype
-    output[[14]]                                            <- clone_phylogeny_birthtime
-    output[[15]]                                            <- clone_phylogeny_deathtime
+    output[[3]]                                             <- package_cell_phylogeny
+
+    package_clone_phylogeny                                 <- list()
+    package_clone_phylogeny[[1]]                            <- clone_phylogeny_labels
+    package_clone_phylogeny[[2]]                            <- clone_phylogeny_ID
+    package_clone_phylogeny[[3]]                            <- clone_phylogeny_origin
+    package_clone_phylogeny[[4]]                            <- clone_phylogeny_genotype
+    package_clone_phylogeny[[5]]                            <- clone_phylogeny_birthtime
+    package_clone_phylogeny[[6]]                            <- clone_phylogeny_deathtime
+    package_clone_phylogeny[[7]]                            <- clone_hclust_nodes
+    package_clone_phylogeny[[8]]                            <- clone_hclust_merge
+    package_clone_phylogeny[[9]]                            <- clone_hclust_height
+
+    output[[4]]                                             <- package_clone_phylogeny
+
     return(output)
 }
