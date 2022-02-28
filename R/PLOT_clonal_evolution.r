@@ -1,5 +1,8 @@
 #=====================================PLOT CLONAL EVOLUTION AS FISH PLOT
 PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
+    if (unit=='year'){
+        vec_time_plot               <- 365*vec_time_plot
+    }
 #---------------------------------------------Input the clonal evolution
     package_clonal_evolution                        <- package_simulation[[1]]
     evolution_origin                                <- package_clonal_evolution[[11]]
