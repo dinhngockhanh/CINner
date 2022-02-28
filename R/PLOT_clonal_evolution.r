@@ -76,6 +76,31 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         table_clonal_populations[1,col]         <- vec_total_populations[col]-sum(table_clonal_populations[,col])
     }
     vec_clonal_parentage                        <- c(0,(vec_clonal_parentage+1))
+
+
+
+#----------------------------------------------Remove unnecessary clones
+#   Find unnecessary clones
+    vec_unnecessary_clones                      <- c()
+    for (clone in 1:nrow(table_clonal_populations)){
+        if (all(table_clonal_populations[clone,]==0)){
+            vec_unnecessary_clones              <- c(vec_unnecessary_clones,clone)
+        }
+    }
+#   Rewire clones to new mother clones
+    for (clone_daughter in 1:length(vec_clonal_parentage)){
+        clone_mother                            <- vec_clonal_parentage[clone_daughter]
+        while ((clone_mother!=0) & (is.element(clone_mother,vec_unnecessary_clones))){
+            clone_mother                        <- vec_clonal_parentage[clone_mother]
+        }
+        vec_clonal_parentage[clone_daughter]    <- clone_mother
+    }
+#   Remove unnecessary clones from existence
+    table_clonal_populations                    <- table_clonal_populations[-vec_unnecessary_clones,]
+    vec_clonal_parentage                        <- vec_clonal_parentage[-vec_unnecessary_clones]
+
+
+
 #-----------------Scale the clonal populations to match total population
     max_total_population                        <- max(vec_total_populations)
     for (col in 1:length(vec_time_plot)){
