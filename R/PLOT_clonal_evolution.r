@@ -84,7 +84,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 #---------------Conform clonal populations to nested format of fish plot
     table_clonal_populations_tmp                <- table_clonal_populations
 
-    for (clone_daughter in 1:length(clone_phylogeny_all_genotypes)){
+    for (clone_daughter in 1:length(vec_clonal_parentage)){
         clone_mother                                <- vec_clonal_parentage[clone_daughter]
         while (clone_mother>0){
             table_clonal_populations[clone_mother,] <- table_clonal_populations[clone_mother,]+table_clonal_populations_tmp[clone_daughter,]+0.01
