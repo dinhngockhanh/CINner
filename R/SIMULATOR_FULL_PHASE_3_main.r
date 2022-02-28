@@ -484,6 +484,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
 #           Update phylogeny in our style
             clone_phylogeny_origin[clone_node_1]                    <- clone_node_mother
             clone_phylogeny_origin[clone_node_2]                    <- clone_node_mother
+
+print('------------------')
+print(clone_node_mother)
+print(cell_node_mother)
+
             clone_phylogeny_elapsed_genotypes[[clone_node_mother]]  <- unique(phylogeny_elapsed_genotypes[[cell_node_mother]])
 
             clone_phylogeny_elapsed_genotypes[[clone_node_1]]       <- unique(c(clone_phylogeny_elapsed_genotypes[[clone_node_1]],phylogeny_elapsed_genotypes[[cell_node_1]]))
