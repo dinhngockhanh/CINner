@@ -179,9 +179,24 @@ BUILD_general_variables <- function(model_name                           = 'MODE
 
 BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
                                  vec_driver_genes   = c(),
-                                 vec_driver_role    = c()){
+                                 vec_driver_role    = c(),
+                                 vec_chromosome     = -1,
+                                 vec_bin            = -1){
 #-------------------------------------------Input the Cancer Gene Census
     DATA_cancer_gene_census             <- read.csv('../data/cancer_gene_census.csv')
+#-----------------------------------------------Build the driver library
+    columns                             <- c('Gene_ID','Gene_role')
+    TABLE_CANCER_GENES                  <- data.frame(vec_driver_genes,vec_driver_role)
+    if (length(vec_chromosome)<length(vec_driver_genes)){
+        TABLE_CANCER_GENES$Chromosome   <- 0
+    }
+    if (any(vec_chromosome==-1)){
+        TABLE_CANCER_GENES$Chromosome   <- 0
+    }
+    if (any(vec_bin==-1)){
+        TABLE_CANCER_GENES$Bin          <- 0
+    }
+
 
 
     print(DATA_cancer_gene_census)
