@@ -1,0 +1,55 @@
+---
+title: "How to use Cancer Simulator"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to use Cancer Simulator}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning=FALSE, message=FALSE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+devtools::install_github("dinhngockhanh/CancerSimulator")
+
+
+library(ggplot2)
+library(signals)
+library(dendextend)
+library(fishplot)
+
+library(CancerSimulator)
+
+devtools::load_all()
+devtools::document()
+```
+
+# Set up model variables
+Cancer Simulator requires several csv files containing variables to set up the simulations. Here we detail how to easily build these files.
+
+Let's give a name to the model.
+
+```{r}
+MODEL             <- 'EXPERIMENT-1'
+```
+
+## General variables for every cell
+The first step is to specify the variables describing every cell during the process:
+
+```{r}
+cell_lifespan     <- list(7,'day')
+T_0               <- list(0,'year')
+T_end             <- list(80,'year')
+```
+
+
+
+```{r}
+BUILD_simulator_variables(cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end)
+```
