@@ -53,9 +53,9 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 
 
         if (length(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]])==0){
-            fish_labels[[clone_phylogeny_mother_node]]                  <- fish_labels[[clone_phylogeny_daughter_node_1]]
+            fish_labels[clone_phylogeny_mother_node]                    <- fish_labels[clone_phylogeny_daughter_node_1]
         }else{if (length(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]])==0){
-            fish_labels[[clone_phylogeny_mother_node]]                  <- fish_labels[[clone_phylogeny_daughter_node_2]]
+            fish_labels[clone_phylogeny_mother_node]                    <- fish_labels[clone_phylogeny_daughter_node_2]
         }}
 
 
