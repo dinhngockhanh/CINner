@@ -161,10 +161,10 @@ vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
                        'ONCOGENE','TSG')
 ```
 
-The function `BUILD_driver_library` builds the driver library, completed with the location of each driver in the genome (this information comes from crosschecking with the Cancer Gene Census database)
+The function `BUILD_driver_library` builds the driver library. If the chromosome and bin locations of the drivers are not given, the function will find them by crosschecking with the Cancer Gene Census database.
 
 ```{r}
-BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
-                     vec_driver_genes=vec_driver_genes,
-                     vec_driver_role=vec_driver_role)
+MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
+                                          vec_driver_genes=vec_driver_genes,
+                                          vec_driver_role=vec_driver_role)
 ```
