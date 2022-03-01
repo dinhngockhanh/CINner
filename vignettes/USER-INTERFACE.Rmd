@@ -40,16 +40,25 @@ MODEL             <- 'EXPERIMENT-1'
 ```
 
 ## General variables for every cell
-The first step is to specify the variables describing every cell during the process:
+The first step is to specify the variables describing every cell during the process. The cells are assumed to have the same expected lifespan (regardless of their driver or CN profiles). The cell lifespan is always in days.
 
 ```{r}
-cell_lifespan     <- list(4,'day')
+cell_lifespan     <- 4
+```
+
+Next, we specify the times at the beginning and the end of the simulation. The unit can be `day`, `week`, `month` or `year`.
+
+```{r}
 T_0               <- list(1,'year')
 T_end             <- list(10,'year')
 ```
 
-
+An important variable is the size of CN bins. By default, this will be 500,000 bp.
 
 ```{r}
-BUILD_simulator_variables(cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end)
+CN_bin_length     <- 500000
+```
+
+```{r}
+BUILD_simulator_variables(model_name=MODEL,cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end,CN_bin_length=CN_bin_length)
 ```

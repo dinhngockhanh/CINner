@@ -28,8 +28,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     for (i in 1:nrow(TABLE_VARIABLES)) {
         assign(TABLE_VARIABLES[i,1],TABLE_VARIABLES[i,2],envir=.GlobalEnv)
     }
-    T_start_time                            <<- age_birth*365
-    T_end_time                              <<- age_end*365
 
 
 

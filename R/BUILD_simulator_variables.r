@@ -1,8 +1,10 @@
-BUILD_simulator_variables <- function(cell_lifespan     = 4,
+BUILD_simulator_variables <- function(model_name        = 'MODEL',
+                                      cell_lifespan     = 4,
                                       T_0               = list(0,'year'),
                                       T_end             = list(100,'year'),
                                       Population_end    = Inf,
-                                      Max_events        = Inf){
+                                      Max_events        = Inf,
+                                      CN_bin_length     = 500000){
 
 print(cell_lifespan)
 print(T_0)
@@ -53,6 +55,12 @@ print(T_end)
 #   Set up cell lifespan
     N_row                           <- N_row+1
     TABLE_VARIABLES[N_row,]         <- c('cell_lifespan',cell_lifespan,'day','Lifespan of one cell')
+#   Set up CN bin width
+    N_row                           <- N_row+1
+    TABLE_VARIABLES[N_row,]         <- c('size_CN_block_DNA',CN_bin_length,'bp','CN bin width')
+
+
+
 
 
 
