@@ -154,7 +154,7 @@ print('~~~~~~~~~~~~~~~~~~~~~~')
 print(table_clonal_populations)
 
 
-    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot,clone.labels=fish_labels])
+    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot,clone.labels=fish_labels)
 
     fish    <- layoutClones(fish)
 
