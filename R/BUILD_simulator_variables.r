@@ -208,14 +208,7 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
     for (gene in 1:length(vec_driver_genes)){
         Gene_ID                             <- vec_driver_genes[gene]
         loc                                 <- which(DATA_cancer_gene_census$Gene.Symbol==Gene_ID)
-        Gene_address                        <- DATA_cancer_gene_census$GenomeLocation[loc]
-
-print('-------------')
-print(DATA_cancer_gene_census$Gene.Symbol)
-print(loc)
-print(Gene_ID)
-print(Gene_address)
-
+        Gene_address                        <- DATA_cancer_gene_census$Genome.Location[loc]
         Gene_chromosome                     <- as.numeric(sub(':.*','',Gene_address))
         Gene_bin                            <- round(as.numeric(sub('-.*','',sub('.*:','',Gene_address)))/size_CN_block_DNA)
         TABLE_CANCER_GENES$Chromosome[gene] <- Gene_chromosome
