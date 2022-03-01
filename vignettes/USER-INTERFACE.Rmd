@@ -43,9 +43,9 @@ MODEL             <- 'EXPERIMENT-1'
 The first step is to specify the variables describing every cell during the process:
 
 ```{r}
-cell_lifespan     <- list(7,'day')
-T_0               <- list(0,'year')
-T_end             <- list(80,'year')
+cell_lifespan     <- list(4,'day')
+T_0               <- list(1,'year')
+T_end             <- list(10,'year')
 ```
 
 
