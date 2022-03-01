@@ -20,11 +20,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     clone_hclust_merge                              <- package_clone_phylogeny[[8]]
 
     N_clones                                        <- length(clone_phylogeny_labels)
-
-
-    fish_labels                                     <- c(1:(length(clone_phylogeny_genotype)-N_clones),clone_phylogeny_labels)
-
-
 #----------------------------Build the genotype list for each clone node
     clone_phylogeny_all_genotypes                                       <- vector('list',length=length(clone_phylogeny_genotype))
 #   Initialize genotype lists for clone leaves
@@ -50,15 +45,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         clone_phylogeny_all_genotypes[[clone_phylogeny_mother_node]]    <- mother_genotypes
         clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]]<- setdiff(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]],mother_genotypes)
         clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]]<- setdiff(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]],mother_genotypes)
-
-
-        if (length(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_1]])==0){
-            fish_labels[clone_phylogeny_mother_node]                    <- fish_labels[clone_phylogeny_daughter_node_1]
-        }else{if (length(clone_phylogeny_all_genotypes[[clone_phylogeny_daughter_node_2]])==0){
-            fish_labels[clone_phylogeny_mother_node]                    <- fish_labels[clone_phylogeny_daughter_node_2]
-        }}
-
-
     }
 #---------------------------------Find clonal populations as time series
     table_clonal_populations                                            <- matrix(0,nrow=length(clone_phylogeny_all_genotypes),ncol=length(vec_time_plot))
@@ -86,11 +72,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         table_clonal_populations[1,col]                                 <- vec_total_populations[col]-sum(table_clonal_populations[,col])
     }
     vec_clonal_parentage                                                <- c(0,(vec_clonal_parentage+1))
-
-
-    fish_labels                                                         <- c('OTHER',fish_labels)
-
-
 #----------------------------------------------Remove unnecessary clones
 #-----------------------------------------i.e. clones that are always 0%
 #   Find unnecessary clones
@@ -111,11 +92,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
 #   Remove unnecessary clones from existence
     table_clonal_populations                                            <- table_clonal_populations[-vec_unnecessary_clones,]
     vec_clonal_parentage                                                <- vec_clonal_parentage[-vec_unnecessary_clones]
-
-
-    fish_labels                                                         <- fish_labels[-vec_unnecessary_clones]
-
-
 #-----------------Scale the clonal populations to match total population
     max_total_population                                                <- max(vec_total_populations)
     for (col in 1:length(vec_time_plot)){
@@ -145,24 +121,15 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     if (unit=='year'){
         vec_time_plot                           <- vec_time_plot/365
     }
+    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot)
 
-print('~~~~~~~~~~~~~~~~~~~~~~')
-print(fish_labels)
-print('~~~~~~~~~~~~~~~~~~~~~~')
-print(vec_clonal_parentage)
-print('~~~~~~~~~~~~~~~~~~~~~~')
-print(table_clonal_populations)
-
-
-    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot,clone.labels=fish_labels)
+    # fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot,clone.labels=fish_labels)
 
     fish    <- layoutClones(fish)
 
-    # fishPlot(fish,shape="spline",title.btm="Sample1",cex.title=0.5)
-
     fishPlot(fish,shape="spline")
 
-    drawLegend(fish)
+    # drawLegend(fish)
 
     dev <- dev.off()
 
