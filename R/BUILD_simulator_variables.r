@@ -252,8 +252,15 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
                                      drivers            = ''){
 #------------------------------Update initial clones - other information
     if (is.null(MODEL_VARIABLES$initial_others)){
-        columns                                 <- c('Clone','Cell_count','Drivers')
-        TABLE_INITIAL_OTHERS                    <- data.frame(1,cell_count,drivers)
+        columns                                             <- c('Clone','Cell_count','Drivers')
+        TABLE_INITIAL_OTHERS                                <- data.frame(1,cell_count,drivers)
+        colnames(TABLE_INITIAL_OTHERS)                      <- columns
+        I_clone                                             <- 1
+    }else{
+        I_clone                                             <- nrow((MODEL_VARIABLES$initial_others))+1
+        MODEL_VARIABLES$initial_others$Clone[I_clone]       <- I_clone
+        MODEL_VARIABLES$initial_others$Cell_count[I_clone]  <- cell_count
+        MODEL_VARIABLES$initial_others$Drivers[I_clone]     <- drivers
     }
 
 
