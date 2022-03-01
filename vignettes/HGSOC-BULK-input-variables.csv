@@ -20,15 +20,16 @@ prob_CN_cnloh_interstitial_length,,,Geometric parameter for the block length of 
 prob_CN_cnloh_terminal_length,,,Geometric parameter for the block length of a terminal CN-LOH event
 rate_driver,,per bp per cell division,Poisson rate of getting new driver mutations
 rate_passenger,9e-11,per bp per cell division,Poisson rate of getting new passenger mutations
-
 bound_driver,3,driver count,Maximum driver count in viable cells (cells exceeding this will die)
 bound_ploidy,10,local CN,Maximum local CN in viable cells (cells exceeding this will die)
-
 SFS_totalsteps,50,,Bin count in SFS data
 prob_coverage,0.05,,Mean coverage depth
 alpha_coverage,0.7,,Alpha parameter for coverage depth
 lower_limit_cell_counts,0,,Lower limit of cell counts for mutations to be detected
 lower_limit_alt_counts,3,,Lower limit of alternate read counts for mutations to be detected
 lower_limit_tot_counts,0,,Lower limit of total read counts for mutations to be detected
+
+
+
 
 N_sample,500,cell count,Number of cells in sequencing sample (Inf if sampling every cell)

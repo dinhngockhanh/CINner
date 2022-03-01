@@ -3,6 +3,7 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
                                                    T_0                                  = list(0,'year'),
                                                    T_end                                = list(100,'year'),
                                                    T_tau_step                           = 3,
+                                                   table_population_dynamics            = matrix(0,ncol=2,nrow=2),
                                                    Population_end                       = Inf,
                                                    Max_events                           = Inf,
                                                    CN_bin_length                        = 500000,
@@ -53,6 +54,10 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     age_end_unit                        <- T_end[[2]]
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('age_end',age_end,age_end_unit,'Age when simulation stops')
+    if (age_birth_unit!=age_end_unit){
+        print('START AND END TIMES DO NOT USE THE SAME UNIT')
+    }
+
     if (age_end_unit=='day'){
         T_end_time                      <- age_end
     }else{if (age_end_unit=='week'){
@@ -125,12 +130,6 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     TABLE_VARIABLES[N_row,]             <- c('lower_limit_alt_counts',lower_limit_alt_counts,'','Lower limit of alternate read counts for mutations to be detected')
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('lower_limit_tot_counts',lower_limit_tot_counts,'','Lower limit of total read counts for mutations to be detected')
-
-
-
-
-
-
 #-----------------------Build model input file for chromosome bin counts
 #-----------------------------------------------and centromere locations
     vec_chromosome_name                 <- c(1:22,'X','Y')
@@ -146,12 +145,30 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
                                              17.9,          17.6,           19,             36.6,
                                              24,            17.2,           26.5,           27.5,
                                              13.2,          14.7,           60.6,           10.4)*10^6
-    vec_bin_count                           <- ceiling(vec_chromosome_bp/CN_bin_length)
+    vec_bin_count                       <- ceiling(vec_chromosome_bp/CN_bin_length)
     vec_centromere_location             <- round(vec_centromere_bp/CN_bin_length)
 #   Set up table of chromosome bin counts and centromere locations
     columns                             <- c('Chromosome','Bin_count','Centromere_location')
     TABLE_CHROMOSOME_CN_INFO            <- data.frame(vec_chromosome_name,vec_bin_count,vec_centromere_location)
     colnames(TABLE_CHROMOSOME_CN_INFO)  <- columns
+#--------Build model input file for population dynamics
+    vec_time_points                     <- table_population_dynamics[,1]
+    vec_cell_count                      <- table_population_dynamics[,2]
+
+    if (age_birth_unit=='day'){
+        vec_time_points                 <- 1*vec_time_points
+    }else{if (age_birth_unit=='week'){
+        vec_time_points                 <- 7*vec_time_points
+    }else{if (age_birth_unit=='month'){
+        vec_time_points                 <- 30*vec_time_points
+    }else{if (age_birth_unit=='year'){
+        vec_time_points                 <- 365*vec_time_points
+    }}}}
+
+    columns                             <- c('Age_in_day','Total_cell_count')
+    TABLE_POPULATION_DYNAMICS           <- data.frame(vec_time_points,vec_cell_count)
+
+
 
 
 
@@ -160,4 +177,5 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
 
     print(TABLE_VARIABLES)
     print(TABLE_CHROMOSOME_CN_INFO)
+    print(TABLE_POPULATION_DYNAMICS)
 }

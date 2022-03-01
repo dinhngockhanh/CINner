@@ -207,13 +207,17 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         selection_rate                      <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block)
         initial_selection_rate[clone]       <<- selection_rate
     }
+
+
+
+
 #---Set up total population dynamics as function of age (in days)
     for (i in 1:ncol(TABLE_POPULATION_DYNAMICS)) {
         assign(colnames(TABLE_POPULATION_DYNAMICS)[i],TABLE_POPULATION_DYNAMICS[,i],envir=.GlobalEnv)
     }
-    vec_age_in_days                         <- 365*Age_in_year
+    vec_age_in_days                         <- Age_in_day
     vec_total_cell_count                    <- Total_cell_count
-    linear_app_fun                          <<- approxfun(c(-100*365, vec_age_in_days, 200*365),c(vec_total_cell_count[1], vec_total_cell_count, tail(vec_total_cell_count,1)),method="linear")
+    linear_app_fun                          <<- approxfun(c(T_start_time-300, vec_age_in_days, T_end_time+300),c(vec_total_cell_count[1], vec_total_cell_count, tail(vec_total_cell_count,1)),method="linear")
     func_expected_population                <<- function(time) linear_app_fun(time)
 #---Set up event rate as function of time (in days)
     func_event_rate                         <<- function(time) 1/cell_lifespan

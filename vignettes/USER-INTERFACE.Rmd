@@ -49,8 +49,8 @@ cell_lifespan                       <- 7
 Next, we specify the times at the beginning and the end of the simulation. The unit can be `day`, `week`, `month` or `year`.
 
 ```{r}
-T_0                                 <- list(1,'year')
-T_end                               <- list(10,'year')
+T_0                                 <- list(0,'year')
+T_end                               <- list(80,'year')
 ```
 
 We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
@@ -100,6 +100,19 @@ bound_driver                        <- 3
 bound_ploidy                        <- 20
 ```
 
+Finally, we need to set up the growth model for the total cell population. The algorithm is designed to follow any dynamics (within the limit imposed by how fast the cells can divide, defined by their lifespan). Note that to avoid cases where the simulations are terminated prematurely because of the stochasticity, the population size should not decrease to below about 10 cells at any time.
+
+We build one vector for the time points (in the same unit as `T_0` and `T_end`, therefore in years in this case), and another vector for the corresponding expected population sizes. As an example, we use the logistic function.
+
+```{r}
+vec_time                            <- T_0:T_end
+L                                   <- 10000
+t_0                                 <- 20
+k                                   <- 0.3
+vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
+table_population_dynamics           <- cbind(vec_time,vec_cell_count)
+```
+
 
 
 
@@ -125,5 +138,6 @@ BUILD_simulator_variables_from_scratch(model_name=MODEL,
                                        rate_driver=rate_driver,
                                        rate_passenger=rate_passenger,
                                        bound_driver=bound_driver,
-                                       bound_ploidy=bound_ploidy)
+                                       bound_ploidy=bound_ploidy,
+                                       table_population_dynamics=table_population_dynamics)
 ```
