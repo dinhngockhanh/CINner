@@ -91,9 +91,9 @@ cell_count        <- 10
 
 CN_arm            <- c(rep('AB',46),rep('',2))
 # CN_arm[1]         <- 'AA'
-# CN_focal          <- list(list(1,1,10,'AAB'),
-#                           list(2,10,20,''))
-CN_focal          <- list()
+CN_focal          <- list(list(1,1,10,'AAB'),
+                          list(2,10,20,''))
+# CN_focal          <- list()
 
 drivers           <- ''
 

@@ -319,11 +319,8 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
                 }
             }
 
-            vec_cols                                        <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(MODEL_VARIABLES$initial_cn)))
+            vec_cols                                        <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(TABLE_INITIAL_CN)))
             TABLE_INITIAL_CN[vec_rows,vec_cols]             <- 'NA'
-
-print(vec_rows)
-print(vec_cols)
 
             if (length(vec_alleles)==0){
                 next
