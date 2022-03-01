@@ -161,10 +161,21 @@ vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
                        'ONCOGENE','TSG')
 ```
 
+We then give each driver a selective strength. The higher it is, the more likely the mutated cell will escape death and the faster it reaches fixation.
+
+```{r}
+vec_driver_s      <- c(0.01,0.01,0.01,0.01,0.01,0.01,
+                       0.01,0.01,0.01,0.01,0.01,0.01,
+                       0.01,0.01)
+```
+
+
+
 The function `BUILD_driver_library` builds the driver library. If the chromosome and bin locations of the drivers are not given, the function will find them by crosschecking with the Cancer Gene Census database.
 
 ```{r}
 MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
                                           vec_driver_genes=vec_driver_genes,
-                                          vec_driver_role=vec_driver_role)
+                                          vec_driver_role=vec_driver_role,
+                                          vec_driver_s=vec_driver_s)
 ```
