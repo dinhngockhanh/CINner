@@ -326,7 +326,7 @@ print(vec_rows)
 print(vec_cols)
 
 
-            if (length(vec_alleles)==0){
+            if (nchar(vec_alleles)==0){
                 next
             }
 
