@@ -1,10 +1,10 @@
 Variable,Value,Unit,Note
+
 age_birth,-0.4,year,Age when simulation starts with 1 normal cell
 age_end,84,year,Age when simulation stops
 Population_end,Inf,cell count,Condition for ending simulation (Inf if no condition)
 Max_events,Inf,event count,Condition for ending simulation (Inf if no condition)
 cell_lifespan,7,day,Lifespan of one cell
-
 size_CN_block_DNA,500000,bp,CN bin width
 
 prob_CN_whole_genome_duplication,,per cell division,Probability for a cell division to harbor a WGD event
