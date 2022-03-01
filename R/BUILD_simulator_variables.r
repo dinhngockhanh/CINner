@@ -258,9 +258,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         I_clone                                             <- 1
     }else{
         I_clone                                             <- nrow((MODEL_VARIABLES$initial_others))+1
-        MODEL_VARIABLES$initial_others$Clone[I_clone]       <- I_clone
-        MODEL_VARIABLES$initial_others$Cell_count[I_clone]  <- cell_count
-        MODEL_VARIABLES$initial_others$Drivers[I_clone]     <- drivers
+        MODEL_VARIABLES[I_clone,]                           <- c(1,cell_count,drivers)
     }
 
 
