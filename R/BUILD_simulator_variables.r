@@ -181,9 +181,6 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
                                  vec_chromosome     = -1,
                                  vec_bin            = -1,
                                  vec_driver_s       = c()){
-
-print(vec_driver_s)
-
 #-------------------------------------------Input the Cancer Gene Census
     DATA_cancer_gene_census             <- read.csv('../data/cancer_gene_census.csv')
 #-----------------------------------------------Build the driver library
@@ -217,7 +214,7 @@ print(vec_driver_s)
     }
 #------------------Supplement driver library with allele selection rates
 
-
+print(TABLE_CANCER_GENES)
 
 #   Count the number of TSGs and ONCOGENEs
     count_TSG                           <- sum(TABLE_CANCER_GENES$Gene_role=='TSG')
