@@ -312,12 +312,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         vec_alleles                                         <- CN_focal[[i]][[4]]
         vec_rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
 
-print(chrom)
-print(bin_start)
-print(bin_end)
-print(vec_alleles)
-print(length(CN_focal))
-print(i)
+print(vec_rows)
 
         if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
             for (strand in 1:(nchar(vec_alleles)-max_no_strands)){

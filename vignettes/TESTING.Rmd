@@ -99,6 +99,7 @@ drivers           <- ''
 MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                        cell_count=cell_count,
                                        CN_arm=CN_arm,
+                                       CN_focal=CN_focal,
                                        drivers=drivers)
 
 
