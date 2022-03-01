@@ -154,7 +154,6 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
 #--------Build model input file for population dynamics
     vec_time_points                     <- table_population_dynamics[,1]
     vec_cell_count                      <- table_population_dynamics[,2]
-
     if (age_birth_unit=='day'){
         vec_time_points                 <- 1*vec_time_points
     }else{if (age_birth_unit=='week'){
@@ -164,9 +163,9 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     }else{if (age_birth_unit=='year'){
         vec_time_points                 <- 365*vec_time_points
     }}}}
-
     columns                             <- c('Age_in_day','Total_cell_count')
     TABLE_POPULATION_DYNAMICS           <- data.frame(vec_time_points,vec_cell_count)
+    colnames(TABLE_POPULATION_DYNAMICS) <- columns
 
 
 

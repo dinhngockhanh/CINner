@@ -105,7 +105,7 @@ Finally, we need to set up the growth model for the total cell population. The a
 We build one vector for the time points (in the same unit as `T_0` and `T_end`, therefore in years in this case), and another vector for the corresponding expected population sizes. As an example, we use the logistic function.
 
 ```{r}
-vec_time                            <- T_0:T_end
+vec_time                            <- T_0[[1]]:T_end[[1]]
 L                                   <- 10000
 t_0                                 <- 20
 k                                   <- 0.3
