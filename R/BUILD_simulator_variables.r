@@ -219,6 +219,10 @@ print(TABLE_CANCER_GENES)
 #   Count the number of TSGs and ONCOGENEs
     count_TSG                           <- sum(TABLE_CANCER_GENES$Gene_role=='TSG')
     count_ONCOGENE                      <- sum(TABLE_CANCER_GENES$Gene_role=='ONCOGENE')
+
+print(count_TSG)
+print(count_ONCOGENE)
+
 #---Compute selection rates for TSGs
     list_TSG                            <- which(TABLE_CANCER_GENES$Gene_role=='TSG')
     s_normalization                     <- 1
@@ -249,6 +253,6 @@ print(TABLE_CANCER_GENES)
 
 
 #----------------------------------------Output the model variable files
-    MODEL_VARIABLES$TABLE_CANCER_GENES          <- TABLE_CANCER_GENES
+    MODEL_VARIABLES$driver_library      <- TABLE_CANCER_GENES
     return(MODEL_VARIABLES)
 }
