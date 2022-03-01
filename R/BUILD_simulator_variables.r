@@ -1,21 +1,23 @@
-BUILD_simulator_variables <- function(model_name                        = 'MODEL',
-                                      cell_lifespan                     = 4,
-                                      T_0                               = list(0,'year'),
-                                      T_end                             = list(100,'year'),
-                                      Population_end                    = Inf,
-                                      Max_events                        = Inf,
-                                      CN_bin_length                     = 500000,
-                                      prob_CN_whole_genome_duplication  = 0,
-                                      prob_CN_missegregation            = 0,
-                                      prob_CN_chrom_arm_missegregation  = 0,
-                                      prob_CN_focal_amplification       = 0,
-                                      prob_CN_focal_deletion            = 0,
-                                      prob_CN_cnloh_interstitial        = 0,
-                                      prob_CN_cnloh_terminal            = 0,
-                                      prob_CN_focal_amplification_length= 0.1,
-                                      prob_CN_focal_deletion_length     = 0.1,
-                                      prob_CN_cnloh_interstitial_length = 0.1,
-                                      prob_CN_cnloh_terminal_length     = 0.1){
+BUILD_simulator_variables_from_scratch <- function(model_name                           = 'MODEL',
+                                                   cell_lifespan                        = 4,
+                                                   T_0                                  = list(0,'year'),
+                                                   T_end                                = list(100,'year'),
+                                                   Population_end                       = Inf,
+                                                   Max_events                           = Inf,
+                                                   CN_bin_length                        = 500000,
+                                                   prob_CN_whole_genome_duplication     = 0,
+                                                   prob_CN_missegregation               = 0,
+                                                   prob_CN_chrom_arm_missegregation     = 0,
+                                                   prob_CN_focal_amplification          = 0,
+                                                   prob_CN_focal_deletion               = 0,
+                                                   prob_CN_cnloh_interstitial           = 0,
+                                                   prob_CN_cnloh_terminal               = 0,
+                                                   prob_CN_focal_amplification_length   = 0.1,
+                                                   prob_CN_focal_deletion_length        = 0.1,
+                                                   prob_CN_cnloh_interstitial_length    = 0.1,
+                                                   prob_CN_cnloh_terminal_length        = 0.1,
+                                                   rate_driver                          = 0,
+                                                   rate_passenger                       = 0){
 #---------------------------Build model input file for general variables
     columns                             <- c('Variable','Value','Unit','Note')
     TABLE_VARIABLES                     <- data.frame(matrix(nrow=0,ncol=length(columns)))
@@ -88,6 +90,11 @@ BUILD_simulator_variables <- function(model_name                        = 'MODEL
     TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_interstitial_length',prob_CN_cnloh_interstitial_length,'','Geometric parameter for the block length of an interstitial CN-LOH event')
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_terminal_length',prob_CN_cnloh_terminal_length,'','Geometric parameter for the block length of a terminal CN-LOH event')
+#   Set up mutation rates
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('rate_driver',rate_driver,'per bp per cell division','Poisson rate of getting new driver mutations')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('rate_passenger',rate_passenger,'per bp per cell division','Poisson rate of getting new passenger mutations')
 
 
 
