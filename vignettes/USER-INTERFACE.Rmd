@@ -59,7 +59,7 @@ An important variable is the size of CN bins. By default, this will be 500,000 b
 CN_bin_length     <- 500000
 ```
 
-We have to set up the probability that each class of CN events occurs in a cell division. The local events (chromosome, chromosome-arm or focal level), if happening, will occur on a random eligible location.
+We have to set up the probability that each class of CN events occurs in a cell division. The local events (chromosome, chromosome-arm or focal level), if happening, will occur on a random location among eligible places.
 
 ```{r}
 prob_CN_whole_genome_duplication    <- 1e-6
@@ -69,6 +69,15 @@ prob_CN_focal_amplification         <- 1e-6
 prob_CN_focal_deletion              <- 1e-6
 prob_CN_cnloh_interstitial          <- 1e-6
 prob_CN_cnloh_terminal              <- 1e-6
+```
+
+The focal and CNLOH events require the geometric parameters for the length (in bin count) of the DNA region being affected.
+
+```{r}
+prob_CN_focal_amplification_length  <- 0.1
+prob_CN_focal_deletion_length       <- 0.1
+prob_CN_cnloh_interstitial_length   <- 0.1
+prob_CN_cnloh_terminal_length       <- 0.1
 ```
 
 
@@ -85,5 +94,9 @@ BUILD_simulator_variables(model_name=MODEL,
                           prob_CN_focal_amplification=prob_CN_focal_amplification,
                           prob_CN_focal_deletion=prob_CN_focal_deletion,
                           prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
-                          prob_CN_cnloh_terminal=prob_CN_cnloh_terminal)
+                          prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
+                          prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
+                          prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
+                          prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
+                          prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length)
 ```
