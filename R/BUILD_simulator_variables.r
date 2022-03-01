@@ -212,6 +212,7 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
 
 print('-------------')
 print(DATA_cancer_gene_census$Gene.Symbol)
+print(loc)
 print(Gene_ID)
 print(Gene_address)
 
