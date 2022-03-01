@@ -314,7 +314,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             vec_rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
 
             if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
-                for (strand in 1:(nchar(vec_alleles)-max_no_strands)){
+                for (strand in max_no_strands:(nchar(vec_alleles)-max_no_strands)){
                     TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
                 }
             }
