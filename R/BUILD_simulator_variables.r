@@ -182,20 +182,20 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
                                  vec_bin            = -1,
                                  vec_driver_s       = c()){
 #-------------------------------------------Input the Cancer Gene Census
-    DATA_cancer_gene_census             <- read.csv('../data/cancer_gene_census.csv')
+    DATA_cancer_gene_census                     <- read.csv('../data/cancer_gene_census.csv')
 #-----------------------------------------------Build the driver library
-    columns                             <- c('Gene_ID','Gene_role','Selective_strength')
-    TABLE_CANCER_GENES                  <- data.frame(vec_driver_genes,vec_driver_role,vec_driver_s)
-    colnames(TABLE_CANCER_GENES)        <- columns
+    columns                                     <- c('Gene_ID','Gene_role','Selective_strength')
+    TABLE_CANCER_GENES                          <- data.frame(vec_driver_genes,vec_driver_role,vec_driver_s)
+    colnames(TABLE_CANCER_GENES)                <- columns
     if (any(vec_chromosome==-1)){
-        TABLE_CANCER_GENES$Chromosome   <- -1
+        TABLE_CANCER_GENES$Chromosome           <- -1
     }else{
-        TABLE_CANCER_GENES$Chromosome   <- vec_chromosome
+        TABLE_CANCER_GENES$Chromosome           <- vec_chromosome
     }
     if (any(vec_bin==-1)){
-        TABLE_CANCER_GENES$Bin          <- -1
+        TABLE_CANCER_GENES$Bin                  <- -1
     }else{
-        TABLE_CANCER_GENES$Bin          <- vec_bin
+        TABLE_CANCER_GENES$Bin                  <- vec_bin
     }
 #--------------------------Supplement driver library with gene locations
     if ((any(TABLE_CANCER_GENES$Chromosome==-1)==TRUE) | (any(TABLE_CANCER_GENES$Bin==-1)==TRUE)){
@@ -213,35 +213,47 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
         }
     }
 #------------------Supplement driver library with allele selection rates
-
-print(TABLE_CANCER_GENES)
-
 #   Count the number of TSGs and ONCOGENEs
-    count_TSG                           <- sum(TABLE_CANCER_GENES$Gene_role=='TSG')
-    count_ONCOGENE                      <- sum(TABLE_CANCER_GENES$Gene_role=='ONCOGENE')
+    count_TSG                                   <- sum(TABLE_CANCER_GENES$Gene_role=='TSG')
+    count_ONCOGENE                              <- sum(TABLE_CANCER_GENES$Gene_role=='ONCOGENE')
 #---Compute selection rates for TSGs
-    list_TSG                            <- which(TABLE_CANCER_GENES$Gene_role=='TSG')
-    s_normalization                     <- 1
+    list_TSG                                    <- which(TABLE_CANCER_GENES$Gene_role=='TSG')
+    s_normalization                             <- 1
     for (driver in 1:length(list_TSG)){
-        row                             <- list_TSG[driver]
+        row                                     <- list_TSG[driver]
 #       Get its selection strength
-        driver_sel_rate                 <- vec_driver_s[row]
+        driver_sel_rate                         <- vec_driver_s[row]
 #       Compute its selection rate for WT and MUT alleles
-        TABLE_CANCER_GENES$s_rate_WT[row]   <- 1/(1+driver_sel_rate)
-        TABLE_CANCER_GENES$s_rate_MUT[row]  <- 1
+        TABLE_CANCER_GENES$s_rate_WT[row]       <- 1/(1+driver_sel_rate)
+        TABLE_CANCER_GENES$s_rate_MUT[row]      <- 1
 #       Update normalizer for selection rate
-        s_normalization                 <- s_normalization*(1+driver_sel_rate)
+        s_normalization                         <- s_normalization*(1+driver_sel_rate)
     }
 #---Compute selection rates for ONCOGENEs
-    s_normalization                     <- s_normalization^(1/count_ONCOGENE)
-    list_ONCOGENE                       <- which(TABLE_CANCER_GENES$Gene_role=='ONCOGENE')
+    s_normalization                             <- s_normalization^(1/count_ONCOGENE)
+    list_ONCOGENE                               <- which(TABLE_CANCER_GENES$Gene_role=='ONCOGENE')
     for (driver in 1:length(list_ONCOGENE)){
-        row                             <- list_ONCOGENE[driver]
+        row                                     <- list_ONCOGENE[driver]
 #       Get its selection strength
-        driver_sel_rate                 <- vec_driver_s[row]
+        driver_sel_rate                         <- vec_driver_s[row]
 #       Compute its selection rate for WT and MUT alleles
-        TABLE_CANCER_GENES$s_rate_WT[row]   <- s_normalization
-        TABLE_CANCER_GENES$s_rate_MUT[row]  <- s_normalization*(1+driver_sel_rate)
+        TABLE_CANCER_GENES$s_rate_WT[row]       <- s_normalization
+        TABLE_CANCER_GENES$s_rate_MUT[row]      <- s_normalization*(1+driver_sel_rate)
+    }
+#----------------------------------------Output the model variable files
+    MODEL_VARIABLES$driver_library              <- TABLE_CANCER_GENES
+    return(MODEL_VARIABLES)
+}
+
+BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
+                                     cell_count         = 1,
+                                     CN_arm             = c(rep('AB',46),rep('',2)),
+                                     CN_focal           = c(),
+                                     drivers            = c()){
+#------------------------------Update initial clones - other information
+    if (is.null(MODEL_VARIABLES$initial_others)){
+        columns                                 <- c('Clone','Cell_count','Drivers')
+        TABLE_INITIAL_OTHERS                    <- data.frame(1,cell_count,drivers)
     }
 
 
@@ -249,6 +261,6 @@ print(TABLE_CANCER_GENES)
 
 
 #----------------------------------------Output the model variable files
-    MODEL_VARIABLES$driver_library      <- TABLE_CANCER_GENES
+    MODEL_VARIABLES$initial_others              <- TABLE_INITIAL_OTHERS
     return(MODEL_VARIABLES)
 }

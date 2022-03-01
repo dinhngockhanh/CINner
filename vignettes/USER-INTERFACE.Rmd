@@ -141,8 +141,6 @@ MODEL_VARIABLES   <- BUILD_general_variables(cell_lifespan=cell_lifespan,
                         table_population_dynamics=table_population_dynamics)
 ```
 
-
-
 ## Driver library
 
 We first define a list of drivers to include in the model:
@@ -169,8 +167,6 @@ vec_driver_s      <- c(0.01,0.01,0.01,0.01,0.01,0.01,
                        0.01,0.01)
 ```
 
-
-
 The function `BUILD_driver_library` builds the driver library. If the chromosome and bin locations of the drivers are not given, the function will find them by crosschecking with the Cancer Gene Census database.
 
 ```{r}
@@ -178,4 +174,43 @@ MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
                                           vec_driver_genes=vec_driver_genes,
                                           vec_driver_role=vec_driver_role,
                                           vec_driver_s=vec_driver_s)
+```
+
+## Initial cell population
+
+Assume we have 20 cells at `T_0`. We can link the cells to clones sharing the same driver and CN profile.
+
+Let's start with having 10 cells with normal female diploid genotype. There would be two strands of each chromosome (strand `A` and strand `B`) from chromosome 1 to X, and no chromosome Y. There is no drivers.
+
+```{r}
+cell_count        <- 10
+CN_arm            <- c(rep('AB',46),rep('',2))
+CN_focal          <- c()
+drivers           <- c()
+
+MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
+                                          cell_count=cell_count,
+                                          CN_arm=CN_arm,
+                                          drivers=drivers)
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+print(MODEL_VARIABLES$general_variables)
+
+print(MODEL_VARIABLES$cn_info)
+
+print(MODEL_VARIABLES$population_dynamics)
+
+print(MODEL_VARIABLES$driver_library)
+
+print(MODEL_VARIABLES$initial_others)
 ```

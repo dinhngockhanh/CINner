@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>How to use Cancer Simulator</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">How to use Cancer Simulator</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;dinhngockhanh/CancerSimulator&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="kw">library</span>(signals)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">library</span>(dendextend)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="kw">library</span>(fishplot)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="kw">library</span>(CancerSimulator)</span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a>devtools<span class="op">::</span><span class="kw">load_all</span>()</span>
+<span id="cb1-12"><a href="#cb1-12"></a>devtools<span class="op">::</span><span class="kw">document</span>()</span></code></pre></div>
+<div id="set-up-model-variables" class="section level1">
+<h1>Set up model variables</h1>
+<p>Cancer Simulator requires several csv files containing variables to set up the simulations. Here we detail how to easily build these files.</p>
+<p>Let’s give a name to the model.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>MODEL                               &lt;-<span class="st"> &#39;EXPERIMENT-1&#39;</span></span></code></pre></div>
+<div id="general-variables-for-every-cell" class="section level2">
+<h2>General variables for every cell</h2>
+<p>The first step is to specify the variables describing every cell during the process. The cells are assumed to have the same expected lifespan (regardless of their driver or CN profiles). The cell lifespan is always in days.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>cell_lifespan                       &lt;-<span class="st"> </span><span class="dv">7</span></span></code></pre></div>
+<p>Next, we specify the times at the beginning and the end of the simulation. The unit can be <code>day</code>, <code>week</code>, <code>month</code> or <code>year</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>T_<span class="dv">0</span>                                 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dv">0</span>,<span class="st">&#39;year&#39;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>T_end                               &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dv">80</span>,<span class="st">&#39;year&#39;</span>)</span></code></pre></div>
+<p>We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie’s algorithm, but it also means increasing runtime. By default, we use tau = 3 days.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>T_tau_step                          &lt;-<span class="st"> </span><span class="dv">3</span></span></code></pre></div>
+<p>An important variable is the size of CN bins. By default, this will be 500,000 bp.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>CN_bin_length                       &lt;-<span class="st"> </span><span class="dv">500000</span></span></code></pre></div>
+<p>We have to set up the probability that each class of CN events occurs in a cell division. The local events (chromosome, chromosome-arm or focal level), if happening, will occur on a random location among eligible places.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>prob_CN_whole_genome_duplication    &lt;-<span class="st"> </span><span class="fl">1e-6</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>prob_CN_missegregation              &lt;-<span class="st"> </span><span class="fl">1e-6</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>prob_CN_chrom_arm_missegregation    &lt;-<span class="st"> </span><span class="fl">1e-6</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>prob_CN_focal_amplification         &lt;-<span class="st"> </span><span class="fl">1e-6</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>prob_CN_focal_deletion              &lt;-<span class="st"> </span><span class="fl">1e-6</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>prob_CN_cnloh_interstitial          &lt;-<span class="st"> </span><span class="fl">1e-6</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>prob_CN_cnloh_terminal              &lt;-<span class="st"> </span><span class="fl">1e-6</span></span></code></pre></div>
+<p>The focal and CNLOH events require the geometric parameters for the length (in bin count) of the DNA region being affected.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>prob_CN_focal_amplification_length  &lt;-<span class="st"> </span><span class="fl">0.1</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>prob_CN_focal_deletion_length       &lt;-<span class="st"> </span><span class="fl">0.1</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>prob_CN_cnloh_interstitial_length   &lt;-<span class="st"> </span><span class="fl">0.1</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>prob_CN_cnloh_terminal_length       &lt;-<span class="st"> </span><span class="fl">0.1</span></span></code></pre></div>
+<p>Next, we set up the mutation rates for drivers and passengers, per bp per cell division.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>rate_driver                         &lt;-<span class="st"> </span><span class="fl">1e-16</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>rate_passenger                      &lt;-<span class="st"> </span><span class="fl">1e-11</span></span></code></pre></div>
+<p>We can also set up the upper limits for the driver count and local CN for a cell to still be viable.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>bound_driver                        &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>bound_ploidy                        &lt;-<span class="st"> </span><span class="dv">20</span></span></code></pre></div>
+<p>Finally, we need to set up the growth model for the total cell population. The algorithm is designed to follow any dynamics (within the limit imposed by how fast the cells can divide, defined by their lifespan). Note that to avoid cases where the simulations are terminated prematurely because of the stochasticity, the population size should not decrease to below about 10 cells at any time.</p>
+<p>We build one vector for the time points (in the same unit as <code>T_0</code> and <code>T_end</code>, therefore in years in this case), and another vector for the corresponding expected population sizes. As an example, we use the logistic function.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>vec_time                            &lt;-<span class="st"> </span>T_<span class="dv">0</span>[[<span class="dv">1</span>]]<span class="op">:</span>T_end[[<span class="dv">1</span>]]</span>
+<span id="cb11-2"><a href="#cb11-2"></a>L                                   &lt;-<span class="st"> </span><span class="dv">10000</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>t_<span class="dv">0</span>                                 &lt;-<span class="st"> </span><span class="dv">20</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>k                                   &lt;-<span class="st"> </span><span class="fl">0.3</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>vec_cell_count                      &lt;-<span class="st"> </span>L<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>k<span class="op">*</span>(vec_time<span class="op">-</span>t_<span class="dv">0</span>)))</span>
+<span id="cb11-6"><a href="#cb11-6"></a>table_population_dynamics           &lt;-<span class="st"> </span><span class="kw">cbind</span>(vec_time,vec_cell_count)</span></code></pre></div>
+<p>Finally, we build the model variable files, using function <code>BUILD_general_variables</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>MODEL_VARIABLES   &lt;-<span class="st"> </span><span class="kw">BUILD_general_variables</span>(<span class="dt">cell_lifespan=</span>cell_lifespan,</span>
+<span id="cb12-2"><a href="#cb12-2"></a>                        <span class="dt">T_0=</span>T_<span class="dv">0</span>,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>                        <span class="dt">T_end=</span>T_end,</span>
+<span id="cb12-4"><a href="#cb12-4"></a>                        <span class="dt">T_tau_step=</span>T_tau_step,</span>
+<span id="cb12-5"><a href="#cb12-5"></a>                        <span class="dt">CN_bin_length=</span>CN_bin_length,</span>
+<span id="cb12-6"><a href="#cb12-6"></a>                        <span class="dt">prob_CN_whole_genome_duplication=</span>prob_CN_whole_genome_duplication,</span>
+<span id="cb12-7"><a href="#cb12-7"></a>                        <span class="dt">prob_CN_missegregation=</span>prob_CN_missegregation,</span>
+<span id="cb12-8"><a href="#cb12-8"></a>                        <span class="dt">prob_CN_chrom_arm_missegregation=</span>prob_CN_chrom_arm_missegregation,</span>
+<span id="cb12-9"><a href="#cb12-9"></a>                        <span class="dt">prob_CN_focal_amplification=</span>prob_CN_focal_amplification,</span>
+<span id="cb12-10"><a href="#cb12-10"></a>                        <span class="dt">prob_CN_focal_deletion=</span>prob_CN_focal_deletion,</span>
+<span id="cb12-11"><a href="#cb12-11"></a>                        <span class="dt">prob_CN_cnloh_interstitial=</span>prob_CN_cnloh_interstitial,</span>
+<span id="cb12-12"><a href="#cb12-12"></a>                        <span class="dt">prob_CN_cnloh_terminal=</span>prob_CN_cnloh_terminal,</span>
+<span id="cb12-13"><a href="#cb12-13"></a>                        <span class="dt">prob_CN_focal_amplification_length=</span>prob_CN_focal_amplification_length,</span>
+<span id="cb12-14"><a href="#cb12-14"></a>                        <span class="dt">prob_CN_focal_deletion_length=</span>prob_CN_focal_deletion_length,</span>
+<span id="cb12-15"><a href="#cb12-15"></a>                        <span class="dt">prob_CN_cnloh_interstitial_length=</span>prob_CN_cnloh_interstitial_length,</span>
+<span id="cb12-16"><a href="#cb12-16"></a>                        <span class="dt">prob_CN_cnloh_terminal_length=</span>prob_CN_cnloh_terminal_length,</span>
+<span id="cb12-17"><a href="#cb12-17"></a>                        <span class="dt">rate_driver=</span>rate_driver,</span>
+<span id="cb12-18"><a href="#cb12-18"></a>                        <span class="dt">rate_passenger=</span>rate_passenger,</span>
+<span id="cb12-19"><a href="#cb12-19"></a>                        <span class="dt">bound_driver=</span>bound_driver,</span>
+<span id="cb12-20"><a href="#cb12-20"></a>                        <span class="dt">bound_ploidy=</span>bound_ploidy,</span>
+<span id="cb12-21"><a href="#cb12-21"></a>                        <span class="dt">table_population_dynamics=</span>table_population_dynamics)</span></code></pre></div>
+</div>
+<div id="driver-library" class="section level2">
+<h2>Driver library</h2>
+<p>We first define a list of drivers to include in the model:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>vec_driver_genes  &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;TP53&#39;</span>,<span class="st">&#39;BRCA1&#39;</span>,<span class="st">&#39;BRCA2&#39;</span>,<span class="st">&#39;MSH2&#39;</span>,<span class="st">&#39;MSH6&#39;</span>,<span class="st">&#39;ARID1A&#39;</span>,</span>
+<span id="cb13-2"><a href="#cb13-2"></a>                       <span class="st">&#39;STK11&#39;</span>,<span class="st">&#39;BRAF&#39;</span>,<span class="st">&#39;MLH1&#39;</span>,<span class="st">&#39;PIK3R1&#39;</span>,<span class="st">&#39;ERBB2&#39;</span>,<span class="st">&#39;CTNNB1&#39;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>                       <span class="st">&#39;AKT1&#39;</span>,<span class="st">&#39;PPP2R1A&#39;</span>)</span></code></pre></div>
+<p>For each driver, we need to decide if it behaves as a TSG or an oncogene. Note that the algorithm requires at least one gene of each type to behave properly.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>vec_driver_role   &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;TSG&#39;</span>,</span>
+<span id="cb14-2"><a href="#cb14-2"></a>                       <span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;ONCOGENE&#39;</span>,<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;TSG&#39;</span>,<span class="st">&#39;ONCOGENE&#39;</span>,<span class="st">&#39;ONCOGENE&#39;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3"></a>                       <span class="st">&#39;ONCOGENE&#39;</span>,<span class="st">&#39;TSG&#39;</span>)</span></code></pre></div>
+<p>We then give each driver a selective strength. The higher it is, the more likely the mutated cell will escape death and the faster it reaches fixation.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>vec_driver_s      &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,</span>
+<span id="cb15-2"><a href="#cb15-2"></a>                       <span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,<span class="fl">0.01</span>,</span>
+<span id="cb15-3"><a href="#cb15-3"></a>                       <span class="fl">0.01</span>,<span class="fl">0.01</span>)</span></code></pre></div>
+<p>The function <code>BUILD_driver_library</code> builds the driver library. If the chromosome and bin locations of the drivers are not given, the function will find them by crosschecking with the Cancer Gene Census database.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>MODEL_VARIABLES   &lt;-<span class="st"> </span><span class="kw">BUILD_driver_library</span>(<span class="dt">MODEL_VARIABLES=</span>MODEL_VARIABLES,</span>
+<span id="cb16-2"><a href="#cb16-2"></a>                                          <span class="dt">vec_driver_genes=</span>vec_driver_genes,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>                                          <span class="dt">vec_driver_role=</span>vec_driver_role,</span>
+<span id="cb16-4"><a href="#cb16-4"></a>                                          <span class="dt">vec_driver_s=</span>vec_driver_s)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">head</span>(MODEL_VARIABLES)</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="co">#&gt; $general_variables</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt;                              Variable Value                     Unit</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt; 1                           age_birth     0                     year</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#&gt; 2                        T_start_time     0                      day</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="co">#&gt; 3                             age_end    80                     year</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a><span class="co">#&gt; 4                          T_end_time 29200                      day</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a><span class="co">#&gt; 5                          T_tau_step     3                      day</span></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="co">#&gt; 6                      Population_end   Inf               cell count</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="co">#&gt; 7                          Max_events   Inf              event count</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a><span class="co">#&gt; 8                       cell_lifespan     7                      day</span></span>
+<span id="cb17-12"><a href="#cb17-12"></a><span class="co">#&gt; 9                   size_CN_block_DNA 5e+05                       bp</span></span>
+<span id="cb17-13"><a href="#cb17-13"></a><span class="co">#&gt; 10   prob_CN_whole_genome_duplication 1e-06        per cell division</span></span>
+<span id="cb17-14"><a href="#cb17-14"></a><span class="co">#&gt; 11             prob_CN_missegregation 1e-06        per cell division</span></span>
+<span id="cb17-15"><a href="#cb17-15"></a><span class="co">#&gt; 12   prob_CN_chrom_arm_missegregation 1e-06        per cell division</span></span>
+<span id="cb17-16"><a href="#cb17-16"></a><span class="co">#&gt; 13        prob_CN_focal_amplification 1e-06        per cell division</span></span>
+<span id="cb17-17"><a href="#cb17-17"></a><span class="co">#&gt; 14             prob_CN_focal_deletion 1e-06        per cell division</span></span>
+<span id="cb17-18"><a href="#cb17-18"></a><span class="co">#&gt; 15         prob_CN_cnloh_interstitial 1e-06        per cell division</span></span>
+<span id="cb17-19"><a href="#cb17-19"></a><span class="co">#&gt; 16             prob_CN_cnloh_terminal 1e-06        per cell division</span></span>
+<span id="cb17-20"><a href="#cb17-20"></a><span class="co">#&gt; 17 prob_CN_focal_amplification_length   0.1                         </span></span>
+<span id="cb17-21"><a href="#cb17-21"></a><span class="co">#&gt; 18      prob_CN_focal_deletion_length   0.1                         </span></span>
+<span id="cb17-22"><a href="#cb17-22"></a><span class="co">#&gt; 19  prob_CN_cnloh_interstitial_length   0.1                         </span></span>
+<span id="cb17-23"><a href="#cb17-23"></a><span class="co">#&gt; 20      prob_CN_cnloh_terminal_length   0.1                         </span></span>
+<span id="cb17-24"><a href="#cb17-24"></a><span class="co">#&gt; 21                        rate_driver 1e-16 per bp per cell division</span></span>
+<span id="cb17-25"><a href="#cb17-25"></a><span class="co">#&gt; 22                     rate_passenger 1e-11 per bp per cell division</span></span>
+<span id="cb17-26"><a href="#cb17-26"></a><span class="co">#&gt; 23                       bound_driver     3             driver count</span></span>
+<span id="cb17-27"><a href="#cb17-27"></a><span class="co">#&gt; 24                       bound_ploidy    20                 local CN</span></span>
+<span id="cb17-28"><a href="#cb17-28"></a><span class="co">#&gt; 25                     SFS_totalsteps    25                         </span></span>
+<span id="cb17-29"><a href="#cb17-29"></a><span class="co">#&gt; 26                      prob_coverage  0.05                         </span></span>
+<span id="cb17-30"><a href="#cb17-30"></a><span class="co">#&gt; 27                     alpha_coverage   0.7                         </span></span>
+<span id="cb17-31"><a href="#cb17-31"></a><span class="co">#&gt; 28            lower_limit_cell_counts     0                         </span></span>
+<span id="cb17-32"><a href="#cb17-32"></a><span class="co">#&gt; 29             lower_limit_alt_counts     3                         </span></span>
+<span id="cb17-33"><a href="#cb17-33"></a><span class="co">#&gt; 30             lower_limit_tot_counts     0                         </span></span>
+<span id="cb17-34"><a href="#cb17-34"></a><span class="co">#&gt;                                                                                Note</span></span>
+<span id="cb17-35"><a href="#cb17-35"></a><span class="co">#&gt; 1                                                        Age when simulation starts</span></span>
+<span id="cb17-36"><a href="#cb17-36"></a><span class="co">#&gt; 2                                     Age when simulation starts (for internal use)</span></span>
+<span id="cb17-37"><a href="#cb17-37"></a><span class="co">#&gt; 3                                                         Age when simulation stops</span></span>
+<span id="cb17-38"><a href="#cb17-38"></a><span class="co">#&gt; 4                                      Age when simulation stops (for internal use)</span></span>
+<span id="cb17-39"><a href="#cb17-39"></a><span class="co">#&gt; 5                                Time step for tau-leaping algorithm for simulation</span></span>
+<span id="cb17-40"><a href="#cb17-40"></a><span class="co">#&gt; 6                             Condition for ending simulation (Inf if no condition)</span></span>
+<span id="cb17-41"><a href="#cb17-41"></a><span class="co">#&gt; 7                             Condition for ending simulation (Inf if no condition)</span></span>
+<span id="cb17-42"><a href="#cb17-42"></a><span class="co">#&gt; 8                                                              Lifespan of one cell</span></span>
+<span id="cb17-43"><a href="#cb17-43"></a><span class="co">#&gt; 9                                                                      CN bin width</span></span>
+<span id="cb17-44"><a href="#cb17-44"></a><span class="co">#&gt; 10                            Probability for a cell division to harbor a WGD event</span></span>
+<span id="cb17-45"><a href="#cb17-45"></a><span class="co">#&gt; 11     Probability for a cell division to harbor a chromosome mis-segregation event</span></span>
+<span id="cb17-46"><a href="#cb17-46"></a><span class="co">#&gt; 12 Probability for a cell division to harbor a chromosome-arm mis-segregation event</span></span>
+<span id="cb17-47"><a href="#cb17-47"></a><span class="co">#&gt; 13            Probability for a cell division to harbor a focal amplification event</span></span>
+<span id="cb17-48"><a href="#cb17-48"></a><span class="co">#&gt; 14                 Probability for a cell division to harbor a focal deletion event</span></span>
+<span id="cb17-49"><a href="#cb17-49"></a><span class="co">#&gt; 15           Probability for a cell division to harbor an interstitial CN-LOH event</span></span>
+<span id="cb17-50"><a href="#cb17-50"></a><span class="co">#&gt; 16                Probability for a cell division to harbor a terminal CN-LOH event</span></span>
+<span id="cb17-51"><a href="#cb17-51"></a><span class="co">#&gt; 17          Geometric parameter for the block length of a focal amplification event</span></span>
+<span id="cb17-52"><a href="#cb17-52"></a><span class="co">#&gt; 18               Geometric parameter for the block length of a focal deletion event</span></span>
+<span id="cb17-53"><a href="#cb17-53"></a><span class="co">#&gt; 19         Geometric parameter for the block length of an interstitial CN-LOH event</span></span>
+<span id="cb17-54"><a href="#cb17-54"></a><span class="co">#&gt; 20              Geometric parameter for the block length of a terminal CN-LOH event</span></span>
+<span id="cb17-55"><a href="#cb17-55"></a><span class="co">#&gt; 21                                     Poisson rate of getting new driver mutations</span></span>
+<span id="cb17-56"><a href="#cb17-56"></a><span class="co">#&gt; 22                                  Poisson rate of getting new passenger mutations</span></span>
+<span id="cb17-57"><a href="#cb17-57"></a><span class="co">#&gt; 23             Maximum driver count in viable cells (cells exceeding this will die)</span></span>
+<span id="cb17-58"><a href="#cb17-58"></a><span class="co">#&gt; 24                 Maximum local CN in viable cells (cells exceeding this will die)</span></span>
+<span id="cb17-59"><a href="#cb17-59"></a><span class="co">#&gt; 25                                                            Bin count in SFS data</span></span>
+<span id="cb17-60"><a href="#cb17-60"></a><span class="co">#&gt; 26                                                              Mean coverage depth</span></span>
+<span id="cb17-61"><a href="#cb17-61"></a><span class="co">#&gt; 27                                               Alpha parameter for coverage depth</span></span>
+<span id="cb17-62"><a href="#cb17-62"></a><span class="co">#&gt; 28                          Lower limit of cell counts for mutations to be detected</span></span>
+<span id="cb17-63"><a href="#cb17-63"></a><span class="co">#&gt; 29                Lower limit of alternate read counts for mutations to be detected</span></span>
+<span id="cb17-64"><a href="#cb17-64"></a><span class="co">#&gt; 30                    Lower limit of total read counts for mutations to be detected</span></span>
+<span id="cb17-65"><a href="#cb17-65"></a><span class="co">#&gt; </span></span>
+<span id="cb17-66"><a href="#cb17-66"></a><span class="co">#&gt; $cn_info</span></span>
+<span id="cb17-67"><a href="#cb17-67"></a><span class="co">#&gt;    Chromosome Bin_count Centromere_location</span></span>
+<span id="cb17-68"><a href="#cb17-68"></a><span class="co">#&gt; 1           1       498                 250</span></span>
+<span id="cb17-69"><a href="#cb17-69"></a><span class="co">#&gt; 2           2       485                 187</span></span>
+<span id="cb17-70"><a href="#cb17-70"></a><span class="co">#&gt; 3           3       397                 182</span></span>
+<span id="cb17-71"><a href="#cb17-71"></a><span class="co">#&gt; 4           4       381                 101</span></span>
+<span id="cb17-72"><a href="#cb17-72"></a><span class="co">#&gt; 5           5       364                  97</span></span>
+<span id="cb17-73"><a href="#cb17-73"></a><span class="co">#&gt; 6           6       342                 122</span></span>
+<span id="cb17-74"><a href="#cb17-74"></a><span class="co">#&gt; 7           7       319                 120</span></span>
+<span id="cb17-75"><a href="#cb17-75"></a><span class="co">#&gt; 8           8       291                  91</span></span>
+<span id="cb17-76"><a href="#cb17-76"></a><span class="co">#&gt; 9           9       277                  98</span></span>
+<span id="cb17-77"><a href="#cb17-77"></a><span class="co">#&gt; 10         10       268                  80</span></span>
+<span id="cb17-78"><a href="#cb17-78"></a><span class="co">#&gt; 11         11       271                 107</span></span>
+<span id="cb17-79"><a href="#cb17-79"></a><span class="co">#&gt; 12         12       267                  72</span></span>
+<span id="cb17-80"><a href="#cb17-80"></a><span class="co">#&gt; 13         13       229                  36</span></span>
+<span id="cb17-81"><a href="#cb17-81"></a><span class="co">#&gt; 14         14       215                  35</span></span>
+<span id="cb17-82"><a href="#cb17-82"></a><span class="co">#&gt; 15         15       204                  38</span></span>
+<span id="cb17-83"><a href="#cb17-83"></a><span class="co">#&gt; 16         16       181                  73</span></span>
+<span id="cb17-84"><a href="#cb17-84"></a><span class="co">#&gt; 17         17       167                  48</span></span>
+<span id="cb17-85"><a href="#cb17-85"></a><span class="co">#&gt; 18         18       161                  34</span></span>
+<span id="cb17-86"><a href="#cb17-86"></a><span class="co">#&gt; 19         19       118                  53</span></span>
+<span id="cb17-87"><a href="#cb17-87"></a><span class="co">#&gt; 20         20       129                  55</span></span>
+<span id="cb17-88"><a href="#cb17-88"></a><span class="co">#&gt; 21         21        94                  26</span></span>
+<span id="cb17-89"><a href="#cb17-89"></a><span class="co">#&gt; 22         22       102                  29</span></span>
+<span id="cb17-90"><a href="#cb17-90"></a><span class="co">#&gt; 23          X       313                 121</span></span>
+<span id="cb17-91"><a href="#cb17-91"></a><span class="co">#&gt; 24          Y       115                  21</span></span>
+<span id="cb17-92"><a href="#cb17-92"></a><span class="co">#&gt; </span></span>
+<span id="cb17-93"><a href="#cb17-93"></a><span class="co">#&gt; $population_dynamics</span></span>
+<span id="cb17-94"><a href="#cb17-94"></a><span class="co">#&gt;    Age_in_day Total_cell_count</span></span>
+<span id="cb17-95"><a href="#cb17-95"></a><span class="co">#&gt; 1           0         24.72623</span></span>
+<span id="cb17-96"><a href="#cb17-96"></a><span class="co">#&gt; 2         365         33.34807</span></span>
+<span id="cb17-97"><a href="#cb17-97"></a><span class="co">#&gt; 3         730         44.96273</span></span>
+<span id="cb17-98"><a href="#cb17-98"></a><span class="co">#&gt; 4        1095         60.59801</span></span>
+<span id="cb17-99"><a href="#cb17-99"></a><span class="co">#&gt; 5        1460         81.62571</span></span>
+<span id="cb17-100"><a href="#cb17-100"></a><span class="co">#&gt; 6        1825        109.86943</span></span>
+<span id="cb17-101"><a href="#cb17-101"></a><span class="co">#&gt; 7        2190        147.74032</span></span>
+<span id="cb17-102"><a href="#cb17-102"></a><span class="co">#&gt; 8        2555        198.40306</span></span>
+<span id="cb17-103"><a href="#cb17-103"></a><span class="co">#&gt; 9        2920        265.96994</span></span>
+<span id="cb17-104"><a href="#cb17-104"></a><span class="co">#&gt; 10       3285        355.71189</span></span>
+<span id="cb17-105"><a href="#cb17-105"></a><span class="co">#&gt; 11       3650        474.25873</span></span>
+<span id="cb17-106"><a href="#cb17-106"></a><span class="co">#&gt; 12       4015        629.73356</span></span>
+<span id="cb17-107"><a href="#cb17-107"></a><span class="co">#&gt; 13       4380        831.72696</span></span>
+<span id="cb17-108"><a href="#cb17-108"></a><span class="co">#&gt; 14       4745       1090.96821</span></span>
+<span id="cb17-109"><a href="#cb17-109"></a><span class="co">#&gt; 15       5110       1418.51065</span></span>
+<span id="cb17-110"><a href="#cb17-110"></a><span class="co">#&gt; 16       5475       1824.25524</span></span>
+<span id="cb17-111"><a href="#cb17-111"></a><span class="co">#&gt; 17       5840       2314.75217</span></span>
+<span id="cb17-112"><a href="#cb17-112"></a><span class="co">#&gt; 18       6205       2890.50497</span></span>
+<span id="cb17-113"><a href="#cb17-113"></a><span class="co">#&gt; 19       6570       3543.43694</span></span>
+<span id="cb17-114"><a href="#cb17-114"></a><span class="co">#&gt; 20       6935       4255.57483</span></span>
+<span id="cb17-115"><a href="#cb17-115"></a><span class="co">#&gt; 21       7300       5000.00000</span></span>
+<span id="cb17-116"><a href="#cb17-116"></a><span class="co">#&gt; 22       7665       5744.42517</span></span>
+<span id="cb17-117"><a href="#cb17-117"></a><span class="co">#&gt; 23       8030       6456.56306</span></span>
+<span id="cb17-118"><a href="#cb17-118"></a><span class="co">#&gt; 24       8395       7109.49503</span></span>
+<span id="cb17-119"><a href="#cb17-119"></a><span class="co">#&gt; 25       8760       7685.24783</span></span>
+<span id="cb17-120"><a href="#cb17-120"></a><span class="co">#&gt; 26       9125       8175.74476</span></span>
+<span id="cb17-121"><a href="#cb17-121"></a><span class="co">#&gt; 27       9490       8581.48935</span></span>
+<span id="cb17-122"><a href="#cb17-122"></a><span class="co">#&gt; 28       9855       8909.03179</span></span>
+<span id="cb17-123"><a href="#cb17-123"></a><span class="co">#&gt; 29      10220       9168.27304</span></span>
+<span id="cb17-124"><a href="#cb17-124"></a><span class="co">#&gt; 30      10585       9370.26644</span></span>
+<span id="cb17-125"><a href="#cb17-125"></a><span class="co">#&gt; 31      10950       9525.74127</span></span>
+<span id="cb17-126"><a href="#cb17-126"></a><span class="co">#&gt; 32      11315       9644.28811</span></span>
+<span id="cb17-127"><a href="#cb17-127"></a><span class="co">#&gt; 33      11680       9734.03006</span></span>
+<span id="cb17-128"><a href="#cb17-128"></a><span class="co">#&gt; 34      12045       9801.59694</span></span>
+<span id="cb17-129"><a href="#cb17-129"></a><span class="co">#&gt; 35      12410       9852.25968</span></span>
+<span id="cb17-130"><a href="#cb17-130"></a><span class="co">#&gt; 36      12775       9890.13057</span></span>
+<span id="cb17-131"><a href="#cb17-131"></a><span class="co">#&gt; 37      13140       9918.37429</span></span>
+<span id="cb17-132"><a href="#cb17-132"></a><span class="co">#&gt; 38      13505       9939.40199</span></span>
+<span id="cb17-133"><a href="#cb17-133"></a><span class="co">#&gt; 39      13870       9955.03727</span></span>
+<span id="cb17-134"><a href="#cb17-134"></a><span class="co">#&gt; 40      14235       9966.65193</span></span>
+<span id="cb17-135"><a href="#cb17-135"></a><span class="co">#&gt; 41      14600       9975.27377</span></span>
+<span id="cb17-136"><a href="#cb17-136"></a><span class="co">#&gt; 42      14965       9981.67061</span></span>
+<span id="cb17-137"><a href="#cb17-137"></a><span class="co">#&gt; 43      15330       9986.41480</span></span>
+<span id="cb17-138"><a href="#cb17-138"></a><span class="co">#&gt; 44      15695       9989.93229</span></span>
+<span id="cb17-139"><a href="#cb17-139"></a><span class="co">#&gt; 45      16060       9992.53971</span></span>
+<span id="cb17-140"><a href="#cb17-140"></a><span class="co">#&gt; 46      16425       9994.47221</span></span>
+<span id="cb17-141"><a href="#cb17-141"></a><span class="co">#&gt; 47      16790       9995.90433</span></span>
+<span id="cb17-142"><a href="#cb17-142"></a><span class="co">#&gt; 48      17155       9996.96553</span></span>
+<span id="cb17-143"><a href="#cb17-143"></a><span class="co">#&gt; 49      17520       9997.75183</span></span>
+<span id="cb17-144"><a href="#cb17-144"></a><span class="co">#&gt; 50      17885       9998.33442</span></span>
+<span id="cb17-145"><a href="#cb17-145"></a><span class="co">#&gt; 51      18250       9998.76605</span></span>
+<span id="cb17-146"><a href="#cb17-146"></a><span class="co">#&gt; 52      18615       9999.08584</span></span>
+<span id="cb17-147"><a href="#cb17-147"></a><span class="co">#&gt; 53      18980       9999.32276</span></span>
+<span id="cb17-148"><a href="#cb17-148"></a><span class="co">#&gt; 54      19345       9999.49828</span></span>
+<span id="cb17-149"><a href="#cb17-149"></a><span class="co">#&gt; 55      19710       9999.62831</span></span>
+<span id="cb17-150"><a href="#cb17-150"></a><span class="co">#&gt; 56      20075       9999.72464</span></span>
+<span id="cb17-151"><a href="#cb17-151"></a><span class="co">#&gt; 57      20440       9999.79601</span></span>
+<span id="cb17-152"><a href="#cb17-152"></a><span class="co">#&gt; 58      20805       9999.84888</span></span>
+<span id="cb17-153"><a href="#cb17-153"></a><span class="co">#&gt; 59      21170       9999.88805</span></span>
+<span id="cb17-154"><a href="#cb17-154"></a><span class="co">#&gt; 60      21535       9999.91706</span></span>
+<span id="cb17-155"><a href="#cb17-155"></a><span class="co">#&gt; 61      21900       9999.93856</span></span>
+<span id="cb17-156"><a href="#cb17-156"></a><span class="co">#&gt; 62      22265       9999.95448</span></span>
+<span id="cb17-157"><a href="#cb17-157"></a><span class="co">#&gt; 63      22630       9999.96628</span></span>
+<span id="cb17-158"><a href="#cb17-158"></a><span class="co">#&gt; 64      22995       9999.97502</span></span>
+<span id="cb17-159"><a href="#cb17-159"></a><span class="co">#&gt; 65      23360       9999.98149</span></span>
+<span id="cb17-160"><a href="#cb17-160"></a><span class="co">#&gt; 66      23725       9999.98629</span></span>
+<span id="cb17-161"><a href="#cb17-161"></a><span class="co">#&gt; 67      24090       9999.98984</span></span>
+<span id="cb17-162"><a href="#cb17-162"></a><span class="co">#&gt; 68      24455       9999.99248</span></span>
+<span id="cb17-163"><a href="#cb17-163"></a><span class="co">#&gt; 69      24820       9999.99443</span></span>
+<span id="cb17-164"><a href="#cb17-164"></a><span class="co">#&gt; 70      25185       9999.99587</span></span>
+<span id="cb17-165"><a href="#cb17-165"></a><span class="co">#&gt; 71      25550       9999.99694</span></span>
+<span id="cb17-166"><a href="#cb17-166"></a><span class="co">#&gt; 72      25915       9999.99773</span></span>
+<span id="cb17-167"><a href="#cb17-167"></a><span class="co">#&gt; 73      26280       9999.99832</span></span>
+<span id="cb17-168"><a href="#cb17-168"></a><span class="co">#&gt; 74      26645       9999.99876</span></span>
+<span id="cb17-169"><a href="#cb17-169"></a><span class="co">#&gt; 75      27010       9999.99908</span></span>
+<span id="cb17-170"><a href="#cb17-170"></a><span class="co">#&gt; 76      27375       9999.99932</span></span>
+<span id="cb17-171"><a href="#cb17-171"></a><span class="co">#&gt; 77      27740       9999.99949</span></span>
+<span id="cb17-172"><a href="#cb17-172"></a><span class="co">#&gt; 78      28105       9999.99963</span></span>
+<span id="cb17-173"><a href="#cb17-173"></a><span class="co">#&gt; 79      28470       9999.99972</span></span>
+<span id="cb17-174"><a href="#cb17-174"></a><span class="co">#&gt; 80      28835       9999.99979</span></span>
+<span id="cb17-175"><a href="#cb17-175"></a><span class="co">#&gt; 81      29200       9999.99985</span></span>
+<span id="cb17-176"><a href="#cb17-176"></a><span class="co">#&gt; </span></span>
+<span id="cb17-177"><a href="#cb17-177"></a><span class="co">#&gt; $driver_library</span></span>
+<span id="cb17-178"><a href="#cb17-178"></a><span class="co">#&gt;    Gene_ID Gene_role Selective_strength Chromosome Bin s_rate_WT s_rate_MUT</span></span>
+<span id="cb17-179"><a href="#cb17-179"></a><span class="co">#&gt; 1     TP53       TSG               0.01         17  15  0.990099    1.00000</span></span>
+<span id="cb17-180"><a href="#cb17-180"></a><span class="co">#&gt; 2    BRCA1       TSG               0.01         17  86  0.990099    1.00000</span></span>
+<span id="cb17-181"><a href="#cb17-181"></a><span class="co">#&gt; 3    BRCA2       TSG               0.01         13  65  0.990099    1.00000</span></span>
+<span id="cb17-182"><a href="#cb17-182"></a><span class="co">#&gt; 4     MSH2       TSG               0.01          2  95  0.990099    1.00000</span></span>
+<span id="cb17-183"><a href="#cb17-183"></a><span class="co">#&gt; 5     MSH6       TSG               0.01          2  96  0.990099    1.00000</span></span>
+<span id="cb17-184"><a href="#cb17-184"></a><span class="co">#&gt; 6   ARID1A       TSG               0.01          1  53  0.990099    1.00000</span></span>
+<span id="cb17-185"><a href="#cb17-185"></a><span class="co">#&gt; 7    STK11       TSG               0.01         19   2  0.990099    1.00000</span></span>
+<span id="cb17-186"><a href="#cb17-186"></a><span class="co">#&gt; 8     BRAF  ONCOGENE               0.01          7 281  1.025188    1.03544</span></span>
+<span id="cb17-187"><a href="#cb17-187"></a><span class="co">#&gt; 9     MLH1       TSG               0.01          3  74  0.990099    1.00000</span></span>
+<span id="cb17-188"><a href="#cb17-188"></a><span class="co">#&gt; 10  PIK3R1       TSG               0.01          5 136  0.990099    1.00000</span></span>
+<span id="cb17-189"><a href="#cb17-189"></a><span class="co">#&gt; 11   ERBB2  ONCOGENE               0.01         17  79  1.025188    1.03544</span></span>
+<span id="cb17-190"><a href="#cb17-190"></a><span class="co">#&gt; 12  CTNNB1  ONCOGENE               0.01          3  82  1.025188    1.03544</span></span>
+<span id="cb17-191"><a href="#cb17-191"></a><span class="co">#&gt; 13    AKT1  ONCOGENE               0.01         14 210  1.025188    1.03544</span></span>
+<span id="cb17-192"><a href="#cb17-192"></a><span class="co">#&gt; 14 PPP2R1A       TSG               0.01         19 104  0.990099    1.00000</span></span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
