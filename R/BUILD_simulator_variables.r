@@ -215,6 +215,7 @@ print(Gene_address)
 print(sub('.*:','',Gene_address))
 print(sub('-.*','',sub('.*:','',Gene_address)))
 print(as.numeric(sub('-.*','',sub('.*:','',Gene_address))))
+print(size_CN_block_DNA)
 
 # print(DATA_cancer_gene_census)
 
