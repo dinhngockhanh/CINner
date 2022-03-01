@@ -187,14 +187,23 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
 #-----------------------------------------------Build the driver library
     columns                             <- c('Gene_ID','Gene_role')
     TABLE_CANCER_GENES                  <- data.frame(vec_driver_genes,vec_driver_role)
+    colnames(TABLE_CANCER_GENES)        <- columns
     if (length(vec_chromosome)<length(vec_driver_genes)){
         TABLE_CANCER_GENES$Chromosome   <- 0
     }
     if (any(vec_chromosome==-1)){
-        TABLE_CANCER_GENES$Chromosome   <- 0
+        TABLE_CANCER_GENES$Chromosome   <- -1
     }
     if (any(vec_bin==-1)){
-        TABLE_CANCER_GENES$Bin          <- 0
+        TABLE_CANCER_GENES$Bin          <- -1
+    }
+    if ((any(TABLE_CANCER_GENES$Chromosome==-1)==FALSE) & (any(TABLE_CANCER_GENES$Bin==-1)==FALSE)){
+        MODEL_VARIABLES$driver_library  <- TABLE_CANCER_GENES
+        return(MODEL_VARIABLES)
+    }
+#--------------------------Supplement driver library with gene locations
+    for (gene in 1:length(vec_driver_genes)){
+        Gene_ID                         <- vec_driver_genes[gene]
     }
 
 
