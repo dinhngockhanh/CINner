@@ -210,10 +210,11 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
         loc                                 <- which(DATA_cancer_gene_census$Gene.Symbol==Gene_ID)
         Gene_address                        <- DATA_cancer_gene_census$Genome.Location[loc]
 
-print(DATA_cancer_gene_census$Genome.Location)
-print(Gene_ID)
-print(loc)
-print(DATA_cancer_gene_census$Genome.Location[loc])
+
+print(Gene_address)
+print(sub('.*:','',Gene_address))
+print(sub('-.*','',sub('.*:','',Gene_address)))
+print(as.numeric(sub('-.*','',sub('.*:','',Gene_address))))
 
 # print(DATA_cancer_gene_census)
 
