@@ -59,6 +59,31 @@ An important variable is the size of CN bins. By default, this will be 500,000 b
 CN_bin_length     <- 500000
 ```
 
+We have to set up the probability that each class of CN events occurs in a cell division. The local events (chromosome, chromosome-arm or focal level), if happening, will occur on a random eligible location.
+
 ```{r}
-BUILD_simulator_variables(model_name=MODEL,cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end,CN_bin_length=CN_bin_length)
+prob_CN_whole_genome_duplication    <- 1e-6
+prob_CN_missegregation              <- 1e-6
+prob_CN_chrom_arm_missegregation    <- 1e-6
+prob_CN_focal_amplification         <- 1e-6
+prob_CN_focal_deletion              <- 1e-6
+prob_CN_cnloh_interstitial          <- 1e-6
+prob_CN_cnloh_terminal              <- 1e-6
+```
+
+
+
+```{r}
+BUILD_simulator_variables(model_name=MODEL,
+                          cell_lifespan=cell_lifespan,
+                          T_0=T_0,
+                          T_end=T_end,
+                          CN_bin_length=CN_bin_length,
+                          prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
+                          prob_CN_missegregation=prob_CN_missegregation,
+                          prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
+                          prob_CN_focal_amplification=prob_CN_focal_amplification,
+                          prob_CN_focal_deletion=prob_CN_focal_deletion,
+                          prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
+                          prob_CN_cnloh_terminal=prob_CN_cnloh_terminal)
 ```
