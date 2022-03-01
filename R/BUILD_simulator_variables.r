@@ -203,22 +203,12 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
     }
 #--------------------------Supplement driver library with gene locations
 #   Get the CN bin length
-    size_CN_block_DNA                       <- MODEL_VARIABLES$general_variables$Value[MODEL_VARIABLES$general_variables$Variable=='size_CN_block_DNA']
+    size_CN_block_DNA                       <- as.numeric(MODEL_VARIABLES$general_variables$Value[MODEL_VARIABLES$general_variables$Variable=='size_CN_block_DNA'])
 #   Find the chromosome and bin for each driver
     for (gene in 1:length(vec_driver_genes)){
         Gene_ID                             <- vec_driver_genes[gene]
         loc                                 <- which(DATA_cancer_gene_census$Gene.Symbol==Gene_ID)
         Gene_address                        <- DATA_cancer_gene_census$Genome.Location[loc]
-
-
-print(Gene_address)
-print(sub('.*:','',Gene_address))
-print(sub('-.*','',sub('.*:','',Gene_address)))
-print(as.numeric(sub('-.*','',sub('.*:','',Gene_address))))
-print(size_CN_block_DNA)
-
-# print(DATA_cancer_gene_census)
-
         Gene_chromosome                     <- as.numeric(sub(':.*','',Gene_address))
         Gene_bin                            <- round(as.numeric(sub('-.*','',sub('.*:','',Gene_address)))/size_CN_block_DNA)
         TABLE_CANCER_GENES$Chromosome[gene] <- Gene_chromosome
