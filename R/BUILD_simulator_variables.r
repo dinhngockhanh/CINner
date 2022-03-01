@@ -311,7 +311,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         bin_end                                             <- CN_focal[[i]][[3]]
         vec_alleles                                         <- CN_focal[[i]][[4]]
         vec_rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
-        if (nchar(vec_alleles)>max_no_strands){
+        if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
             for (strand in 1:(nchar(vec_alleles)-max_no_strands)){
                 TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
             }
@@ -325,9 +325,9 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         }
 
         for (strand in 1:nchar(vec_alleles)){
-            allele                                      <- substr(vec_alleles,strand,strand)
-            col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-            TABLE_INITIAL_CN[vec_rows,col]              <- allele
+            allele                                          <- substr(vec_alleles,strand,strand)
+            col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+            TABLE_INITIAL_CN[vec_rows,col]                  <- allele
         }
     }
 
