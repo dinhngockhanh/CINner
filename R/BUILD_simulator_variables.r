@@ -219,10 +219,6 @@ print(TABLE_CANCER_GENES)
 #   Count the number of TSGs and ONCOGENEs
     count_TSG                           <- sum(TABLE_CANCER_GENES$Gene_role=='TSG')
     count_ONCOGENE                      <- sum(TABLE_CANCER_GENES$Gene_role=='ONCOGENE')
-
-print(count_TSG)
-print(count_ONCOGENE)
-
 #---Compute selection rates for TSGs
     list_TSG                            <- which(TABLE_CANCER_GENES$Gene_role=='TSG')
     s_normalization                     <- 1
@@ -231,8 +227,8 @@ print(count_ONCOGENE)
 #       Get its selection strength
         driver_sel_rate                 <- vec_driver_s[row]
 #       Compute its selection rate for WT and MUT alleles
-        TABLE_CANCER_GENES$s_rate_WT[row]   <<- 1/(1+driver_sel_rate)
-        TABLE_CANCER_GENES$s_rate_MUT[row]  <<- 1
+        TABLE_CANCER_GENES$s_rate_WT[row]   <- 1/(1+driver_sel_rate)
+        TABLE_CANCER_GENES$s_rate_MUT[row]  <- 1
 #       Update normalizer for selection rate
         s_normalization                 <- s_normalization*(1+driver_sel_rate)
     }
@@ -244,8 +240,8 @@ print(count_ONCOGENE)
 #       Get its selection strength
         driver_sel_rate                 <- vec_driver_s[row]
 #       Compute its selection rate for WT and MUT alleles
-        TABLE_CANCER_GENES$s_rate_WT[row]   <<- s_normalization
-        TABLE_CANCER_GENES$s_rate_MUT[row]  <<- s_normalization*(1+driver_sel_rate)
+        TABLE_CANCER_GENES$s_rate_WT[row]   <- s_normalization
+        TABLE_CANCER_GENES$s_rate_MUT[row]  <- s_normalization*(1+driver_sel_rate)
     }
 
 
