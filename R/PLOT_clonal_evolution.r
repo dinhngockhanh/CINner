@@ -96,7 +96,7 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     for (col in 1:length(vec_time_plot)){
 #       Total population size can only go up to 90% to have leeway with
 #       numerical errors
-        table_clonal_populations[,col]                                  <- 99*table_clonal_populations[,col]/max_total_population
+        table_clonal_populations[,col]                                  <- 49*table_clonal_populations[,col]/max_total_population
     }
 #---------------Conform clonal populations to nested format of fish plot
     table_clonal_populations_tmp                                        <- table_clonal_populations
