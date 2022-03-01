@@ -1,33 +1,34 @@
-BUILD_simulator_variables_from_scratch <- function(model_name                           = 'MODEL',
-                                                   cell_lifespan                        = 4,
-                                                   T_0                                  = list(0,'year'),
-                                                   T_end                                = list(100,'year'),
-                                                   T_tau_step                           = 3,
-                                                   table_population_dynamics            = matrix(0,ncol=2,nrow=2),
-                                                   Population_end                       = Inf,
-                                                   Max_events                           = Inf,
-                                                   CN_bin_length                        = 500000,
-                                                   prob_CN_whole_genome_duplication     = 0,
-                                                   prob_CN_missegregation               = 0,
-                                                   prob_CN_chrom_arm_missegregation     = 0,
-                                                   prob_CN_focal_amplification          = 0,
-                                                   prob_CN_focal_deletion               = 0,
-                                                   prob_CN_cnloh_interstitial           = 0,
-                                                   prob_CN_cnloh_terminal               = 0,
-                                                   prob_CN_focal_amplification_length   = 0.1,
-                                                   prob_CN_focal_deletion_length        = 0.1,
-                                                   prob_CN_cnloh_interstitial_length    = 0.1,
-                                                   prob_CN_cnloh_terminal_length        = 0.1,
-                                                   rate_driver                          = 0,
-                                                   rate_passenger                       = 0,
-                                                   bound_driver                         = 3,
-                                                   bound_ploidy                         = 10,
-                                                   SFS_totalsteps                       = 25,
-                                                   prob_coverage                        = 0.05,
-                                                   alpha_coverage                       = 0.7,
-                                                   lower_limit_cell_counts              = 0,
-                                                   lower_limit_alt_counts               = 3,
-                                                   lower_limit_tot_counts               = 0){
+
+BUILD_general_variables <- function(model_name                           = 'MODEL',
+                                    cell_lifespan                        = 4,
+                                    T_0                                  = list(0,'year'),
+                                    T_end                                = list(100,'year'),
+                                    T_tau_step                           = 3,
+                                    table_population_dynamics            = matrix(0,ncol=2,nrow=2),
+                                    Population_end                       = Inf,
+                                    Max_events                           = Inf,
+                                    CN_bin_length                        = 500000,
+                                    prob_CN_whole_genome_duplication     = 0,
+                                    prob_CN_missegregation               = 0,
+                                    prob_CN_chrom_arm_missegregation     = 0,
+                                    prob_CN_focal_amplification          = 0,
+                                    prob_CN_focal_deletion               = 0,
+                                    prob_CN_cnloh_interstitial           = 0,
+                                    prob_CN_cnloh_terminal               = 0,
+                                    prob_CN_focal_amplification_length   = 0.1,
+                                    prob_CN_focal_deletion_length        = 0.1,
+                                    prob_CN_cnloh_interstitial_length    = 0.1,
+                                    prob_CN_cnloh_terminal_length        = 0.1,
+                                    rate_driver                          = 0,
+                                    rate_passenger                       = 0,
+                                    bound_driver                         = 3,
+                                    bound_ploidy                         = 10,
+                                    SFS_totalsteps                       = 25,
+                                    prob_coverage                        = 0.05,
+                                    alpha_coverage                       = 0.7,
+                                    lower_limit_cell_counts              = 0,
+                                    lower_limit_alt_counts               = 3,
+                                    lower_limit_tot_counts               = 0){
 #---------------------------Build model input file for general variables
     columns                             <- c('Variable','Value','Unit','Note')
     TABLE_VARIABLES                     <- data.frame(matrix(nrow=0,ncol=length(columns)))
@@ -151,7 +152,7 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     columns                             <- c('Chromosome','Bin_count','Centromere_location')
     TABLE_CHROMOSOME_CN_INFO            <- data.frame(vec_chromosome_name,vec_bin_count,vec_centromere_location)
     colnames(TABLE_CHROMOSOME_CN_INFO)  <- columns
-#--------Build model input file for population dynamics
+#-------------------------Build model input file for population dynamics
     vec_time_points                     <- table_population_dynamics[,1]
     vec_cell_count                      <- table_population_dynamics[,2]
     if (age_birth_unit=='day'){
@@ -166,11 +167,24 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     columns                             <- c('Age_in_day','Total_cell_count')
     TABLE_POPULATION_DYNAMICS           <- data.frame(vec_time_points,vec_cell_count)
     colnames(TABLE_POPULATION_DYNAMICS) <- columns
-
-    MODEL_VARIABLES                     <- list()
+#----------------------------------------Output the model variable files
+    if (exists('MODEL_VARIABLES')==FALSE){
+        MODEL_VARIABLES                 <- list()
+    }
     MODEL_VARIABLES$general_variables   <- TABLE_VARIABLES
     MODEL_VARIABLES$cn_info             <- TABLE_CHROMOSOME_CN_INFO
     MODEL_VARIABLES$population_dynamics <- TABLE_POPULATION_DYNAMICS
+    return(MODEL_VARIABLES)
+}
+
+BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
+                                 vec_driver_genes   = c(),
+                                 vec_driver_role    = c()){
+#-------------------------------------------Input the Cancer Gene Census
+    DATA_cancer_gene_census             <- read.csv('../data/cancer_gene_census.csv')
+
+
+    print(DATA_cancer_gene_census)
 
     return(MODEL_VARIABLES)
 }

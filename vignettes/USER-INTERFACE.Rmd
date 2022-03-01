@@ -31,6 +31,7 @@ devtools::document()
 ```
 
 # Set up model variables
+
 Cancer Simulator requires several csv files containing variables to set up the simulations. Here we detail how to easily build these files.
 
 Let's give a name to the model.
@@ -40,6 +41,7 @@ MODEL                               <- 'EXPERIMENT-1'
 ```
 
 ## General variables for every cell
+
 The first step is to specify the variables describing every cell during the process. The cells are assumed to have the same expected lifespan (regardless of their driver or CN profiles). The cell lifespan is always in days.
 
 ```{r}
@@ -113,31 +115,56 @@ vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
 table_population_dynamics           <- cbind(vec_time,vec_cell_count)
 ```
 
-
-
-
+Finally, we build the model variable files, using function `BUILD_general_variables`:
 
 ```{r}
-MODEL_VARIABLES   <- BUILD_simulator_variables_from_scratch(model_name=MODEL,
-                                                            cell_lifespan=cell_lifespan,
-                                                            T_0=T_0,
-                                                            T_end=T_end,
-                                                            T_tau_step=T_tau_step,
-                                                            CN_bin_length=CN_bin_length,
-                                                            prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
-                                                            prob_CN_missegregation=prob_CN_missegregation,
-                                                            prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
-                                                            prob_CN_focal_amplification=prob_CN_focal_amplification,
-                                                            prob_CN_focal_deletion=prob_CN_focal_deletion,
-                                                            prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
-                                                            prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
-                                                            prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
-                                                            prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
-                                                            prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
-                                                            prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
-                                                            rate_driver=rate_driver,
-                                                            rate_passenger=rate_passenger,
-                                                            bound_driver=bound_driver,
-                                                            bound_ploidy=bound_ploidy,
-                                                            table_population_dynamics=table_population_dynamics)
+MODEL_VARIABLES   <- BUILD_general_variables(cell_lifespan=cell_lifespan,
+                        T_0=T_0,
+                        T_end=T_end,
+                        T_tau_step=T_tau_step,
+                        CN_bin_length=CN_bin_length,
+                        prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
+                        prob_CN_missegregation=prob_CN_missegregation,
+                        prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
+                        prob_CN_focal_amplification=prob_CN_focal_amplification,
+                        prob_CN_focal_deletion=prob_CN_focal_deletion,
+                        prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
+                        prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
+                        prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
+                        prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
+                        prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
+                        prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
+                        rate_driver=rate_driver,
+                        rate_passenger=rate_passenger,
+                        bound_driver=bound_driver,
+                        bound_ploidy=bound_ploidy,
+                        table_population_dynamics=table_population_dynamics)
+```
+
+
+
+## Driver library
+
+We first define a list of drivers to include in the model:
+
+```{r}
+vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
+                       'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1',
+                       'AKT1','PPP2R1A')
+```
+
+For each driver, we need to decide if it behaves as a TSG or an oncogene. Note that the algorithm requires at least one gene of each type to behave properly.
+
+```{r}
+vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
+                       'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE',
+                       'ONCOGENE','TSG')
+```
+
+The function `BUILD_driver_library` builds the driver library, completed with the location of each driver in the genome (this information comes from crosschecking with the Cancer Gene Census database)
+
+```{r}
+BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
+                     vec_driver_genes=vec_driver_genes,
+                     vec_driver_role=vec_driver_role)
 ```
