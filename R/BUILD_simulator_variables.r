@@ -209,6 +209,9 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
         Gene_ID                             <- vec_driver_genes[gene]
         loc                                 <- which(DATA_cancer_gene_census$Gene.Symbol==Gene_ID)
         Gene_address                        <- DATA_cancer_gene_census$Genome.Location[loc]
+
+print(DATA_cancer_gene_census)
+
         Gene_chromosome                     <- as.numeric(sub(':.*','',Gene_address))
         Gene_bin                            <- round(as.numeric(sub('-.*','',sub('.*:','',Gene_address)))/size_CN_block_DNA)
         TABLE_CANCER_GENES$Chromosome[gene] <- Gene_chromosome
