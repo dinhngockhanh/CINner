@@ -2,6 +2,7 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
                                                    cell_lifespan                        = 4,
                                                    T_0                                  = list(0,'year'),
                                                    T_end                                = list(100,'year'),
+                                                   T_tau_step                           = 3,
                                                    Population_end                       = Inf,
                                                    Max_events                           = Inf,
                                                    CN_bin_length                        = 500000,
@@ -39,6 +40,9 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     }}}}
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_start_time',T_start_time,'day','Age when simulation starts (for internal use)')
+#   Set up the time step for tau-leaping algorithm
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('T_tau_step',T_tau_step,'day','Time step for tau-leaping algorithm for simulation')
 #   Set up the end time of simulations
     age_end                             <- T_end[[1]]
     age_end_unit                        <- T_end[[2]]

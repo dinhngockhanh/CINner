@@ -43,7 +43,7 @@ MODEL                               <- 'EXPERIMENT-1'
 The first step is to specify the variables describing every cell during the process. The cells are assumed to have the same expected lifespan (regardless of their driver or CN profiles). The cell lifespan is always in days.
 
 ```{r}
-cell_lifespan                       <- 4
+cell_lifespan                       <- 7
 ```
 
 Next, we specify the times at the beginning and the end of the simulation. The unit can be `day`, `week`, `month` or `year`.
@@ -51,6 +51,12 @@ Next, we specify the times at the beginning and the end of the simulation. The u
 ```{r}
 T_0                                 <- list(1,'year')
 T_end                               <- list(10,'year')
+```
+
+We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
+
+```{r}
+T_tau_step                          <- 3
 ```
 
 An important variable is the size of CN bins. By default, this will be 500,000 bp.
@@ -93,10 +99,11 @@ rate_passenger                      <- 1e-11
 
 
 ```{r}
-BUILD_simulator_variables(model_name=MODEL,
+BUILD_simulator_variables_from_scratch(model_name=MODEL,
                           cell_lifespan=cell_lifespan,
                           T_0=T_0,
                           T_end=T_end,
+                          T_tau_step=T_tau_step,
                           CN_bin_length=CN_bin_length,
                           prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
                           prob_CN_missegregation=prob_CN_missegregation,
