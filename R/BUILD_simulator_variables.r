@@ -2,7 +2,7 @@ BUILD_simulator_variables <- function(cell_lifespan     = 4,
                                       T_0               = list(0,'year'),
                                       T_end             = list(100,'year'),
                                       Population_end    = Inf,
-                                      Max_events        = Inf,){
+                                      Max_events        = Inf){
 
 print(cell_lifespan)
 print(T_0)
