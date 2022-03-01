@@ -331,6 +331,9 @@ print(vec_cols)
             }
 
             for (strand in 1:nchar(vec_alleles)){
+
+print(strand)
+
                 allele                                      <- substr(vec_alleles,strand,strand)
                 col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
                 TABLE_INITIAL_CN[vec_rows,col]              <- allele
