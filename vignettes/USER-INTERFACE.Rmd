@@ -212,5 +212,7 @@ print(MODEL_VARIABLES$population_dynamics)
 
 print(MODEL_VARIABLES$driver_library)
 
+print(MODEL_VARIABLES$initial_cn)
+
 print(MODEL_VARIABLES$initial_others)
 ```

@@ -261,12 +261,32 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         I_clone                                             <- nrow(TABLE_INITIAL_OTHERS)+1
         TABLE_INITIAL_OTHERS[I_clone,]                      <- c(1,cell_count,drivers)
     }
+#------------------------------------Update initial clones - CN profiles
+#   Initialize table of alleles if necessary
+    if (is.null(MODEL_VARIABLES$initial_cn)){
+        TABLE_CHROMOSOME_CN_INFO                            <- MODEL_VARIABLES$cn_info
+        vec_chrom                                           <- c()
+        vec_bin                                             <- c()
+        for (chrom in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
+            bin_count                                       <- TABLE_CHROMOSOME_CN_INFO$Bin_count[chrom]
+            vec_chrom                                       <- c(vec_chrom,rep(TABLE_CHROMOSOME_CN_INFO$Chromosome[chrom],bin_count))
+            vec_bin                                         <- c(vec_bin,(1:bin_count))
+        }
+        columns                                             <- c('Chromosome','Bin')
+        TABLE_INITIAL_CN                                    <- data.frame(vec_chrom,vec_bin)
+        colnames(TABLE_INITIAL_CN)                          <- columns
+    }else{
+        TABLE_INITIAL_CN                                    <- MODEL_VARIABLES$initial_cn
+    }
+
+
 
 
 
 
 
 #----------------------------------------Output the model variable files
-    MODEL_VARIABLES$initial_others              <- TABLE_INITIAL_OTHERS
+    MODEL_VARIABLES$initial_others                          <- TABLE_INITIAL_OTHERS
+    MODEL_VARIABLES$initial_cn                              <- TABLE_INITIAL_CN
     return(MODEL_VARIABLES)
 }
