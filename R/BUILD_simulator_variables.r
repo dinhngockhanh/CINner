@@ -81,13 +81,13 @@ BUILD_simulator_variables <- function(model_name                        = 'MODEL
     TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_terminal',prob_CN_cnloh_terminal,'per cell division','Probability for a cell division to harbor a terminal CN-LOH event')
 #   Set up geometric parameters for lengths of local CN events
     N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('prob_CN_focal_amplification_length',prob_CN_focal_amplification_length,,'Geometric parameter for the block length of a focal amplification event')
+    TABLE_VARIABLES[N_row,]             <- c('prob_CN_focal_amplification_length',prob_CN_focal_amplification_length,'','Geometric parameter for the block length of a focal amplification event')
     N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('prob_CN_focal_deletion_length',prob_CN_focal_deletion_length,,'Geometric parameter for the block length of a focal deletion event')
+    TABLE_VARIABLES[N_row,]             <- c('prob_CN_focal_deletion_length',prob_CN_focal_deletion_length,'','Geometric parameter for the block length of a focal deletion event')
     N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_interstitial_length',prob_CN_cnloh_interstitial_length,,'Geometric parameter for the block length of an interstitial CN-LOH event')
+    TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_interstitial_length',prob_CN_cnloh_interstitial_length,'','Geometric parameter for the block length of an interstitial CN-LOH event')
     N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_terminal_length',prob_CN_cnloh_terminal_length,,'Geometric parameter for the block length of a terminal CN-LOH event')
+    TABLE_VARIABLES[N_row,]             <- c('prob_CN_cnloh_terminal_length',prob_CN_cnloh_terminal_length,'','Geometric parameter for the block length of a terminal CN-LOH event')
 
 
 
