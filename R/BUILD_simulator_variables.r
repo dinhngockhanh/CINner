@@ -316,6 +316,8 @@ print(chrom)
 print(bin_start)
 print(bin_end)
 print(vec_alleles)
+print(length(CN_focal))
+print(i)
 
         if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
             for (strand in 1:(nchar(vec_alleles)-max_no_strands)){
