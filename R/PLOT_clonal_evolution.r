@@ -1,7 +1,7 @@
 #=====================================PLOT CLONAL EVOLUTION AS FISH PLOT
 PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     if (unit=='year'){
-        vec_time_plot               <- 365*vec_time_plot
+        vec_time_plot                               <- 365*vec_time_plot
     }
 #---------------------------------------------Input the clonal evolution
     package_clonal_evolution                        <- package_simulation[[1]]
@@ -13,12 +13,19 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     package_sample_phylogeny                        <- package_simulation[[3]]
     package_clone_phylogeny                         <- package_sample_phylogeny[[4]]
     clone_phylogeny_labels                          <- package_clone_phylogeny[[1]]
+    clone_phylogeny_ID                              <- package_clone_phylogeny[[2]]
     clone_phylogeny_origin                          <- package_clone_phylogeny[[3]]
     clone_phylogeny_genotype                        <- package_clone_phylogeny[[4]]
     clone_hclust_nodes                              <- package_clone_phylogeny[[7]]
     clone_hclust_merge                              <- package_clone_phylogeny[[8]]
 
     N_clones                                        <- length(clone_phylogeny_labels)
+
+
+    fish_labels                                     <- c(1:(length(clone_phylogeny_genotype)-N_clones),clone_phylogeny_labels)
+print(fish_labels)
+
+
 #----------------------------Build the genotype list for each clone node
     clone_phylogeny_all_genotypes                                       <- vector('list',length=length(clone_phylogeny_genotype))
 #   Initialize genotype lists for clone leaves
