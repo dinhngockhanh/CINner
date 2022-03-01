@@ -93,6 +93,12 @@ rate_driver                         <- 1e-16
 rate_passenger                      <- 1e-11
 ```
 
+We can also set up the upper limits for the driver count and local CN for a cell to still be viable.
+
+```{r}
+bound_driver                        <- 3
+bound_ploidy                        <- 20
+```
 
 
 
@@ -100,22 +106,24 @@ rate_passenger                      <- 1e-11
 
 ```{r}
 BUILD_simulator_variables_from_scratch(model_name=MODEL,
-                          cell_lifespan=cell_lifespan,
-                          T_0=T_0,
-                          T_end=T_end,
-                          T_tau_step=T_tau_step,
-                          CN_bin_length=CN_bin_length,
-                          prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
-                          prob_CN_missegregation=prob_CN_missegregation,
-                          prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
-                          prob_CN_focal_amplification=prob_CN_focal_amplification,
-                          prob_CN_focal_deletion=prob_CN_focal_deletion,
-                          prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
-                          prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
-                          prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
-                          prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
-                          prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
-                          prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
-                          rate_driver=rate_driver,
-                          rate_passenger=rate_passenger)
+                                       cell_lifespan=cell_lifespan,
+                                       T_0=T_0,
+                                       T_end=T_end,
+                                       T_tau_step=T_tau_step,
+                                       CN_bin_length=CN_bin_length,
+                                       prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
+                                       prob_CN_missegregation=prob_CN_missegregation,
+                                       prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
+                                       prob_CN_focal_amplification=prob_CN_focal_amplification,
+                                       prob_CN_focal_deletion=prob_CN_focal_deletion,
+                                       prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
+                                       prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
+                                       prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
+                                       prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
+                                       prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
+                                       prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
+                                       rate_driver=rate_driver,
+                                       rate_passenger=rate_passenger,
+                                       bound_driver=bound_driver,
+                                       bound_ploidy=bound_ploidy)
 ```

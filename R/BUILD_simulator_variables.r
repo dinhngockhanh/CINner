@@ -18,7 +18,15 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
                                                    prob_CN_cnloh_interstitial_length    = 0.1,
                                                    prob_CN_cnloh_terminal_length        = 0.1,
                                                    rate_driver                          = 0,
-                                                   rate_passenger                       = 0){
+                                                   rate_passenger                       = 0,
+                                                   bound_driver                         = 3,
+                                                   bound_ploidy                         = 10,
+                                                   SFS_totalsteps                       = 25,
+                                                   prob_coverage                        = 0.05,
+                                                   alpha_coverage                       = 0.7,
+                                                   lower_limit_cell_counts              = 0,
+                                                   lower_limit_alt_counts               = 3,
+                                                   lower_limit_tot_counts               = 0){
 #---------------------------Build model input file for general variables
     columns                             <- c('Variable','Value','Unit','Note')
     TABLE_VARIABLES                     <- data.frame(matrix(nrow=0,ncol=length(columns)))
@@ -40,9 +48,6 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     }}}}
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_start_time',T_start_time,'day','Age when simulation starts (for internal use)')
-#   Set up the time step for tau-leaping algorithm
-    N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('T_tau_step',T_tau_step,'day','Time step for tau-leaping algorithm for simulation')
 #   Set up the end time of simulations
     age_end                             <- T_end[[1]]
     age_end_unit                        <- T_end[[2]]
@@ -59,6 +64,9 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     }}}}
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_end_time',T_end_time,'day','Age when simulation stops (for internal use)')
+#   Set up the time step for tau-leaping algorithm
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('T_tau_step',T_tau_step,'day','Time step for tau-leaping algorithm for simulation')
 #   Set up condition to end simulation prematurely based on population size or event count
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('Population_end',Population_end,'cell count','Condition for ending simulation (Inf if no condition)')
@@ -99,6 +107,25 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     TABLE_VARIABLES[N_row,]             <- c('rate_driver',rate_driver,'per bp per cell division','Poisson rate of getting new driver mutations')
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('rate_passenger',rate_passenger,'per bp per cell division','Poisson rate of getting new passenger mutations')
+#   Set up upper limits for driver and local CN for viable cells
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('bound_driver',bound_driver,'driver count','Maximum driver count in viable cells (cells exceeding this will die)')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('bound_ploidy',bound_ploidy,'local CN','Maximum local CN in viable cells (cells exceeding this will die)')
+#   Set up variables for sequencing
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('SFS_totalsteps',SFS_totalsteps,'','Bin count in SFS data')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('prob_coverage',prob_coverage,'','Mean coverage depth')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('alpha_coverage',alpha_coverage,'','Alpha parameter for coverage depth')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('lower_limit_cell_counts',lower_limit_cell_counts,'','Lower limit of cell counts for mutations to be detected')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('lower_limit_alt_counts',lower_limit_alt_counts,'','Lower limit of alternate read counts for mutations to be detected')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('lower_limit_tot_counts',lower_limit_tot_counts,'','Lower limit of total read counts for mutations to be detected')
+
 
 
 
