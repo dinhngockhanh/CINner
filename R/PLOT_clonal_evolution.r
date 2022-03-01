@@ -118,16 +118,23 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
     }
 #----------------------------------------------Plot the clonal evolution
     if (unit=='year'){
-        vec_time_plot               <- vec_time_plot/365
+        vec_time_plot                           <- vec_time_plot/365
     }
 
-    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot)
+
+
+
+    fish    <- createFishObject(table_clonal_populations,vec_clonal_parentage,timepoints=vec_time_plot,clone.labels=LETTERS[1:nrow(table_clonal_populations)])
 
     fish    <- layoutClones(fish)
 
     # fishPlot(fish,shape="spline",title.btm="Sample1",cex.title=0.5)
 
     fishPlot(fish,shape="spline")
+
+    drawLegend(fish)
+
+    dev <- dev.off()
 
     # vlines=c(0,150),vlab=c("day 0","day 150"))
 
