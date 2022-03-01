@@ -202,8 +202,17 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
         return(MODEL_VARIABLES)
     }
 #--------------------------Supplement driver library with gene locations
+#   Get the CN bin length
+    size_CN_block_DNA                   <- MODEL_VARIABLES$general_variables$Value[MODEL_VARIABLES$general_variables$Variable=='size_CN_block_DNA']
+
+print(size_CN_block_DNA)
+
     for (gene in 1:length(vec_driver_genes)){
         Gene_ID                         <- vec_driver_genes[gene]
+        loc                             <- which(DATA_cancer_gene_census$Gene.Symbol==Gene_ID)
+        Gene_address                    <- DATA_cancer_gene_census$GenomeLocation[loc]
+        Gene_chromosome                 <- as.numeric(sub(':.*','',Gene_address))
+
     }
 
 
