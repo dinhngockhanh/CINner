@@ -201,5 +201,7 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
 
     print(DATA_cancer_gene_census)
 
+    print(TABLE_CANCER_GENES)
+
     return(MODEL_VARIABLES)
 }
