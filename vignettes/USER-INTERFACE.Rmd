@@ -186,7 +186,7 @@ Let's start with having 10 cells with normal female diploid genotype. There woul
 cell_count        <- 10
 CN_arm            <- c(rep('AB',46),rep('',2))
 CN_focal          <- c()
-drivers           <- c()
+drivers           <- ''
 
 MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           cell_count=cell_count,

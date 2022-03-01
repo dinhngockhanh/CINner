@@ -249,7 +249,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
                                      cell_count         = 1,
                                      CN_arm             = c(rep('AB',46),rep('',2)),
                                      CN_focal           = c(),
-                                     drivers            = c()){
+                                     drivers            = ''){
 #------------------------------Update initial clones - other information
     if (is.null(MODEL_VARIABLES$initial_others)){
         columns                                 <- c('Clone','Cell_count','Drivers')
