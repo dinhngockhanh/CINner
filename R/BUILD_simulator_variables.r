@@ -288,15 +288,23 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
 
     for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
         chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
-        vec_rows                                            <- which(TABLE_INITIAL_CN$Chromosome==chrom)
-        vec_alleles                                         <- CN_arm[i]
-        if (nchar(vec_alleles)==0){
-            next
-        }
-        for (strand in 1:nchar(vec_alleles)){
-            allele                                          <- substr(vec_alleles,strand,strand)
-            col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-            TABLE_INITIAL_CN[vec_rows,col]                  <- allele
+        centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i]
+        for (arm in 1:2){
+            if (arm==1){
+                vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
+                vec_alleles                                 <- CN_arm[2*i-1]
+            }else{
+                vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
+                vec_alleles                                 <- CN_arm[2*i]
+            }
+            if (nchar(vec_alleles)==0){
+                next
+            }
+            for (strand in 1:nchar(vec_alleles)){
+                allele                                      <- substr(vec_alleles,strand,strand)
+                col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+                TABLE_INITIAL_CN[vec_rows,col]              <- allele
+            }
         }
     }
 
