@@ -178,9 +178,9 @@ MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
 
 ## Initial cell population
 
-Assume we have 20 cells at `T_0`. We can link the cells to clones sharing the same driver and CN profile.
+Assume we have 20 cells at `T_0`. We can link the cells to clones sharing the same driver and CN profile. There are four variables describing each clone. `cell_count` is the number of cells in this clone at `T_0`. `CN_arm` gives the baseline allele specifics of each chromosome arm. `CN_focal` overrides the baseline with specific bins' abnormal alleles (if any). Finally, `drivers` lists the mutated drivers to be placed on the genome.
 
-Let's start with having 10 cells with normal female diploid genotype. There would be two strands of each chromosome (strand `A` and strand `B`) from chromosome 1 to X, and no chromosome Y. There is no drivers.
+Let's start with having 10 cells with normal female diploid genotype. There would be two strands of each chromosome (strand `A` and strand `B`) from chromosome 1 to X, and no chromosome Y.
 
 ```{r}
 cell_count        <- 10
@@ -194,6 +194,7 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           drivers=drivers)
 ```
 
+The second clone contains 5 cells, and
 
 
 
