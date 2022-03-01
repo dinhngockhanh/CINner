@@ -278,6 +278,24 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
     }else{
         TABLE_INITIAL_CN                                    <- MODEL_VARIABLES$initial_cn
     }
+#   Build the CN profile for the new clone - start from arm level
+    max_no_strands                                          <- max(nchar(CN_arm))
+
+    for (strand in 1:max_no_strands){
+        TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
+    }
+
+
+    # for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
+    #     chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
+    #     vec_rows                                            <- which(TABLE_INITIAL_CN==chrom)
+    #     vec_alleles                                         <- CN_arm[i]
+    #
+    #
+    #     if ()
+    # }
+
+
 
 
 
