@@ -167,6 +167,7 @@ BUILD_simulator_variables_from_scratch <- function(model_name                   
     TABLE_POPULATION_DYNAMICS           <- data.frame(vec_time_points,vec_cell_count)
     colnames(TABLE_POPULATION_DYNAMICS) <- columns
 
+    MODEL_VARIABLES                     <- list()
     MODEL_VARIABLES$general_variables   <- TABLE_VARIABLES
     MODEL_VARIABLES$cn_info             <- TABLE_CHROMOSOME_CN_INFO
     MODEL_VARIABLES$population_dynamics <- TABLE_POPULATION_DYNAMICS
