@@ -305,35 +305,38 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         }
     }
 #---Build the CN profile for the new clone - continue with local regions
-    for (i in 1:length(CN_focal)){
-        chrom                                               <- CN_focal[[i]][[1]]
-        bin_start                                           <- CN_focal[[i]][[2]]
-        bin_end                                             <- CN_focal[[i]][[3]]
-        vec_alleles                                         <- CN_focal[[i]][[4]]
-        vec_rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
+    if (length(CN_focal)>=1){
+        for (i in 1:length(CN_focal)){
+            chrom                                           <- CN_focal[[i]][[1]]
+            bin_start                                       <- CN_focal[[i]][[2]]
+            bin_end                                         <- CN_focal[[i]][[3]]
+            vec_alleles                                     <- CN_focal[[i]][[4]]
+            vec_rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
 
-        if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
-            for (strand in 1:(nchar(vec_alleles)-max_no_strands)){
-                TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
+            if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
+                for (strand in 1:(nchar(vec_alleles)-max_no_strands)){
+                    TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
+                }
             }
-        }
 
-        vec_cols                                            <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(MODEL_VARIABLES$initial_cn)))
-        TABLE_INITIAL_CN[vec_rows,vec_cols]                 <- 'NA'
+            vec_cols                                        <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(MODEL_VARIABLES$initial_cn)))
+            TABLE_INITIAL_CN[vec_rows,vec_cols]             <- 'NA'
 
 print(vec_rows)
 print(vec_cols)
 
-        if (length(vec_alleles)==0){
-            next
-        }
+            if (length(vec_alleles)==0){
+                next
+            }
 
-        for (strand in 1:nchar(vec_alleles)){
-            allele                                          <- substr(vec_alleles,strand,strand)
-            col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-            TABLE_INITIAL_CN[vec_rows,col]                  <- allele
+            for (strand in 1:nchar(vec_alleles)){
+                allele                                      <- substr(vec_alleles,strand,strand)
+                col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+                TABLE_INITIAL_CN[vec_rows,col]              <- allele
+            }
         }
     }
+
 
 
 
