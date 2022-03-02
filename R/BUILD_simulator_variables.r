@@ -256,7 +256,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
 
         DRIVERS                                             <- ''
         if (length(drivers)>0){
-            for (i in 1:)
+            # for (i in 1:)
         }
 
         TABLE_INITIAL_OTHERS                                <- data.frame(1,cell_count,drivers)
