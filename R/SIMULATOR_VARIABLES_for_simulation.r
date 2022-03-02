@@ -24,16 +24,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #---Input other information for the initial population
     filename                                <- paste(model,'-input-initial-others.csv',sep='')
     TABLE_INITIAL_OTHERS                    <- read.table(filename,header=TRUE,sep=',')
-
-
-print(TABLE_VARIABLES)
-print(TABLE_POPULATION_DYNAMICS)
-print(TABLE_CHROMOSOME_CN_INFO)
-print(TABLE_CANCER_GENES)
-print(TABLE_INITIAL_COPY_NUMBER_PROFILES)
-print(TABLE_INITIAL_OTHERS)
-
-
 #---Set up individual variables from table
     for (i in 1:nrow(TABLE_VARIABLES)) {
         assign(TABLE_VARIABLES[i,1],TABLE_VARIABLES[i,2],envir=.GlobalEnv)
@@ -126,21 +116,6 @@ print(TABLE_INITIAL_OTHERS)
             if (length(vec_delete)>0){
                 CHROM_COPY_NUMBER_PROFILES  <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
             }
-
-
-
-
-            # if (ncol(CHROM_COPY_NUMBER_PROFILES)==2){
-            #     no_blocks                   <- vec_CN_block_no[chrom]
-            #     ploidy_chrom[chrom]         <- 0
-            #     ploidy_block[[chrom]][[1]]  <- rep(0,no_blocks)
-            #     ploidy_allele[[chrom]][[1]] <- matrix(rep(0,no_blocks),nrow=1)
-            #     next
-            # }
-
-
-
-
 #           Update the strand count for each chromosome
             no_strands                      <- ncol(CHROM_COPY_NUMBER_PROFILES)-2
             ploidy_chrom[chrom]             <- no_strands
