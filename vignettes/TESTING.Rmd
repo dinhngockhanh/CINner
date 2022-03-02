@@ -19,24 +19,28 @@ devtools::document()
 
 ```{r}
 MODEL                               <- 'EXPERIMENT-1'
-cell_lifespan                       <- 7
+cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 N_sample                            <- 200
 T_tau_step                          <- 3
 CN_bin_length                       <- 500000
-prob_CN_whole_genome_duplication    <- 1e-6
-prob_CN_missegregation              <- 1e-6
-prob_CN_chrom_arm_missegregation    <- 1e-6
-prob_CN_focal_amplification         <- 1e-6
-prob_CN_focal_deletion              <- 1e-6
-prob_CN_cnloh_interstitial          <- 1e-6
-prob_CN_cnloh_terminal              <- 1e-6
+
+prob_CN_whole_genome_duplication    <- 5e-6
+prob_CN_missegregation              <- 2e-4
+prob_CN_chrom_arm_missegregation    <- 2e-4
+prob_CN_focal_amplification         <- 2e-4
+prob_CN_focal_deletion              <- 2e-4
+prob_CN_cnloh_interstitial          <- 2e-4
+prob_CN_cnloh_terminal              <- 2e-4
+
 prob_CN_focal_amplification_length  <- 0.1
 prob_CN_focal_deletion_length       <- 0.1
 prob_CN_cnloh_interstitial_length   <- 0.1
 prob_CN_cnloh_terminal_length       <- 0.1
+
 rate_driver                         <- 1e-16
+
 rate_passenger                      <- 1e-11
 bound_driver                        <- 3
 bound_ploidy                        <- 20
@@ -74,9 +78,18 @@ vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
 vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
                       'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE',
                       'ONCOGENE','TSG')
-vec_driver_s      <- c(0.01,0.01,0.01,0.01,0.01,0.01,
-                     0.01,0.01,0.01,0.01,0.01,0.01,
-                     0.01,0.01)
+
+# vec_driver_s      <- rep(0.005,length(vec_driver_genes))
+# vec_driver_s[1]   <- 0.009
+# vec_driver_s[2]   <- 0.007
+# vec_driver_s[3]   <- 0.007
+
+vec_driver_s      <- rep(0.01,length(vec_driver_genes))
+vec_driver_s[1]   <- 0.02
+vec_driver_s[2]   <- 0.015
+vec_driver_s[3]   <- 0.015
+
+
 MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
                                        vec_driver_genes=vec_driver_genes,
                                        vec_driver_role=vec_driver_role,
@@ -127,7 +140,9 @@ SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
 stage_final       <- 3
 simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL_NAME,stage_final)
 
-PLOT_total_population_vs_input(simulation,MODEL,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,84,by=1),unit='year')
 
 
 PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,84,by=1),unit='year')

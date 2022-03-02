@@ -123,6 +123,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
         sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
     }
+    print(paste('DETECTED ',length(clone_ID_letters),' CLONES IN THE SAMPLE',sep=''))
 #---------------------------------Output package of data from simulation
     output                                  <- list()
     output[[1]]                             <- sample_genotype_profile
