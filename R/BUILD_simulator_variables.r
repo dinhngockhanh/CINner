@@ -251,13 +251,18 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
                                      CN_focal           = list(),
                                      drivers            = list()){
 #------------------------------Update initial clones - other information
+    DRIVERS                                                 <- ''
+    if (length(drivers)>0){
+        for (i in 1:length(drivers)){
+            strand                                          <- drivers[[i]][[1]]
+            unit                                            <- drivers[[i]][[2]]
+            driver_ID                                       <- drivers[[i]][[3]]
+            DRIVERS                                         <- paste(DRIVERS,driver_ID,'_strand',strand,'_unit',unit,sep='')
+        }
+    }
+
     if (is.null(MODEL_VARIABLES$initial_others)){
         columns                                             <- c('Clone','Cell_count','Drivers')
-
-        DRIVERS                                             <- ''
-        # if (length(drivers)>0){
-            # for (i in 1:)
-        # }
 
         TABLE_INITIAL_OTHERS                                <- data.frame(1,cell_count,DRIVERS)
         colnames(TABLE_INITIAL_OTHERS)                      <- columns
@@ -265,8 +270,6 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
     }else{
         TABLE_INITIAL_OTHERS                                <- MODEL_VARIABLES$initial_others
         I_clone                                             <- nrow(TABLE_INITIAL_OTHERS)+1
-
-        DRIVERS                                             <- ''
 
         TABLE_INITIAL_OTHERS[I_clone,]                      <- c(1,cell_count,DRIVERS)
     }
@@ -325,17 +328,6 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             bin_start                                       <- focal_event[[3]]
             bin_end                                         <- focal_event[[4]]
             allele                                          <- focal_event[[5]]
-
-print('----------------')
-print(I_clone)
-print(paste('Clone_',I_clone,'_strand_',strand,sep=''))
-
-print(chrom)
-print(strand)
-print(bin_start)
-print(bin_end)
-print(allele)
-
             if (allele==''){
                 allele                                      <- 'NA'
             }
