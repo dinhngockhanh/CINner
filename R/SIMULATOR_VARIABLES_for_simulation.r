@@ -184,6 +184,7 @@ print(TABLE_INITIAL_OTHERS)
         all_drivers                         <- TABLE_INITIAL_OTHERS$Drivers[loc]
 
 print(all_drivers)
+print(is.na(all_drivers))
 
         if (is.na(all_drivers)){
             initial_driver_count[clone]     <<- 0
