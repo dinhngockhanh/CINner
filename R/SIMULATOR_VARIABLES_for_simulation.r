@@ -115,7 +115,7 @@ print(TABLE_INITIAL_OTHERS)
             ploidy_block[[chrom]]           <- list()
             ploidy_allele[[chrom]]          <- list()
 #           Get CN genotype for this chromosome
-            CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==chrom,]
+            CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==  TABLE_CHROMOSOME_CN_INFO$Chromosome[chrom],]
 #           Clean CN genotype of unnecessary strands
             vec_delete                      <- c()
             for (column in 3:ncol(CHROM_COPY_NUMBER_PROFILES)){
@@ -139,10 +139,10 @@ print(TABLE_INITIAL_OTHERS)
                     col                     <- strand+2
                     vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
 
-print('-------------')
-print(chrom)
-print(N_chromosomes)
-print(vec_allele)
+# print('-------------')
+# print(chrom)
+# print(N_chromosomes)
+# print(vec_allele)
 
                     if (is.na(vec_allele)){
                         strand_ploidy_block[block]              <- 0
