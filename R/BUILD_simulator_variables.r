@@ -268,9 +268,9 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         TABLE_INITIAL_OTHERS[I_clone,]                      <- c(1,cell_count,drivers)
     }
 #------------------------------------Update initial clones - CN profiles
+    TABLE_CHROMOSOME_CN_INFO                                <- MODEL_VARIABLES$cn_info
 #   Initialize table of alleles if necessary
     if (is.null(MODEL_VARIABLES$initial_cn)){
-        TABLE_CHROMOSOME_CN_INFO                            <- MODEL_VARIABLES$cn_info
         vec_chrom                                           <- c()
         vec_bin                                             <- c()
         for (chrom in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
