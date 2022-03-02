@@ -132,6 +132,7 @@ print(TABLE_INITIAL_OTHERS)
                 ploidy_chrom[chrom]         <- 0
                 ploidy_block[[chrom]][[1]]  <- rep(0,no_blocks)
                 ploidy_allele[[chrom]][[1]] <- matrix(rep(0,no_blocks),nrow=1)
+                next
             }
 
 
