@@ -322,6 +322,14 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             bin_start                                       <- focal_event[[3]]
             bin_end                                         <- focal_event[[4]]
             allele                                          <- focal_event[[5]]
+
+print('----------------')
+print(chrom)
+print(strand)
+print(bin_start)
+print(bin_end)
+print(allele)
+
             if (allele==''){
                 allele                                      <- 'NA'
             }
