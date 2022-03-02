@@ -17,6 +17,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         #     return(clone_selection_rate)
         # }
     }
+    print('1')
 #-------------------Cell is not viable if exceeding maximum driver count
     if (driver_count>0){
         driver_count_unique         <- unique(driver_map[,1])
@@ -25,11 +26,13 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
             return(clone_selection_rate)
         }
     }
+    print('1')
 #----------If driver library is empty, then viable cells have sel rate 1
     if (nrow(driver_library)==0){
         clone_selection_rate        <- 1
         return(clone_selection_rate)
     }
+    print('1')
 #------------------------------Compute selection rates for viable clones
     driver_library_copy                             <- driver_library
     driver_library_copy$Copy_WT                     <- 0
@@ -52,6 +55,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
             driver_library_copy$Copy_WT[driver_ID]  <- driver_library_copy$Copy_WT[driver_ID]-1
         }
     }
+    print('1')
 #   Compute selection rate
     clone_selection_rate                            <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT)*prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     return(clone_selection_rate)
