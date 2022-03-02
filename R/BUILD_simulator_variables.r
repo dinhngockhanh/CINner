@@ -254,18 +254,21 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
     if (is.null(MODEL_VARIABLES$initial_others)){
         columns                                             <- c('Clone','Cell_count','Drivers')
 
-        # DRIVERS                                             <- ''
+        DRIVERS                                             <- ''
         # if (length(drivers)>0){
             # for (i in 1:)
         # }
 
-        # TABLE_INITIAL_OTHERS                                <- data.frame(1,cell_count,drivers)
+        TABLE_INITIAL_OTHERS                                <- data.frame(1,cell_count,DRIVERS)
         colnames(TABLE_INITIAL_OTHERS)                      <- columns
         I_clone                                             <- 1
     }else{
         TABLE_INITIAL_OTHERS                                <- MODEL_VARIABLES$initial_others
         I_clone                                             <- nrow(TABLE_INITIAL_OTHERS)+1
-        # TABLE_INITIAL_OTHERS[I_clone,]                      <- c(1,cell_count,drivers)
+
+        DRIVERS                                             <- ''
+
+        TABLE_INITIAL_OTHERS[I_clone,]                      <- c(1,cell_count,DRIVERS)
     }
 #------------------------------------Update initial clones - CN profiles
     TABLE_CHROMOSOME_CN_INFO                                <- MODEL_VARIABLES$cn_info
