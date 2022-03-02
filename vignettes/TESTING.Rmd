@@ -86,8 +86,8 @@ vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
 
 vec_driver_s      <- rep(0.01,length(vec_driver_genes))
 vec_driver_s[1]   <- 0.02
-vec_driver_s[2]   <- 0.015
-vec_driver_s[3]   <- 0.015
+vec_driver_s[2]   <- 0.02
+vec_driver_s[3]   <- 0.02
 
 
 MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
