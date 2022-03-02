@@ -10,9 +10,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         # }
         vec_CN                      <- rep(0,vec_CN_block_no[chrom])
 
-        if (no_strands==0){
-            next
-        }
+        # if (no_strands==0){
+        #     next
+        # }
 
         for (strand in 1:no_strands){
             vec_CN                  <- vec_CN+ploidy_block[[chrom]][[strand]]

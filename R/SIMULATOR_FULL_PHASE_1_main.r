@@ -52,18 +52,6 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #   Set up the probability of new drivers per division for each clone
     genotype_list_prob_new_drivers              <<- initial_prob_new_drivers
     assign('genotype_list_prob_new_drivers',genotype_list_prob_new_drivers,envir=.GlobalEnv)
-
-print('--------')
-print(genotype_list_driver_count)
-print('--------')
-print(genotype_list_driver_map)
-print('--------')
-print(genotype_list_selection_rate)
-print('--------')
-print(genotype_list_DNA_length)
-print('--------')
-print(genotype_list_prob_new_drivers)
-
 #-------------------------------------Set up the clonal evolution record
     N_clones                                    <<- initial_N_clones
     assign('N_clones',N_clones,envir=.GlobalEnv)
