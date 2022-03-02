@@ -31,6 +31,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
 #   Set up the strand count for each chromosome for each clone
     genotype_list_ploidy_chrom                  <<- initial_ploidy_chrom
     assign('genotype_list_ploidy_chrom',genotype_list_ploidy_chrom,envir=.GlobalEnv)
+
+print(genotype_list_ploidy_chrom)
+
 #   Set up the CN count for each chrosomome strand for each clone
     genotype_list_ploidy_block                  <<- initial_ploidy_block
     assign('genotype_list_ploidy_block',genotype_list_ploidy_block,envir=.GlobalEnv)
