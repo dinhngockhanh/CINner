@@ -257,6 +257,9 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             strand                                          <- drivers[[i]][[1]]
             unit                                            <- drivers[[i]][[2]]
             driver_ID                                       <- drivers[[i]][[3]]
+            if (DRIVERS!=''){
+                DRIVERS                     <- paste(DRIVERS,';',sep='')
+            } 
             DRIVERS                                         <- paste(DRIVERS,driver_ID,'_strand',strand,'_unit',unit,sep='')
         }
     }
