@@ -12,10 +12,10 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         for (strand in 1:no_strands){
             vec_CN                  <- vec_CN+ploidy_block[[chrom]][[strand]]
         }
-        if ((max(vec_CN)==0) || (max(vec_CN)>bound_ploidy)){
-            clone_selection_rate    <- 0
-            return(clone_selection_rate)
-        }
+        # if ((max(vec_CN)==0) || (max(vec_CN)>bound_ploidy)){
+        #     clone_selection_rate    <- 0
+        #     return(clone_selection_rate)
+        # }
     }
 #-------------------Cell is not viable if exceeding maximum driver count
     if (driver_count>0){
