@@ -367,23 +367,20 @@ SAVE_model_variables <- function(MODEL_NAME='',
                                 MODEL_VARIABLES=list()){
 #---Save file for general variables
     filename    <- paste(MODEL_NAME,'-input-variables.csv',sep='')
-    write.csv(MODEL_VARIABLES$general_variables,filename)
+    write.csv(MODEL_VARIABLES$general_variables,filename,row.names=FALSE)
 #---Save file for CN information
     filename    <- paste(MODEL_NAME,'-input-copy-number-blocks.csv',sep='')
-    write.csv(MODEL_VARIABLES$cn_info,filename)
+    write.csv(MODEL_VARIABLES$cn_info,filename,row.names=FALSE)
 #---Save file for population dynamics
     filename    <- paste(MODEL_NAME,'-input-population-dynamics.csv',sep='')
-    write.csv(MODEL_VARIABLES$population_dynamics,filename)
-
-
-
+    write.csv(MODEL_VARIABLES$population_dynamics,filename,row.names=FALSE)
 #---Save file for driver library
     filename    <- paste(MODEL_NAME,'-input-cancer-genes.csv',sep='')
-    write.csv(MODEL_VARIABLES$driver_library,filename)
+    write.csv(MODEL_VARIABLES$driver_library,filename,row.names=FALSE)
 #---Save file for initial clones' CN profiles
     filename    <- paste(MODEL_NAME,'-input-initial-cn-profiles.csv',sep='')
-    write.csv(MODEL_VARIABLES$initial_cn,filename)
+    write.csv(MODEL_VARIABLES$initial_cn,filename,row.names=FALSE)
 #---Save file for initial clones' other information
     filename    <- paste(MODEL_NAME,'-input-initial-others.csv',sep='')
-    write.csv(MODEL_VARIABLES$initial_others,filename)
+    write.csv(MODEL_VARIABLES$initial_others,filename,row.names=FALSE)
 }
