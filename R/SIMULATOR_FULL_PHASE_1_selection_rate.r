@@ -2,6 +2,7 @@
 SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy_chrom,ploidy_block) {
 #-------------------------Cell is not viable if losing whole chromosomes
 #------------------------------------------or exceeding maximum CN count
+print('HERE')
     for (chrom in 1:N_chromosomes){
         no_strands                  <- ploidy_chrom[chrom]
         if (no_strands<=0){
@@ -26,13 +27,13 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
             return(clone_selection_rate)
         }
     }
-    print('1')
+    print('2')
 #----------If driver library is empty, then viable cells have sel rate 1
     if (nrow(driver_library)==0){
         clone_selection_rate        <- 1
         return(clone_selection_rate)
     }
-    print('1')
+    print('3')
 #------------------------------Compute selection rates for viable clones
     driver_library_copy                             <- driver_library
     driver_library_copy$Copy_WT                     <- 0
@@ -55,7 +56,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
             driver_library_copy$Copy_WT[driver_ID]  <- driver_library_copy$Copy_WT[driver_ID]-1
         }
     }
-    print('1')
+    print('4')
 #   Compute selection rate
     clone_selection_rate                            <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT)*prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     return(clone_selection_rate)
