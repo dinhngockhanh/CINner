@@ -365,6 +365,24 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
 
 SAVE_model_variables <- function(MODEL_NAME='',
                                 MODEL_VARIABLES=list()){
+
+
+    TABLE_CHROMOSOME_CN_INFO        <- MODEL_VARIABLES$cn_info
+    TABLE_INITIAL_CN                <- MODEL_VARIABLES$initial_cn
+
+    vec_delete                      <- c()
+    for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
+        chrom                       <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
+        if (all(TABLE_INITIAL_CN[TABLE_INITIAL_CN==chrom,3:ncol(TABLE_INITIAL_CN)]=='NA')){
+            vec_delete              <- c(vec_delete,chrom)
+        }
+    }
+
+    if (length(vec_delete)>0){
+        MODEL_VARIABLES$cn_info     <- MODEL_VARIABLES$cn_info[-which(is.element(MODEL_VARIABLES$cn_info$Chrom,vec_delete)),]
+        MODEL_VARIABLES$initial_cn  <- MODEL_VARIABLES$initial_cn[-which(is.element(MODEL_VARIABLES$initial_cn$Chromosome,vec_delete)),]
+    }
+
 #---Save file for general variables
     filename    <- paste(MODEL_NAME,'-input-variables.csv',sep='')
     write.csv(MODEL_VARIABLES$general_variables,filename,row.names=FALSE)
