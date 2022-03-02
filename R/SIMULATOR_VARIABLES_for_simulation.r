@@ -139,6 +139,9 @@ print(TABLE_INITIAL_OTHERS)
                     col                     <- strand+2
                     vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
 
+print('-------------')
+print(chrom)
+print(N_chromosomes)
 print(vec_allele)
 
                     if (is.na(vec_allele)){
