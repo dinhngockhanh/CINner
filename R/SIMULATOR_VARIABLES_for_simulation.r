@@ -214,6 +214,9 @@ print(TABLE_INITIAL_OTHERS)
         ploidy_block                        <- initial_ploidy_block[[clone]]
         DNA_length                          <- 0
         for (chrom in 1:N_chromosomes) {
+            if (ploidy_chrom[chrom]==0){
+                next
+            }
             for (strand in 1:ploidy_chrom[chrom]) {
                 DNA_length                  <- DNA_length+sum(ploidy_block[[chrom]][[strand]])
             }
