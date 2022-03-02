@@ -146,8 +146,10 @@ print(CHROM_COPY_NUMBER_PROFILES)
                     vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
 
 print('-------------')
-print(chrom)
-print(N_chromosomes)
+print(strand)
+print(block)
+print(row)
+print(col)
 print(vec_allele)
 
                     if (is.na(vec_allele)){
