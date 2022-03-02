@@ -322,7 +322,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             bin_start                                       <- focal_event[[3]]
             bin_end                                         <- focal_event[[4]]
             allele                                          <- focal_event[[5]]
-            if (allele=''){
+            if (allele==''){
                 allele                                      <- 'NA'
             }
             rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
