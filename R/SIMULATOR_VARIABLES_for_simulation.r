@@ -182,10 +182,6 @@ print(TABLE_INITIAL_OTHERS)
 #       Get driver profile of this clone
         loc                                 <- which(TABLE_INITIAL_OTHERS$Clone==clone)
         all_drivers                         <- TABLE_INITIAL_OTHERS$Drivers[loc]
-
-print(all_drivers)
-print(is.na(all_drivers))
-
         if (is.na(all_drivers)){
             initial_driver_count[clone]     <<- 0
             initial_driver_map[[clone]]     <<- matrix(0,nrow=1)
@@ -198,12 +194,8 @@ print(is.na(all_drivers))
 #       Update the driver map for this clone
         driver_map                          <- c()
         for (driver in 1:length(list_drivers)){
-print(list_drivers[driver])
             driver_info                     <- strsplit(list_drivers[driver],'_')
-print(driver_info)
             driver_info                     <- driver_info[[1]]
-print(driver_info)
-
 #           Get driver's ID, strand and unit
             driver_ID                       <- driver_info[1]
             driver_strand                   <- strtoi(sub('.*strand','',driver_info[2]))

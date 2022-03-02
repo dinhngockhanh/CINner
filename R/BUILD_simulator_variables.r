@@ -292,7 +292,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         TABLE_INITIAL_OTHERS                                <- MODEL_VARIABLES$initial_others
         I_clone                                             <- nrow(TABLE_INITIAL_OTHERS)+1
 
-        TABLE_INITIAL_OTHERS[I_clone,]                      <- c(1,cell_count,DRIVERS)
+        TABLE_INITIAL_OTHERS[I_clone,]                      <- c(I_clone,cell_count,DRIVERS)
     }
 #------------------------------------Update initial clones - CN profiles
     TABLE_CHROMOSOME_CN_INFO                                <- MODEL_VARIABLES$cn_info
