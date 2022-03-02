@@ -120,17 +120,12 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           CN_focal=CN_focal,
                                           drivers=drivers)
 
-
-
-
-print(MODEL_VARIABLES$general_variables)
-print(MODEL_VARIABLES$cn_info)
-print(MODEL_VARIABLES$population_dynamics)
-print(MODEL_VARIABLES$driver_library)
-print(MODEL_VARIABLES$initial_cn)
-print(MODEL_VARIABLES$initial_others)
+MODEL_NAME        <- 'EXPERIMENT-1A'
 
 SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
+
+stage_final       <- 3
+simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL_NAME,stage_final)
 ```
 
 

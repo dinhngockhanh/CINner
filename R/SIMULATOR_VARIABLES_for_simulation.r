@@ -3,6 +3,9 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #--------------------------------------Set up variables for cancer model
 #---Input table of variables from file
     filename                                <- paste(model,'-input-variables.csv',sep='')
+
+print(filename)
+
     TABLE_VARIABLES                         <- read.table(filename,header=TRUE,sep=',')
 #---Input table of total population dynamics
     filename                                <- paste(model,'-input-population-dynamics.csv',sep='')
