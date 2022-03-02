@@ -291,8 +291,8 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
 
     }
     for (i_chrom in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
-        chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
-        centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i]
+        chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i_chrom]
+        centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i_chrom]
         for (strand in 1:max_no_strands){
             col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
             strand_allele                                   <- CN_arm[[i_chrom]][[strand]]
