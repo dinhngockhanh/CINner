@@ -127,6 +127,9 @@ print(TABLE_INITIAL_OTHERS)
                 CHROM_COPY_NUMBER_PROFILES  <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
             }
 
+print(CHROM_COPY_NUMBER_PROFILES)
+print(ncol(CHROM_COPY_NUMBER_PROFILES))
+
             if (ncol(CHROM_COPY_NUMBER_PROFILES)==0){
                 no_blocks                   <- vec_CN_block_no[chrom]
                 ploidy_chrom[chrom]         <- 0
