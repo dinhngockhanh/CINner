@@ -247,12 +247,18 @@ BUILD_driver_library <- function(MODEL_VARIABLES    = list(),
 
 BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
                                      cell_count         = 1,
-                                     CN_arm             = c(rep('AB',46),rep('',2)),
-                                     CN_focal           = c(),
-                                     drivers            = ''){
+                                     CN_arm             = cbind(c(rep('A-A',length=23),''),c(rep('B-B',length=23),'')),
+                                     CN_focal           = list(),
+                                     drivers            = list()){
 #------------------------------Update initial clones - other information
     if (is.null(MODEL_VARIABLES$initial_others)){
         columns                                             <- c('Clone','Cell_count','Drivers')
+
+        DRIVERS                                             <- ''
+        if (length(drivers)>0){
+            for (i in 1:)
+        }
+
         TABLE_INITIAL_OTHERS                                <- data.frame(1,cell_count,drivers)
         colnames(TABLE_INITIAL_OTHERS)                      <- columns
         I_clone                                             <- 1
@@ -279,67 +285,83 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         TABLE_INITIAL_CN                                    <- MODEL_VARIABLES$initial_cn
     }
 #---Build the CN profile for the new clone - start from arm level
-    max_no_strands                                          <- max(nchar(CN_arm))
+    max_no_strands                                          <- ncol(CN_arm)
     for (strand in 1:max_no_strands){
         TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
+
     }
-    for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
+    for (i_chrom in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
         chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
         centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i]
-        for (arm in 1:2){
-            if (arm==1){
-                vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
-                vec_alleles                                 <- CN_arm[2*i-1]
-            }else{
-                vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
-                vec_alleles                                 <- CN_arm[2*i]
-            }
-            if (nchar(vec_alleles)==0){
+        for (strand in 1:max_no_strands){
+            col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+            strand_allele                                   <- CN_arm[[i_chrom]][[strand]]
+            if (strand_allele==''){
                 next
             }
-            for (strand in 1:nchar(vec_alleles)){
-                allele                                      <- substr(vec_alleles,strand,strand)
-                col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-                TABLE_INITIAL_CN[vec_rows,col]              <- allele
-            }
+            strand_allele_left                              <- sub('-.*','',strand_allele)
+            rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
+            TABLE_INITIAL_CN[rows,col]                      <- strand_allele_left
+
+            strand_allele_right                             <- sub('.*-','',strand_allele)
+            rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
+            TABLE_INITIAL_CN[rows,col]                      <- strand_allele_right
         }
     }
-#---Build the CN profile for the new clone - continue with local regions
-    if (length(CN_focal)>=1){
-        for (i in 1:length(CN_focal)){
-            chrom                                           <- CN_focal[[i]][[1]]
-            bin_start                                       <- CN_focal[[i]][[2]]
-            bin_end                                         <- CN_focal[[i]][[3]]
-            vec_alleles                                     <- CN_focal[[i]][[4]]
-            vec_rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
-
-            if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
-                for (strand in (max_no_strands+1):nchar(vec_alleles)){
-                    TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
-                }
-            }
-
-            vec_cols                                        <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(TABLE_INITIAL_CN)))
-            TABLE_INITIAL_CN[vec_rows,vec_cols]             <- 'NA'
-
-print(vec_rows)
-print(vec_cols)
 
 
-            if (nchar(vec_alleles)==0){
-                next
-            }
 
-            for (strand in 1:nchar(vec_alleles)){
 
-print(strand)
-
-                allele                                      <- substr(vec_alleles,strand,strand)
-                col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-                TABLE_INITIAL_CN[vec_rows,col]              <- allele
-            }
-        }
-    }
+#     for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
+#         chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
+#         centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i]
+#         for (arm in 1:2){
+#             if (arm==1){
+#                 vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
+#                 vec_alleles                                 <- CN_arm[2*i-1]
+#             }else{
+#                 vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
+#                 vec_alleles                                 <- CN_arm[2*i]
+#             }
+#             if (nchar(vec_alleles)==0){
+#                 next
+#             }
+#             for (strand in 1:nchar(vec_alleles)){
+#                 allele                                      <- substr(vec_alleles,strand,strand)
+#                 col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+#                 TABLE_INITIAL_CN[vec_rows,col]              <- allele
+#             }
+#         }
+#     }
+# #---Build the CN profile for the new clone - continue with local regions
+#     if (length(CN_focal)>=1){
+#         for (i in 1:length(CN_focal)){
+#             chrom                                           <- CN_focal[[i]][[1]]
+#             bin_start                                       <- CN_focal[[i]][[2]]
+#             bin_end                                         <- CN_focal[[i]][[3]]
+#             vec_alleles                                     <- CN_focal[[i]][[4]]
+#             vec_rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
+#             if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
+#                 for (strand in (max_no_strands+1):nchar(vec_alleles)){
+#                     TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
+#                 }
+#             }
+#             vec_cols                                        <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(TABLE_INITIAL_CN)))
+#             TABLE_INITIAL_CN[vec_rows,vec_cols]             <- 'NA'
+#             if (nchar(vec_alleles)==0){
+#                 next
+#             }
+#
+#             for (strand in 1:nchar(vec_alleles)){
+#
+# print(strand)
+#
+#                 allele                                      <- substr(vec_alleles,strand,strand)
+#                 col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+#                 TABLE_INITIAL_CN[vec_rows,col]              <- allele
+#             }
+#         }
+#     }
 
 
 

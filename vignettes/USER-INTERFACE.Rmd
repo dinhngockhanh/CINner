@@ -178,16 +178,30 @@ MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
 
 ## Initial cell population
 
-Assume we have 20 cells at `T_0`. We can link the cells to clones sharing the same driver and CN profile. There are four variables describing each clone. `cell_count` is the number of cells in this clone at `T_0`. `CN_arm` gives the baseline allele specifics of each chromosome arm. `CN_focal` overrides the baseline with specific bins' abnormal alleles (if any). Finally, `drivers` lists the mutated drivers to be placed on the genome.
+For a given cell, we have to know how many strands there are of each chromosome. For every strand, we have to provide the alleles at each bin.
 
-Let's start with having 10 cells with normal female diploid genotype. There would be two strands of each chromosome (strand `A` and strand `B`) from chromosome 1 to X, and no chromosome Y.
+Assume we have 20 cells at `T_0`. We can link the cells to clones sharing the same driver and CN profile.
+
+Let's start by declaring the clone for the first 10 cells. `cell_count` tells the algorithm how many cells there are in this clone at `T_0`.
 
 ```{r}
 cell_count        <- 10
-CN_arm            <- c(rep('AB',46),rep('',2))
-CN_focal          <- c()
-drivers           <- ''
+```
 
+`CN_arm` is a matrix of the baseline allele specification for each arm of each strand.
+
+```{r}
+CN_strand_1       <- c(rep('A-A',length=23),'')
+CN_strand_2       <- c(rep('B-B',length=23),'')
+CN_arm            <- cbind(CN_strand_1,CN_strand_2)
+print(CN_arm)
+```
+
+`CN_focal` overrides `CN_arm` if there are CN events targetting
+
+```{r}
+CN_focal          <- list()
+drivers           <- ''
 MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           cell_count=cell_count,
                                           CN_arm=CN_arm,
@@ -195,7 +209,28 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           drivers=drivers)
 ```
 
-The second clone contains 5 cells, and
+The second clone contains 5 cells, assume that it has undergone the driver and CN events in order:
+
+1. Gain TP53 mutation on strand B
+2. Terminal CN-LOH on chromosome 17 from bin 1 to bin 20. Now the
+
+
+replacing allele A with allele B (giving the TP52 mutation a second-hit).
+3. Focal deletion on chromosome 3 from bin 50-70 on strand B
+4. Whole-genome duplication
+5. Gain BRAF mutation on strand B
+6. Addition of chromosome-arm 10p
+
+Then `CN_arm` should be `AABB` for every chromosome 1-X, except `AABBB` on chromosome-arm 10p.
+`CN_focal` should account for the `BBBB` configuration on chromosome 17 on bin 1-20 and the `AA` configuration on chromosome 3 on bins 50-70.
+There are driver mutations of TP53 and BRAF at 5 locations: TP53 on all strands of chromosome 17 and BRAF on strand 3 of chromosome 7 (which has allele B).
+
+```{r}
+cell_count        <- 5
+CN_arm            <- c(rep('AABB',46),rep('',2))
+CN_arm[21]        <- 'AABBB'
+CN_focal          <- list(list(17,1,20,'BBBB'))
+```
 
 
 
