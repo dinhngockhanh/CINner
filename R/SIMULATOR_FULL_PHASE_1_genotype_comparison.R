@@ -16,9 +16,9 @@ SIMULATOR_FULL_PHASE_1_genotype_comparison <- function(genotype_1,genotype_2) {
         chrom_ploidy    <- ploidy_chrom_1[chrom]
         for (strand in 1:chrom_ploidy) {
 
-            if (strand==0){
-                next
-            }
+            # if (strand==0){
+            #     next
+            # }
 
             if (any(ploidy_block_1[[chrom]][[strand]] != ploidy_block_2[[chrom]][[strand]])) {
                 output  <- 0
