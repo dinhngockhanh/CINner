@@ -34,12 +34,6 @@ devtools::document()
 
 Cancer Simulator requires several csv files containing variables to set up the simulations. Here we detail how to easily build these files.
 
-Let's give a name to the model.
-
-```{r}
-MODEL                               <- 'EXPERIMENT-1'
-```
-
 ## General variables for every cell
 
 The first step is to specify the variables describing every cell during the process. The cells are assumed to have the same expected lifespan (regardless of their driver or CN profiles). The cell lifespan is always in days.
@@ -279,9 +273,17 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
 
 ## Save the input files
 
-The last step is to save the model variable files:
+The last step is to save the model variable files.
 
+Let's give a name to the model.
 
+```{r}
+MODEL_NAME        <- 'EXPERIMENT-1A'
+```
+
+```{r}
+SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
+```
 
 
 

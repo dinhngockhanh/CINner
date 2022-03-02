@@ -357,54 +357,33 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             TABLE_INITIAL_CN[rows,col]                      <- allele
         }
     }
-
-
-
-
-
-
-
-
-# #---Build the CN profile for the new clone - continue with local regions
-#     if (length(CN_focal)>=1){
-#         for (i in 1:length(CN_focal)){
-#             chrom                                           <- CN_focal[[i]][[1]]
-#             bin_start                                       <- CN_focal[[i]][[2]]
-#             bin_end                                         <- CN_focal[[i]][[3]]
-#             vec_alleles                                     <- CN_focal[[i]][[4]]
-#             vec_rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
-#             if ((vec_alleles!='')&(nchar(vec_alleles)>max_no_strands)){
-#                 for (strand in (max_no_strands+1):nchar(vec_alleles)){
-#                     TABLE_INITIAL_CN[paste('Clone_',I_clone,'_strand_',strand,sep='')]  <- 'NA'
-#                 }
-#             }
-#             vec_cols                                        <- which(grepl(paste('Clone_',I_clone,sep=''),colnames(TABLE_INITIAL_CN)))
-#             TABLE_INITIAL_CN[vec_rows,vec_cols]             <- 'NA'
-#             if (nchar(vec_alleles)==0){
-#                 next
-#             }
-#
-#             for (strand in 1:nchar(vec_alleles)){
-#
-# print(strand)
-#
-#                 allele                                      <- substr(vec_alleles,strand,strand)
-#                 col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-#                 TABLE_INITIAL_CN[vec_rows,col]              <- allele
-#             }
-#         }
-#     }
-
-
-
-
-
-
-
-
-
 #----------------------------------------Output the model variable files
     MODEL_VARIABLES$initial_others                          <- TABLE_INITIAL_OTHERS
     MODEL_VARIABLES$initial_cn                              <- TABLE_INITIAL_CN
     return(MODEL_VARIABLES)
+}
+
+SAVE_model_variables <- function(MODEL_NAME='',
+                                MODEL_VARIABLES=list()){
+#---Save file for general variables
+    filename    <- paste(MODEL_NAME,'-input-variables.csv',sep='')
+    write.csv(MODEL_VARIABLES$general_variables,filename)
+#---Save file for CN information
+    filename    <- paste(MODEL_NAME,'-input-copy-number-blocks.csv',sep='')
+    write.csv(MODEL_VARIABLES$cn_info,filename)
+#---Save file for population dynamics
+    filename    <- paste(MODEL_NAME,'-input-population-dynamics.csv',sep='')
+    write.csv(MODEL_VARIABLES$population_dynamics,filename)
+
+
+
+#---Save file for driver library
+    filename    <- paste(MODEL_NAME,'-input-cancer-genes.csv',sep='')
+    write.csv(MODEL_VARIABLES$driver_library,filename)
+#---Save file for initial clones' CN profiles
+    filename    <- paste(MODEL_NAME,'-input-initial-cn-profiles.csv',sep='')
+    write.csv(MODEL_VARIABLES$initial_cn,filename)
+#---Save file for initial clones' other information
+    filename    <- paste(MODEL_NAME,'-input-initial-others.csv',sep='')
+    write.csv(MODEL_VARIABLES$initial_others,filename)
 }

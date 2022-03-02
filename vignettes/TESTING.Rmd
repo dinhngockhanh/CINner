@@ -100,7 +100,7 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           drivers=drivers)
 
 
-cell_count        <- 5
+cell_count        <- 10
 CN_strand_1       <- c(rep('A-A',length=23),'')
 CN_strand_2       <- c(rep('B-B',length=23),'')
 CN_strand_3       <- c(rep('A-B',length=23),'')
@@ -129,6 +129,8 @@ print(MODEL_VARIABLES$population_dynamics)
 print(MODEL_VARIABLES$driver_library)
 print(MODEL_VARIABLES$initial_cn)
 print(MODEL_VARIABLES$initial_others)
+
+SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
 ```
 
 
