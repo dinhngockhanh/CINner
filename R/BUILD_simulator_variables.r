@@ -300,6 +300,7 @@ print('------')
 print(CN_arm)
 print(i_chrom)
 print(strand)
+print(CN_arm[[i_chrom]][[strand]])
 
             strand_allele                                   <- CN_arm[[i_chrom]][[strand]]
             if (strand_allele==''){
