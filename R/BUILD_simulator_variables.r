@@ -3,6 +3,7 @@ BUILD_general_variables <- function(model_name                           = 'MODE
                                     cell_lifespan                        = 4,
                                     T_0                                  = list(0,'year'),
                                     T_end                                = list(100,'year'),
+                                    N_sample                             = 0,
                                     T_tau_step                           = 3,
                                     table_population_dynamics            = matrix(0,ncol=2,nrow=2),
                                     Population_end                       = Inf,
@@ -70,6 +71,23 @@ BUILD_general_variables <- function(model_name                           = 'MODE
     }}}}
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_end_time',T_end_time,'day','Age when simulation stops (for internal use)')
+
+
+
+
+
+
+
+#   Set up the number of cells to sample
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('N_sample',N_sample,'cell count','Number of cells in sequencing sample (Inf if sampling every cell)')
+
+
+
+
+
+
+
 #   Set up the time step for tau-leaping algorithm
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_tau_step',T_tau_step,'day','Time step for tau-leaping algorithm for simulation')
@@ -259,7 +277,7 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             driver_ID                                       <- drivers[[i]][[3]]
             if (DRIVERS!=''){
                 DRIVERS                     <- paste(DRIVERS,';',sep='')
-            } 
+            }
             DRIVERS                                         <- paste(DRIVERS,driver_ID,'_strand',strand,'_unit',unit,sep='')
         }
     }

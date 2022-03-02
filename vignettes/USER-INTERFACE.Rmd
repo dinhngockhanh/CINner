@@ -55,6 +55,12 @@ T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 ```
 
+We will sample 200 cells from the population at `T_end`:
+
+```{r}
+N_sample                            <- 200
+```
+
 We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
 
 ```{r}
@@ -121,6 +127,7 @@ Finally, we build the model variable files, using function `BUILD_general_variab
 MODEL_VARIABLES   <- BUILD_general_variables(cell_lifespan=cell_lifespan,
                         T_0=T_0,
                         T_end=T_end,
+                        N_sample=N_sample,
                         T_tau_step=T_tau_step,
                         CN_bin_length=CN_bin_length,
                         prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
@@ -178,9 +185,9 @@ MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
 
 ## Initial cell population
 
-For a given cell, we have to know how many strands there are of each chromosome. For every strand, we have to provide the alleles at each bin.
+Assume we have 20 cells at `T_0`, which come from 2 different clones. We will declare the specifics of each clone.
 
-Assume we have 20 cells at `T_0`. We can link the cells to clones sharing the same driver and CN profile.
+### Normal diploid cells
 
 Let's start by declaring the clone for the first 10 cells. `cell_count` tells the algorithm how many cells there are in this clone at `T_0`.
 
@@ -188,7 +195,7 @@ Let's start by declaring the clone for the first 10 cells. `cell_count` tells th
 cell_count        <- 10
 ```
 
-`CN_arm` is a matrix of the baseline allele specification for each arm of each strand.
+`CN_arm` is a matrix of the baseline allele specification for each arm of each strand. A strand having `B-B` tells the algorithm that it has allele B everywhere.
 
 ```{r}
 CN_strand_1       <- c(rep('A-A',length=23),'')
@@ -197,11 +204,21 @@ CN_arm            <- cbind(CN_strand_1,CN_strand_2)
 print(CN_arm)
 ```
 
-`CN_focal` overrides `CN_arm` if there are CN events targetting
+`CN_focal` overrides `CN_arm` if there are local CN events. As there is no abnormal CN, this is empty.
 
 ```{r}
 CN_focal          <- list()
-drivers           <- ''
+```
+
+Finally, `drivers` lists the mutated drivers, also empty for this clone.
+
+```{r}
+drivers           <- list()
+```
+
+We use the function `BUILD_initial_population` to add this clone to the initial cell population.
+
+```{r}
 MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           cell_count=cell_count,
                                           CN_arm=CN_arm,
@@ -209,28 +226,60 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           drivers=drivers)
 ```
 
-The second clone contains 5 cells, assume that it has undergone the driver and CN events in order:
+### Clone with WGD and mutated TP53 activated via CN-LOH
+
+The second clone contains 10 cells, and it has undergone the driver and CN events in order:
 
 1. Gain TP53 mutation on strand B
-2. Terminal CN-LOH on chromosome 17 from bin 1 to bin 20. Now the
+2. Terminal CN-LOH on chromosome 17 from bin 1 to bin 20
+3. Whole-genome duplication
 
-
-replacing allele A with allele B (giving the TP52 mutation a second-hit).
-3. Focal deletion on chromosome 3 from bin 50-70 on strand B
-4. Whole-genome duplication
-5. Gain BRAF mutation on strand B
-6. Addition of chromosome-arm 10p
-
-Then `CN_arm` should be `AABB` for every chromosome 1-X, except `AABBB` on chromosome-arm 10p.
-`CN_focal` should account for the `BBBB` configuration on chromosome 17 on bin 1-20 and the `AA` configuration on chromosome 3 on bins 50-70.
-There are driver mutations of TP53 and BRAF at 5 locations: TP53 on all strands of chromosome 17 and BRAF on strand 3 of chromosome 7 (which has allele B).
+Again, we declare the clone's population at `T_0`:
 
 ```{r}
 cell_count        <- 5
-CN_arm            <- c(rep('AABB',46),rep('',2))
-CN_arm[21]        <- 'AABBB'
-CN_focal          <- list(list(17,1,20,'BBBB'))
 ```
+
+Because of WGD, there are two strands A and two strands B of each chromosome:
+
+```{r}
+CN_strand_1       <- c(rep('A-A',length=23),'')
+CN_strand_2       <- c(rep('B-B',length=23),'')
+CN_strand_3       <- c(rep('B-B',length=23),'')
+CN_strand_4       <- c(rep('B-B',length=23),'')
+CN_arm            <- cbind(CN_strand_1,CN_strand_2,CN_strand_3,CN_strand_4)
+print(CN_arm)
+```
+
+Except on chromosome 17. Since the CN-LOH event happens before WGD, the region on all strands should be replaced with the B allele.
+
+```{r}
+CN_focal          <- list(    list(chromosome=17,strand=1,bin_start=1,bin_end=20,allele='B'),
+                              list(chromosome=17,strand=2,bin_start=1,bin_end=20,allele='B'),
+                              list(chromosome=17,strand=3,bin_start=1,bin_end=20,allele='B'),
+                              list(chromosome=17,strand=4,bin_start=1,bin_end=20,allele='B'))
+```
+
+Finally, there should be mutated TP53 on all strands of chromosome 17:
+
+```{r}
+drivers           <- list(    list(strand=1,unit=1,driver='TP53'),
+                              list(strand=2,unit=1,driver='TP53'),
+                              list(strand=3,unit=1,driver='TP53'),
+                              list(strand=4,unit=1,driver='TP53'))
+```
+
+```{r}
+MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
+                                          cell_count=cell_count,
+                                          CN_arm=CN_arm,
+                                          CN_focal=CN_focal,
+                                          drivers=drivers)
+```
+
+## Save the input files
+
+The last step is to save the model variable files:
 
 
 
