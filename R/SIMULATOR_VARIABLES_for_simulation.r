@@ -7,6 +7,9 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 print(filename)
 
     TABLE_VARIABLES                         <- read.table(filename,header=TRUE,sep=',')
+
+print(TABLE_VARIABLES)
+
 #---Input table of total population dynamics
     filename                                <- paste(model,'-input-population-dynamics.csv',sep='')
     TABLE_POPULATION_DYNAMICS               <- read.table(filename,header=TRUE,sep=',')
