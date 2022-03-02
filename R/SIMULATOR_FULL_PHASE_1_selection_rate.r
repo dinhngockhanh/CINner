@@ -41,11 +41,11 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         block                                       <- driver_library_copy$Bin[i_driver]
         no_strands                                  <- ploidy_chrom[chrom]
         driver_copy                                 <- 0
-        if (no_strands>0){
+        # if (no_strands>0){
             for (strand in 1:no_strands){
                 driver_copy                         <- driver_copy+ploidy_block[[chrom]][[strand]][block]
             }
-        }
+        # }
         driver_library_copy$Copy_WT[i_driver]       <- driver_copy
     }
     if (driver_count>=1){
