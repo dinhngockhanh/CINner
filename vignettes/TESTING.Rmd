@@ -84,12 +84,15 @@ MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
 
 
 cell_count        <- 10
+
 CN_strand_1       <- c(rep('A-A',length=23),'')
 CN_strand_2       <- c(rep('B-B',length=23),'')
 CN_arm            <- cbind(CN_strand_1,CN_strand_2)
-print(CN_arm)
+
 CN_focal          <- list()
-drivers           <- ''
+
+drivers           <- list()
+
 MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           cell_count=cell_count,
                                           CN_arm=CN_arm,
@@ -100,14 +103,16 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
 
 
 cell_count        <- 10
+
 CN_strand_1       <- c(rep('A-A',length=23),'')
 CN_strand_2       <- c(rep('B-B',length=23),'')
 CN_arm            <- cbind(CN_strand_1,CN_strand_2)
-CN_arm[1,2]       <- 'A-A'
 
-print(CN_arm)
-CN_focal          <- list()
-drivers           <- ''
+CN_focal          <- list(    list(1,1,1,10,'AA'),
+                              list(2,2,3,7,''))
+
+drivers           <- list()
+
 MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
                                           cell_count=cell_count,
                                           CN_arm=CN_arm,

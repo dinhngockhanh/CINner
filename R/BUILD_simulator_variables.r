@@ -299,40 +299,45 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             if (strand_allele==''){
                 next
             }
+
             strand_allele_left                              <- sub('-.*','',strand_allele)
-            rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
-            TABLE_INITIAL_CN[rows,col]                      <- strand_allele_left
+            if (strand_allele_left!=''){
+                rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
+                TABLE_INITIAL_CN[rows,col]                  <- strand_allele_left
+            }
 
             strand_allele_right                             <- sub('.*-','',strand_allele)
-            rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
-            TABLE_INITIAL_CN[rows,col]                      <- strand_allele_right
+            if (strand_allele_right!=''){
+                rows                                        <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
+                TABLE_INITIAL_CN[rows,col]                  <- strand_allele_right
+            }
+        }
+    }
+#---Build the CN profile for the new clone - continue with local regions
+    if (length(CN_focal)>0){
+        for (i_focal in 1:length(CN_focal)){
+            focal_event                                     <- CN_focal[[i_focal]]
+            chrom                                           <- focal_event[[1]]
+            strand                                          <- focal_event[[2]]
+            bin_start                                       <- focal_event[[3]]
+            bin_end                                         <- focal_event[[4]]
+            allele                                          <- focal_event[[5]]
+            if (allele=''){
+                allele                                      <- 'NA'
+            }
+            rows                                            <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>=bin_start)&(TABLE_INITIAL_CN$Bin<=bin_end))
+            col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+            TABLE_INITIAL_CN[rows,col]                      <- allele
         }
     }
 
 
 
 
-#     for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
-#         chrom                                               <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
-#         centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i]
-#         for (arm in 1:2){
-#             if (arm==1){
-#                 vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin<=centromere))
-#                 vec_alleles                                 <- CN_arm[2*i-1]
-#             }else{
-#                 vec_rows                                    <- which((TABLE_INITIAL_CN$Chromosome==chrom)&(TABLE_INITIAL_CN$Bin>centromere))
-#                 vec_alleles                                 <- CN_arm[2*i]
-#             }
-#             if (nchar(vec_alleles)==0){
-#                 next
-#             }
-#             for (strand in 1:nchar(vec_alleles)){
-#                 allele                                      <- substr(vec_alleles,strand,strand)
-#                 col                                         <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
-#                 TABLE_INITIAL_CN[vec_rows,col]              <- allele
-#             }
-#         }
-#     }
+
+
+
+
 # #---Build the CN profile for the new clone - continue with local regions
 #     if (length(CN_focal)>=1){
 #         for (i in 1:length(CN_focal)){
