@@ -327,6 +327,9 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             allele                                          <- focal_event[[5]]
 
 print('----------------')
+print(I_clone)
+print(paste('Clone_',I_clone,'_strand_',strand,sep=''))
+
 print(chrom)
 print(strand)
 print(bin_start)
