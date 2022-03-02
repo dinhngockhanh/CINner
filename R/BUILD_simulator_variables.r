@@ -295,6 +295,12 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
         centromere                                          <- TABLE_CHROMOSOME_CN_INFO$Centromere_location[i_chrom]
         for (strand in 1:max_no_strands){
             col                                             <- which(colnames(TABLE_INITIAL_CN)==paste('Clone_',I_clone,'_strand_',strand,sep=''))
+
+print('------')
+print(CN_arm)
+print(i_chrom)
+print(strand)
+
             strand_allele                                   <- CN_arm[[i_chrom]][[strand]]
             if (strand_allele==''){
                 next
