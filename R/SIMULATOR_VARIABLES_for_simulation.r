@@ -117,7 +117,7 @@ print(TABLE_INITIAL_OTHERS)
 #           Get CN genotype for this chromosome
             CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==  TABLE_CHROMOSOME_CN_INFO$Chromosome[chrom],]
 
-print('--------')
+print('========')
 print(clone)
 print(chrom)
 print(CHROM_COPY_NUMBER_PROFILES)
@@ -145,10 +145,10 @@ print(CHROM_COPY_NUMBER_PROFILES)
                     col                     <- strand+2
                     vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
 
-# print('-------------')
-# print(chrom)
-# print(N_chromosomes)
-# print(vec_allele)
+print('-------------')
+print(chrom)
+print(N_chromosomes)
+print(vec_allele)
 
                     if (is.na(vec_allele)){
                         strand_ploidy_block[block]              <- 0
