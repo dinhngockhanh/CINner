@@ -130,13 +130,13 @@ print(TABLE_INITIAL_OTHERS)
 
 
 
-            if (ncol(CHROM_COPY_NUMBER_PROFILES)==2){
-                no_blocks                   <- vec_CN_block_no[chrom]
-                ploidy_chrom[chrom]         <- 0
-                ploidy_block[[chrom]][[1]]  <- rep(0,no_blocks)
-                ploidy_allele[[chrom]][[1]] <- matrix(rep(0,no_blocks),nrow=1)
-                next
-            }
+            # if (ncol(CHROM_COPY_NUMBER_PROFILES)==2){
+            #     no_blocks                   <- vec_CN_block_no[chrom]
+            #     ploidy_chrom[chrom]         <- 0
+            #     ploidy_block[[chrom]][[1]]  <- rep(0,no_blocks)
+            #     ploidy_allele[[chrom]][[1]] <- matrix(rep(0,no_blocks),nrow=1)
+            #     next
+            # }
 
 
 
