@@ -129,7 +129,7 @@ print(TABLE_INITIAL_OTHERS)
 
 
 
-            
+
             if (ncol(CHROM_COPY_NUMBER_PROFILES)==2){
                 no_blocks                   <- vec_CN_block_no[chrom]
                 ploidy_chrom[chrom]         <- 0
@@ -194,8 +194,12 @@ print(TABLE_INITIAL_OTHERS)
 #       Update the driver map for this clone
         driver_map                          <- c()
         for (driver in 1:length(list_drivers)){
+print(list_drivers[driver])
             driver_info                     <- strsplit(list_drivers[driver],'_')
+print(driver_info)
             driver_info                     <- driver_info[[1]]
+print(driver_info)
+
 #           Get driver's ID, strand and unit
             driver_ID                       <- driver_info[1]
             driver_strand                   <- strtoi(sub('.*strand','',driver_info[2]))
