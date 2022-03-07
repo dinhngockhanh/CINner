@@ -1,7 +1,10 @@
 #==================================COMPUTE THE SELECTION RATE OF A CLONE
-SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy_chrom,ploidy_block) {
+SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy_chrom,ploidy_block,ploidy_allele) {
 #-------------------------Cell is not viable if losing whole chromosomes
 #------------------------------------or exceeding maximum average ploidy
+
+print(ploidy_allele)
+
     vec_CN_all                      <- c()
     for (chrom in 1:N_chromosomes){
         no_strands                  <- ploidy_chrom[chrom]
