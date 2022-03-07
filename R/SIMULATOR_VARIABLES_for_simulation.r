@@ -204,10 +204,11 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #---Set up the initial clones' selection rates
     for (clone in 1:initial_N_clones){
         ploidy_chrom                        <- initial_ploidy_chrom[[clone]]
+        ploidy_allele                       <- initial_ploidy_allele[[clone]]
         ploidy_block                        <- initial_ploidy_block[[clone]]
         driver_count                        <- initial_driver_count[clone]
         driver_map                          <- initial_driver_map[[clone]]
-        selection_rate                      <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block)
+        selection_rate                      <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count,driver_map,ploidy_chrom,ploidy_block,ploidy_allele)
         initial_selection_rate[clone]       <<- selection_rate
     }
 
