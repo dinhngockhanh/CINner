@@ -117,9 +117,6 @@ stage_final       <- 3
 simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL_NAME,stage_final)
 
 
-SAVE_cell_cn_profiles(simulation,filename=paste(MODEL_NAME,'-output-cn-profiles',sep=''))
-
-
 PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,84,by=1),unit='year')
 
 

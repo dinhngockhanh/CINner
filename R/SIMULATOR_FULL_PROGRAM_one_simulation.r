@@ -29,6 +29,11 @@ end.time    <- Sys.time()
 time.taken  <- end.time - start.time
 print(time.taken)
     }
+#   Save the sample's cell CN profiles
+    sample_genotype_profiles                        <- package_sample[[1]]
+    filename                                        <- paste(model,'-output-cn-profiles','.rda',sep='')
+    # write.csv(sample_genotype_profiles,filename,row.names=FALSE)
+    save(sample_genotype_profiles,file=filename)
 #-----------------------------------Simulate the phylogeny of the sample
     if(stage_final>=3){
 print('')
@@ -40,8 +45,16 @@ end.time    <- Sys.time()
 time.taken  <- end.time - start.time
 print(time.taken)
     }
+#   Save the sample's cell phylogeny
+    phylogeny_clustering_truth                      <- package_sample_phylogeny[[1]]
+    filename                                        <- paste(model,'-output-clustering','.rda',sep='')
+    save(phylogeny_clustering_truth,file=filename)
+
+
+
 print('')
 print('DONE WITH SIMULATION...')
+
 #------------------------------------------Output the simulation package
     return(package_output)
 }
