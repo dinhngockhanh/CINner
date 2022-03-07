@@ -1,34 +1,34 @@
-BUILD_general_variables <- function(model_name                           = 'MODEL',
-                                    cell_lifespan                        = 4,
-                                    T_0                                  = list(0,'year'),
-                                    T_end                                = list(100,'year'),
-                                    N_sample                             = 0,
-                                    T_tau_step                           = 3,
-                                    table_population_dynamics            = matrix(0,ncol=2,nrow=2),
-                                    Population_end                       = Inf,
-                                    Max_events                           = Inf,
-                                    CN_bin_length                        = 500000,
-                                    prob_CN_whole_genome_duplication     = 0,
-                                    prob_CN_missegregation               = 0,
-                                    prob_CN_chrom_arm_missegregation     = 0,
-                                    prob_CN_focal_amplification          = 0,
-                                    prob_CN_focal_deletion               = 0,
-                                    prob_CN_cnloh_interstitial           = 0,
-                                    prob_CN_cnloh_terminal               = 0,
-                                    prob_CN_focal_amplification_length   = 0.1,
-                                    prob_CN_focal_deletion_length        = 0.1,
-                                    prob_CN_cnloh_interstitial_length    = 0.1,
-                                    prob_CN_cnloh_terminal_length        = 0.1,
-                                    rate_driver                          = 0,
-                                    rate_passenger                       = 0,
-                                    bound_driver                         = 3,
-                                    bound_ploidy                         = 10,
-                                    SFS_totalsteps                       = 25,
-                                    prob_coverage                        = 0.05,
-                                    alpha_coverage                       = 0.7,
-                                    lower_limit_cell_counts              = 0,
-                                    lower_limit_alt_counts               = 3,
-                                    lower_limit_tot_counts               = 0){
+BUILD_general_variables <- function(model_name                          = 'MODEL',
+                                    cell_lifespan                       = 4,
+                                    T_0                                 = list(0,'year'),
+                                    T_end                               = list(100,'year'),
+                                    N_sample                            = 0,
+                                    T_tau_step                          = 3,
+                                    table_population_dynamics           = matrix(0,ncol=2,nrow=2),
+                                    Population_end                      = Inf,
+                                    Max_events                          = Inf,
+                                    CN_bin_length                       = 500000,
+                                    prob_CN_whole_genome_duplication    = 0,
+                                    prob_CN_missegregation              = 0,
+                                    prob_CN_chrom_arm_missegregation    = 0,
+                                    prob_CN_focal_amplification         = 0,
+                                    prob_CN_focal_deletion              = 0,
+                                    prob_CN_cnloh_interstitial          = 0,
+                                    prob_CN_cnloh_terminal              = 0,
+                                    prob_CN_focal_amplification_length  = 0.1,
+                                    prob_CN_focal_deletion_length       = 0.1,
+                                    prob_CN_cnloh_interstitial_length   = 0.1,
+                                    prob_CN_cnloh_terminal_length       = 0.1,
+                                    rate_driver                         = 0,
+                                    rate_passenger                      = 0,
+                                    bound_driver                        = 3,
+                                    bound_average_ploidy                = 5,
+                                    SFS_totalsteps                      = 25,
+                                    prob_coverage                       = 0.05,
+                                    alpha_coverage                      = 0.7,
+                                    lower_limit_cell_counts             = 0,
+                                    lower_limit_alt_counts              = 3,
+                                    lower_limit_tot_counts              = 0){
 #---------------------------Build model input file for general variables
     columns                             <- c('Variable','Value','Unit','Note')
     TABLE_VARIABLES                     <- data.frame(matrix(nrow=0,ncol=length(columns)))
@@ -134,7 +134,7 @@ BUILD_general_variables <- function(model_name                           = 'MODE
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('bound_driver',bound_driver,'driver count','Maximum driver count in viable cells (cells exceeding this will die)')
     N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('bound_ploidy',bound_ploidy,'local CN','Maximum local CN in viable cells (cells exceeding this will die)')
+    TABLE_VARIABLES[N_row,]             <- c('bound_average_ploidy',bound_average_ploidy,'','Maximum average ploidy across genome (cells exceeding this will die)')
 #   Set up variables for sequencing
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('SFS_totalsteps',SFS_totalsteps,'','Bin count in SFS data')
