@@ -18,6 +18,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
             return(clone_selection_rate)
         }
     }
+
+    print(bound_ploidy)
+
 #-------------------Cell is not viable if exceeding maximum driver count
     if (driver_count>0){
         driver_count_unique         <- unique(driver_map[,1])
