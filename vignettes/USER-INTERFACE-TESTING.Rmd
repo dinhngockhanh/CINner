@@ -1,0 +1,134 @@
+```{r setup}
+devtools::install_github("dinhngockhanh/CancerSimulator")
+
+
+library(ggplot2)
+library(signals)
+library(dendextend)
+library(fishplot)
+
+library(CancerSimulator)
+
+devtools::load_all()
+devtools::document()
+```
+
+```{r,fig.height=7,fig.width=10}
+MODEL                               <- 'EXPERIMENT-1'
+cell_lifespan                       <- 30
+T_0                                 <- list(0,'year')
+T_end                               <- list(80,'year')
+N_sample                            <- 200
+T_tau_step                          <- 3
+CN_bin_length                       <- 500000
+            prob_CN_whole_genome_duplication    <- 0
+            prob_CN_missegregation              <- 3e-4
+            prob_CN_chrom_arm_missegregation    <- 3e-4
+            prob_CN_focal_amplification         <- 2e-4
+            prob_CN_focal_deletion              <- 2e-4
+            prob_CN_cnloh_interstitial          <- 2e-4
+            prob_CN_cnloh_terminal              <- 2e-4
+
+            prob_CN_focal_amplification_length  <- 0.3
+            prob_CN_focal_deletion_length       <- 0.3
+            prob_CN_cnloh_interstitial_length   <- 0.3
+            prob_CN_cnloh_terminal_length       <- 0.3
+
+            rate_driver                         <- 1e-16
+rate_passenger                      <- 1e-11
+bound_driver                        <- 3
+bound_ploidy                        <- 20
+vec_time                            <- T_0[[1]]:T_end[[1]]
+L                                   <- 10000
+t_0                                 <- 20
+k                                   <- 0.3
+vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
+table_population_dynamics           <- cbind(vec_time,vec_cell_count)
+MODEL_VARIABLES   <- BUILD_general_variables(cell_lifespan=cell_lifespan,
+T_0=T_0,
+T_end=T_end,
+N_sample=N_sample,
+T_tau_step=T_tau_step,
+CN_bin_length=CN_bin_length,
+prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
+prob_CN_missegregation=prob_CN_missegregation,
+prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
+prob_CN_focal_amplification=prob_CN_focal_amplification,
+prob_CN_focal_deletion=prob_CN_focal_deletion,
+prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
+prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
+prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
+prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
+prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
+prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
+rate_driver=rate_driver,
+rate_passenger=rate_passenger,
+bound_driver=bound_driver,
+bound_ploidy=bound_ploidy,
+table_population_dynamics=table_population_dynamics)
+vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
+'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
+vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
+'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
+            vec_driver_s      <- rep(0.01,length(vec_driver_genes))
+            vec_driver_s[1]   <- 0.01
+            vec_driver_s[2]   <- 0.01
+            vec_driver_s[3]   <- 0.01
+MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
+vec_driver_genes=vec_driver_genes,
+vec_driver_role=vec_driver_role,
+vec_driver_s=vec_driver_s)
+            cell_count        <- 10
+            CN_strand_1       <- c(rep('A-A',length=23),'')
+            CN_strand_2       <- c(rep('B-B',length=23),'')
+            CN_arm            <- cbind(CN_strand_1,CN_strand_2)
+            CN_focal          <- list()
+            drivers           <- list()
+MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
+cell_count=cell_count,
+CN_arm=CN_arm,
+CN_focal=CN_focal,
+drivers=drivers)
+            cell_count        <- 10
+            CN_strand_1       <- c(rep('A-A',length=23),'')
+            CN_strand_2       <- c(rep('B-B',length=23),'')
+            CN_strand_3       <- c(rep('A-B',length=23),'')
+            CN_strand_4       <- c(rep('B-B',length=23),'')
+            CN_arm            <- cbind(CN_strand_1,CN_strand_2,CN_strand_3,CN_strand_4)
+            CN_focal          <- list(    list(chromosome=17,strand=1,bin_start=1,bin_end=20,allele='B'),
+                                          list(chromosome=17,strand=2,bin_start=1,bin_end=20,allele='B'),
+                                          list(chromosome=17,strand=3,bin_start=1,bin_end=20,allele='B'),
+                                          list(chromosome=17,strand=4,bin_start=1,bin_end=20,allele='B'))
+            drivers           <- list(    list(strand=1,unit=1,driver='TP53'),
+                                          list(strand=2,unit=1,driver='TP53'),
+                                          list(strand=3,unit=1,driver='TP53'),
+                                          list(strand=4,unit=1,driver='TP53'))
+MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
+cell_count=cell_count,
+CN_arm=CN_arm,
+CN_focal=CN_focal,
+drivers=drivers)
+
+MODEL_NAME        <- 'EXPERIMENT-1A'
+
+SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
+
+stage_final       <- 3
+simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(MODEL_NAME,stage_final)
+
+
+
+PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,84,by=1),unit='year')
+
+
+PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='total_copy')
+
+
+PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='min_copy')
+
+
+PLOT_clonal_phylogeny(simulation)
+```

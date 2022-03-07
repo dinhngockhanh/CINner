@@ -17,27 +17,21 @@ SIMULATOR_VARIABLES_for_fitting <- function(model,parameter_set) {
     prob_CN_focal_deletion_length       <<- parameter_set$prob_CN_focal_deletion_length
     prob_CN_cnloh_interstitial_length   <<- parameter_set$prob_CN_cnloh_interstitial_length
     prob_CN_cnloh_terminal_length       <<- parameter_set$prob_CN_cnloh_terminal_length
-
-
-
 #---Set up the initial clones' DNA length
     for (clone in 1:initial_N_clones){
-        ploidy_chrom                        <- initial_ploidy_chrom[[clone]]
-        ploidy_block                        <- initial_ploidy_block[[clone]]
-        DNA_length                          <- 0
+        ploidy_chrom                    <- initial_ploidy_chrom[[clone]]
+        ploidy_block                    <- initial_ploidy_block[[clone]]
+        DNA_length                      <- 0
         for (chrom in 1:N_chromosomes) {
             for (strand in 1:ploidy_chrom[chrom]) {
-                DNA_length                  <- DNA_length+sum(ploidy_block[[chrom]][[strand]])
+                DNA_length              <- DNA_length+sum(ploidy_block[[chrom]][[strand]])
             }
         }
-        DNA_length                          <- size_CN_block_DNA*DNA_length
-        prob_new_drivers                    <- 1-dpois(x=0,lambda=rate_driver*DNA_length)
-        initial_DNA_length[[clone]]         <<- DNA_length
-        initial_prob_new_drivers[clone]     <<- prob_new_drivers
+        DNA_length                      <- size_CN_block_DNA*DNA_length
+        prob_new_drivers                <- 1-dpois(x=0,lambda=rate_driver*DNA_length)
+        initial_DNA_length[[clone]]     <<- DNA_length
+        initial_prob_new_drivers[clone] <<- prob_new_drivers
     }
-
-
-
 #---------------------------Set up the driver selection rates from input
     vec_selection_rates                 <<- parameter_set$vec_selection_rates
 #   Count the number of TSGs and ONCOGENEs
