@@ -3,7 +3,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
 #-------------------------Cell is not viable if losing whole chromosomes
 #------------------------------------or exceeding maximum average ploidy
 
-print(ploidy_allele)
+print(length(ploidy_allele))
 
     vec_CN_all                      <- c()
     for (chrom in 1:N_chromosomes){
