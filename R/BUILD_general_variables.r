@@ -23,6 +23,7 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
                                     rate_passenger                      = 0,
                                     bound_driver                        = 3,
                                     bound_average_ploidy                = 5,
+                                    bound_homozygosity                  = 0,
                                     SFS_totalsteps                      = 25,
                                     prob_coverage                       = 0.05,
                                     alpha_coverage                      = 0.7,
@@ -135,6 +136,8 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
     TABLE_VARIABLES[N_row,]             <- c('bound_driver',bound_driver,'driver count','Maximum driver count in viable cells (cells exceeding this will die)')
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('bound_average_ploidy',bound_average_ploidy,'','Maximum average ploidy across genome (cells exceeding this will die)')
+    N_row                               <- N_row+1
+    TABLE_VARIABLES[N_row,]             <- c('bound_homozygosity',bound_homozygosity,'','Maximum number of bins under homozygosity (cells exceeding this will die)')
 #   Set up variables for sequencing
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('SFS_totalsteps',SFS_totalsteps,'','Bin count in SFS data')
