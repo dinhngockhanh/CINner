@@ -2,10 +2,6 @@
 SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy_chrom,ploidy_block,ploidy_allele) {
 #-------------------------Cell is not viable if losing whole chromosomes
 #------------------------------------or exceeding maximum average ploidy
-
-# print(length(ploidy_allele))
-print(ploidy_allele)
-
     vec_CN_all                      <- c()
     for (chrom in 1:N_chromosomes){
         no_strands                  <- ploidy_chrom[chrom]
@@ -27,6 +23,16 @@ print(ploidy_allele)
         clone_selection_rate        <- 0
         return(clone_selection_rate)
     }
+#---------Cell is not viable is exceeding maximum length of homozygosity
+    # print(length(ploidy_allele))
+    # print(ploidy_allele)
+
+    print('-----------------')
+    chrom   <- 19
+    print(ploidy_chrom[[chrom]])
+    print(ploidy_block[[chrom]])
+    print(ploidy_allele[[chrom]])
+
 #-------------------Cell is not viable if exceeding maximum driver count
     if (driver_count>0){
         driver_count_unique         <- unique(driver_map[,1])
