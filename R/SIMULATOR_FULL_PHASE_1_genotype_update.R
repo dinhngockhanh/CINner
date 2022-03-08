@@ -42,7 +42,7 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype_1,genotype_2) {
     genotype_list_DNA_length[[genotype_2]]      <<- DNA_length_2
 #-----------------------Compute the selection rate for the new genotypes
     selection_rate_1                            <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_1,driver_map_1,ploidy_chrom_1,ploidy_block_1,ploidy_allele_1)
-    selection_rate_2                            <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_2,driver_map_2,ploidy_chrom_2,ploidy_block_2,ploidy_allele_1)
+    selection_rate_2                            <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_2,driver_map_2,ploidy_chrom_2,ploidy_block_2,ploidy_allele_2)
 #----------------------------Update the DNA length for the new genotypes
     genotype_list_selection_rate[genotype_1]    <<- selection_rate_1
     genotype_list_selection_rate[genotype_2]    <<- selection_rate_2
