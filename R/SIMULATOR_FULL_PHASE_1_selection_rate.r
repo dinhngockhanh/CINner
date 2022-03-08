@@ -28,17 +28,23 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
     for (chrom in 1:N_chromosomes){
         no_strands                  <- ploidy_chrom[chrom]
 
+print('--------')
+print(no_strands)
+print(length(ploidy_block[[chrom]]))
+print(length(ploidy_allele[[chrom]]))
+
+
         vec_allele_1                <- rep(0,vec_CN_block_no[chrom])
         vec_allele_2                <- rep(0,vec_CN_block_no[chrom])
 
         for (strand in 1:no_strands){
 
-print('--------')
-print(chrom)
-print(strand)
-print(max(ploidy_block[[chrom]][[strand]]))
-print(ncol(ploidy_allele[[chrom]][[strand]]))
-print(nrow(ploidy_allele[[chrom]][[strand]]))
+# print('--------')
+# print(chrom)
+# print(strand)
+# print(max(ploidy_block[[chrom]][[strand]]))
+# print(ncol(ploidy_allele[[chrom]][[strand]]))
+# print(nrow(ploidy_allele[[chrom]][[strand]]))
 
             N_rows                  <- nrow(ploidy_allele[[chrom]][[strand]])
             for (row in 1:N_rows){
