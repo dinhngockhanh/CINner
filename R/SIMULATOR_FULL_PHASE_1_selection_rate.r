@@ -36,6 +36,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
 print('--------')
 print(chrom)
 print(strand)
+print(max(ploidy_block[[chrom]][[strand]]))
 print(ncol(ploidy_allele[[chrom]][[strand]]))
 print(nrow(ploidy_allele[[chrom]][[strand]]))
 
