@@ -32,6 +32,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         vec_allele_2                <- rep(0,vec_CN_block_no[chrom])
 
         for (strand in 1:no_strands){
+
+print(ploidy_allele[[chrom]][[strand]])
+
             N_rows                  <- nrow(ploidy_allele[[chrom]][[strand]])
             for (row in 1:N_rows){
                 vec_loc_1               <- which(ploidy_allele[[chrom]][[strand]][row,]==1)
