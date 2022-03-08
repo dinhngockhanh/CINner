@@ -23,7 +23,7 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model='',
                                                                         print('');print('SAMPLING...');start.time  <- Sys.time()
             package_sample              <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
                                                                         end.time<-Sys.time();time.taken<-end.time-start.time;print(time.taken)
-            N_clones                    <- nrow(output[[package_sample]])
+            N_clones                    <- nrow(package_sample[[5]])
             if ((N_clones<N_clones_min)|(N_clones>N_clones_max)){
                 flag_success            <- 0
             }
