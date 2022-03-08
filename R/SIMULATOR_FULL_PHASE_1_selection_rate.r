@@ -25,7 +25,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
     }
 #---------Cell is not viable is exceeding maximum length of homozygosity
     L_homozygosity                  <- 0
-    for (chrom in 1:N_chromosome){
+    for (chrom in 1:N_chromosomes){
         no_strands                  <- ploidy_chrom[chrom]
 
         vec_allele_1                <- rep(0,vec_CN_block_no[chrom])

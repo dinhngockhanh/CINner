@@ -24,6 +24,7 @@
 "rate_passenger","1e-11","per bp per cell division","Poisson rate of getting new passenger mutations"
 "bound_driver","3","driver count","Maximum driver count in viable cells (cells exceeding this will die)"
 "bound_average_ploidy","5","","Maximum average ploidy across genome (cells exceeding this will die)"
+"bound_homozygosity","100","","Maximum number of bins under homozygosity (cells exceeding this will die)"
 "SFS_totalsteps","25","","Bin count in SFS data"
 "prob_coverage","0.05","","Mean coverage depth"
 "alpha_coverage","0.7","","Alpha parameter for coverage depth"
