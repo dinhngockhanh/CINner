@@ -45,10 +45,6 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         L_homozygosity              <- L_homozygosity+length(vec_homozygosity)
 
         if (L_homozygosity>bound_homozygosity){
-print('BOUND ON HOMOZYGOSITY:')
-print(chrom)
-print(L_homozygosity)
-print(bound_homozygosity)
             clone_selection_rate        <- 0
             return(clone_selection_rate)
         }
