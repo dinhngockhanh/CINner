@@ -28,6 +28,8 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
     for (chrom in 1:N_chromosomes){
         no_strands                  <- ploidy_chrom[chrom]
 
+        # no_strands                  <- length(ploidy_allele[[chrom]])
+
 if ((length(ploidy_block[[chrom]])<no_strands)|(length(ploidy_allele[[chrom]])<no_strands)){
 print('--------')
 print(no_strands)

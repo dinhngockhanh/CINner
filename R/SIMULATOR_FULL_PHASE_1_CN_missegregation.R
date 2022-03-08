@@ -142,6 +142,21 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
     driver_unique_2                                 <- driver_unique_2[driver_unique_2!=0]
     driver_count_2                                  <- length(driver_unique_2)
 #-----------------------------------------------Output the new genotypes
+
+
+if (i_gain==1){
+    print('--------')
+    print(ploidy_chrom_1[chrom])
+    print(length(ploidy_block_1[[chrom]]))
+    print(length(ploidy_allele_1[[chrom]]))
+}else{
+    print('--------')
+    print(ploidy_chrom_2[chrom])
+    print(length(ploidy_block_2[[chrom]]))
+    print(length(ploidy_allele_2[[chrom]]))
+}
+
+
     genotype_list_ploidy_chrom[[genotype_daughter_1]]      <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]]     <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]]      <<- ploidy_block_1
