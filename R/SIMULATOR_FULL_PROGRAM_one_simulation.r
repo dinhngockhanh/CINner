@@ -30,6 +30,9 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model='',
         }
         if (flag_success==0){
             print('SIMULATION CONDITION NOT SATISFIED; REDOING...')
+print(N_clones)
+print(N_clones_min)
+print(N_clones_max)
             next
         }
 #-----------------------------------Simulate the phylogeny of the sample

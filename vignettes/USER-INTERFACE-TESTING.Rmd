@@ -22,12 +22,12 @@ N_sample                            <- 200
 T_tau_step                          <- 3
 CN_bin_length                       <- 500000
             prob_CN_whole_genome_duplication    <- 0
-            prob_CN_missegregation              <- 3e-4
-            prob_CN_chrom_arm_missegregation    <- 3e-4
-            prob_CN_focal_amplification         <- 2e-4
-            prob_CN_focal_deletion              <- 2e-4
-            prob_CN_cnloh_interstitial          <- 2e-4
-            prob_CN_cnloh_terminal              <- 2e-4
+            prob_CN_missegregation              <- 2e-4
+            prob_CN_chrom_arm_missegregation    <- 2e-4
+            prob_CN_focal_amplification         <- 1e-4
+            prob_CN_focal_deletion              <- 1e-4
+            prob_CN_cnloh_interstitial          <- 1e-4
+            prob_CN_cnloh_terminal              <- 1e-4
 
             prob_CN_focal_amplification_length  <- 0.3
             prob_CN_focal_deletion_length       <- 0.3
@@ -116,7 +116,9 @@ SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
 
 
 stage_final       <- 3
-simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(model=MODEL_NAME,stage_final=stage_final)
+N_clones_min      <- 3
+N_clones_max      <- 6
+simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(model=MODEL_NAME,stage_final=stage_final,N_clones_min=N_clones_min,N_clones_max=N_clones_max)
 
 
 PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,80,by=1),unit='year')
