@@ -145,12 +145,12 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,genotype_
 
 
 if (i_gain==1){
-    print('--------')
+    print('--------Before:')
     print(ploidy_chrom_1[chrom])
     print(length(ploidy_block_1[[chrom]]))
     print(length(ploidy_allele_1[[chrom]]))
 }else{
-    print('--------')
+    print('--------Before:')
     print(ploidy_chrom_2[chrom])
     print(length(ploidy_block_2[[chrom]]))
     print(length(ploidy_allele_2[[chrom]]))
