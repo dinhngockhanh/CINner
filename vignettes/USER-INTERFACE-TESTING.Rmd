@@ -76,21 +76,29 @@ vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
             vec_driver_s[1]   <- 0.01
             vec_driver_s[2]   <- 0.01
             vec_driver_s[3]   <- 0.01
-MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
-vec_driver_genes=vec_driver_genes,
-vec_driver_role=vec_driver_role,
-vec_driver_s=vec_driver_s)
+MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,vec_driver_genes=vec_driver_genes,vec_driver_role=vec_driver_role,vec_driver_s=vec_driver_s)
+
+
+
+
+
+
+
+
             cell_count        <- 10
+            CN_matrix         <- BUILD_cn_normal_XX(MODEL_VARIABLES$cn_info)
+```
+```{r}
+
+
+
+
             CN_strand_1       <- c(rep('A-A',length=23),'')
             CN_strand_2       <- c(rep('B-B',length=23),'')
             CN_arm            <- cbind(CN_strand_1,CN_strand_2)
             CN_focal          <- list()
             drivers           <- list()
-MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
-cell_count=cell_count,
-CN_arm=CN_arm,
-CN_focal=CN_focal,
-drivers=drivers)
+MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,cell_count=cell_count,CN_arm=CN_arm,CN_focal=CN_focal,drivers=drivers)
             cell_count        <- 10
             CN_strand_1       <- c(rep('A-A',length=23),'')
             CN_strand_2       <- c(rep('B-B',length=23),'')

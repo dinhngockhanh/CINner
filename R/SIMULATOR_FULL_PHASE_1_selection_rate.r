@@ -29,28 +29,22 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count,driver_map,ploidy
         no_strands                  <- ploidy_chrom[chrom]
         vec_allele_1                <- rep(0,vec_CN_block_no[chrom])
         vec_allele_2                <- rep(0,vec_CN_block_no[chrom])
-
         for (strand in 1:no_strands){
             N_rows                  <- nrow(ploidy_allele[[chrom]][[strand]])
             for (row in 1:N_rows){
                 vec_loc_1               <- which(ploidy_allele[[chrom]][[strand]][row,]==1)
                 vec_allele_1[vec_loc_1] <- 1
-
                 vec_loc_2               <- which(ploidy_allele[[chrom]][[strand]][row,]==2)
                 vec_allele_2[vec_loc_2] <- 1
             }
         }
-
         vec_homozygosity            <- which(vec_allele_1==0 | vec_allele_2==0)
         L_homozygosity              <- L_homozygosity+length(vec_homozygosity)
-
         if (L_homozygosity>bound_homozygosity){
             clone_selection_rate        <- 0
             return(clone_selection_rate)
         }
     }
-
-
 #-------------------Cell is not viable if exceeding maximum driver count
     if (driver_count>0){
         driver_count_unique         <- unique(driver_map[,1])

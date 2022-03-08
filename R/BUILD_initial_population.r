@@ -11,12 +11,11 @@ BUILD_initial_population <- function(MODEL_VARIABLES    = list(),
             unit                                            <- drivers[[i]][[2]]
             driver_ID                                       <- drivers[[i]][[3]]
             if (DRIVERS!=''){
-                DRIVERS                     <- paste(DRIVERS,';',sep='')
+                DRIVERS                                     <- paste(DRIVERS,';',sep='')
             }
             DRIVERS                                         <- paste(DRIVERS,driver_ID,'_strand',strand,'_unit',unit,sep='')
         }
     }
-
     if (is.null(MODEL_VARIABLES$initial_others)){
         columns                                             <- c('Clone','Cell_count','Drivers')
 
