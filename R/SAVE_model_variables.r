@@ -8,14 +8,14 @@ SAVE_model_variables <- function(MODEL_NAME='',
     vec_delete                      <- c()
     for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
         chrom                       <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]
-        if (all(TABLE_INITIAL_CN[TABLE_INITIAL_CN==chrom,3:ncol(TABLE_INITIAL_CN)]=='NA')){
+        vec_loc                     <- which(TABLE_INITIAL_CN$Chromosome==chrom)
+        if (length(vec_loc)==0){
             vec_delete              <- c(vec_delete,chrom)
         }
     }
 
     if (length(vec_delete)>0){
         MODEL_VARIABLES$cn_info     <- MODEL_VARIABLES$cn_info[-which(is.element(MODEL_VARIABLES$cn_info$Chrom,vec_delete)),]
-        MODEL_VARIABLES$initial_cn  <- MODEL_VARIABLES$initial_cn[-which(is.element(MODEL_VARIABLES$initial_cn$Chromosome,vec_delete)),]
     }
 
 #---Save file for general variables
