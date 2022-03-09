@@ -141,7 +141,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         initial_ploidy_allele[[clone]]      <<- ploidy_allele
         initial_ploidy_block[[clone]]       <<- ploidy_block
     }
-    ploidy_chrom
+    print(ploidy_chrom)
 #---Set up the initial clones' driver profiles
     for (clone in 1:initial_N_clones){
 #       Get driver profile of this clone
