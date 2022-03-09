@@ -173,13 +173,13 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
 #------------------------Build model input file for sampling information
     TABLE_SAMPLING_INFO                 <- Table_sample
     if (age_birth_unit=='day'){
-        TABLE_SAMPLING_INFO.T_sample    <- 1*TABLE_SAMPLING_INFO.Age_sample
+        TABLE_SAMPLING_INFO$T_sample    <- 1*TABLE_SAMPLING_INFO$Age_sample
     }else{if (age_birth_unit=='week'){
-        TABLE_SAMPLING_INFO.T_sample    <- 7*TABLE_SAMPLING_INFO.Age_sample
+        TABLE_SAMPLING_INFO$T_sample    <- 7*TABLE_SAMPLING_INFO$Age_sample
     }else{if (age_birth_unit=='month'){
-        TABLE_SAMPLING_INFO.T_sample    <- 30*TABLE_SAMPLING_INFO.Age_sample
+        TABLE_SAMPLING_INFO$T_sample    <- 30*TABLE_SAMPLING_INFO$Age_sample
     }else{if (age_birth_unit=='year'){
-        TABLE_SAMPLING_INFO.T_sample    <- 365*TABLE_SAMPLING_INFO.Age_sample
+        TABLE_SAMPLING_INFO$T_sample    <- 365*TABLE_SAMPLING_INFO$Age_sample
     }}}}
 #----------------------------------------Output the model variable files
     MODEL_VARIABLES                     <- list()
