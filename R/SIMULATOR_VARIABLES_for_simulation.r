@@ -32,6 +32,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         assign(TABLE_VARIABLES[i,1],TABLE_VARIABLES[i,2],envir=.GlobalEnv)
     }
     Table_sampling                          <<- TABLE_SAMPLING_INFO
+    assign('Table_sampling',Table_sampling,envir=.GlobalEnv)
 
 
 
