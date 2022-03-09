@@ -53,9 +53,9 @@ vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
 vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
 'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
             vec_driver_s      <- rep(0.01,length(vec_driver_genes))
-            vec_driver_s[1]   <- 0.3
-            vec_driver_s[2]   <- 0.01
-            vec_driver_s[3]   <- 0.01
+            vec_driver_s[1]   <- 0.2
+            vec_driver_s[2]   <- 0.1
+            vec_driver_s[3]   <- 0.1
 MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,vec_driver_genes=vec_driver_genes,vec_driver_role=vec_driver_role,vec_driver_s=vec_driver_s)
 
 
