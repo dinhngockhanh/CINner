@@ -269,7 +269,7 @@ PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,80,by=1
 
 We next plot the evolution of clones found in the sample.
 
-```{r}
+```{r,fig.height=4,fig.width=10}
 PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,80,by=1),unit='year')
 ```
 

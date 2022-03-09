@@ -117,9 +117,6 @@ PLOT_clonal_evolution <- function(package_simulation,vec_time_plot,unit){
         vec_row[vec_fix]                        <- 100
         table_clonal_populations[row,]          <- vec_row
     }
-
-print(table_clonal_populations)
-
 #----------------------------------------------Plot the clonal evolution
     if (unit=='year'){
         vec_time_plot                           <- vec_time_plot/365
@@ -134,7 +131,7 @@ print(table_clonal_populations)
 
     # drawLegend(fish)
 
-    dev <- dev.off()
+    # dev <- dev.off()
 
     # vlines=c(0,150),vlab=c("day 0","day 150"))
 
