@@ -36,7 +36,7 @@ CN_bin_length                       <- 500000
             prob_CN_cnloh_interstitial_length   <- 0.3
             prob_CN_cnloh_terminal_length       <- 0.3
 
-            rate_driver                         <- 1e-16
+            rate_driver                         <- 5e-16
 rate_passenger                      <- 1e-11
 bound_driver                        <- 3
             bound_average_ploidy    <- 5
@@ -52,10 +52,10 @@ vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
 'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
 vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
 'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
-            vec_driver_s      <- rep(0.01,length(vec_driver_genes))
-            vec_driver_s[1]   <- 0.2
-            vec_driver_s[2]   <- 0.1
-            vec_driver_s[3]   <- 0.1
+            vec_driver_s      <- rep(0.02,length(vec_driver_genes))
+            vec_driver_s[1]   <- 0.07
+            vec_driver_s[2]   <- 0.04
+            vec_driver_s[3]   <- 0.04
 MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,vec_driver_genes=vec_driver_genes,vec_driver_role=vec_driver_role,vec_driver_s=vec_driver_s)
 
 

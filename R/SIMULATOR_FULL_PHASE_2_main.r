@@ -7,6 +7,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     genotype_list_ploidy_chrom      <- package_clonal_evolution[[5]]
     genotype_list_ploidy_block      <- package_clonal_evolution[[6]]
     genotype_list_ploidy_allele     <- package_clonal_evolution[[7]]
+
+    genotype_list_driver_map        <- package_clonal_evolution[[9]]
+
     evolution_traj_time             <- package_clonal_evolution[[13]]
     evolution_traj_divisions        <- package_clonal_evolution[[14]]
     evolution_traj_clonal_ID        <- package_clonal_evolution[[15]]
@@ -148,6 +151,27 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
         sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
     }
+
+
+    for (row in 1:nrow(table_clone_ID_vs_letters)){
+        clone_ID_numeric                            <- table_clone_ID_vs_letters$Clone_ID_number[row]
+        clone_ID_letters                            <- table_clone_ID_vs_letters$Clone_ID_letter[row]
+        clone_driver_list                           <- unique(genotype_list_driver_map[[clone_ID_numeric]][,1])
+        text_report                                 <- paste('Clone ',clone_ID_letters,': ',sep='')
+        if (length(clone_driver_list)==0){
+            text_report                             <- paste(text_report,'no drivers',sep='')
+        }else{
+            for (i in 1:length(clone_driver_list)){
+                if (i>=2){
+                    text_report                     <- paste(text_report,', ',sep='')
+                }
+                text_report                         <- paste(text_report,driver_library$Gene_ID[clone_driver_list[i]],sep='')
+            }
+            print(text_report)
+        }
+    }
+
+
 #---------------------------------Output package of data from simulation
     output                                  <- list()
     output[[1]]                             <- sample_genotype_profile
