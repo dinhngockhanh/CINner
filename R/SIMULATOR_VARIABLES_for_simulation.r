@@ -94,9 +94,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
 #---Set up the initial clones' CN genotypes
     for (clone in 1:initial_N_clones){
 #       Extract mini table for the CN genotypes of this clone
-        text_clone_ID                       <- paste('Clone_',clone,sep='')
-        vec_loc                             <- c(1,2,grep(text_clone_ID,vec_header))
-        CLONE_INITIAL_COPY_NUMBER_PROFILES  <- TABLE_INITIAL_COPY_NUMBER_PROFILES[,vec_loc]
+        CLONE_INITIAL_COPY_NUMBER_PROFILES  <- TABLE_INITIAL_COPY_NUMBER_PROFILES[TABLE_INITIAL_COPY_NUMBER_PROFILES$Clone==clone,]
 #       Set up clone's CN genotype
         ploidy_chrom                        <- rep(0,N_chromosomes)
         ploidy_block                        <- list()
@@ -105,53 +103,44 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
             ploidy_block[[chrom]]           <- list()
             ploidy_allele[[chrom]]          <- list()
 #           Get CN genotype for this chromosome
-            CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==  TABLE_CHROMOSOME_CN_INFO$Chromosome[chrom],]
-#           Clean CN genotype of unnecessary strands
-            vec_delete                      <- c()
-            for (column in 3:ncol(CHROM_COPY_NUMBER_PROFILES)){
-                if (all(is.na(CHROM_COPY_NUMBER_PROFILES[,column]))){
-                    vec_delete              <- c(vec_delete,column)
-                }
-            }
-            if (length(vec_delete)>0){
-                CHROM_COPY_NUMBER_PROFILES  <- CHROM_COPY_NUMBER_PROFILES[,-vec_delete]
+            CHROM_COPY_NUMBER_PROFILES      <- CLONE_INITIAL_COPY_NUMBER_PROFILES[CLONE_INITIAL_COPY_NUMBER_PROFILES$Chromosome==TABLE_CHROMOSOME_CN_INFO$Chromosome[chrom],]
+            if (nrow(CHROM_COPY_NUMBER_PROFILES)==0){
+                ploidy_chrom[chrom]         <- 0
+                next
+            }else{
+                no_strands                  <- max(CHROM_COPY_NUMBER_PROFILES$Strand)
             }
 #           Update the strand count for each chromosome
-            no_strands                      <- ncol(CHROM_COPY_NUMBER_PROFILES)-2
             ploidy_chrom[chrom]             <- no_strands
 #           Update the CN count and allele info for each chrosomome strand
             for (strand in 1:no_strands){
                 no_blocks                   <- vec_CN_block_no[chrom]
                 strand_ploidy_block         <- rep(0,no_blocks)
                 strand_ploidy_allele        <- matrix(rep(0,no_blocks),nrow=1)
-                for (block in 1:no_blocks){
-                    row                     <- which(CHROM_COPY_NUMBER_PROFILES$Bin==block)
-                    col                     <- strand+2
-                    vec_allele              <- CHROM_COPY_NUMBER_PROFILES[row,col]
-                    if (is.na(vec_allele)){
-                        strand_ploidy_block[block]              <- 0
-                    }else{
-                        strand_ploidy_block[block]              <- nchar(vec_allele)
-                        if (nchar(vec_allele)==0){
-                            strand_ploidy_allele[unit,block]    <- 0
-                        }else{
-                        for (unit in 1:nchar(vec_allele)){
-                            if (unit>nrow(strand_ploidy_allele)){
-                                strand_ploidy_allele            <- rbind(strand_ploidy_allele,rep(0,ncol(strand_ploidy_allele)))
-                            }
-                            strand_ploidy_allele[unit,block]    <- utf8ToInt(substr(vec_allele,unit,unit))-64
-                        }}
+                STRAND_COPY_NUMBER          <- CHROM_COPY_NUMBER_PROFILES[CHROM_COPY_NUMBER_PROFILES$Strand==strand,]
+                if (nrow(STRAND_COPY_NUMBER)>0){for (i in 1:nrow(STRAND_COPY_NUMBER)){
+                    bin_start               <- STRAND_COPY_NUMBER$Bin_start[i]
+                    bin_end                 <- STRAND_COPY_NUMBER$Bin_end[i]
+                    no_units                <- nchar(STRAND_COPY_NUMBER$Allee[i])
+                    strand_ploidy_block[bin_start:bin_end]              <- no_units
+                    for (unit in 1:no_units){
+                        if (unit>nrow(strand_ploidy_allele)){
+                            strand_ploidy_allele                        <- rbind(strand_ploidy_allele,rep(0,ncol(strand_ploidy_allele)))
+                        }
+                        strand_ploidy_allele[unit,bin_start:bin_end]    <- utf8ToInt(substr(vec_allele,unit,unit))-64
                     }
-                }
-                ploidy_block[[chrom]][[strand]]     <- strand_ploidy_block
-                ploidy_allele[[chrom]][[strand]]    <- strand_ploidy_allele
+
+                }}
             }
+            ploidy_block[[chrom]][[strand]]     <- strand_ploidy_block
+            ploidy_allele[[chrom]][[strand]]    <- strand_ploidy_allele
         }
 #       Store the clone's CN profiles
         initial_ploidy_chrom[[clone]]       <<- ploidy_chrom
         initial_ploidy_allele[[clone]]      <<- ploidy_allele
         initial_ploidy_block[[clone]]       <<- ploidy_block
     }
+    ploidy_chrom
 #---Set up the initial clones' driver profiles
     for (clone in 1:initial_N_clones){
 #       Get driver profile of this clone

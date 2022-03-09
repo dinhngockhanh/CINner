@@ -97,6 +97,12 @@ MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,ce
 
 MODEL_NAME        <- 'EXPERIMENT-1A'
 SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
+
+stage_final       <- 3
+N_clones_min      <- 3
+N_clones_max      <- 6
+simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(model=MODEL_NAME,stage_final=stage_final,N_clones_min=N_clones_min,N_clones_max=N_clones_max)
+
 ```
 
 
@@ -106,17 +112,6 @@ SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
 
 
 
-
-
-MODEL_NAME        <- 'EXPERIMENT-1A'
-SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
-
-
-
-stage_final       <- 3
-N_clones_min      <- 3
-N_clones_max      <- 6
-simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(model=MODEL_NAME,stage_final=stage_final,N_clones_min=N_clones_min,N_clones_max=N_clones_max)
 
 
 PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,80,by=1),unit='year')
