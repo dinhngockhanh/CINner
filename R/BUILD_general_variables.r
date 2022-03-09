@@ -2,7 +2,6 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
                                     cell_lifespan                       = 4,
                                     T_0                                 = list(0,'year'),
                                     T_end                               = list(100,'year'),
-                                    N_sample                            = 0,
                                     T_tau_step                          = 3,
                                     table_population_dynamics           = matrix(0,ncol=2,nrow=2),
                                     Population_end                      = Inf,
@@ -78,9 +77,9 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
 
 
 
-#   Set up the number of cells to sample
-    N_row                               <- N_row+1
-    TABLE_VARIABLES[N_row,]             <- c('N_sample',N_sample,'cell count','Number of cells in sequencing sample (Inf if sampling every cell)')
+# #   Set up the number of cells to sample
+#     N_row                               <- N_row+1
+#     TABLE_VARIABLES[N_row,]             <- c('N_sample',N_sample,'cell count','Number of cells in sequencing sample (Inf if sampling every cell)')
 
 
 
