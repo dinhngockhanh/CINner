@@ -23,11 +23,13 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #-------------------------------Find a random sample of final population
     all_sample_genotype             <- c()
     all_sample_ID                   <- c()
+    all_sample_sampled_time         <- c()
     for (sample in 1:nrow(Table_sampling)){
         N_sample                    <- Table_sampling$Cell_count[sample]
         ID_sample                   <- Table_sampling$Sample_ID[sample]
+        T_sample                    <- Table_sampling$T_sample[sample]
 
-        loc                         <- which.min(abs(evolution_traj_time-Table_sampling$T_sample[sample]))
+        loc                         <- which.min(abs(evolution_traj_time-T_sample))
         vec_clonal_ID               <- evolution_traj_clonal_ID[[loc]]
         vec_clonal_population       <- evolution_traj_population[[loc]]
         vec_population              <- c()
@@ -40,6 +42,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         sample_genotype             <- sample(x=vec_population,size=N_sample,replace=FALSE)
         all_sample_genotype         <- c(all_sample_genotype,sample_genotype)
         all_sample_ID               <- c(all_sample_ID,rep(ID_sample,N_sample))
+        all_sample_sampled_time     <- c(all_sample_sampled_time,rep(T_sample,N_sample))
 
         print(paste('DETECTED ',length(unique(sample_genotype)),' CLONES IN SAMPLE ',ID_sample,sep=''))
     }
@@ -110,6 +113,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #---Find the CN profiles for each cell in the sample
     sample_cell_ID                  <- c()
     sample_clone_ID                 <- all_sample_genotype
+    sample_time                     <- all_sample_sampled_time
+
     for (i_cell in 1:length(all_sample_genotype)){
         sample_ID                   <- all_sample_ID[i_cell]
         clone_ID                    <- sample_clone_ID[i_cell]
@@ -150,5 +155,6 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     output[[3]]                             <- sample_clone_ID
     output[[4]]                             <- sample_clone_ID_letters
     output[[5]]                             <- table_clone_ID_vs_letters
+    output[[6]]                             <- sample_time
     return(output)
 }
