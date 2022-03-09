@@ -3,7 +3,6 @@
 "T_start_time","0","day","Age when simulation starts (for internal use)"
 "age_end","80","year","Age when simulation stops"
 "T_end_time","29200","day","Age when simulation stops (for internal use)"
-"N_sample","200","cell count","Number of cells in sequencing sample (Inf if sampling every cell)"
 "T_tau_step","3","day","Time step for tau-leaping algorithm for simulation"
 "Population_end","Inf","cell count","Condition for ending simulation (Inf if no condition)"
 "Max_events","Inf","event count","Condition for ending simulation (Inf if no condition)"

@@ -12,6 +12,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     evolution_traj_clonal_ID        <- package_clonal_evolution[[15]]
     evolution_traj_population       <- package_clonal_evolution[[16]]
 
+print(N_sample)
+
     if (N_sample==Inf){
         N_sample                    <<- N_cells_current
     }
