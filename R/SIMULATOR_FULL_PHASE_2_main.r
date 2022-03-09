@@ -12,18 +12,40 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     evolution_traj_clonal_ID        <- package_clonal_evolution[[15]]
     evolution_traj_population       <- package_clonal_evolution[[16]]
 
-# print(N_sample)
-
-# print(evolution_traj_time)
-
-print(Table_sampling)
-
-    # for (row in 1:nrow())
-
-    if (N_sample==Inf){
-        N_sample                    <<- N_cells_current
+    for (row in 1:nrow(Table_sampling)){
+        if (Table_sampling$Cell_count[row]==Inf){
+            loc                     <- which.min(abs(evolution_traj_time-Table_sampling$T_sample[row]))
+            N_cells_total           <- sum(evolution_traj_population[[loc]])
+            Table_sampling$Cell_count[row]  <- N_cells_total
+        }
     }
+
 #-------------------------------Find a random sample of final population
+    sample_genotype                 <- c()
+    sample_ID                       <- c()
+    for (sample in 1:nrow(Table_sampling)){
+        N_sample                    <- Table_sampling$Cell_count[sample]
+        ID_sample                   <- Table_sampling$Sample_ID[sample]
+
+        loc                         <- which.min(abs(evolution_traj_time-Table_sampling$T_sample[sample]))
+        vec_clonal_ID               <- evolution_traj_clonal_ID[[loc]]
+        vec_clonal_population       <- evolution_traj_population[[loc]]
+        vec_population              <- c()
+        for (i in 1:length(vec_clonal_ID)) {
+            clone                   <- vec_clonal_ID[i]
+            clonal_population       <- vec_clonal_population[i]
+            vec_population          <- c(vec_population,rep(clone,1,clonal_population))
+        }
+
+        sample_genotype             <- c(sample_genotype,sample(x=vec_population,size=N_sample,replace=FALSE))
+        sample_ID                   <- c(sample_ID,rep(ID_sample,N_sample))
+    }
+
+    print(sample_genotype)
+    print(sample_ID)
+
+
+
     final_clonal_ID                 <- tail(evolution_traj_clonal_ID,1)[[1]]
     final_clonal_population         <- tail(evolution_traj_population,1)[[1]]
     final_population                <- c()
