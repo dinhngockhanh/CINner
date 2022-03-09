@@ -40,23 +40,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         sample_genotype             <- c(sample_genotype,sample(x=vec_population,size=N_sample,replace=FALSE))
         sample_ID                   <- c(sample_ID,rep(ID_sample,N_sample))
     }
-
-    print(sample_genotype)
-    print(sample_ID)
-
-
-
-    final_clonal_ID                 <- tail(evolution_traj_clonal_ID,1)[[1]]
-    final_clonal_population         <- tail(evolution_traj_population,1)[[1]]
-    final_population                <- c()
-    for (i in 1:length(final_clonal_ID)) {
-        clone                       <- final_clonal_ID[i]
-        clonal_population           <- final_clonal_population[i]
-        final_population            <- c(final_population,rep(clone,1,clonal_population))
-    }
-    node_genotype_current           <- sample(x=final_population,size=N_sample,replace=FALSE)
 #---------------------------------Create CN object for the sampled cells
-    sample_genotype                 <- node_genotype_current
 #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique          <- unique(sample_genotype)
     sample_genotype_unique_profile  <- list()
@@ -122,13 +106,15 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 #---Find the CN profiles for each cell in the sample
     sample_cell_ID                  <- c()
     sample_clone_ID                 <- sample_genotype
-    for (i_cell in 1:N_sample){
-        clone_ID                    <- sample_genotype[i_cell]
+    for (i_cell in 1:length(sample_genotype)){
+        sample_ID                   <- sample_ID[i_cell]
+        clone_ID                    <- sample_clone_ID[i_cell]
         i_clone                     <- which(sample_genotype_unique==clone_ID)[1]
 #       Find the CN profile for this cell
         cell_genotype_profile       <- sample_genotype_unique_profile[[i_clone]]
 #       Add column for cell ID
-        cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
+        cell_ID                     <- paste(sample_ID,'-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
+        # cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         sample_cell_ID[i_cell]      <- cell_ID
         cell_genotype_profile       <- cbind(cell_genotype_profile,rep(cell_ID,nrow(cell_genotype_profile)))
         names(cell_genotype_profile)<- c("chr","start","end","copy","state","Min","Maj","cell_id")
