@@ -132,9 +132,9 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                     }
 
                 }}
+                ploidy_block[[chrom]][[strand]]     <- strand_ploidy_block
+                ploidy_allele[[chrom]][[strand]]    <- strand_ploidy_allele
             }
-            ploidy_block[[chrom]][[strand]]     <- strand_ploidy_block
-            ploidy_allele[[chrom]][[strand]]    <- strand_ploidy_allele
         }
 #       Store the clone's CN profiles
         initial_ploidy_chrom[[clone]]       <<- ploidy_chrom
