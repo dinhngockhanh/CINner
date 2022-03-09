@@ -16,6 +16,10 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
 
 print(evolution_traj_time)
 
+print(TABLE_SAMPLING_INFO)
+
+    for (row in 1:nrow())
+
     if (N_sample==Inf){
         N_sample                    <<- N_cells_current
     }
