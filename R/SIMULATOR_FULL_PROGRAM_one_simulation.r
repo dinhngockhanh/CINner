@@ -9,7 +9,7 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model='',
     flag_success                        <- 0
     while (flag_success==0){
 #------------------------------------------Simulate the clonal evolution
-                                                                        print('');print('CLONAL EVOLUTION...');start.time<-Sys.time()
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');print('CLONAL EVOLUTION...');start.time<-Sys.time()
         output                          <- SIMULATOR_FULL_PHASE_1_main()
         flag_success                    <- output[[1]]
         package_clonal_evolution        <- output[[2]]
@@ -20,7 +20,7 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model='',
         }
 #----------------------------------------------------Simulate the sample
         if(stage_final>=2){
-                                                                        print('');print('SAMPLING...');start.time  <- Sys.time()
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');print('SAMPLING...');start.time  <- Sys.time()
             package_sample              <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution)
                                                                         end.time<-Sys.time();time.taken<-end.time-start.time;print(time.taken)
             N_clones                    <- nrow(package_sample[[5]])
@@ -29,12 +29,13 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model='',
             }
         }
         if (flag_success==0){
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             print('SIMULATION CONDITION NOT SATISFIED; REDOING...')
             next
         }
 #-----------------------------------Simulate the phylogeny of the sample
         if(stage_final>=3){
-                                                                        print('');print('SAMPLE PHYLOGENY...');start.time  <- Sys.time()
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');print('SAMPLE PHYLOGENY...');start.time  <- Sys.time()
             package_sample_phylogeny    <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution,package_sample)
                                                                         end.time<-Sys.time();time.taken<-end.time-start.time;print(time.taken)
         }
@@ -64,7 +65,7 @@ SIMULATOR_FULL_PROGRAM_one_simulation <- function(model='',
         save(phylogeny_clustering_truth,file=filename)
     }
 #------------------------------------------Output the simulation package
-                                                                        print('')
+                                                                        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                                                                         print('DONE WITH SIMULATION...')
     return(package_output)
 }

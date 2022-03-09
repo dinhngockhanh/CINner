@@ -23,9 +23,9 @@ T_end                               <- list(80,'year')
 
 T_tau_step                          <- 3
 CN_bin_length                       <- 500000
-            prob_CN_whole_genome_duplication    <- 5e-5
-            prob_CN_missegregation              <- 5e-5
-            prob_CN_chrom_arm_missegregation    <- 5e-5
+            prob_CN_whole_genome_duplication    <- 1e-4
+            prob_CN_missegregation              <- 1e-4
+            prob_CN_chrom_arm_missegregation    <- 1e-4
             prob_CN_focal_amplification         <- 2e-4
             prob_CN_focal_deletion              <- 2e-4
             prob_CN_cnloh_interstitial          <- 2e-4
@@ -36,7 +36,7 @@ CN_bin_length                       <- 500000
             prob_CN_cnloh_interstitial_length   <- 0.3
             prob_CN_cnloh_terminal_length       <- 0.3
 
-            rate_driver                         <- 1e-15
+            rate_driver                         <- 8e-16
 rate_passenger                      <- 1e-11
 bound_driver                        <- 3
             bound_average_ploidy    <- 5
