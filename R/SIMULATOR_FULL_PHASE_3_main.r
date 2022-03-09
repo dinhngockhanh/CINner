@@ -81,7 +81,7 @@ print(N_sample_clone)
         }
 #=======Sanity tests
         if (sum(eligible_clonal_sample_population)!=length(node_genotype_current)) {
-            fprintf('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
+            print('\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n');
             }
         else { if (any(eligible_clonal_sample_population>eligible_clonal_total_population)) {
             cat('\nERROR: CLONAL POPULATIONS IN SAMPLE ARE LARGER THAN IN TOTAL CELL POPULATION\n\n')

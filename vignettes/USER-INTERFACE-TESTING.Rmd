@@ -19,7 +19,11 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-            Table_sample                        <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(10,10,10),Age_sample=c(40,60,80))
+            # Table_sample                        <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(10,10,10),Age_sample=c(40,60,80))
+
+            Table_sample                        <- data.frame(Sample_ID=c('SA01','SA02'),Cell_count=c(10,10),Age_sample=c(40,80))
+
+            # Table_sample                        <- data.frame(Sample_ID=c('SA01'),Cell_count=c(10),Age_sample=c(80))
 
 T_tau_step                          <- 3
 CN_bin_length                       <- 500000
