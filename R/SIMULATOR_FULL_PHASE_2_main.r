@@ -111,13 +111,13 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     sample_cell_ID                  <- c()
     sample_clone_ID                 <- all_sample_genotype
     for (i_cell in 1:length(all_sample_genotype)){
-        all_sample_ID                   <- all_sample_ID[i_cell]
+        sample_ID                   <- all_sample_ID[i_cell]
         clone_ID                    <- sample_clone_ID[i_cell]
         i_clone                     <- which(sample_genotype_unique==clone_ID)[1]
 #       Find the CN profile for this cell
         cell_genotype_profile       <- sample_genotype_unique_profile[[i_clone]]
 #       Add column for cell ID
-        cell_ID                     <- paste(all_sample_ID,'-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
+        cell_ID                     <- paste(sample_ID,'-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         # cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         sample_cell_ID[i_cell]      <- cell_ID
         cell_genotype_profile       <- cbind(cell_genotype_profile,rep(cell_ID,nrow(cell_genotype_profile)))
