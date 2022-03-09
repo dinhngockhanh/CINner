@@ -25,7 +25,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     all_sample_ID                   <- c()
     for (sample in 1:nrow(Table_sampling)){
         N_sample                    <- Table_sampling$Cell_count[sample]
-        ID_sample                   <- Table_sampling$all_sample_ID[sample]
+        ID_sample                   <- Table_sampling$Sample_ID[sample]
 
         loc                         <- which.min(abs(evolution_traj_time-Table_sampling$T_sample[sample]))
         vec_clonal_ID               <- evolution_traj_clonal_ID[[loc]]
