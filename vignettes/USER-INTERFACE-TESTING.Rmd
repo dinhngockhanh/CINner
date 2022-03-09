@@ -19,17 +19,17 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-            Table_sample                        <- data.frame(Sample_ID=c('SA01'),Cell_count=c(100),Age_sample=c(80))
+            Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=100,Age_sample=80)
 
 T_tau_step                          <- 3
 CN_bin_length                       <- 500000
-            prob_CN_whole_genome_duplication    <- 0
-            prob_CN_missegregation              <- 1e-4
-            prob_CN_chrom_arm_missegregation    <- 1e-4
-            prob_CN_focal_amplification         <- 1e-4
-            prob_CN_focal_deletion              <- 1e-4
-            prob_CN_cnloh_interstitial          <- 1e-4
-            prob_CN_cnloh_terminal              <- 1e-4
+            prob_CN_whole_genome_duplication    <- 5e-5
+            prob_CN_missegregation              <- 7e-5
+            prob_CN_chrom_arm_missegregation    <- 7e-5
+            prob_CN_focal_amplification         <- 7e-5
+            prob_CN_focal_deletion              <- 7e-5
+            prob_CN_cnloh_interstitial          <- 7e-5
+            prob_CN_cnloh_terminal              <- 7e-5
 
             prob_CN_focal_amplification_length  <- 0.3
             prob_CN_focal_deletion_length       <- 0.3
@@ -53,7 +53,7 @@ vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
 vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
 'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
             vec_driver_s      <- rep(0.01,length(vec_driver_genes))
-            vec_driver_s[1]   <- 0.01
+            vec_driver_s[1]   <- 0.3
             vec_driver_s[2]   <- 0.01
             vec_driver_s[3]   <- 0.01
 MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,vec_driver_genes=vec_driver_genes,vec_driver_role=vec_driver_role,vec_driver_s=vec_driver_s)
@@ -97,4 +97,10 @@ PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='min_copy')
 
 
 PLOT_clonal_phylogeny(simulation)
+```
+
+
+
+```{r}
+
 ```

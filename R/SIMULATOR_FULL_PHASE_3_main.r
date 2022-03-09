@@ -17,13 +17,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution,package_sample)
     table_clone_ID_vs_letters                               <- package_sample[[5]]
 
     N_sample                                                <- length(sample_cell_ID)
-
-    N_sample_clone                                          <- length(sample_clone_ID)
-
-print(N_sample)
-print(N_sample_clone)
-print(sample_time)
-
 #-----------------------------------Initialize phylogeny in hclust style
 #   Initialize information to build phylogeny in hclust style
     hclust_row                                              <- 0
