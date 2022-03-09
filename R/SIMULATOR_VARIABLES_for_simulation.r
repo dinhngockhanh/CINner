@@ -121,7 +121,8 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
                 if (nrow(STRAND_COPY_NUMBER)>0){for (i in 1:nrow(STRAND_COPY_NUMBER)){
                     bin_start               <- STRAND_COPY_NUMBER$Bin_start[i]
                     bin_end                 <- STRAND_COPY_NUMBER$Bin_end[i]
-                    no_units                <- nchar(STRAND_COPY_NUMBER$Allele[i])
+                    vec_allele              <- STRAND_COPY_NUMBER$Allele[i]
+                    no_units                <- nchar(vec_allele)
                     strand_ploidy_block[bin_start:bin_end]              <- no_units
                     for (unit in 1:no_units){
                         if (unit>nrow(strand_ploidy_allele)){
