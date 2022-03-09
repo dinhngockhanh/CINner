@@ -3,6 +3,7 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
                                     T_0                                 = list(0,'year'),
                                     T_end                               = list(100,'year'),
                                     T_tau_step                          = 3,
+                                    Table_sample                        = data.frame(),
                                     table_population_dynamics           = matrix(0,ncol=2,nrow=2),
                                     Population_end                      = Inf,
                                     Max_events                          = Inf,
@@ -70,23 +71,6 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
     }}}}
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_end_time',T_end_time,'day','Age when simulation stops (for internal use)')
-
-
-
-
-
-
-
-# #   Set up the number of cells to sample
-#     N_row                               <- N_row+1
-#     TABLE_VARIABLES[N_row,]             <- c('N_sample',N_sample,'cell count','Number of cells in sequencing sample (Inf if sampling every cell)')
-
-
-
-
-
-
-
 #   Set up the time step for tau-leaping algorithm
     N_row                               <- N_row+1
     TABLE_VARIABLES[N_row,]             <- c('T_tau_step',T_tau_step,'day','Time step for tau-leaping algorithm for simulation')
@@ -186,10 +170,22 @@ BUILD_general_variables <- function(model_name                          = 'MODEL
     columns                             <- c('Age_in_day','Total_cell_count')
     TABLE_POPULATION_DYNAMICS           <- data.frame(vec_time_points,vec_cell_count)
     colnames(TABLE_POPULATION_DYNAMICS) <- columns
+#------------------------Build model input file for sampling information
+    TABLE_SAMPLING_INFO                 <- Table_sample
+    if (age_birth_unit=='day'){
+        TABLE_SAMPLING_INFO.T_sample    <- 1*TABLE_SAMPLING_INFO.Age_sample
+    }else{if (age_birth_unit=='week'){
+        TABLE_SAMPLING_INFO.T_sample    <- 7*TABLE_SAMPLING_INFO.Age_sample
+    }else{if (age_birth_unit=='month'){
+        TABLE_SAMPLING_INFO.T_sample    <- 30*TABLE_SAMPLING_INFO.Age_sample
+    }else{if (age_birth_unit=='year'){
+        TABLE_SAMPLING_INFO.T_sample    <- 365*TABLE_SAMPLING_INFO.Age_sample
+    }}}}
 #----------------------------------------Output the model variable files
     MODEL_VARIABLES                     <- list()
     MODEL_VARIABLES$general_variables   <- TABLE_VARIABLES
     MODEL_VARIABLES$cn_info             <- TABLE_CHROMOSOME_CN_INFO
     MODEL_VARIABLES$population_dynamics <- TABLE_POPULATION_DYNAMICS
+    MODEL_VARIABLES$sampling_info       <- TABLE_SAMPLING_INFO
     return(MODEL_VARIABLES)
 }

@@ -27,6 +27,9 @@ SAVE_model_variables <- function(MODEL_NAME='',
 #---Save file for population dynamics
     filename    <- paste(MODEL_NAME,'-input-population-dynamics.csv',sep='')
     write.csv(MODEL_VARIABLES$population_dynamics,filename,row.names=FALSE)
+#---Save file for sampling information
+    filename    <- paste(MODEL_NAME,'-input-sampling.csv',sep='')
+    write.csv(MODEL_VARIABLES$sampling_info,filename,row.names=FALSE)
 #---Save file for driver library
     filename    <- paste(MODEL_NAME,'-input-cancer-genes.csv',sep='')
     write.csv(MODEL_VARIABLES$driver_library,filename,row.names=FALSE)
