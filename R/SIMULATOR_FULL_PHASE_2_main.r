@@ -21,11 +21,11 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     }
 
 #-------------------------------Find a random sample of final population
-    sample_genotype                 <- c()
-    sample_ID                       <- c()
+    all_sample_genotype             <- c()
+    all_sample_ID                   <- c()
     for (sample in 1:nrow(Table_sampling)){
         N_sample                    <- Table_sampling$Cell_count[sample]
-        ID_sample                   <- Table_sampling$Sample_ID[sample]
+        ID_sample                   <- Table_sampling$all_sample_ID[sample]
 
         loc                         <- which.min(abs(evolution_traj_time-Table_sampling$T_sample[sample]))
         vec_clonal_ID               <- evolution_traj_clonal_ID[[loc]]
@@ -37,12 +37,16 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_population          <- c(vec_population,rep(clone,1,clonal_population))
         }
 
-        sample_genotype             <- c(sample_genotype,sample(x=vec_population,size=N_sample,replace=FALSE))
-        sample_ID                   <- c(sample_ID,rep(ID_sample,N_sample))
+        sample_genotype             <- sample(x=vec_population,size=N_sample,replace=FALSE)
+        all_sample_genotype         <- c(all_sample_genotype,sample_genotype)
+        all_sample_ID               <- c(all_sample_ID,rep(ID_sample,N_sample))
+
+        print(paste('DETECTED ',length(unique(sample_genotype)),' CLONES IN SAMPLE ',ID_sample,sep=''))
     }
+    print(paste('DETECTED ',length(unique(all_sample_genotype)),' CLONES IN ALL SAMPLES',sep=''))
 #---------------------------------Create CN object for the sampled cells
 #---Find the CN profiles for each clone found in the sample
-    sample_genotype_unique          <- unique(sample_genotype)
+    sample_genotype_unique          <- unique(all_sample_genotype)
     sample_genotype_unique_profile  <- list()
     for(i_clone in 1:length(sample_genotype_unique)){
 #       Extract CN information for the clone from clonal evolution data
@@ -105,15 +109,15 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     }
 #---Find the CN profiles for each cell in the sample
     sample_cell_ID                  <- c()
-    sample_clone_ID                 <- sample_genotype
-    for (i_cell in 1:length(sample_genotype)){
-        sample_ID                   <- sample_ID[i_cell]
+    sample_clone_ID                 <- all_sample_genotype
+    for (i_cell in 1:length(all_sample_genotype)){
+        all_sample_ID                   <- all_sample_ID[i_cell]
         clone_ID                    <- sample_clone_ID[i_cell]
         i_clone                     <- which(sample_genotype_unique==clone_ID)[1]
 #       Find the CN profile for this cell
         cell_genotype_profile       <- sample_genotype_unique_profile[[i_clone]]
 #       Add column for cell ID
-        cell_ID                     <- paste(sample_ID,'-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
+        cell_ID                     <- paste(all_sample_ID,'-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         # cell_ID                     <- paste('Sample-Library-',as.character(i_cell),'-',as.character(i_cell),sep='')
         sample_cell_ID[i_cell]      <- cell_ID
         cell_genotype_profile       <- cbind(cell_genotype_profile,rep(cell_ID,nrow(cell_genotype_profile)))
@@ -139,7 +143,6 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         vec_cell_ID                                 <- which(sample_clone_ID_numeric==clone_ID_numeric)
         sample_clone_ID_letters[vec_cell_ID]        <- clone_ID_letters
     }
-    print(paste('DETECTED ',length(sample_clone_ID_unique_numeric),' CLONES IN THE SAMPLE',sep=''))
 #---------------------------------Output package of data from simulation
     output                                  <- list()
     output[[1]]                             <- sample_genotype_profile
