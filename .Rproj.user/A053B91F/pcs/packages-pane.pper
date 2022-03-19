@@ -1,7 +1,0 @@
-{
-    "installOptions": {
-        "installFromRepository": true,
-        "libraryPath": "/Users/dinhngockhanh/Library/R/4.0/library",
-        "installDependencies": true
-    }
-}

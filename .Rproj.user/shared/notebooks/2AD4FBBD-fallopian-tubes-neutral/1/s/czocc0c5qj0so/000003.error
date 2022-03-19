@@ -1,1 +1,0 @@
-{"frames":[],"message":"Error in vec_time[seq(from = 1, to = length(vec_time), by = 100)]/365 : \n  non-numeric argument to binary operator\n"}
