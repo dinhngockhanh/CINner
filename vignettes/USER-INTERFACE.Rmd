@@ -263,30 +263,30 @@ simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(model=MODEL_NAME,
 
 We first confirm that the population size in the simulation follows the input dynamics:
 
-```{r,fig.height=4,fig.width=10}
+```{r,fig.height=7,fig.width=15}
 PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,80,by=1),unit='year')
-```
-
-We next plot the evolution of clones found in the sample.
-
-```{r,fig.height=4,fig.width=10}
-PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,80,by=1),unit='year')
 ```
 
 We can also look at the total CN profiles of the sampled cells.
 
-```{r,fig.height=7,fig.width=10}
+```{r,fig.height=7,fig.width=15}
 PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='total_copy')
 ```
 
 As well as their minor CN profiles.
 
-```{r,fig.height=7,fig.width=10}
+```{r,fig.height=7,fig.width=15}
 PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='min_copy')
 ```
 
 Finally, we take a look at the events that give rise to the clones found in the sample.
 
-```{r,fig.height=4,fig.width=10}
+```{r,fig.height=7,fig.width=15}
 PLOT_clonal_phylogeny(simulation)
+```
+
+We next plot the evolution of clones found in the sample.
+
+```{r,fig.height=7,fig.width=15}
+PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,80,by=1),unit='year')
 ```

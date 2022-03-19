@@ -1,5 +1,5 @@
 ```{r setup}
-devtools::install_github("dinhngockhanh/CancerSimulator")
+# devtools::install_github("dinhngockhanh/CancerSimulator")
 
 
 library(ggplot2)
@@ -7,10 +7,40 @@ library(signals)
 library(dendextend)
 library(fishplot)
 
-library(CancerSimulator)
-
-devtools::load_all()
-devtools::document()
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_cn_normal_XX.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_driver_library.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_empty_input.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_general_variables.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_initial_population.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/EXTRA_build_model_variables_from_sample.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/PLOT_clonal_evolution.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/PLOT_clonal_phylogeny.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/PLOT_copy_number_heatmap.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/PLOT_total_population_vs_input.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SAVE_model_variables.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_OUTPUT_for_comparison_between_MATLAB_and_R.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_clonal_population_cleaning.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_focal_amplification.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_focal_deletion.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_missegregation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_drivers.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_cleaning.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_comparison.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_initiation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_update.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_main.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_selection_rate.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_2_main.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_3_main_OLD.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_3_main.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PROGRAM_many_simulations.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PROGRAM_one_simulation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_VARIABLES_for_fitting.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_VARIABLES_for_simulation.r")
 ```
 
 ```{r,fig.height=7,fig.width=10}
@@ -90,10 +120,10 @@ PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,80,by=1
 PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,80,by=1),unit='year')
 
 
-PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='total_copy')
+PLOT_copy_number_heatmap(simulation,phylo="true",plotcol="total_copy")
 
 
-PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='min_copy')
+PLOT_copy_number_heatmap(simulation,phylo="true",plotcol="min_copy")
 
 
 PLOT_clonal_phylogeny(simulation)
