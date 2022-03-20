@@ -41,8 +41,14 @@ The information about the initial cell population is given in two files. The fil
 
 ## Run the simulator
 
+There are several stages for how far the simulator will do, depending on what the user requires from the simulations. The variable `stage_final` dictates this:
+- `stage_final`=1 only produces the clonal evolution.
+- `stage_final`=2 samples cells as specified above, and outputs their CN profiles as a `rda` file.
+- `stage_final`=3 further builds the phylogeny for these cells, and outputs this as a `rda` file. The phylogeny is built based on information from the clonal evolution.
+
+`N_clones_min` and `N_clones_max` are optional variables in case we want to limit the number of clones in the simulation.
+
 To produce one simulation for model `*`, we can call
 ```r
 simulation <- SIMULATOR_FULL_PROGRAM_one_simulation(model=*,stage_final,N_clones_min,N_clones_max)
 ```
-where 
