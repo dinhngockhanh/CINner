@@ -38,3 +38,11 @@ where alpha is such that the product of all s_rate_WT is 1.
 ### Initial population
 
 The information about the initial cell population is given in two files. The file `*-input-initial-others.csv` lists the clones in the population, their cell counts, and mutated drivers. The file `*-input-initial-cn-profiles.csv` specifies the CN profile of each clone. For each clone and for each chromosome, we need to specify the allele identity of each strand.
+
+## Run the simulator
+
+To produce one simulation for model `*`, we can call
+```r
+simulation <- SIMULATOR_FULL_PROGRAM_one_simulation(model=*,stage_final,N_clones_min,N_clones_max)
+```
+where 
