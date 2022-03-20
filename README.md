@@ -50,5 +50,7 @@ There are several stages for how far the simulator will do, depending on what th
 
 To produce one simulation for model `*`, we can call
 ```r
-simulation <- SIMULATOR_FULL_PROGRAM_one_simulation(model=*,stage_final,N_clones_min,N_clones_max)
+simulation <- SIMULATOR_FULL_PROGRAM_one_simulation(model=*,stage_final=stage_final,N_clones_min=N_clones_min,N_clones_max=N_clones_max)
 ```
+
+See the vignettes for further analyses that can be performed from `simulation`.
