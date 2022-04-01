@@ -168,7 +168,7 @@ cell_count        <- 20
 `CN_matrix` is a data frame with five variables, in which `Allele` gives the allele specification for the region from `Bin_start` to `Bin_end` of `Strand` of `Chromosome`. The user can build this data frame themselves, or use function `BUILD_cn_normal_XX` to build the normal diploid CN profile.
 
 ```{r}
-CN_matrix         <- BUILD_cn_normal_XX(MODEL_VARIABLES$cn_info)
+CN_matrix         <- BUILD_cn_normal_XX(model_variables$cn_info)
 ```
 
 Finally, `drivers` lists the mutated drivers. If there is no driver, it is an empty list.
