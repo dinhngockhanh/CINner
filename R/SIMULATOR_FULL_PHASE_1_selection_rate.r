@@ -37,7 +37,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             return(clone_selection_rate)
         }
     }
-    #-------------------Cell is not viable if exceeding maximum driver count
+    #---------------Cell is not viable if exceeding maximum driver count
     if (driver_count > 0) {
         driver_count_unique <- unique(driver_map[, 1])
         if (length(driver_count_unique) > bound_driver) {
@@ -45,12 +45,12 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             return(clone_selection_rate)
         }
     }
-    #----------If driver library is empty, then viable cells have sel rate 1
+    #------If driver library is empty, then viable cells have sel rate 1
     if (nrow(driver_library) == 0) {
         clone_selection_rate <- 1
         return(clone_selection_rate)
     }
-    #------------------------------Compute selection rates for viable clones
+    #--------------------------Compute selection rates for viable clones
     driver_library_copy <- driver_library
     driver_library_copy$Copy_WT <- 0
     driver_library_copy$Copy_MUT <- 0
@@ -60,11 +60,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         block <- driver_library_copy$Bin[i_driver]
         no_strands <- ploidy_chrom[chrom]
         driver_copy <- 0
-        # if (no_strands>0){
         for (strand in 1:no_strands) {
             driver_copy <- driver_copy + ploidy_block[[chrom]][[strand]][block]
         }
-        # }
         driver_library_copy$Copy_WT[i_driver] <- driver_copy
     }
     if (driver_count >= 1) {
@@ -75,6 +73,8 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         }
     }
     #   Compute selection rate
-    clone_selection_rate <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) * prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
+    clone_selection_rate <- (s_normalization^mean(vec_CN_all)) * prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) * prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
+
+
     return(clone_selection_rate)
 }

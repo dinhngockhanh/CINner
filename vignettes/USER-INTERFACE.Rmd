@@ -55,17 +55,12 @@ We will sample 200 cells from the population at `T_end`:
 
 ```{r}
 Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=100,Age_sample=80)
-
-
-# Table_sample                        <- data.frame(Sample_ID=c('SA01','SA02','SA03'),
-#                                                 Cell_count=c(100,100,100),
-#                                                 Age_sample=c(40,60,80))
 ```
 
 We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
 
 ```{r}
-T_tau_step                          <- 3
+T_tau_step                          <- 15
 ```
 
 An important variable is the size of CN bins. By default, this will be 500,000 bp.
@@ -77,22 +72,22 @@ CN_bin_length                       <- 500000
 We have to set up the probability that each class of CN events occurs in a cell division. The local events (chromosome, chromosome-arm or focal level), if happening, will occur on a random location among eligible places.
 
 ```{r}
-prob_CN_whole_genome_duplication    <- 1e-4
-prob_CN_missegregation              <- 1e-4
-prob_CN_chrom_arm_missegregation    <- 1e-4
-prob_CN_focal_amplification         <- 2e-4
+prob_CN_whole_genome_duplication    <- 0.5e-4
+prob_CN_missegregation              <- 2e-4
+prob_CN_chrom_arm_missegregation    <- 2e-4
+prob_CN_focal_amplification         <- 0.e-4
 prob_CN_focal_deletion              <- 2e-4
-prob_CN_cnloh_interstitial          <- 2e-4
-prob_CN_cnloh_terminal              <- 2e-4
+prob_CN_cnloh_interstitial          <- 0e-4
+prob_CN_cnloh_terminal              <- 0e-4
 ```
 
 The focal and CNLOH events require the geometric parameters for the length (in bin count) of the DNA region being affected.
 
 ```{r}
-prob_CN_focal_amplification_length  <- 0.3
-prob_CN_focal_deletion_length       <- 0.3
-prob_CN_cnloh_interstitial_length   <- 0.3
-prob_CN_cnloh_terminal_length       <- 0.3
+prob_CN_focal_amplification_length  <- 0.5
+prob_CN_focal_deletion_length       <- 0.5
+prob_CN_cnloh_interstitial_length   <- 0.5
+prob_CN_cnloh_terminal_length       <- 0.5
 ```
 
 Next, we set up the mutation rates for drivers and passengers, per bp per cell division.
@@ -106,8 +101,8 @@ We can also set up the upper limits for the driver count and local CN for a cell
 
 ```{r}
 bound_driver                        <- 3
-bound_average_ploidy                <- 5
-bound_homozygosity                  <- 100
+bound_average_ploidy                <- 4.5
+bound_homozygosity                  <- 500
 ```
 
 Finally, we need to set up the growth model for the total cell population. The algorithm is designed to follow any dynamics (within the limit imposed by how fast the cells can divide, defined by their lifespan). Note that to avoid cases where the simulations are terminated prematurely because of the stochasticity, the population size should not decrease to below about 10 cells at any time.
@@ -126,28 +121,7 @@ table_population_dynamics           <- cbind(vec_time,vec_cell_count)
 Finally, we build the model variable files, using function `BUILD_general_variables`:
 
 ```{r}
-MODEL_VARIABLES   <- BUILD_general_variables(cell_lifespan=cell_lifespan,
-                    T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,
-                    Table_sample=Table_sample,
-                    CN_bin_length=CN_bin_length,
-                    prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
-                    prob_CN_missegregation=prob_CN_missegregation,
-                    prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
-                    prob_CN_focal_amplification=prob_CN_focal_amplification,
-                    prob_CN_focal_deletion=prob_CN_focal_deletion,
-                    prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
-                    prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
-                    prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
-                    prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
-                    prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
-                    prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
-                    rate_driver=rate_driver,
-                    rate_passenger=rate_passenger,
-                    bound_driver=bound_driver,
-                    bound_average_ploidy=bound_average_ploidy,
-                    bound_homozygosity=bound_homozygosity,
-                    table_population_dynamics=table_population_dynamics)
-
+model_variables   <- BUILD_general_variables(cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,Table_sample=Table_sample,CN_bin_length=CN_bin_length,prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,prob_CN_missegregation=prob_CN_missegregation,prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,prob_CN_focal_amplification=prob_CN_focal_amplification,prob_CN_focal_deletion=prob_CN_focal_deletion,prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,rate_driver=rate_driver,rate_passenger=rate_passenger,bound_driver=bound_driver,bound_average_ploidy=bound_average_ploidy,bound_homozygosity=bound_homozygosity,table_population_dynamics=table_population_dynamics)
 ```
 
 ## Driver library
@@ -156,44 +130,39 @@ We first define a list of drivers to include in the model:
 
 ```{r}
 vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
-                       'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1',
-                       'AKT1','PPP2R1A')
+'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
 ```
 
 For each driver, we need to decide if it behaves as a TSG or an oncogene. Note that the algorithm requires at least one gene of each type to behave properly.
 
 ```{r}
 vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
-                       'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE',
-                       'ONCOGENE','TSG')
+'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
 ```
 
 We then give each driver a selective strength. The higher it is, the more likely the mutated cell will escape death and the faster it reaches fixation.
 
 ```{r}
-vec_driver_s      <- rep(0.02,length(vec_driver_genes))
-vec_driver_s[1]   <- 0.07
-vec_driver_s[2]   <- 0.04
-vec_driver_s[3]   <- 0.04
+vec_driver_s      <- rep(0.003,length(vec_driver_genes))
+vec_driver_s[1]   <- 0.01
+vec_driver_s[2]   <- 0.005
+vec_driver_s[3]   <- 0.005
 ```
 
 The function `BUILD_driver_library` builds the driver library. If the chromosome and bin locations of the drivers are not given, the function will find them by crosschecking with the Cancer Gene Census database.
 
 ```{r}
-MODEL_VARIABLES   <- BUILD_driver_library(MODEL_VARIABLES=MODEL_VARIABLES,
-                                          vec_driver_genes=vec_driver_genes,
-                                          vec_driver_role=vec_driver_role,
-                                          vec_driver_s=vec_driver_s)
+model_variables   <- BUILD_driver_library(model_variables=model_variables,vec_driver_genes=vec_driver_genes,vec_driver_role=vec_driver_role,vec_driver_s=vec_driver_s)
 ```
 
 ## Initial cell population
 
-Assume we have 20 cells at `T_0`, which come from 2 different clones. We will declare the specifics of each clone.
+Assume we have 20 cells at `T_0`, which are all normal diploid cells. We will declare the specifics of each clone.
 
 Let's start by declaring the clone for the first 10 cells. `cell_count` tells the algorithm how many cells there are in this clone at `T_0`.
 
 ```{r}
-cell_count        <- 10
+cell_count        <- 20
 ```
 
 `CN_matrix` is a data frame with five variables, in which `Allele` gives the allele specification for the region from `Bin_start` to `Bin_end` of `Strand` of `Chromosome`. The user can build this data frame themselves, or use function `BUILD_cn_normal_XX` to build the normal diploid CN profile.
@@ -211,19 +180,7 @@ drivers           <- list()
 We use the function `BUILD_initial_population` to add this clone to the initial cell population.
 
 ```{r}
-MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
-                    cell_count=cell_count,CN_matrix=CN_matrix,drivers=drivers)
-```
-
-We add another clone which is the same, except TP53 is mutated.
-
-```{r}
-cell_count        <- 10
-CN_matrix         <- BUILD_cn_normal_XX(MODEL_VARIABLES$cn_info)
-drivers           <- list(list(strand=1,unit=1,driver='TP53'),
-                          list(strand=2,unit=1,driver='TP53'))
-MODEL_VARIABLES   <- BUILD_initial_population(MODEL_VARIABLES=MODEL_VARIABLES,
-                    cell_count=cell_count,CN_matrix=CN_matrix,drivers=drivers)
+model_variables   <- BUILD_initial_population(model_variables=model_variables,cell_count=cell_count,CN_matrix=CN_matrix,drivers=drivers)
 ```
 
 ## Save the input files
@@ -233,13 +190,13 @@ The last step is to save the model variable files.
 Let's give a name to the model.
 
 ```{r}
-MODEL_NAME        <- 'EXPERIMENT-1A'
+model_name        <- 'EXPERIMENT-1A-SELECTIVE'
 ```
 
 The function `SAVE_model_variables` saves the input variables required to run the simulations according to our specification in 7 csv files. The names for these files begin with `MODEL_NAME`.
 
 ```{r}
-SAVE_model_variables(MODEL_NAME=MODEL_NAME,MODEL_VARIABLES=MODEL_VARIABLES)
+SAVE_model_variables(model_name=model_name,model_variables=model_variables)
 ```
 
 # Run the simulation
@@ -255,38 +212,19 @@ The function `SIMULATOR_FULL_PROGRAM_one_simulation` produces one simulation. It
 
 ```{r}
 stage_final       <- 3
-N_clones_min      <- 3
-N_clones_max      <- 6
-simulation        <- SIMULATOR_FULL_PROGRAM_one_simulation(model=MODEL_NAME,
-                    stage_final=stage_final,N_clones_min=N_clones_min,N_clones_max=N_clones_max)
+n_clones_min      <- 18
+n_clones_max      <- 26
+n_simulations     <- 1
+simulator_full_program(model = model_name,
+    n_simulations = n_simulations,
+    stage_final = stage_final,
+    n_clones_min = n_clones_min,
+    n_clones_max = n_clones_max,
+    save_cn_profile = TRUE)
 ```
 
-We first confirm that the population size in the simulation follows the input dynamics:
+A variety of plots from the simulation:
 
 ```{r,fig.height=7,fig.width=15}
-PLOT_total_population_vs_input(simulation,MODEL_NAME,vec_time_plot=seq(0,80,by=1),unit='year')
-```
-
-We can also look at the total CN profiles of the sampled cells.
-
-```{r,fig.height=7,fig.width=15}
-PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='total_copy')
-```
-
-As well as their minor CN profiles.
-
-```{r,fig.height=7,fig.width=15}
-PLOT_copy_number_heatmap(simulation,phylo='true',plotcol='min_copy')
-```
-
-Finally, we take a look at the events that give rise to the clones found in the sample.
-
-```{r,fig.height=7,fig.width=15}
-PLOT_clonal_phylogeny(simulation)
-```
-
-We next plot the evolution of clones found in the sample.
-
-```{r,fig.height=7,fig.width=15}
-PLOT_clonal_evolution(simulation,vec_time_plot=seq(0,80,by=1),unit='year')
+plot_all(model = model_name,n_simulations = n_simulations)
 ```

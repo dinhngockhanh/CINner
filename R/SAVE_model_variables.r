@@ -1,9 +1,9 @@
-SAVE_model_variables <- function(MODEL_NAME='',
-                                MODEL_VARIABLES=list()){
+SAVE_model_variables <- function(model_name='',
+                                model_variables=list()){
 
 
-    TABLE_CHROMOSOME_CN_INFO        <- MODEL_VARIABLES$cn_info
-    TABLE_INITIAL_CN                <- MODEL_VARIABLES$initial_cn
+    TABLE_CHROMOSOME_CN_INFO        <- model_variables$cn_info
+    TABLE_INITIAL_CN                <- model_variables$initial_cn
 
     vec_delete                      <- c()
     for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)){
@@ -15,28 +15,28 @@ SAVE_model_variables <- function(MODEL_NAME='',
     }
 
     if (length(vec_delete)>0){
-        MODEL_VARIABLES$cn_info     <- MODEL_VARIABLES$cn_info[-which(is.element(MODEL_VARIABLES$cn_info$Chrom,vec_delete)),]
+        model_variables$cn_info     <- model_variables$cn_info[-which(is.element(model_variables$cn_info$Chrom,vec_delete)),]
     }
 
 #---Save file for general variables
-    filename    <- paste(MODEL_NAME,'-input-variables.csv',sep='')
-    write.csv(MODEL_VARIABLES$general_variables,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-variables.csv',sep='')
+    write.csv(model_variables$general_variables,filename,row.names=FALSE)
 #---Save file for CN information
-    filename    <- paste(MODEL_NAME,'-input-copy-number-blocks.csv',sep='')
-    write.csv(MODEL_VARIABLES$cn_info,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-copy-number-blocks.csv',sep='')
+    write.csv(model_variables$cn_info,filename,row.names=FALSE)
 #---Save file for population dynamics
-    filename    <- paste(MODEL_NAME,'-input-population-dynamics.csv',sep='')
-    write.csv(MODEL_VARIABLES$population_dynamics,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-population-dynamics.csv',sep='')
+    write.csv(model_variables$population_dynamics,filename,row.names=FALSE)
 #---Save file for sampling information
-    filename    <- paste(MODEL_NAME,'-input-sampling.csv',sep='')
-    write.csv(MODEL_VARIABLES$sampling_info,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-sampling.csv',sep='')
+    write.csv(model_variables$sampling_info,filename,row.names=FALSE)
 #---Save file for driver library
-    filename    <- paste(MODEL_NAME,'-input-cancer-genes.csv',sep='')
-    write.csv(MODEL_VARIABLES$driver_library,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-cancer-genes.csv',sep='')
+    write.csv(model_variables$driver_library,filename,row.names=FALSE)
 #---Save file for initial clones' CN profiles
-    filename    <- paste(MODEL_NAME,'-input-initial-cn-profiles.csv',sep='')
-    write.csv(MODEL_VARIABLES$initial_cn,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-initial-cn-profiles.csv',sep='')
+    write.csv(model_variables$initial_cn,filename,row.names=FALSE)
 #---Save file for initial clones' other information
-    filename    <- paste(MODEL_NAME,'-input-initial-others.csv',sep='')
-    write.csv(MODEL_VARIABLES$initial_others,filename,row.names=FALSE)
+    filename    <- paste(model_name,'-input-initial-others.csv',sep='')
+    write.csv(model_variables$initial_others,filename,row.names=FALSE)
 }
