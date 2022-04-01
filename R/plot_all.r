@@ -8,7 +8,7 @@ plot_all <- function(model = "",
         width = 1000,
         height = 1000
     )
-    print('HERE')
+    print("HERE")
     #   Plot cell evolution as phylogeny tree
     cat("Plotting cell evolution as phylogeny tree...\n")
     plot_cell_phylo(
