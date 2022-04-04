@@ -1,0 +1,214 @@
+```{r setup}
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+
+
+library(ggplot2)
+library(ggtree)
+library(signals)
+library(dendextend)
+library(fishplot)
+
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_cn_normal_XX.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_driver_library.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_empty_input.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_general_variables.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/BUILD_initial_population.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/GET_clone_from_simulation.r")
+
+source("/Users/dinhngockhanh/CancerSimulator/R/EXTRA_build_model_variables_from_sample.r")
+
+source("/Users/dinhngockhanh/CancerSimulator/R/plot_all.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/plot_clonal_fishplot.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/plot_clonal_phylo.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/plot_cell_phylo.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/plot_cn_heatmap.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/plot_tot_pop_vs_input.r")
+
+source("/Users/dinhngockhanh/CancerSimulator/R/SAVE_model_variables.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_OUTPUT_for_comparison_between_MATLAB_and_R.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_clonal_population_cleaning.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_focal_amplification.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_focal_deletion.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_missegregation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_drivers.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_cleaning.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_comparison.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_initiation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_genotype_update.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_main.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_1_selection_rate.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_2_main.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_2_copy_number_table.r")
+
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_3_main_OLD.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PHASE_3_main.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/simulator_full_program.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PROGRAM_many_simulations.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_FULL_PROGRAM_one_simulation.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_VARIABLES_for_fitting.r")
+source("/Users/dinhngockhanh/CancerSimulator/R/SIMULATOR_VARIABLES_for_simulation.r")
+```
+
+```{r,fig.height=5,fig.width=10}
+#--------------------------------------------------------SELECTIVE MODEL
+
+cell_lifespan                       <- 30
+T_0                                 <- list(0,'year')
+T_end                               <- list(80,'year')
+
+            Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
+
+T_tau_step                          <- 15
+CN_bin_length                       <- 500000
+            # prob_CN_whole_genome_duplication    <- 1e-4
+            # prob_CN_missegregation              <- 1e-4
+            # prob_CN_chrom_arm_missegregation    <- 1e-4
+            # prob_CN_focal_amplification         <- 2e-4
+            # prob_CN_focal_deletion              <- 2e-4
+            # prob_CN_cnloh_interstitial          <- 2e-4
+            # prob_CN_cnloh_terminal              <- 2e-4
+
+            # prob_CN_whole_genome_duplication    <- 0.5e-4
+            # prob_CN_missegregation              <- 2e-4
+            # prob_CN_chrom_arm_missegregation    <- 2e-4
+            # prob_CN_focal_amplification         <- 0e-4
+            # prob_CN_focal_deletion              <- 0e-4
+            # prob_CN_cnloh_interstitial          <- 0.e-4
+            # prob_CN_cnloh_terminal              <- 0.e-4
+
+            prob_CN_whole_genome_duplication    <- 0.5e-4
+            prob_CN_missegregation              <- 2e-4
+            prob_CN_chrom_arm_missegregation    <- 2e-4
+            prob_CN_focal_amplification         <- 0.e-4
+            prob_CN_focal_deletion              <- 2e-4
+            prob_CN_cnloh_interstitial          <- 0e-4
+            prob_CN_cnloh_terminal              <- 0e-4
+
+            prob_CN_focal_amplification_length  <- 0.5
+            prob_CN_focal_deletion_length       <- 0.5
+            prob_CN_cnloh_interstitial_length   <- 0.5
+            prob_CN_cnloh_terminal_length       <- 0.5
+
+            # rate_driver                         <- 8e-16
+
+            rate_driver                         <- 0
+
+rate_passenger                      <- 1e-11
+bound_driver                        <- 3
+            bound_average_ploidy    <- 4.5
+            bound_homozygosity      <- 500
+vec_time                            <- T_0[[1]]:T_end[[1]]
+L                                   <- 10000
+t_0                                 <- 20
+k                                   <- 0.3
+vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
+table_population_dynamics           <- cbind(vec_time,vec_cell_count)
+model_variables   <- BUILD_general_variables(cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,Table_sample=Table_sample,CN_bin_length=CN_bin_length,prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,prob_CN_missegregation=prob_CN_missegregation,prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,prob_CN_focal_amplification=prob_CN_focal_amplification,prob_CN_focal_deletion=prob_CN_focal_deletion,prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,rate_driver=rate_driver,rate_passenger=rate_passenger,bound_driver=bound_driver,bound_average_ploidy=bound_average_ploidy,bound_homozygosity=bound_homozygosity,table_population_dynamics=table_population_dynamics)
+
+vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
+'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
+vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
+'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
+
+            # vec_driver_s      <- rep(0.02,length(vec_driver_genes))
+            # vec_driver_s[1]   <- 0.14
+            # vec_driver_s[2]   <- 0.07
+            # vec_driver_s[3]   <- 0.07
+
+            vec_driver_s      <- rep(0.003,length(vec_driver_genes))
+            vec_driver_s[1]   <- 0.01
+            vec_driver_s[2]   <- 0.005
+            vec_driver_s[3]   <- 0.005
+
+model_variables   <- BUILD_driver_library(model_variables=model_variables,vec_driver_genes=vec_driver_genes,vec_driver_role=vec_driver_role,vec_driver_s=vec_driver_s)
+
+            cell_count        <- 20
+            CN_matrix         <- BUILD_cn_normal_XX(model_variables$cn_info)
+            drivers           <- list()
+model_variables   <- BUILD_initial_population(model_variables=model_variables,cell_count=cell_count,CN_matrix=CN_matrix,drivers=drivers)
+
+model_name        <- 'EXPERIMENT-1A-SELECTIVE'
+SAVE_model_variables(model_name=model_name,model_variables=model_variables)
+
+
+stage_final       <- 3
+
+# n_clones_min      <- 18
+# n_clones_max      <- 26
+n_clones_min      <- 1
+n_clones_max      <- Inf
+
+n_simulations     <- 1
+
+
+
+simulator_full_program(model = model_name,
+    n_simulations = n_simulations,
+    stage_final = stage_final,
+    n_clones_min = n_clones_min,
+    n_clones_max = n_clones_max,
+    save_cn_profile = TRUE)
+
+
+plot_all(model = model_name,n_simulations = n_simulations)
+```
+
+
+```{r}
+model_variables$initial_others <- c()
+model_variables$initial_cn <- c()
+
+
+
+cell_count <- 10
+clone_profile <- GET_clone_from_simulation(model_variables=model_variables,cell_count=cell_count,old_simulation="EXPERIMENT-1A-SELECTIVE_simulation_1",clone="L")
+model_variables   <- BUILD_initial_population(model_variables=model_variables,cell_count=cell_count,CN_matrix=clone_profile$CN_profile,drivers=clone_profile$driver_profile)
+
+
+
+cell_count <- 10
+clone_profile <- GET_clone_from_simulation(model_variables=model_variables,cell_count=cell_count,old_simulation="EXPERIMENT-1A-SELECTIVE_simulation_3",clone="G")
+model_variables   <- BUILD_initial_population(model_variables=model_variables,cell_count=cell_count,CN_matrix=clone_profile$CN_profile,drivers=clone_profile$driver_profile)
+
+
+
+Table_sample <- data.frame(Sample_ID=c('SA101','SA102','SA103'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
+Table_sample$T_sample <- 365*Table_sample$Age_sample
+model_variables$sampling_info <- Table_sample
+
+
+
+model_name        <- 'EXPERIMENT-1B-SELECTIVE'
+SAVE_model_variables(model_name=model_name,model_variables=model_variables)
+
+stage_final       <- 3
+
+# n_clones_min      <- 18
+# n_clones_max      <- 26
+
+n_clones_min      <- 1
+n_clones_max      <- Inf
+
+n_simulations     <- 10
+
+simulator_full_program(model = model_name,
+    n_simulations = n_simulations,
+    stage_final = stage_final,
+    n_clones_min = n_clones_min,
+    n_clones_max = n_clones_max,
+    save_cn_profile = TRUE)
+
+plot_all(model = model_name,n_simulations = n_simulations)
+```
+
+```{r}
+model_name <- "EXPERIMENT-1B-SELECTIVE"
+
+n_simulations <- 1
+
+plot_all(model = model_name,n_simulations = n_simulations)
+```

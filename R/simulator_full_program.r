@@ -54,10 +54,14 @@ simulator_full_program <- function(model = "",
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")
         save(simulation, file = filename)
         #-----------------------------------Save the sampled CN profiles
-        if (save_cn_profile == TRUE){
-            filename <- paste(model, "_cn_profiles_", i, ".rda", sep = "")
+        if (save_cn_profile == TRUE) {
             sample_genotype_profiles <- simulation$sample$sample_genotype_profiles
-            save(sample_genotype_profiles, file = filename)   
+
+            filename <- paste(model, "_cn_profiles_", i, ".csv", sep = "")
+            write.csv(sample_genotype_profiles, filename, row.names = FALSE)
+
+            # filename <- paste(model, "_cn_profiles_", i, ".rda", sep = "")
+            # save(sample_genotype_profiles, file = filename)
         }
     }
 }

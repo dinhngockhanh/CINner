@@ -18,8 +18,8 @@ knitr::opts_chunk$set(
 ```{r setup}
 devtools::install_github("dinhngockhanh/CancerSimulator")
 
-
 library(ggplot2)
+library(ggtree)
 library(signals)
 library(dendextend)
 library(fishplot)

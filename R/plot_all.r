@@ -47,14 +47,14 @@ plot_all <- function(model = "",
         width = 1000,
         height = 1000
     )
-    #   Plot clonal evolution as fish plot
-    cat("Plotting clonal evolution as fish plot...\n")
-    plot_clonal_fishplot(
-        model = model,
-        n_simulations = n_simulations,
-        vec_time = seq(0, 80, by = 1),
-        unit_time = "year",
-        width = 1000,
-        height = 500
+    # #   Plot clonal evolution as fish plot
+    # cat("Plotting clonal evolution as fish plot...\n")
+    # plot_clonal_fishplot(
+    #     model = model,
+    #     n_simulations = n_simulations,
+    #     vec_time = seq(0, 80, by = 1),
+    #     unit_time = "year",
+    #     width = 1000,
+    #     height = 500
     )
 }
