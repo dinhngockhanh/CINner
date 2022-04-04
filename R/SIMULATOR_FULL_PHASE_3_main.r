@@ -9,25 +9,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     evolution_traj_divisions <- package_clonal_evolution$evolution_traj_divisions
     evolution_traj_clonal_ID <- package_clonal_evolution$evolution_traj_clonal_ID
     evolution_traj_population <- package_clonal_evolution$evolution_traj_population
-
-    if (standard_time_unit == "day") {
-
-    } else {
-        if (standard_time_unit == "week") {
-            T_current <- T_current / 7
-            evolution_traj_time <- evolution_traj_time / 7
-        } else {
-            if (standard_time_unit == "month") {
-                T_current <- T_current / 30
-                evolution_traj_time <- evolution_traj_time / 30
-            } else {
-                if (standard_time_unit == "year") {
-                    T_current <- T_current / 365
-                    evolution_traj_time <- evolution_traj_time / 365
-                }
-            }
-        }
-    }
     #---------------------------------------------------Input the sample
     sample_cell_ID <- package_sample$sample_cell_ID
     sample_clone_ID <- package_sample$sample_clone_ID
@@ -39,6 +20,28 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     all_sample_ID <- package_sample$all_sample_ID
 
     N_sample <- length(sample_cell_ID)
+
+    if (standard_time_unit == "day") {
+        Table_sampling$T_sample_phylo <- Table_sampling$T_sample
+    } else {
+        if (standard_time_unit == "week") {
+            T_current <- T_current / 7
+            evolution_traj_time <- evolution_traj_time / 7
+            Table_sampling$T_sample_phylo <- Table_sampling$T_sample / 7
+        } else {
+            if (standard_time_unit == "month") {
+                T_current <- T_current / 30
+                evolution_traj_time <- evolution_traj_time / 30
+                Table_sampling$T_sample_phylo <- Table_sampling$T_sample / 30
+            } else {
+                if (standard_time_unit == "year") {
+                    T_current <- T_current / 365
+                    evolution_traj_time <- evolution_traj_time / 365
+                    Table_sampling$T_sample_phylo <- Table_sampling$T_sample / 365
+                }
+            }
+        }
+    }
     #-------------------------------Initialize phylogeny in hclust style
     #   Initialize information to build phylogeny in hclust style
     hclust_row <- 0
@@ -60,7 +63,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     for (node in N_sample:(2 * N_sample - 1)) {
         phylogeny_elapsed_genotypes[[node]] <- sample_clone_ID[node - N_sample + 1]
         sample_ID <- all_sample_ID[node - N_sample + 1]
-        phylogeny_deathtime[node] <- Table_sampling$T_sample[which(Table_sampling$Sample_ID == sample_ID)]
+        phylogeny_deathtime[node] <- Table_sampling$T_sample_phylo[which(Table_sampling$Sample_ID == sample_ID)]
     }
     phylogeny_genotype[N_sample:(2 * N_sample - 1)] <- sample_clone_ID
     #-------------------------------Build the sample cell phylogeny tree
@@ -667,6 +670,26 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     cat("clone_hclust_merge: ", clone_hclust_merge, "\n\n")
     cat("clone_hclust_height: ", clone_hclust_height, "\n\n")
 
+
+
+    print("===========================================================")
+    print("===========================================================")
+    print("===========================================================")
+    print(phylogeny_birthtime)
+    print("===========================================================")
+    print("===========================================================")
+    print("===========================================================")
+    print(phylogeny_deathtime)
+    print("===========================================================")
+    print("===========================================================")
+    print("===========================================================")
+    print(hclust_height)
+    print("===========================================================")
+    print("===========================================================")
+    print("===========================================================")
+
+
+
     package_cell_phylogeny <- list()
     package_cell_phylogeny$phylogeny_origin <- phylogeny_origin
     package_cell_phylogeny$phylogeny_elapsed_gens <- phylogeny_elapsed_gens
@@ -689,6 +712,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
     output <- list()
     output$phylogeny_clustering_truth <- phylogeny_clustering_truth
+    output$cell_phylogeny_hclust <- phylogeny_hclust
     output$clone_phylogeny_phylo <- clone_phylogeny_phylo
     output$package_cell_phylogeny <- package_cell_phylogeny
     output$package_clone_phylogeny <- package_clone_phylogeny

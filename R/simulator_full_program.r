@@ -3,7 +3,8 @@ simulator_full_program <- function(model = "",
                                    stage_final = 0,
                                    n_clones_min = 0,
                                    n_clones_max = Inf,
-                                   save_cn_profile = FALSE) {
+                                   save_cn_profile = FALSE,
+                                   save_newick_tree = FALSE) {
     for (i in 1:n_simulations) {
         print("=======================================================")
         print(paste("BEGINNING SIMULATION-", i, "...", sep = ""))
@@ -62,6 +63,13 @@ simulator_full_program <- function(model = "",
 
             # filename <- paste(model, "_cn_profiles_", i, ".rda", sep = "")
             # save(sample_genotype_profiles, file = filename)
+        }
+        #-------------------------Save the sampled cells' phylogeny tree
+        if (save_newick_tree == TRUE) {
+            cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
+
+            filename <- paste(model, "_cell_phylogeny_", i, ".newick", sep = "")
+            write(hc2Newick(cell_phylogeny_hclust), file = filename)
         }
     }
 }

@@ -10,7 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  warning=FALSE, message=FALSE,
+  warning = FALSE, message = FALSE,
   comment = "#>"
 )
 ```
@@ -23,6 +23,7 @@ library(ggtree)
 library(signals)
 library(dendextend)
 library(fishplot)
+library(ctc)
 
 library(CancerSimulator)
 

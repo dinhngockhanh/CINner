@@ -10,9 +10,13 @@ plot_cell_phylo <- function(model = "",
         #--------------------------------------Input cell phylogeny tree
         cell_phylogeny_phylo <- simulation$sample_phylogeny$phylogeny_clustering_truth$tree
 
-        print(cell_phylogeny_phylo)
+        cell_phylogeny_birthtime <- simulation$sample_phylogeny$package_cell_phylogeny$phylogeny_birthtime
 
-        print(class(cell_phylogeny_phylo))
+        cell_phylogeny_deathtime <- simulation$sample_phylogeny$package_cell_phylogeny$phylogeny_deathtime
+
+        # print(cell_phylogeny_birthtime)
+        # print(cell_phylogeny_deathtime)
+
         # cell_phylogeny_labels <- simulation$sample_phylogeny$
         #---------------------------------------Plot cell phylogeny tree
         jpeg(paste(model, "_cell_phylo_", i, ".jpeg", sep = ""), width = width, height = height)
@@ -28,7 +32,8 @@ plot_cell_phylo <- function(model = "",
         #
         # # ape::tiplabels()
 
-        p <- ggtree(cell_phylogeny_phylo) + geom_rootedge(rootedge = 3000)
+        p <- ggtree(cell_phylogeny_phylo) + theme_tree2()
+        # + geom_rootedge(rootedge = 3000)
 
         print(p)
 
