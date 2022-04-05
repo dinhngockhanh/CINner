@@ -55,7 +55,7 @@ We
 We will sample 200 cells from the population at `T_end`:
 
 ```{r}
-Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=100,Age_sample=80)
+Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
 ```
 
 We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
@@ -213,8 +213,8 @@ The function `SIMULATOR_FULL_PROGRAM_one_simulation` produces one simulation. It
 
 ```{r}
 stage_final       <- 3
-n_clones_min      <- 18
-n_clones_max      <- 26
+n_clones_min      <- 1
+n_clones_max      <- Inf
 n_simulations     <- 1
 simulator_full_program(model = model_name,
     n_simulations = n_simulations,
