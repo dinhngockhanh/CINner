@@ -1,4 +1,4 @@
-SIMULATOR_FULL_PHASE_2_copy_number_table <- function(package_sample){
+SIMULATOR_FULL_PHASE_2_copy_number_table <- function(package_sample) {
     all_sample_genotype <- package_sample$all_sample_genotype
     all_sample_sampled_time <- package_sample$all_sample_sampled_time
     all_sample_ID <- package_sample$all_sample_ID
@@ -9,11 +9,15 @@ SIMULATOR_FULL_PHASE_2_copy_number_table <- function(package_sample){
     sample_clone_ID <- all_sample_genotype
     sample_time <- all_sample_sampled_time
 
-    for (i_cell in 1:length(all_sample_genotype)) {
-        if (i_cell %% 10 == 0) {
-            print(paste("Cell-", i_cell, sep = ""))
-        }
+    pb <- txtProgressBar(
+        min = 0,
+        max = length(all_sample_genotype),
+        style = 3,
+        width = 50,
+        char = "="
+    )
 
+    for (i_cell in 1:length(all_sample_genotype)) {
         sample_ID <- all_sample_ID[i_cell]
         clone_ID <- sample_clone_ID[i_cell]
         i_clone <- which(sample_genotype_unique == clone_ID)[1]
@@ -30,6 +34,7 @@ SIMULATOR_FULL_PHASE_2_copy_number_table <- function(package_sample){
         } else {
             sample_genotype_profiles <- rbind(sample_genotype_profiles, cell_genotype_profile)
         }
+        setTxtProgressBar(pb, i_cell)
     }
 
     package_sample$sample_genotype_profiles <- sample_genotype_profiles

@@ -276,7 +276,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                         hclust_row <- hclust_row + 1
                         hclust_nodes[node_mother] <- hclust_row
                         hclust_merge[hclust_row, ] <- c(hclust_nodes[node_1], hclust_nodes[node_2])
+
+
                         hclust_height[hclust_row] <- T_current - time
+                        # hclust_height[hclust_row] <- 0.5 * (phylogeny_deathtime[node_1] + phylogeny_deathtime[node_2]) - time
+
+
                         #                       Update phylogeny in our style
                         phylogeny_origin[node_1] <- node_mother
                         phylogeny_origin[node_2] <- node_mother
@@ -424,6 +429,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     hclust_clustering <- data.frame(sample_cell_ID, sample_clone_ID_letters)
     names(hclust_clustering) <- c("cell_id", "clone_id")
     #--------------------------------Create phylogeny object in hclust style
+    hclust_height <- 2 * hclust_height
     #   Create phylogeny object in hclust style
     phylogeny_hclust <- list()
     phylogeny_hclust$merge <- hclust_merge
@@ -434,6 +440,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     #---------------------------------Create phylogeny object in phylo style
     #   Create phylogeny object in phylo style
     phylogeny_phylo <- ape::as.phylo(phylogeny_hclust, use.labels = TRUE)
+    hclust_height <- hclust_height / 2
     #   Create object containing both phylo-style tree and clustering
     phylogeny_clustering_truth <- list()
     phylogeny_clustering_truth$tree <- phylogeny_phylo
@@ -638,6 +645,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
     #---------------------------Create clone phylogeny object in phylo style
     if (N_clones > 1) {
+        clone_hclust_height <- 2 * clone_hclust_height
         #       Create clone phylogeny object in hclust style
         clone_phylogeny_hclust <- list()
         clone_phylogeny_hclust$merge <- clone_hclust_merge
@@ -648,6 +656,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
         class(clone_phylogeny_hclust) <- "hclust"
         #       Create clone phylogeny object in phylo style
         clone_phylogeny_phylo <- ape::as.phylo(clone_phylogeny_hclust, use.labels = TRUE)
+        clone_hclust_height <- clone_hclust_height / 2
     } else {
         clone_phylogeny_phylo <- list()
     }
@@ -669,24 +678,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     cat("clone_hclust_nodes: ", clone_hclust_nodes, "\n\n")
     cat("clone_hclust_merge: ", clone_hclust_merge, "\n\n")
     cat("clone_hclust_height: ", clone_hclust_height, "\n\n")
-
-
-
-    print("===========================================================")
-    print("===========================================================")
-    print("===========================================================")
-    print(phylogeny_birthtime)
-    print("===========================================================")
-    print("===========================================================")
-    print("===========================================================")
-    print(phylogeny_deathtime)
-    print("===========================================================")
-    print("===========================================================")
-    print("===========================================================")
-    print(hclust_height)
-    print("===========================================================")
-    print("===========================================================")
-    print("===========================================================")
 
 
 

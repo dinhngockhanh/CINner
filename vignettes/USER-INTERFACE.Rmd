@@ -221,7 +221,8 @@ simulator_full_program(model = model_name,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
-    save_cn_profile = TRUE)
+    save_cn_profile = TRUE,
+    save_newick_tree = TRUE)
 ```
 
 A variety of plots from the simulation:
