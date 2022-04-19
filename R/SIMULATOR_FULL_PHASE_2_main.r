@@ -46,9 +46,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         all_sample_ID <- c(all_sample_ID, rep(ID_sample, N_sample))
         all_sample_sampled_time <- c(all_sample_sampled_time, rep(T_sample, N_sample))
 
-        print(paste("DETECTED ", length(unique(sample_genotype)), " CLONES IN SAMPLE ", ID_sample, sep = ""))
+        cat(paste("Detected ", length(unique(sample_genotype)), " clones in sample ", ID_sample, "\n", sep = ""))
     }
-    print(paste("DETECTED ", length(unique(all_sample_genotype)), " CLONES IN ALL SAMPLES", sep = ""))
+    cat(paste("Detected ", length(unique(all_sample_genotype)), " clones in all samples\n", sep = ""))
     #---------------------------------Create CN object for the sampled cells
     #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique <- unique(all_sample_genotype)
@@ -79,12 +79,12 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             vec_Allele_2 <- rep(0, 1, chrom_block_count)
             for (strand in 1:chrom_ploidy) {
 
-# print('-------------------------')
-# print(chrom)
-# print(N_chromosomes)
-# print(strand)
-# print(chrom_ploidy)
-# print(length(ploidy_allele[[chrom]]))
+                # print('-------------------------')
+                # print(chrom)
+                # print(N_chromosomes)
+                # print(strand)
+                # print(chrom_ploidy)
+                # print(length(ploidy_allele[[chrom]]))
 
                 mat_allele <- ploidy_allele[[chrom]][[strand]]
                 for (CN_row in 1:nrow(mat_allele)) {
@@ -132,15 +132,15 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     #--------------------------Give each clone a character index (A,B,C,...)
     sample_clone_ID_numeric <- all_sample_genotype
     sample_clone_ID_unique_numeric <- unique(sample_clone_ID_numeric)
-    sample_clone_ID_unique_letters <- rep("",length=length(sample_clone_ID_unique_numeric))
-    for (i in 1:length(sample_clone_ID_unique_letters)){
-        if (i <= 26){
+    sample_clone_ID_unique_letters <- rep("", length = length(sample_clone_ID_unique_numeric))
+    for (i in 1:length(sample_clone_ID_unique_letters)) {
+        if (i <= 26) {
             sample_clone_ID_unique_letters[i] <- LETTERS[as.numeric(i)]
         } else {
-            if ((i%%26)==0) {
-                sample_clone_ID_unique_letters[i] <- paste(LETTERS[as.numeric(floor((i-1)/26))],'Z',sep="")
-            }else{
-                sample_clone_ID_unique_letters[i] <- paste(LETTERS[as.numeric(floor((i-1)/26))],LETTERS[as.numeric(i%%26)],sep="")
+            if ((i %% 26) == 0) {
+                sample_clone_ID_unique_letters[i] <- paste(LETTERS[as.numeric(floor((i - 1) / 26))], "Z", sep = "")
+            } else {
+                sample_clone_ID_unique_letters[i] <- paste(LETTERS[as.numeric(floor((i - 1) / 26))], LETTERS[as.numeric(i %% 26)], sep = "")
             }
         }
     }
@@ -157,23 +157,23 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
     }
 
 
-    for (row in 1:nrow(table_clone_ID_vs_letters)) {
-        clone_ID_numeric <- table_clone_ID_vs_letters$Clone_ID_number[row]
-        clone_ID_letters <- table_clone_ID_vs_letters$Clone_ID_letter[row]
-        clone_driver_list <- unique(genotype_list_driver_map[[clone_ID_numeric]][, 1])
-        text_report <- paste("Clone ", clone_ID_letters, ": ", sep = "")
-        if (length(clone_driver_list) == 0) {
-            text_report <- paste(text_report, "no drivers", sep = "")
-        } else {
-            for (i in 1:length(clone_driver_list)) {
-                if (i >= 2) {
-                    text_report <- paste(text_report, ", ", sep = "")
-                }
-                text_report <- paste(text_report, driver_library$Gene_ID[clone_driver_list[i]], sep = "")
-            }
-            print(text_report)
-        }
-    }
+    # for (row in 1:nrow(table_clone_ID_vs_letters)) {
+    #     clone_ID_numeric <- table_clone_ID_vs_letters$Clone_ID_number[row]
+    #     clone_ID_letters <- table_clone_ID_vs_letters$Clone_ID_letter[row]
+    #     clone_driver_list <- unique(genotype_list_driver_map[[clone_ID_numeric]][, 1])
+    #     text_report <- paste("Clone ", clone_ID_letters, ": ", sep = "")
+    #     if (length(clone_driver_list) == 0) {
+    #         text_report <- paste(text_report, "no drivers", sep = "")
+    #     } else {
+    #         for (i in 1:length(clone_driver_list)) {
+    #             if (i >= 2) {
+    #                 text_report <- paste(text_report, ", ", sep = "")
+    #             }
+    #             text_report <- paste(text_report, driver_library$Gene_ID[clone_driver_list[i]], sep = "")
+    #         }
+    #         print(text_report)
+    #     }
+    # }
 
 
     #---------------------------------Output package of data from simulation

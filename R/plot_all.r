@@ -8,14 +8,31 @@ plot_all <- function(model = "",
         width = 1000,
         height = 1000
     )
-    #   Plot cell evolution as phylogeny tree
-    cat("Plotting cell evolution as phylogeny tree...\n")
-    plot_cell_phylo(
+
+
+
+    #   Plot clonal evolution as percentages at sample time points
+    cat("Plotting clonal percentages at sample time points...\n")
+    plot_clonal_percentages(
         model = model,
         n_simulations = n_simulations,
         width = 1000,
         height = 1000
     )
+
+
+
+    # #   Plot cell evolution as phylogeny tree
+    # cat("Plotting cell evolution as phylogeny tree...\n")
+    # plot_cell_phylo(
+    #     model = model,
+    #     n_simulations = n_simulations,
+    #     width = 1000,
+    #     height = 1000
+    # )
+
+
+
     # #   Plot total population
     # cat("Plotting total population vs input dynamics...\n")
     # plot_tot_pop_vs_input(
@@ -26,6 +43,9 @@ plot_all <- function(model = "",
     #     width = 1000,
     #     height = 500
     # )
+
+
+
     # #   Plot total CN profile
     # cat("Plotting total CN profile...\n")
     # plot_cn_heatmap(
@@ -36,6 +56,9 @@ plot_all <- function(model = "",
     #     width = 1000,
     #     height = 1000
     # )
+
+
+
     # #   Plot minor CN profile
     # cat("Plotting minor CN profile...\n")
     # plot_cn_heatmap(
@@ -46,6 +69,9 @@ plot_all <- function(model = "",
     #     width = 1000,
     #     height = 1000
     # )
+
+
+
     # #   Plot clonal evolution as fish plot
     # cat("Plotting clonal evolution as fish plot...\n")
     # plot_clonal_fishplot(

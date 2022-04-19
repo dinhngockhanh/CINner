@@ -25,7 +25,7 @@ plot_cn_heatmap <- function(model = "",
                 clusters = phylogeny_clustering_truth$clustering,
                 tree = phylogeny_clustering_truth$tree,
                 reorderclusters = TRUE,
-                plottree = FALSE
+                plottree = TRUE
             )
             print(p)
             dev.off()
@@ -46,7 +46,7 @@ plot_cn_heatmap <- function(model = "",
                 clusters = phylogeny_clustering_truth$clustering,
                 tree = phylogeny_clustering_truth$tree,
                 reorderclusters = TRUE,
-                plottree = FALSE
+                plottree = TRUE
             )
             print(p)
             dev.off()

@@ -21,6 +21,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
     N_sample <- length(sample_cell_ID)
 
+    print(standard_time_unit)
+
     if (standard_time_unit == "day") {
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample
     } else {
@@ -662,22 +664,22 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     }
     #---------------------------------Output package of data from simulation
 
-    cat("clone_phylogeny_labels: ", clone_phylogeny_labels, "\n\n")
-    cat("clone_phylogeny_ID: ", clone_phylogeny_ID, "\n\n")
-    cat("clone_phylogeny_origin: ", clone_phylogeny_origin, "\n\n")
-
-    for (i in 1:length(clone_phylogeny_origin)) {
-        if (i == clone_phylogeny_origin[i]) {
-            cat("\n!!!!! WRONG AT i=", i, "\n\n")
-        }
-    }
-
-    cat("clone_phylogeny_genotype: ", clone_phylogeny_genotype, "\n\n")
-    cat("clone_phylogeny_birthtime: ", clone_phylogeny_birthtime, "\n\n")
-    cat("clone_phylogeny_deathtime: ", clone_phylogeny_deathtime, "\n\n")
-    cat("clone_hclust_nodes: ", clone_hclust_nodes, "\n\n")
-    cat("clone_hclust_merge: ", clone_hclust_merge, "\n\n")
-    cat("clone_hclust_height: ", clone_hclust_height, "\n\n")
+    # cat("clone_phylogeny_labels: ", clone_phylogeny_labels, "\n\n")
+    # cat("clone_phylogeny_ID: ", clone_phylogeny_ID, "\n\n")
+    # cat("clone_phylogeny_origin: ", clone_phylogeny_origin, "\n\n")
+    #
+    # for (i in 1:length(clone_phylogeny_origin)) {
+    #     if (i == clone_phylogeny_origin[i]) {
+    #         cat("\n!!!!! WRONG AT i=", i, "\n\n")
+    #     }
+    # }
+    #
+    # cat("clone_phylogeny_genotype: ", clone_phylogeny_genotype, "\n\n")
+    # cat("clone_phylogeny_birthtime: ", clone_phylogeny_birthtime, "\n\n")
+    # cat("clone_phylogeny_deathtime: ", clone_phylogeny_deathtime, "\n\n")
+    # cat("clone_hclust_nodes: ", clone_hclust_nodes, "\n\n")
+    # cat("clone_hclust_merge: ", clone_hclust_merge, "\n\n")
+    # cat("clone_hclust_height: ", clone_hclust_height, "\n\n")
 
 
 
