@@ -19,7 +19,7 @@
 "prob_CN_focal_deletion_length","0.5","","Geometric parameter for the block length of a focal deletion event"
 "prob_CN_cnloh_interstitial_length","0.5","","Geometric parameter for the block length of an interstitial CN-LOH event"
 "prob_CN_cnloh_terminal_length","0.5","","Geometric parameter for the block length of a terminal CN-LOH event"
-"rate_driver","8e-16","per bp per cell division","Poisson rate of getting new driver mutations"
+"rate_driver","0","per bp per cell division","Poisson rate of getting new driver mutations"
 "rate_passenger","1e-11","per bp per cell division","Poisson rate of getting new passenger mutations"
 "bound_driver","3","driver count","Maximum driver count in viable cells (cells exceeding this will die)"
 "bound_average_ploidy","4.5","","Maximum average ploidy across genome (cells exceeding this will die)"

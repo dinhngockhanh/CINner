@@ -55,8 +55,8 @@ We
 We will sample 200 cells from the population at `T_end`:
 
 ```{r}
-Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
-# Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
+# Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
+Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
 ```
 
 We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
