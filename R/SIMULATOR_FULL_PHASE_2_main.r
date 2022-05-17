@@ -23,6 +23,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         }
     }
     #-------------------------------Find a random sample of final population
+    Table_sampling$T_sample_real <- Table_sampling$T_sample
+
     all_sample_genotype <- c()
     all_sample_ID <- c()
     all_sample_sampled_time <- c()
@@ -31,7 +33,13 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         ID_sample <- Table_sampling$Sample_ID[sample]
         T_sample <- Table_sampling$T_sample[sample]
 
+
+
         loc <- which.min(abs(evolution_traj_time - T_sample))
+        Table_sampling$T_sample_real[sample] <- evolution_traj_time[loc]
+
+
+
         vec_clonal_ID <- evolution_traj_clonal_ID[[loc]]
         vec_clonal_population <- evolution_traj_population[[loc]]
         vec_population <- c()
@@ -71,7 +79,8 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
             chrom_block_count <- vec_CN_block_no[chrom]
             chrom_ploidy <- ploidy_chrom[chrom]
             #           Find location information of each chromosome block
-            vec_chr <- rep(as.character(chrom), 1, chrom_block_count)
+            vec_chr <- rep(vec_chromosome_id[chrom], 1, chrom_block_count)
+            # vec_chr <- rep(as.character(chrom), 1, chrom_block_count)
             vec_start <- seq(0, size_CN_block_DNA * (chrom_block_count - 1), by = size_CN_block_DNA) + 1
             vec_end <- seq(size_CN_block_DNA, size_CN_block_DNA * chrom_block_count, by = size_CN_block_DNA)
             #           Find CN counts for each allele of each chromosome block

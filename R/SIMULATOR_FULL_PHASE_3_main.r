@@ -1,7 +1,7 @@
 # =============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
 SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample) {
     #-----------------------------------------Input the clonal evolution
-    T_current <- package_clonal_evolution$T_current
+    T_final <- package_clonal_evolution$T_current
     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- package_clonal_evolution$genotype_list_ploidy_block
     genotype_list_ploidy_allele <- package_clonal_evolution$genotype_list_ploidy_allele
@@ -21,25 +21,23 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
     N_sample <- length(sample_cell_ID)
 
-    print(standard_time_unit)
-
     if (standard_time_unit == "day") {
-        Table_sampling$T_sample_phylo <- Table_sampling$T_sample
+        Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real
     } else {
         if (standard_time_unit == "week") {
-            T_current <- T_current / 7
+            T_final <- T_final / 7
             evolution_traj_time <- evolution_traj_time / 7
-            Table_sampling$T_sample_phylo <- Table_sampling$T_sample / 7
+            Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 7
         } else {
             if (standard_time_unit == "month") {
-                T_current <- T_current / 30
+                T_final <- T_final / 30
                 evolution_traj_time <- evolution_traj_time / 30
-                Table_sampling$T_sample_phylo <- Table_sampling$T_sample / 30
+                Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 30
             } else {
                 if (standard_time_unit == "year") {
-                    T_current <- T_current / 365
+                    T_final <- T_final / 365
                     evolution_traj_time <- evolution_traj_time / 365
-                    Table_sampling$T_sample_phylo <- Table_sampling$T_sample / 365
+                    Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 365
                 }
             }
         }
@@ -107,18 +105,35 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
         }
         # =======Sanity tests
         if (sum(eligible_clonal_sample_population) != length(current_node_genotype)) {
-            cat("\nERROR: CLONAL POPULATIONS IN SAMPLE DO NOT ADD UP\n\n")
-            # cat('Time =',time,'\n')
-            # cat('Clones in total population:',sort(unique(eligible_clonal_ID)),'\n')
-            # cat('Clones in sample:',sort(unique(current_node_genotype)),'\n')
-            # cat('Setdiff:',setdiff(current_node_genotype,eligible_clonal_ID))
-            # cat('---------------------------------------------------\n')
+            cat("Time =", time, "\n\n")
+            cat("Clones in total population:", sort(unique(eligible_clonal_ID)), "\n\n")
+            cat("Clones in sample:", sort(unique(current_node_genotype)), "\n\n")
+            cat("Setdiff:", setdiff(current_node_genotype, eligible_clonal_ID), "\n\n")
+            cat("---------------------------------------------------\n")
+
+            cat("Previous clonal ID:", sort(unique(OLD_eligible_clonal_ID)), "\n\n")
+            cat("Previous clones in sample:", sort(unique(OLD_current_node_genotype)), "\n\n")
+            cat("Old setdiff:", setdiff(OLD_current_node_genotype, OLD_eligible_clonal_ID), "\n\n")
+
+            cat("Previous clonal populations in TOTAL:", OLD_eligible_clonal_total_population, "\n\n")
+            cat("Previous clonal populations in SAMPLE:", OLD_eligible_clonal_sample_population, "\n\n")
+            cat("Previous limits on populations:", OLD_limit_clonal_total_population, "\n\n")
+            cat("Previous division matrix:\n")
+            print(evolution_traj_divisions[[i + 1]])
+
+            stop("Clonal populations in sample do not add up", call. = FALSE)
         } else {
             if (any(eligible_clonal_sample_population > eligible_clonal_total_population)) {
-                cat("\nERROR: CLONAL POPULATIONS IN SAMPLE ARE LARGER THAN IN TOTAL CELL POPULATION\n\n")
-                # print(time)
+                stop("Clonal populations in sample are larger than in total cell population", call. = FALSE)
             }
         }
+
+        OLD_eligible_clonal_ID <- eligible_clonal_ID
+        OLD_current_node_genotype <- current_node_genotype
+        OLD_eligible_clonal_total_population <- eligible_clonal_total_population
+        OLD_eligible_clonal_sample_population <- eligible_clonal_sample_population
+        OLD_limit_clonal_total_population <- limit_clonal_total_population
+
         # =======Get list of divisions occurring in total population
         #       Column 1:       number of divisions
         #       Column 2:       genotype mother
@@ -278,12 +293,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                         hclust_row <- hclust_row + 1
                         hclust_nodes[node_mother] <- hclust_row
                         hclust_merge[hclust_row, ] <- c(hclust_nodes[node_1], hclust_nodes[node_2])
-
-
-                        hclust_height[hclust_row] <- T_current - time
-                        # hclust_height[hclust_row] <- 0.5 * (phylogeny_deathtime[node_1] + phylogeny_deathtime[node_2]) - time
-
-
+                        hclust_height[hclust_row] <- T_final - time
                         #                       Update phylogeny in our style
                         phylogeny_origin[node_1] <- node_mother
                         phylogeny_origin[node_2] <- node_mother
@@ -361,7 +371,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             hclust_row <- hclust_row + 1
             hclust_merge[hclust_row, ] <- c(hclust_node_anchor, hclust_nodes[node])
             hclust_node_anchor <- hclust_node_anchor + 1
-            hclust_height[hclust_row] <- T_current
+            hclust_height[hclust_row] <- T_final
         }
     }
     #---Complete the phylogeny in our style
@@ -439,10 +449,31 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     phylogeny_hclust$order <- hclust_order
     phylogeny_hclust$labels <- sample_cell_ID
     class(phylogeny_hclust) <- "hclust"
-    #---------------------------------Create phylogeny object in phylo style
+    #-----------------------------Create phylogeny object in phylo style
     #   Create phylogeny object in phylo style
     phylogeny_phylo <- ape::as.phylo(phylogeny_hclust, use.labels = TRUE)
     hclust_height <- hclust_height / 2
+
+
+
+    #---------Adjust the leaf lengths in phylo according to sample times
+    for (leaf in 1:length(phylogeny_phylo$tip.label)) {
+        #   Find the sample time for this leaf
+        sample_id <- strsplit(phylogeny_phylo$tip.label[leaf], "-")[[1]][1]
+        T_sample <- Table_sampling$Age_sample[which(Table_sampling$Sample_ID == sample_id)]
+        #   Find the location of leaf merging in phylo
+        leaf_row <- 0
+        for (row in 1:nrow(phylogeny_phylo$edge)) {
+            if (phylogeny_phylo$edge[row, 1] == leaf | phylogeny_phylo$edge[row, 2] == leaf) {
+                leaf_row <- row
+            }
+        }
+        #   Substract the duration from length of leaf merging in phylo
+        phylogeny_phylo$edge.length[leaf_row] <- phylogeny_phylo$edge.length[leaf_row] - (T_final - T_sample)
+    }
+
+
+
     #   Create object containing both phylo-style tree and clustering
     phylogeny_clustering_truth <- list()
     phylogeny_clustering_truth$tree <- phylogeny_phylo
@@ -472,7 +503,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     #   Initialize data for leaves of clone phylogeny
     for (node in N_clones:(2 * N_clones - 1)) {
         clone_phylogeny_genotype[node] <- clone_phylogeny_ID[node - N_clones + 1]
-        clone_phylogeny_deathtime[node] <- T_current
+        clone_phylogeny_deathtime[node] <- T_final
     }
     #   Build the clone phylogeny tree
     for (hclust_mother_cell_node in 1:nrow(hclust_merge)) {
@@ -513,7 +544,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             clone_current_node_genotype[loc_1] <- genotype_mother
         } else {
             #           If the cell merging happens between different clones...
-            genotype_mother <- phylogeny_genotype[cell_node_mother]
+            if (cell_node_mother > 0) {
+                genotype_mother <- phylogeny_genotype[cell_node_mother]
+            } else {
+                genotype_mother <- 0
+            }
+            # genotype_mother <- phylogeny_genotype[cell_node_mother]
             clone_node_mother <- min(clone_current_node_list) - 1
             #           Update clone phylogeny in hclust style
             clone_hclust_row <- clone_hclust_row + 1
@@ -526,9 +562,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
             clone_phylogeny_genotype[clone_node_mother] <- genotype_mother
 
-            clone_phylogeny_birthtime[clone_node_1] <- T_current - hclust_height[hclust_mother_cell_node]
-            clone_phylogeny_birthtime[clone_node_2] <- T_current - hclust_height[hclust_mother_cell_node]
-            clone_phylogeny_deathtime[clone_node_mother] <- T_current - hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_birthtime[clone_node_1] <- T_final - hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_birthtime[clone_node_2] <- T_final - hclust_height[hclust_mother_cell_node]
+            clone_phylogeny_deathtime[clone_node_mother] <- T_final - hclust_height[hclust_mother_cell_node]
             #           Update clone phylogeny records in our style
 
             pos_delete <- c(which(clone_current_node_list == clone_node_1), which(clone_current_node_list == clone_node_2))
@@ -562,9 +598,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
                     clone_phylogeny_genotype[clone_node_mother] <- genotype_resolve
 
-                    clone_phylogeny_birthtime[clone_node_1] <- T_current - hclust_height[hclust_mother_cell_node]
-                    clone_phylogeny_birthtime[clone_node_2] <- T_current - hclust_height[hclust_mother_cell_node]
-                    clone_phylogeny_deathtime[clone_node_mother] <- T_current - hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_birthtime[clone_node_1] <- T_final - hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_birthtime[clone_node_2] <- T_final - hclust_height[hclust_mother_cell_node]
+                    clone_phylogeny_deathtime[clone_node_mother] <- T_final - hclust_height[hclust_mother_cell_node]
 
                     pos_delete <- c(which(clone_current_node_list == clone_node_1), which(clone_current_node_list == clone_node_2))
 
@@ -595,7 +631,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             clone_hclust_row <- clone_hclust_row + 1
             clone_hclust_merge[clone_hclust_row, ] <- c(clone_hclust_node_anchor, clone_hclust_nodes[clone_node])
             clone_hclust_node_anchor <- clone_hclust_row
-            clone_hclust_height[clone_hclust_row] <- T_current
+            clone_hclust_height[clone_hclust_row] <- T_final
         }
     }
     #   Complete the phylogeny in our style

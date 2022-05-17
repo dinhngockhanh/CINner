@@ -32,7 +32,7 @@ plot_cell_phylo <- function(model = "",
 
         # cell_phylogeny_labels <- simulation$sample_phylogeny$
         #---------------------------------------Plot cell phylogeny tree
-        jpeg(paste(model, "_cell_phylo_", i, ".jpeg", sep = ""), width = width, height = height)
+        jpeg(paste(model, "_sim", i, "_cell_phylo", ".jpeg", sep = ""), width = width, height = height)
 
         # ape::plot.phylo(cell_phylogeny_phylo, show.tip.label = FALSE, root.edge = TRUE, use.edge.length = TRUE, direction = "downward")
         # # ape::plot.phylo(cell_phylogeny_phylo, direction = "downward", show.tip.label = FALSE, root.edge = TRUE)

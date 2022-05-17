@@ -29,7 +29,12 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     alpha_coverage = 0.7,
                                     lower_limit_cell_counts = 0,
                                     lower_limit_alt_counts = 3,
-                                    lower_limit_tot_counts = 0) {
+                                    lower_limit_tot_counts = 0,
+                                    gc = data.frame(matrix(ncol = 5, nrow = 0)),
+                                    gc_slope = 1.2,
+                                    gc_int = 0,
+                                    sigma1 = 0.1,
+                                    num_reads = 1e6) {
     #---------------------------Build model input file for general variables
     columns <- c("Variable", "Value", "Unit", "Note")
     TABLE_VARIABLES <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -133,6 +138,15 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("bound_average_ploidy", bound_average_ploidy, "", "Maximum average ploidy across genome (cells exceeding this will die)")
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("bound_homozygosity", bound_homozygosity, "", "Maximum number of bins under homozygosity (cells exceeding this will die)")
+    #   Set up variables for read count model
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("gc_slope", gc_slope, "", "Slope for linear GC model")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("gc_int", gc_int, "", "Intercept for linear GC model")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("sigma1", sigma1, "", "Gamma scale for read depth noise")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("num_reads", num_reads, "", "Number of reads per cell")
     #   Set up variables for sequencing
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("SFS_totalsteps", SFS_totalsteps, "", "Bin count in SFS data")
@@ -215,5 +229,6 @@ BUILD_general_variables <- function(model_name = "MODEL",
     MODEL_VARIABLES$cn_info <- TABLE_CHROMOSOME_CN_INFO
     MODEL_VARIABLES$population_dynamics <- TABLE_POPULATION_DYNAMICS
     MODEL_VARIABLES$sampling_info <- TABLE_SAMPLING_INFO
+    MODEL_VARIABLES$gc_and_mappability <- gc
     return(MODEL_VARIABLES)
 }

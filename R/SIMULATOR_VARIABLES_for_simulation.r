@@ -4,6 +4,9 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #---Input table of variables from file
     filename <- paste(model, "-input-variables.csv", sep = "")
     TABLE_VARIABLES <- read.table(filename, header = TRUE, sep = ",")
+    #---Save file for GC content and mappability per CN bin
+    filename <- paste(model_name, "-input-gc.csv", sep = "")
+    TABLE_GC <- read.table(filename, header = TRUE, sep = ",")
     #---Input table of total population dynamics
     filename <- paste(model, "-input-population-dynamics.csv", sep = "")
     TABLE_POPULATION_DYNAMICS <- read.table(filename, header = TRUE, sep = ",")
@@ -57,6 +60,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     for (i in 1:ncol(TABLE_CHROMOSOME_CN_INFO)) {
         assign(colnames(TABLE_CHROMOSOME_CN_INFO)[i], TABLE_CHROMOSOME_CN_INFO[, i], envir = .GlobalEnv)
     }
+    vec_chromosome_id <<- Chromosome
     vec_CN_block_no <<- Bin_count
     vec_centromere_location <<- Centromere_location
     #---Set up mutational and CNA driver library (without selection rates)
@@ -65,6 +69,10 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     } else {
         driver_library <<- TABLE_CANCER_GENES
     }
+
+    #---Set up table of GC content and mappability per CN bin
+    gc <<- TABLE_GC
+
     #-----------------------------------Set up initial state for simulations
     #   Get number of clones in the initial population
     initial_N_clones <<- nrow(TABLE_INITIAL_OTHERS)
