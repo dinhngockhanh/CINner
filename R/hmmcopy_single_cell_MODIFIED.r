@@ -2,11 +2,6 @@ stack_params_MODIFIED <- function(data, paramname) {
     data <- data.frame(data)
     colnames(data) <- 1:length(data) - 1
     data$state <- as.numeric(row.names(data)) - 1
-
-    #-----------------------------------------------------------Modified
-    class(data) <- "data.table"
-    #-------------------------------------------------------------------
-
     data <- melt(data, id.vars = "state", value.name = "value", variable.name = "iteration")
     data$parameter <- paramname
     return(data)
@@ -107,13 +102,11 @@ run_hmmcopy_MODIFIED <- function(cell, corrected_copy, param, multipliers, verbo
         cor_gc = samp.corrected$cor.gc, copy = samp.corrected$copy, valid = samp.corrected$valid, ideal = samp.corrected$ideal,
         cor_map = samp.corrected$cor.map
     )
+
+
     opt <- list()
     opt$sample_id <- cell
     #-------------------------------------------------------------------
-
-
-
-
 
 
     VALS <- as.numeric(strsplit(multipliers, ",")[[1]])
@@ -387,5 +380,4 @@ get_parameters_MODIFIED <- function(str, e, mu, lambda, nu, kappa, m, eta, gamma
 #
 # param <- get_parameters_MODIFIED(opt$param_str, opt$param_e, opt$param_mu, opt$param_l, opt$param_nu, opt$param_k, opt$param_m, opt$param_eta, opt$param_g, opt$param_s)
 #
-# run_hmmcopy_MODIFIED(opt$sample_id, opt$corrected_data, param, opt$outdir, opt$param_multiplier)
 # run_hmmcopy_MODIFIED(opt$sample_id, opt$corrected_data, param, opt$outdir, opt$param_multiplier)

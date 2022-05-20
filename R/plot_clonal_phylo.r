@@ -153,7 +153,7 @@ plot_clonal_phylo <- function(model = "",
             n_all_events <- length(all_event_types)
             dend_length <- clone_phylogeny_dend_length[node_phylo]
             if (node_mother_phylo == 0) {
-                hjust_start <- -0.5
+                hjust_start <- 0.5
             } else {
                 hjust_start <- dend_length / 2 - dend_length / (n_all_events + 1)
             }
@@ -431,9 +431,12 @@ plot_clonal_phylo <- function(model = "",
 
 
         #----------------------------------------------Add in the legend
+
+        row_spacing <- log(N_clones) / 5
+
         for (row in 1:length(cols)) {
-            p <- p + annotate("point", -1, N_clones - row, size = 16, color = cols[row])
-            p <- p + annotate("text", 0, N_clones - row, size = 16, hjust = 0, label = names(cols)[row])
+            p <- p + annotate("point", -1, (N_clones - (row - 1) * row_spacing), size = 16, color = cols[row])
+            p <- p + annotate("text", 0, (N_clones - (row - 1) * row_spacing), size = 16, hjust = 0, label = names(cols)[row])
         }
 
 

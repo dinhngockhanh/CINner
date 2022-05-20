@@ -14,32 +14,16 @@ library(plyr)
 
 library(RColorBrewer)
 
+
+
+#-----------------------------------------------------------------------
 setwd("/Users/dinhngockhanh/CancerSimulator/R/")
 files_sources <- list.files(pattern = "*.r$")
 sapply(files_sources, source)
-```
-
-
-
-```{r setup}
-library(ggplot2)
-library(ggtree)
-library(signals)
-library(dendextend)
-library(fishplot)
-library(ctc)
-library(adephylo)
-library(data.table)
-library(HMMcopy)
-
-# library(getopt)
-library(plyr)
-
-library(RColorBrewer)
-
-devtools::install_github("dinhngockhanh/CancerSimulator")
-devtools::load_all()
-devtools::document()
+#-----------------------------------------------------------------------
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# devtools::load_all()
+# devtools::document()
 ```
 
 

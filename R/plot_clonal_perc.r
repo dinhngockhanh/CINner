@@ -1,7 +1,8 @@
 plot_clonal_perc <- function(model = "",
                              n_simulations = 0,
                              width = 1000,
-                             height = 500) {
+                             height = 500,
+                             perc_cutoff = 3.5) {
     for (i in 1:n_simulations) {
         #------------------------------------------Input simulation file
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")
@@ -41,26 +42,38 @@ plot_clonal_perc <- function(model = "",
             all_clone_perc,
             all_clone_id
         )
+        #------------------------------------------Eliminate tiny clones
+        table_clone_perc_tmp <- data.frame(
+            all_index = c(),
+            all_sample_id = c(),
+            all_clone_perc = c(),
+            all_clone_id = c()
+        )
+        for (clone in 1:length(list_clone_id)) {
+            table_clone_perc_mini <- table_clone_perc[which(table_clone_perc$all_clone_id == list_clone_id[clone]), ]
+            if (max(table_clone_perc_mini$all_clone_perc) >= perc_cutoff) {
+                table_clone_perc_tmp <- rbind(table_clone_perc_tmp, table_clone_perc_mini)
+            }
+        }
+        table_clone_perc <- table_clone_perc_tmp
         #--------------------------Plot the clonal percentages over time
         filename <- paste(model, "_sim", i, "_clonal_percentages", ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
 
-        print(table_clone_perc)
 
-        p <- ggplot(table_clone_perc, aes(x = all_index, y = all_clone_perc, fill = factor(all_clone_id, levels = list_clone_id))) +
-            geom_area(size = 0.5, alpha = 0.8, color = "black") +
+        p <- ggplot(table_clone_perc, aes(x = all_index, y = all_clone_perc, color = all_clone_id)) +
+            geom_line(position = position_dodge(), size = 2) +
+            scale_y_log10() +
             xlab("Samples") +
             ylab("Percentages") +
-            labs(fill = "Clone") +
+            labs(color = "Clone") +
             theme(text = element_text(size = 20)) +
             scale_x_continuous(
                 breaks = (1:length(list_sample_id)), labels = list_sample_id, expand = c(0, 0),
                 limits = c(1, length(list_sample_id))
             ) +
-            scale_y_continuous(
-                expand = c(0, 0),
-                limits = c(0, 100)
-            )
+            theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
+            theme(text = element_text(size = 40))
         print(p)
         dev.off()
     }

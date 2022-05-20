@@ -113,7 +113,6 @@ p2_reads_from_cn <- function(simulation) {
     #----------------------------------Use HMMcopy to find inferred copy
     cat("B===Use HMMcopy to infer bias-free CN...\n")
     noisy_cn_profiles_long_list <- vector("list", length = length(all_cell_id))
-    # for (cell in 1:1) {
     for (cell in 1:length(all_cell_id)) {
         #---Get noisy CN profile for this cell
         cell_id <- all_cell_id[cell]
@@ -123,8 +122,14 @@ p2_reads_from_cn <- function(simulation) {
         #---Correct noisy CN profile for GC and mappability biases
         corrected_copy <- correctReadcount(uncorrected_reads)
         #---Run HMMcopy to infer CN state
-        #   Prepare input variables for (modified) HMMcopy pipeline
+        #   Prepare parameters for (modified) HMMcopy pipeline
         cell <- cell_id
+
+        param <- HMMsegment(corrected_copy, getparam = TRUE)
+        class(param) <- "data.table"
+
+        multipliers <- "2"
+
 
         # opt <- list()
         # opt$param_str <- 2
@@ -142,26 +147,22 @@ p2_reads_from_cn <- function(simulation) {
         # opt$param_g <- 2
         # opt$param_s <- 2
         # param <- get_parameters_MODIFIED(opt$param_str, opt$param_e, opt$param_mu, opt$param_l, opt$param_nu, opt$param_k, opt$param_m, opt$param_eta, opt$param_g, opt$param_s)
-        param <- HMMsegment(corrected_copy, getparam = TRUE)
-        class(param) <- "data.table"
 
-        multipliers <- "2"
 
         #   Run (modified) HMMcopy pipeline
         output <- run_hmmcopy_MODIFIED(cell, corrected_copy, param, multipliers)
+
+        # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        # str(output)
+        # print(output$auto_ploidy.reads)
+
         #   Put the data together for this cell
         corrected_copy <- corrected_copy[order(corrected_copy$chr, corrected_copy$start), ]
         colnames(corrected_copy)[which(names(corrected_copy) == "copy")] <- "copy_log2"
         corrected_copy$multiplier <- output$auto_ploidy.reads$multiplier
         corrected_copy$copy <- output$auto_ploidy.reads$copy
         corrected_copy$state <- output$auto_ploidy.reads$state
-
-
-
-        print(corrected_copy)
-
-
-
+        #   Store inferred CN profiles for this cell
         noisy_cn_profiles_long_list[[cell]] <- corrected_copy
     }
     noisy_cn_profiles_long <- rbindlist(noisy_cn_profiles_long_list, use.names = FALSE, fill = FALSE, idcol = NULL)

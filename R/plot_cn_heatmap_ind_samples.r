@@ -62,7 +62,8 @@ plot_cn_heatmap_ind_samples <- function(model = "",
                     clusters = list_sample_clustering[[j]],
                     tree = list_sample_tree[[j]],
                     reorderclusters = TRUE,
-                    plottree = TRUE
+                    plottree = TRUE,
+                    plotfrequency = TRUE
                 )
                 print(p)
                 dev.off()
@@ -78,7 +79,8 @@ plot_cn_heatmap_ind_samples <- function(model = "",
                     clusters = list_sample_clustering[[j]],
                     tree = list_sample_tree[[j]],
                     reorderclusters = TRUE,
-                    plottree = TRUE
+                    plottree = TRUE,
+                    plotfrequency = TRUE
                 )
                 print(p)
                 dev.off()

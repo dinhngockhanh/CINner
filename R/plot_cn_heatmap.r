@@ -29,7 +29,8 @@ plot_cn_heatmap <- function(model = "",
                 clusters = sample_clustering,
                 tree = sample_tree,
                 reorderclusters = TRUE,
-                plottree = TRUE
+                plottree = TRUE,
+                plotfrequency = TRUE
             )
             print(p)
             dev.off()
@@ -43,7 +44,8 @@ plot_cn_heatmap <- function(model = "",
                 clusters = sample_clustering,
                 tree = sample_tree,
                 reorderclusters = TRUE,
-                plottree = TRUE
+                plottree = TRUE,
+                plotfrequency = TRUE
             )
             print(p)
             dev.off()
