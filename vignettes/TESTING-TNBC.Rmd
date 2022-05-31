@@ -29,8 +29,7 @@ sapply(files_sources, source)
 
 
 ```{r,fig.height=5,fig.width=10}
-model_name        <- 'NEUTRAL'
-# model_name        <- 'TNBC'
+model_name        <- 'TNBC'
 n_simulations     <- 20
 plot_all(model = model_name,n_simulations = n_simulations)
 ```
@@ -43,10 +42,10 @@ cell_lifespan                       <- 10
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-Table_sample <- data.frame(Sample_ID=c('SA03'),Cell_count=c(100),Age_sample=c(80))
+Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(100),Age_sample=c(80))
 # Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
 
-T_tau_step                          <- 5
+T_tau_step                          <- cell_lifespan/2
 CN_bin_length                       <- 500000
 
             # prob_CN_whole_genome_duplication    <- 0.5e-4
@@ -57,13 +56,13 @@ CN_bin_length                       <- 500000
             # prob_CN_cnloh_interstitial          <- 1e-4
             # prob_CN_cnloh_terminal              <- 1e-4
 
-            prob_CN_whole_genome_duplication    <- 0.0*0.5e-4
+            prob_CN_whole_genome_duplication    <- 0.1*0.5e-4
             prob_CN_missegregation              <- 1.0*2e-4
             prob_CN_chrom_arm_missegregation    <- 2.0*2e-4
             prob_CN_focal_amplification         <- 2.0*1e-4
-            prob_CN_focal_deletion              <- 0.0*2e-4
-            prob_CN_cnloh_interstitial          <- 0.2*1e-4
-            prob_CN_cnloh_terminal              <- 0.2*1e-4
+            prob_CN_focal_deletion              <- 0.1*2e-4
+            prob_CN_cnloh_interstitial          <- 0.1*1e-4
+            prob_CN_cnloh_terminal              <- 0.1*1e-4
 
             prob_CN_focal_amplification_length  <- 0.01
             prob_CN_focal_deletion_length       <- 0.01
@@ -157,7 +156,7 @@ stage_final       <- 3
 n_clones_min      <- 1
 n_clones_max      <- Inf
 
-n_simulations     <- 20
+n_simulations     <- 100
 
 
 
@@ -166,12 +165,16 @@ simulator_full_program(model = model_name,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
-    save_cn_profile = FALSE,
-    format_cn_profile = "both",
+
     save_newick_tree = FALSE,
-    model_readcount = FALSE)
+
+    save_cn_profile = TRUE,
+    format_cn_profile = "long",
+    internal_nodes_cn_info = FALSE,
+
+    model_readcount = TRUE)
 
 
 
-plot_all(model = model_name,n_simulations = n_simulations)
+# plot_all(model = model_name,n_simulations = n_simulations)
 ```

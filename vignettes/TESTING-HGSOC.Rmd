@@ -41,10 +41,11 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(1,1,1),Age_sample=c(40,60,80))
+Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(10),Age_sample=c(80))
+
 # Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
 
-T_tau_step                          <- 15
+T_tau_step                          <- cell_lifespan/2
 CN_bin_length                       <- 500000
 
             # prob_CN_whole_genome_duplication    <- 0.5e-4
@@ -166,9 +167,13 @@ simulator_full_program(model = model_name,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
-    save_cn_profile = FALSE,
-    format_cn_profile = "both",
+
     save_newick_tree = FALSE,
+
+    save_cn_profile = TRUE,
+    format_cn_profile = "long",
+    internal_nodes_cn_info = FALSE,
+
     model_readcount = TRUE)
 
 
