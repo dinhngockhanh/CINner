@@ -13,12 +13,12 @@ p2_write_gc_map_as_wig <- function(filename_gc, filename_map) {
     #--------------------------------Input values for GC and mappability
     df_gc$gc <- -1
     df_gc$map <- -1
-    for (row in 1:nrow(gc)) {
-        val_chr <- gc$chr[row]
-        val_start <- gc$start[row]
-        val_end <- gc$end[row]
-        val_gc <- gc$gc[row]
-        val_map <- gc$map[row]
+    for (row in 1:nrow(table_gc)) {
+        val_chr <- table_gc$chr[row]
+        val_start <- table_gc$start[row]
+        val_end <- table_gc$end[row]
+        val_gc <- table_gc$gc[row]
+        val_map <- table_gc$map[row]
         loc <- which(df_gc$chr == val_chr & df_gc$start == val_start & df_gc$end == val_end)
         df_gc$gc[loc] <- val_gc
         df_gc$map[loc] <- val_map
