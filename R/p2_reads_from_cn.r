@@ -1,4 +1,4 @@
-p2_reads_from_cn <- function(simulation) {
+p2_reads_from_cn <- function(simulation, report_progress) {
     noisy_cn_profiles_long <- simulation$sample$cn_profiles_long
     #-------------------Find true_CN and BAF for every bin in every cell
     #   Find true_CN and BAF for every bin in every cell
@@ -9,7 +9,9 @@ p2_reads_from_cn <- function(simulation) {
     #-----------------------------------------Find list of all cell ID's
     all_cell_id <- unique(noisy_cn_profiles_long$cell_id)
     #--------------------Find GC/mappability for every bin in every cell
-    cat("+---Assign GC to every bin in every cell...\n")
+    if (report_progress == TRUE) {
+        cat("+---Assign GC to every bin in every cell...\n")
+    }
     #   Find GC/mappability for the first cell
     cell_id <- all_cell_id[1]
     one_noisy_cn_profiles_long <- data.frame(
@@ -23,10 +25,10 @@ p2_reads_from_cn <- function(simulation) {
         chr <- one_noisy_cn_profiles_long$chr[row]
         start <- one_noisy_cn_profiles_long$start[row]
         end <- one_noisy_cn_profiles_long$end[row]
-        loc <- which(gc$chr == chr & gc$start == start & gc$end == end)
+        loc <- which(table_gc$chr == chr & table_gc$start == start & table_gc$end == end)
         if (length(loc) > 0) {
-            one_noisy_cn_profiles_long$gc[row] <- gc$gc[loc]
-            one_noisy_cn_profiles_long$map[row] <- gc$map[loc]
+            one_noisy_cn_profiles_long$gc[row] <- table_gc$gc[loc]
+            one_noisy_cn_profiles_long$map[row] <- table_gc$map[loc]
         }
     }
     #   Assign GC/mappability for every cell
@@ -50,66 +52,53 @@ p2_reads_from_cn <- function(simulation) {
     # for (row in 1:nrow(gc)) {
     #     setTxtProgressBar(pb, row)
     #
-    #     vec_loc <- which(noisy_cn_profiles_long$chr == gc$chr[row] &
-    #         noisy_cn_profiles_long$start == gc$start[row] &
-    #         noisy_cn_profiles_long$end == gc$end[row])
+    #     vec_loc <- which(noisy_cn_profiles_long$chr == table_gc$chr[row] &
+    #         noisy_cn_profiles_long$start == table_gc$start[row] &
+    #         noisy_cn_profiles_long$end == table_gc$end[row])
     #     if (length(vec_loc) > 0) {
-    #         noisy_cn_profiles_long$gc[vec_loc] <- gc$gc[row]
-    #         noisy_cn_profiles_long$map[vec_loc] <- gc$map[row]
+    #         noisy_cn_profiles_long$gc[vec_loc] <- table_gc$gc[row]
+    #         noisy_cn_profiles_long$map[vec_loc] <- table_gc$map[row]
     #     }
     # }
     # cat("\n")
     # #   Delete CN bins without GC/mappability information
     # vec_delete <- which(noisy_cn_profiles_long$gc < 0)
     # noisy_cn_profiles_long <- noisy_cn_profiles_long[-vec_delete, ]
-
-
-
-
-
     #----------------------------Find locations with positive GC content
     vec_work <- which(noisy_cn_profiles_long$gc > 0)
-    #   Delete CN bins without GC/mappability information
-    # vec_delete <- which(noisy_cn_profiles_long$gc < 0)
-    # noisy_cn_profiles_long <- noisy_cn_profiles_long[-vec_delete, ]
     #-------------Simulate noisy CN profiles for each cell in the sample
     #-------------------------------------with GC and mappability biases
     #---Model GC bias
-    cat("+---Model GC bias...\n")
+    if (report_progress == TRUE) {
+        cat("+---Model GC bias...\n")
+    }
     noisy_cn_profiles_long$observed_CN <- -1
     noisy_cn_profiles_long$observed_CN[vec_work] <- noisy_cn_profiles_long$true_CN[vec_work] *
         (gc_slope * noisy_cn_profiles_long$gc[vec_work] + gc_int)
-    # noisy_cn_profiles_long$observed_CN <- noisy_cn_profiles_long$true_CN *
-    #     (gc_slope * noisy_cn_profiles_long$gc + gc_int)
     #---Model random noise in observed CN
-    cat("+---Model random noise in observed CN...\n")
+    if (report_progress == TRUE) {
+        cat("+---Model random noise in observed CN...\n")
+    }
     noisy_cn_profiles_long$noisy_CN <- -1
     noisy_cn_profiles_long$noisy_CN[vec_work] <- rgamma(
         n = length(vec_work),
         shape = noisy_cn_profiles_long$observed_CN[vec_work] / sigma1,
         scale = sigma1
     )
-    # noisy_cn_profiles_long$noisy_CN <- rgamma(
-    #     n = nrow(noisy_cn_profiles_long),
-    #     shape = noisy_cn_profiles_long$observed_CN / sigma1,
-    #     scale = sigma1
-    # )
     #---Normalize noisy CN per cell
-    cat("+---Normalize noisy CN per cell...\n")
+    if (report_progress == TRUE) {
+        cat("+---Normalize noisy CN per cell...\n")
+    }
     noisy_cn_profiles_long$noisy_CN_pval <- 0
     for (row in 1:length(all_cell_id)) {
         vec_loc <- which(noisy_cn_profiles_long$cell_id == all_cell_id[row] & noisy_cn_profiles_long$gc > 0)
         noisy_cn_profiles_long$noisy_CN_pval[vec_loc] <-
             noisy_cn_profiles_long$noisy_CN[vec_loc] / sum(noisy_cn_profiles_long$noisy_CN[vec_loc])
     }
-    # noisy_cn_profiles_long$noisy_CN_pval <- 0
-    # for (row in 1:length(all_cell_id)) {
-    #     vec_loc <- which(noisy_cn_profiles_long$cell_id == all_cell_id[row])
-    #     noisy_cn_profiles_long$noisy_CN_pval[vec_loc] <-
-    #         noisy_cn_profiles_long$noisy_CN[vec_loc] / sum(noisy_cn_profiles_long$noisy_CN[vec_loc])
-    # }
     #---Model total read counts per bin per cell
-    cat("+---Model total read counts...\n")
+    if (report_progress == TRUE) {
+        cat("+---Model total read counts...\n")
+    }
     noisy_cn_profiles_long$reads <- 0
     for (row in 1:length(all_cell_id)) {
         vec_loc <- which(noisy_cn_profiles_long$cell_id == all_cell_id[row] & noisy_cn_profiles_long$gc > 0)
@@ -119,101 +108,24 @@ p2_reads_from_cn <- function(simulation) {
             prob = noisy_cn_profiles_long$noisy_CN_pval[vec_loc]
         )
     }
-    # noisy_cn_profiles_long$reads <- 0
-    # for (row in 1:length(all_cell_id)) {
-    #     vec_loc <- which(noisy_cn_profiles_long$cell_id == all_cell_id[row])
-    #     noisy_cn_profiles_long$reads[vec_loc] <- rmultinom(
-    #         n = 1,
-    #         size = num_reads,
-    #         prob = noisy_cn_profiles_long$noisy_CN_pval[vec_loc]
-    #     )
-    # }
     #---Model minor read counts per bin per cell
-    cat("+---Model minor read counts...\n")
+    if (report_progress == TRUE) {
+        cat("+---Model minor read counts...\n")
+    }
     noisy_cn_profiles_long$minor_reads <- 0
     noisy_cn_profiles_long$minor_reads[vec_work] <- rbinom(
         n = length(vec_work),
         size = noisy_cn_profiles_long$reads[vec_work],
         prob = noisy_cn_profiles_long$true_BAF[vec_work]
     )
-    # noisy_cn_profiles_long$minor_reads <- rbinom(
-    #     n = nrow(noisy_cn_profiles_long),
-    #     size = noisy_cn_profiles_long$reads,
-    #     prob = noisy_cn_profiles_long$true_BAF
-    # )
     #---Find major read counts per bin per cell
-    cat("+---Find major read counts...\n")
+    if (report_progress == TRUE) {
+        cat("+---Find major read counts...\n")
+    }
     noisy_cn_profiles_long$major_reads <- 0
     noisy_cn_profiles_long$major_reads[vec_work] <-
         noisy_cn_profiles_long$reads[vec_work] -
         noisy_cn_profiles_long$minor_reads[vec_work]
-    # noisy_cn_profiles_long$major_reads <-
-    #     noisy_cn_profiles_long$reads -
-    #     noisy_cn_profiles_long$minor_reads
-
-
-
-
-    # #----------------------------------Use HMMcopy to find inferred copy
-    # cat("B===Use HMMcopy to infer bias-free CN...\n")
-    # noisy_cn_profiles_long_list <- vector("list", length = length(all_cell_id))
-    # for (cell in 1:length(all_cell_id)) {
-    #     #---Get noisy CN profile for this cell
-    #     cell_id <- all_cell_id[cell]
-    #     vec_loc <- which(noisy_cn_profiles_long$cell_id == cell_id)
-    #     uncorrected_reads <- noisy_cn_profiles_long[vec_loc, ]
-    #     uncorrected_reads <- uncorrected_reads[c("chr", "start", "end", "reads", "gc", "map", "true_CN")]
-    #     #---Correct noisy CN profile for GC and mappability biases
-    #     corrected_copy <- correctReadcount(uncorrected_reads)
-    #     #---Run HMMcopy to infer CN state
-    #     #   Prepare parameters for (modified) HMMcopy pipeline
-    #     cell <- cell_id
-    #
-    #     param <- HMMsegment(corrected_copy, getparam = TRUE)
-    #     class(param) <- "data.table"
-    #
-    #     print(param)
-    #
-    #     multipliers <- "2"
-    #
-    #
-    #     # opt <- list()
-    #     # opt$param_str <- 2
-    #     # # ???????????????????????????
-    #     # opt$param_e <- 0.9
-    #     # # opt$param_e <- 2
-    #     # opt$param_mu <- "2"
-    #     # opt$param_l <- 2
-    #     # opt$param_nu <- 2
-    #     # # ???????????????????????????
-    #     # opt$param_k <- "1"
-    #     # # opt$param_k <- "2"
-    #     # opt$param_m <- "2"
-    #     # opt$param_eta <- "2"
-    #     # opt$param_g <- 2
-    #     # opt$param_s <- 2
-    #     # param <- get_parameters_MODIFIED(opt$param_str, opt$param_e, opt$param_mu, opt$param_l, opt$param_nu, opt$param_k, opt$param_m, opt$param_eta, opt$param_g, opt$param_s)
-    #
-    #
-    #     #   Run (modified) HMMcopy pipeline
-    #     output <- run_hmmcopy_MODIFIED(cell, corrected_copy, param, multipliers)
-    #
-    #     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    #     str(output)
-    #     print(output$auto_ploidy.reads)
-    #     print(output$auto_ploidy.params)
-    #
-    #
-    #     #   Put the data together for this cell
-    #     corrected_copy <- corrected_copy[order(corrected_copy$chr, corrected_copy$start), ]
-    #     colnames(corrected_copy)[which(names(corrected_copy) == "copy")] <- "copy_log2"
-    #     corrected_copy$multiplier <- output$auto_ploidy.reads$multiplier
-    #     corrected_copy$copy <- output$auto_ploidy.reads$copy
-    #     corrected_copy$state <- output$auto_ploidy.reads$state
-    #     #   Store inferred CN profiles for this cell
-    #     noisy_cn_profiles_long_list[[cell]] <- corrected_copy
-    # }
-    # noisy_cn_profiles_long <- rbindlist(noisy_cn_profiles_long_list, use.names = FALSE, fill = FALSE, idcol = NULL)
     #-------------------------------------------Output noisy CN profiles
     simulation$sample$noisy_cn_profiles_long <- noisy_cn_profiles_long
     return(simulation)

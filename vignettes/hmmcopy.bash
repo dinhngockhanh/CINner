@@ -1,9 +1,7 @@
 #!/bin/bash
 
-
-
-model_name="HGSOC"
-n_simulations=1
+model_name=$1
+n_simulations=$2
 #-------------------------------Find ID's and cell counts of each sample
 declare -a Sample_ID
 declare -a Cell_count

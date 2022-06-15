@@ -13,7 +13,7 @@ plot_cn_heatmap_ind_samples <- function(model = "",
             package_sample <- simulation$sample
             package_sample_phylogeny <- simulation$sample_phylogeny
 
-            sample_genotype_profiles <- package_sample$sample_genotype_profiles
+            sample_genotype_profiles <- package_sample$cn_profiles_long
             phylogeny_clustering_truth <- package_sample_phylogeny$phylogeny_clustering_truth
 
             sample_clustering <- phylogeny_clustering_truth$clustering

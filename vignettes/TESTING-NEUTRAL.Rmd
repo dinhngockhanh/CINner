@@ -84,9 +84,7 @@ table_population_dynamics           <- cbind(vec_time,vec_cell_count)
             gc                      <- read.csv(file = '../data/gc_map_500kb.csv')
             gc_slope                <- 1.2
             gc_int                  <- 0
-            # sigma1                  <- 0.1
-            sigma1                  <- 0.0001
-            # num_reads               <- 2e6
+            sigma1                  <- 0.1
             num_reads               <- 1e6
 
 model_variables   <- BUILD_general_variables(

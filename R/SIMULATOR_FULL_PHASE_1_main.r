@@ -1,4 +1,4 @@
-SIMULATOR_FULL_PHASE_1_main <- function() {
+SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     #---------------------------------------------------Input CN event rates
     prob_CN_WGD <- prob_CN_whole_genome_duplication
     prob_CN_misseg <- prob_CN_missegregation
@@ -63,12 +63,16 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
     N_events_current <- 0
     N_events_goal <- Max_events
     #-----------------------------------------------------Simulation process
-    pb <- txtProgressBar(
-        min = T_start_time, max = T_goal,
-        style = 3, width = 50, char = "="
-    )
+    if (report_progress == TRUE) {
+        pb <- txtProgressBar(
+            min = T_start_time, max = T_goal,
+            style = 3, width = 50, char = "="
+        )
+    }
     while ((T_current < T_goal) && (N_cells_current < N_cells_goal) && (N_events_current < N_events_goal)) {
-        setTxtProgressBar(pb, T_current)
+        if (report_progress == TRUE) {
+            setTxtProgressBar(pb, T_current)
+        }
         #       Find the Poisson propensities of event count for all clones
         rate_base_lifetime <- func_event_rate(T_current)
         all_propensity <- T_tau_step * rate_base_lifetime * clonal_population_current
@@ -266,7 +270,9 @@ SIMULATOR_FULL_PHASE_1_main <- function() {
         evolution_traj_population[[evolution_traj_count]] <- clonal_population_current
         evolution_traj_divisions[[evolution_traj_count - 1]] <- mat_divisions
     }
-    cat("\n")
+    if (report_progress == TRUE) {
+        cat("\n")
+    }
     #---------------------------------Output package of data from simulation
     if (is.null(N_cells_current)) {
         flag_success <- 0

@@ -30,7 +30,12 @@ sapply(files_sources, source)
 
 ```{r,fig.height=5,fig.width=10}
 model_name        <- 'HGSOC'
-n_simulations     <- 20
+n_simulations     <- 2
+
+append_with_hmm(model = model_name,n_simulations = n_simulations, UMAP = TRUE)
+
+
+
 plot_all(model = model_name,n_simulations = n_simulations)
 ```
 
@@ -41,7 +46,11 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(10),Age_sample=c(80))
+Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(2),Age_sample=c(80))
+
+# Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(100),Age_sample=c(80))
+
+# Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(10),Age_sample=c(80))
 
 # Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
 
@@ -69,7 +78,6 @@ CN_bin_length                       <- 500000
             prob_CN_cnloh_interstitial_length   <- 0.01
             prob_CN_cnloh_terminal_length       <- 0.01
 
-            # rate_driver                         <- 0
             rate_driver                         <- 8e-16
 
 rate_passenger                      <- 1e-11
@@ -86,10 +94,10 @@ table_population_dynamics           <- cbind(vec_time,vec_cell_count)
             gc                      <- read.csv(file = '../data/gc_map_500kb.csv')
             gc_slope                <- 1.2
             gc_int                  <- 0
-            # sigma1                  <- 0.1
-            sigma1                  <- 0.0001
-            # num_reads               <- 2e6
-            num_reads               <- 1e6
+            sigma1                  <- 0.1
+            # num_reads               <- 1e6
+            num_reads               <- 2e6
+
 
 model_variables   <- BUILD_general_variables(
     cell_lifespan=cell_lifespan,
@@ -153,8 +161,6 @@ SAVE_model_variables(model_name=model_name,model_variables=model_variables)
 
 stage_final       <- 3
 
-# n_clones_min      <- 18
-# n_clones_max      <- 26
 n_clones_min      <- 1
 n_clones_max      <- Inf
 
@@ -162,19 +168,27 @@ n_simulations     <- 1
 
 
 
-simulator_full_program(model = model_name,
+simulator_full_program(
+    model = model_name,
     n_simulations = n_simulations,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
 
-    save_newick_tree = FALSE,
+    internal_nodes_cn_info = TRUE,
+
+    save_newick_tree = TRUE,
 
     save_cn_profile = TRUE,
-    format_cn_profile = "long",
-    internal_nodes_cn_info = FALSE,
+    format_cn_profile = "both",
 
-    model_readcount = TRUE)
+    model_readcount = TRUE,
+
+    apply_HMM = TRUE,
+    apply_UMAP_on_HMM = TRUE,
+
+    report_progress = TRUE
+)
 
 
 

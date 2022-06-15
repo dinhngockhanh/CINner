@@ -1,22 +1,54 @@
 plot_all <- function(model = "",
                      n_simulations = 0) {
-    # #----------------------------------------------Plot total CN profile
-    # cat("Plotting total CN profile...\n")
+    #-------------------------------Plot total CN profile - ground truth
+    cat("Plotting total CN profile - GROUND TRUTH...\n")
+    plot_cn_heatmap(
+        model = model,
+        n_simulations = n_simulations,
+        plotcol = "total-copy",
+        CN_data = "TRUTH",
+        phylo = "TRUTH",
+        width = 1000,
+        height = 1000
+    )
+    #-------------------------------Plot minor CN profile - GROUND TRUTH
+    cat("Plotting minor CN profile - GROUND TRUTH...\n")
+    plot_cn_heatmap(
+        model = model,
+        n_simulations = n_simulations,
+        plotcol = "minor-copy",
+        CN_data = "TRUTH",
+        phylo = "TRUTH",
+        width = 1000,
+        height = 1000
+    )
+    # #-------------Plot total CN profile - CN from HMM & phylo from TRUTH
+    # cat("Plotting total CN profile - CN=HMMcopy, phylogeny=TRUTH...\n")
     # plot_cn_heatmap(
     #     model = model,
     #     n_simulations = n_simulations,
     #     plotcol = "total-copy",
-    #     phylo = TRUE,
+    #     CN_data = "HMM",
+    #     phylo = "TRUTH",
     #     width = 1000,
     #     height = 1000
     # )
-    # #----------------------------------------------Plot minor CN profile
-    # cat("Plotting minor CN profile...\n")
+    # #--------------Plot total CN profile - CN from HMM & phylo from UMAP
+    # cat("Plotting total CN profile - CN=HMMcopy, phylogeny=UMAP...\n")
     # plot_cn_heatmap(
     #     model = model,
     #     n_simulations = n_simulations,
-    #     plotcol = "minor-copy",
-    #     phylo = TRUE,
+    #     plotcol = "total-copy",
+    #     CN_data = "HMM",
+    #     phylo = "UMAP",
+    #     width = 1000,
+    #     height = 1000
+    # )
+    # #----------------------Plot CN profile for each clone - GROUND TRUTH
+    # plot_cn_per_clone(
+    #     model = model,
+    #     n_simulations = n_simulations,
+    #     CN_data = "TRUTH",
     #     width = 1000,
     #     height = 1000
     # )
@@ -48,26 +80,26 @@ plot_all <- function(model = "",
         width = 2000,
         height = 2000
     )
-    # #----------------------------------------------Plot total population
-    # cat("Plotting total population vs input dynamics...\n")
-    # plot_tot_pop_vs_input(
-    #     model = model,
-    #     n_simulations = n_simulations,
-    #     vec_time = seq(0, 80, by = 1),
-    #     unit_time = "year",
-    #     width = 1000,
-    #     height = 500
-    # )
-    # #---------------------------------Plot clonal evolution as fish plot
-    # cat("Plotting clonal evolution as fish plot...\n")
-    # plot_clonal_fishplot(
-    #     model = model,
-    #     n_simulations = n_simulations,
-    #     vec_time = seq(0, 80, by = 1),
-    #     unit_time = "year",
-    #     width = 2000,
-    #     height = 1000
-    # )
+    #----------------------------------------------Plot total population
+    cat("Plotting total population vs input dynamics...\n")
+    plot_tot_pop_vs_input(
+        model = model,
+        n_simulations = n_simulations,
+        vec_time = seq(0, 80, by = 1),
+        unit_time = "year",
+        width = 1000,
+        height = 500
+    )
+    #---------------------------------Plot clonal evolution as fish plot
+    cat("Plotting clonal evolution as fish plot...\n")
+    plot_clonal_fishplot(
+        model = model,
+        n_simulations = n_simulations,
+        vec_time = seq(0, 80, by = 1),
+        unit_time = "year",
+        width = 2000,
+        height = 1000
+    )
     # #----------------------------------Plot clonal percentages over time
     # cat("Plotting clonal percentages over time...\n")
     # plot_clonal_perc(

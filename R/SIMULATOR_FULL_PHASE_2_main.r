@@ -1,5 +1,5 @@
 # =============================================PHASE 2: SAMPLE PHYLOGENY
-SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
+SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progress) {
     #-----------------------------------------Input the clonal evolution
     T_current <- package_clonal_evolution$T_current
     N_cells_current <- package_clonal_evolution$N_cells_current
@@ -48,9 +48,13 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution) {
         all_sample_ID <- c(all_sample_ID, rep(ID_sample, N_sample))
         all_sample_sampled_time <- c(all_sample_sampled_time, rep(T_sample, N_sample))
 
-        cat(paste("Detected ", length(unique(sample_genotype)), " clones in sample ", ID_sample, "\n", sep = ""))
+        if (report_progress == TRUE) {
+            cat(paste("Detected ", length(unique(sample_genotype)), " clones in sample ", ID_sample, "\n", sep = ""))
+        }
     }
-    cat(paste("Detected ", length(unique(all_sample_genotype)), " clones in all samples\n", sep = ""))
+    if (report_progress == TRUE) {
+        cat(paste("Detected ", length(unique(all_sample_genotype)), " clones in all samples\n", sep = ""))
+    }
     #-----------------------------Create CN object for the sampled cells
     #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique <- unique(all_sample_genotype)

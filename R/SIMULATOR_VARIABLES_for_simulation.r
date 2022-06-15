@@ -71,7 +71,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     }
 
     #---Set up table of GC content and mappability per CN bin
-    gc <<- TABLE_GC
+    table_gc <<- TABLE_GC
 
     #-----------------------------------Set up initial state for simulations
     #   Get number of clones in the initial population

@@ -143,7 +143,7 @@ plot_clonal_phylo <- function(model = "",
                 for (event in 1:n_events) {
                     all_event_types <- c(all_event_types, evolution_genotype_changes[[genotype_current]][[event]][1])
 
-                    print(evolution_genotype_changes[[genotype_current]][[event]])
+                    # print(evolution_genotype_changes[[genotype_current]][[event]])
 
                     # all_event_text <- ??????????????????????????????
                 }
