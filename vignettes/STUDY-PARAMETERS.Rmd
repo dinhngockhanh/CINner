@@ -21,7 +21,7 @@ library(RColorBrewer)
 # files_sources <- list.files(pattern = "*.r$")
 # sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
+devtools::install_github("dinhngockhanh/CancerSimulator",force = TRUE)
 devtools::load_all()
 devtools::document()
 ```
