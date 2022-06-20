@@ -4,6 +4,7 @@ simulator_full_program <- function(model = "",
                                    n_clones_min = 0,
                                    n_clones_max = Inf,
                                    internal_nodes_cn_info = FALSE,
+                                   save_simulation = FALSE,
                                    save_newick_tree = FALSE,
                                    save_cn_profile = FALSE,
                                    format_cn_profile = "none",
@@ -15,6 +16,10 @@ simulator_full_program <- function(model = "",
         dir.create(model)
     }
     # ======================================MAIN LOOP OF CANCERSIMULATOR
+    #-------------------------------Initialize statistics of simulations
+    vec_N_clones_time <- c()
+    vec_N_clones_values <- matrix(,nrow=1,ncol=1)
+    #---------------------------------------Main loop of CancerSimulator
     for (i in 1:n_simulations) {
         if (report_progress == TRUE) {
             cat("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
@@ -25,8 +30,10 @@ simulator_full_program <- function(model = "",
         if (report_progress == TRUE) {
             cat("\nSave simulation package...\n")
         }
-        filename <- paste(model, "_simulation_", i, ".rda", sep = "")
-        save(simulation, file = filename)
+        if (save_simulation == TRUE) {
+            filename <- paste(model, "_simulation_", i, ".rda", sep = "")
+            save(simulation, file = filename)
+        }
         #-----------------------------Save GC & mappability as WIG files
         if (report_progress == TRUE) {
             cat("\nSave GC & mappability in WIG format...\n")
@@ -118,11 +125,24 @@ simulator_full_program <- function(model = "",
             cell_phylogeny_hclust <-
                 simulation$sample_phylogeny$cell_phylogeny_hclust
             filename <- paste(model, "_cell_phylogeny_", i, ".newick", sep = "")
-            # write(hc2Newick(cell_phylogeny_hclust), file = filename)
             write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
+        }
+        #----------------------------------Save statistics of simulation
+        #   Save clone count over time
+        if (stage_final >= 1) {
+            if (i == 1) {
+                vec_N_clones_time <- simulation$clonal_evolution$evolution_traj_time
+            }
+
         }
     }
     # ===============================================DOWNSTREAM ANALYSIS
+    #----------------------------------Compute statistics of simulations
+    simulation_statistics <- list()
+
+
+
+    #-----------------------Infer CN from noisy readcounts using HMMcopy
     if (apply_HMM == TRUE) {
         if (report_progress == TRUE) {
             cat("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
@@ -132,6 +152,8 @@ simulator_full_program <- function(model = "",
         system(paste("bash hmmcopy.bash ", model, " ", n_simulations, sep = ""))
         append_with_hmm(model = model, n_simulations = n_simulations, UMAP = apply_UMAP_on_HMM)
     }
+    # =================================================OUTPUT SIMULATION
+    return(simulation_statistics)
 }
 
 one_simulation <- function(model, stage_final, save_cn_profile, internal_nodes_cn_info, format_cn_profile, model_readcount, report_progress) {

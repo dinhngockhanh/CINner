@@ -1,7 +1,7 @@
 ```{r setup}
 library(ggplot2)
 library(ggtree)
-library(signals)
+# library(signals)
 library(dendextend)
 library(fishplot)
 library(ctc)
@@ -33,7 +33,9 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
+Table_sample <- data.frame(Sample_ID=c('SA03'),Cell_count=c(5),Age_sample=c(80))
+
+# Table_sample <- data.frame(Sample_ID=c('SA01','SA02','SA03'),Cell_count=c(100,100,100),Age_sample=c(40,60,80))
 
 T_tau_step                          <- cell_lifespan/2
 CN_bin_length                       <- 500000
@@ -144,9 +146,9 @@ simulator_full_program(
     save_newick_tree = TRUE,
     save_cn_profile = TRUE,
     format_cn_profile = "both",
-    model_readcount = FALSE,
-    apply_HMM = FALSE,
-    apply_UMAP_on_HMM = FALSE,
+    model_readcount = TRUE,
+    apply_HMM = TRUE,
+    apply_UMAP_on_HMM = TRUE,
     report_progress = TRUE
 )
 plot_all(model = model_name,n_simulations = n_simulations)

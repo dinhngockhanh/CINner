@@ -29,6 +29,7 @@ sapply(files_sources, source)
 
 
 ```{r,fig.height=5,fig.width=10}
+#====================================================   FIXED PARAMETERS
 cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
@@ -134,18 +135,28 @@ model_variables   <- BUILD_initial_population(model_variables=model_variables,ce
 
 
 
+#==================================================   STUDY FOR WGD RATE
+rate_missegregation     <- 0.5e-4
+vec_rate_WGD            <- (1:2)*1e-4
+# vec_rate_WGD            <- (1:10)*1e-4
+n_simulations_per_batch <- 1
+model_name_prefix       <- 'SENSITIVITY-WGD'
+for (batch in 1:length(vec_rate_WGD)){
+    #   Fix value for rate of missegregation
+    loc <- which(model_variables$general_variables$Variable=='prob_CN_missegregation')
+    model_variables$general_variables$Value[loc] <- rate_missegregation
+    #   Fix value for rate of WGD
+    loc <- which(model_variables$general_variables$Variable=='prob_CN_whole_genome_duplication')
+    model_variables$general_variables$Value[loc] <- vec_rate_WGD[batch]
+    #   Save parameter set
+    model_name <- paste(model_name_prefix,'-',batch)
+    SAVE_model_variables(model_name=model_name,model_variables=model_variables)
+    #
+}
 
 
-rate_WGD<-0.5e-4
-vec_rate_miss<-(1:10)*1e-4
-
-print(rate_WGD)
-print(vec_rate_miss)
 
 
-
-# model_name        <- 'HGSOC'
-# SAVE_model_variables(model_name=model_name,model_variables=model_variables)
 #
 #
 # stage_final       <- 3
