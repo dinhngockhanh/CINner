@@ -16,17 +16,21 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::install_github("dinhngockhanh/CancerSimulator")
-
 library(ggplot2)
 library(ggtree)
 library(signals)
 library(dendextend)
 library(fishplot)
 library(ctc)
+library(adephylo)
+library(data.table)
+library(HMMcopy)
+library(plyr)
+library(matrixStats)
+library(parallel)
+library(RColorBrewer)
 
-library(CancerSimulator)
-
+devtools::install_github("dinhngockhanh/CancerSimulator",force = TRUE)
 devtools::load_all()
 devtools::document()
 ```
@@ -62,7 +66,7 @@ Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=30
 We use the tau-leaping algorithm to simulate the clonal evolution. This requires a time step. The smaller this step is, the closer the resulting simulation is to the traditional Gillespie's algorithm, but it also means increasing runtime. By default, we use tau = 3 days.
 
 ```{r}
-T_tau_step                          <- 15
+T_tau_step                          <- cell_lifespan/2
 ```
 
 An important variable is the size of CN bins. By default, this will be 500,000 bp.
@@ -121,10 +125,46 @@ vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
 table_population_dynamics           <- cbind(vec_time,vec_cell_count)
 ```
 
+Parameters for the sequencing noise and bias model:
+
+```{r}
+gc                                  <- read.csv(file = '../data/gc_map_500kb.csv')
+gc_slope                            <- 1.2
+gc_int                              <- 0
+sigma1                              <- 0.1
+num_reads                           <- 2e6
+```
+
 Finally, we build the model variable files, using function `BUILD_general_variables`:
 
 ```{r}
-model_variables   <- BUILD_general_variables(cell_lifespan=cell_lifespan,T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,Table_sample=Table_sample,CN_bin_length=CN_bin_length,prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,prob_CN_missegregation=prob_CN_missegregation,prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,prob_CN_focal_amplification=prob_CN_focal_amplification,prob_CN_focal_deletion=prob_CN_focal_deletion,prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,rate_driver=rate_driver,rate_passenger=rate_passenger,bound_driver=bound_driver,bound_average_ploidy=bound_average_ploidy,bound_homozygosity=bound_homozygosity,table_population_dynamics=table_population_dynamics)
+model_variables   <- BUILD_general_variables(
+    cell_lifespan=cell_lifespan,
+    T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,
+    Table_sample=Table_sample,
+    CN_bin_length=CN_bin_length,
+    prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
+    prob_CN_missegregation=prob_CN_missegregation,
+    prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
+    prob_CN_focal_amplification=prob_CN_focal_amplification,
+    prob_CN_focal_deletion=prob_CN_focal_deletion,
+    prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
+    prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
+    prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
+    prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
+    prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
+    prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
+    rate_driver=rate_driver,
+    rate_passenger=rate_passenger,
+    bound_driver=bound_driver,
+    bound_average_ploidy=bound_average_ploidy,
+    bound_homozygosity=bound_homozygosity,
+    table_population_dynamics=table_population_dynamics,
+    gc=gc,
+    gc_slope=gc_slope,
+    gc_int=gc_int,
+    sigma1=sigma1,
+    num_reads=num_reads)
 ```
 
 ## Driver library
@@ -214,21 +254,33 @@ The function `SIMULATOR_FULL_PROGRAM_one_simulation` produces one simulation. It
 `N_clones_min` and `N_clones_max` are optional variables in case we want to limit the number of clones in the simulation.
 
 ```{r}
+n_simulations     <- 1
 stage_final       <- 3
 n_clones_min      <- 1
 n_clones_max      <- Inf
-n_simulations     <- 1
-simulator_full_program(model = model_name,
+
+simulator_full_program(
+    model = model_name,
     n_simulations = n_simulations,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
+    save_simulation = TRUE,
+    internal_nodes_cn_info = TRUE,
+    save_newick_tree = TRUE,
     save_cn_profile = TRUE,
-    save_newick_tree = TRUE)
+    format_cn_profile = "both",
+
+    model_readcount = FALSE,
+    apply_HMM = FALSE,
+    apply_UMAP_on_HMM = FALSE,
+
+    report_progress = TRUE
+)
 ```
 
 A variety of plots from the simulation:
 
-```{r,fig.height=7,fig.width=15}
+```{r}
 plot_all(model = model_name,n_simulations = n_simulations)
 ```
