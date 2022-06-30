@@ -13,7 +13,8 @@ simulator_full_program <- function(model = "",
                                    apply_HMM = FALSE,
                                    apply_UMAP_on_HMM = FALSE,
                                    report_progress = TRUE,
-                                   compute_parallel = FALSE) {
+                                   compute_parallel = FALSE,
+                                   seed = Inf) {
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
     if (apply_HMM == TRUE) {
         save_simulation <- TRUE
@@ -23,6 +24,11 @@ simulator_full_program <- function(model = "",
         dir.create(model)
     }
     # ======================================MAIN LOOP OF CANCERSIMULATOR
+    if (seed == Inf) {
+        set.seed(Sys.time())
+    } else {
+        set.seed(seed)
+    }
     if (compute_parallel == FALSE) {
         #-------------------------Run CancerSimulator in sequential mode
         all_simulations <- vector("list", length = n_simulations)
@@ -277,6 +283,10 @@ one_simulation <- function(model, stage_final, save_cn_profile, internal_nodes_c
             package_sample_phylogeny <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution, package_sample)
         }
     }
+    # =============================COMPUTE STATISTICS FOR THE SIMULATION
+
+
+
     # ======================PREPARE DATA FROM PHASE 1 (CLONAL EVOLUTION)
     if (stage_final >= 1) {
         simulation <- list()

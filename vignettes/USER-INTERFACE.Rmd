@@ -275,7 +275,8 @@ simulator_full_program(
     apply_HMM = FALSE,
     apply_UMAP_on_HMM = FALSE,
 
-    report_progress = TRUE
+    report_progress = TRUE,
+    seed = 10
 )
 ```
 
