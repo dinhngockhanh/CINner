@@ -1,7 +1,7 @@
 p2_readcount_model <- function(simulation, report_progress) {
     noisy_cn_profiles_long <- simulation$sample$cn_profiles_long
     #-------------------Find true_CN and BAF for every bin in every cell
-    #   Find true_CN and BAF for every bin in every cell
+    #   Find true CN and BAF for every bin in every cell
     noisy_cn_profiles_long$true_CN <- noisy_cn_profiles_long$state
     noisy_cn_profiles_long$true_BAF <- noisy_cn_profiles_long$Min / noisy_cn_profiles_long$state
     #   Eliminate unnecessary columns

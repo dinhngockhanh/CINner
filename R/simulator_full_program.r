@@ -31,14 +31,25 @@ simulator_full_program <- function(model = "",
     }
     if (compute_parallel == FALSE) {
         #-------------------------Run CancerSimulator in sequential mode
-        all_simulations <- vector("list", length = n_simulations)
         for (iteration in 1:n_simulations) {
             if (report_progress == TRUE) {
                 cat("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
                 cat(paste("BEGINNING SIMULATION-", iteration, "...\n", sep = ""))
             }
-            simulation <- one_simulation(model, stage_final, n_clones_min, n_clones_max, save_cn_profile, internal_nodes_cn_info, format_cn_profile, model_readcount, report_progress)
-            all_simulations[[iteration]] <- simulation
+            one_simulation(
+                iteration,
+                model,
+                stage_final,
+                n_clones_min,
+                n_clones_max,
+                save_simulation,
+                internal_nodes_cn_info,
+                save_newick_tree,
+                save_cn_profile,
+                format_cn_profile,
+                model_readcount,
+                report_progress
+            )
         }
     } else {
         #---------------------------Run CancerSimulator in parallel mode
@@ -47,18 +58,29 @@ simulator_full_program <- function(model = "",
         cl <- makePSOCKcluster(numCores - 1)
         setDefaultCluster(cl)
         #   Prepare input parameters for CancerSimulator
-        model_name <<- model
-        n_clones_min <<- n_clones_min
-        n_clones_max <<- n_clones_max
         model <<- model
         stage_final <<- stage_final
-        save_cn_profile <<- save_cn_profile
+        n_clones_min <<- n_clones_min
+        n_clones_max <<- n_clones_max
+        save_simulation <<- save_simulation
         internal_nodes_cn_info <<- internal_nodes_cn_info
+        save_newick_tree <<- save_newick_tree
+        save_cn_profile <<- save_cn_profile
         format_cn_profile <<- format_cn_profile
         model_readcount <<- model_readcount
         report_progress <<- report_progress
         clusterExport(NULL, varlist = c(
-            "model", "stage_final", "save_cn_profile", "internal_nodes_cn_info", "format_cn_profile", "model_readcount", "report_progress", "model_name", "n_clones_min", "n_clones_max",
+            "model",
+            "stage_final",
+            "n_clones_min",
+            "n_clones_max",
+            "save_simulation",
+            "internal_nodes_cn_info",
+            "save_newick_tree",
+            "save_cn_profile",
+            "format_cn_profile",
+            "model_readcount",
+            "report_progress",
             "one_simulation",
             "SIMULATOR_VARIABLES_for_simulation",
             "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
@@ -68,88 +90,31 @@ simulator_full_program <- function(model = "",
             "get_cn_profile", "rbindlist", "p2_cn_profiles_long", "p2_readcount_model"
         ))
         #   Run CancerSimulator in parallel
-        all_simulations <- parLapply(NULL, 1:n_simulations, function(i) {
-            simulation <- one_simulation(model, stage_final, n_clones_min, n_clones_max, save_cn_profile, internal_nodes_cn_info, format_cn_profile, model_readcount, report_progress)
-            return(simulation)
+        parLapply(NULL, 1:n_simulations, function(iteration) {
+            one_simulation(
+                iteration,
+                model,
+                stage_final,
+                n_clones_min,
+                n_clones_max,
+                save_simulation,
+                internal_nodes_cn_info,
+                save_newick_tree,
+                save_cn_profile,
+                format_cn_profile,
+                model_readcount,
+                report_progress
+            )
         })
         #   Stop parallel cluster
         stopCluster(cl)
     }
-    # =====================================PROCESSING OF CANCERSIMULATOR
-    for (iteration in 1:n_simulations) {
-        simulation <- all_simulations[[iteration]]
-        #------------------------------------Save the simulation package
-        if (save_simulation == TRUE) {
-            if (report_progress == TRUE) cat("\nSave simulation package...\n")
-            save(simulation, file = paste(model, "_simulation_", iteration, ".rda", sep = ""))
-        }
-        #-----------------------------Save GC & mappability as WIG files
-        if (model_readcount == TRUE) {
-            if (report_progress == TRUE) cat("\nSave GC & mappability in WIG format...\n")
-            p2_write_gc_map_as_wig(filename_gc = paste(model, "_gc.wig", sep = ""), filename_map = paste(model, "_map.wig", sep = ""))
-        }
-        #-----------------------------------Save the sampled CN profiles
-        if (save_cn_profile == TRUE) {
-            if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
-                if (report_progress == TRUE) cat("\nSave true CN profiles in long format...\n")
-                cn_profiles_long <- simulation$sample$cn_profiles_long
-                filename <- paste(model, "_cn_profiles_long_", iteration, ".csv", sep = "")
-                write.csv(cn_profiles_long, filename, row.names = FALSE)
-            }
-            if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
-                if (report_progress == TRUE) cat("\nSave true CN profiles in wide format...\n")
-                cn_profiles_wide <- simulation$sample$cn_profiles_wide
-                filename <- paste(model, "_cn_profiles_wide_", iteration, ".csv", sep = "")
-                write.csv(cn_profiles_wide, filename, row.names = FALSE)
-            }
-        }
-        #------------------Save the table of CN events in cell phylogeny
-        if (internal_nodes_cn_info == TRUE) {
-            if (report_progress == TRUE) cat("\nSave table of CN events in cell phylogeny...\n")
-            hclust_CN_events <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events
-            filename <- paste(model, "_cn_events_", iteration, ".csv", sep = "")
-            write.csv(hclust_CN_events, filename, row.names = FALSE)
-        }
-        #-------------------------------------Save the noisy CN profiles
-        if (model_readcount == TRUE) {
-            if (save_cn_profile == TRUE) {
-                if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
-                    if (report_progress == TRUE) cat("\nSave noisy CN profiles in long format...\n")
-                    noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
-                    filename <- paste(model, "_noisy_cn_profiles_long_", iteration, ".csv", sep = "")
-                    write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
-                }
-                if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
-                    if (report_progress == TRUE) cat("\nSave noisy CN profiles in wide format...\n")
-                    ############################
-                    ############################
-                    ############################
-                    noisy_cn_profiles_wide <- simulation$sample$noisy_cn_profiles_wide
-                    filename <- paste(model, "_noisy_cn_profiles_wide_", iteration, ".csv", sep = "")
-                    write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
-                    ############################
-                    ############################
-                    ############################
-                }
-            }
-            if (report_progress == TRUE) cat("\nSave noisy CN profiles in WIG format...\n")
-            sample_cell_ID <- simulation$sample$sample_cell_ID
-            noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
-            for (cell in 1:length(sample_cell_ID)) {
-                cell_ID <- sample_cell_ID[cell]
-                filename <- paste(model, "/", model, "_noisy_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
-                p2_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
-            }
-        }
-        #-------------------------Save the sampled cells' phylogeny tree
-        if (save_newick_tree == TRUE) {
-            if (report_progress == TRUE) cat("\nSave sampled cells' phylogeny in Newick format...\n")
-            cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
-            filename <- paste(model, "_cell_phylogeny_", iteration, ".newick", sep = "")
-            write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
-        }
+    # ================================SAVE GC & MAPPABILITY AS WIG FILES
+    if (model_readcount == TRUE) {
+        if (report_progress == TRUE) cat("\nSave GC & mappability in WIG format...\n")
+        p2_write_gc_map_as_wig(filename_gc = paste(model, "_gc.wig", sep = ""), filename_map = paste(model, "_map.wig", sep = ""))
     }
-    #-----------------------Infer CN from noisy readcounts using HMMcopy
+    # ======================INFER CN FROM NOISY READCOUNTS USING HMMCOPY
     if (apply_HMM == TRUE) {
         if (report_progress == TRUE) {
             cat("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
@@ -168,7 +133,18 @@ simulator_full_program <- function(model = "",
     }
 }
 
-one_simulation <- function(model, stage_final, n_clones_min, n_clones_max, save_cn_profile, internal_nodes_cn_info, format_cn_profile, model_readcount, report_progress) {
+one_simulation <- function(iteration,
+                           model,
+                           stage_final,
+                           n_clones_min,
+                           n_clones_max,
+                           save_simulation,
+                           internal_nodes_cn_info,
+                           save_newick_tree,
+                           save_cn_profile,
+                           format_cn_profile,
+                           model_readcount,
+                           report_progress) {
     # =============================================LOAD MODEL PARAMETERS
     SIMULATOR_VARIABLES_for_simulation(model)
     # ============================================PRODUCE ONE SIMULATION
@@ -228,16 +204,10 @@ one_simulation <- function(model, stage_final, n_clones_min, n_clones_max, save_
         if (model_readcount == TRUE) {
             if (report_progress == TRUE) cat("\nExtra: simulate readcount profiles with noise & bias...\n")
             simulation <- p2_readcount_model(simulation, report_progress)
-            #######################
-            #######################
-            #######################
             if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
                 if (report_progress == TRUE) cat("\nExtra: build noisy & biased readcount profile table in wide format...\n")
                 simulation <- p2_readcount_model_wide(simulation, report_progress)
             }
-            #######################
-            #######################
-            #######################
         }
     }
     # ======================PREPARE DATA FROM PHASE 3 (SAMPLE PHYLOGENY)
@@ -261,6 +231,64 @@ one_simulation <- function(model, stage_final, n_clones_min, n_clones_max, save_
             }
         }
     }
-    # =====================================OUTPUT THE SIMULATION PACKAGE
-    return(simulation)
+    # ======================================OUTPUT FILES FROM SIMULATION
+    #----------------------------------------Save the simulation package
+    if (save_simulation == TRUE) {
+        if (report_progress == TRUE) cat("\nSave simulation package...\n")
+        save(simulation, file = paste(model, "_simulation_", iteration, ".rda", sep = ""))
+    }
+    #---------------------------------------Save the sampled CN profiles
+    if (save_cn_profile == TRUE) {
+        if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
+            if (report_progress == TRUE) cat("\nSave true CN profiles in long format...\n")
+            cn_profiles_long <- simulation$sample$cn_profiles_long
+            filename <- paste(model, "_cn_profiles_long_", iteration, ".csv", sep = "")
+            write.csv(cn_profiles_long, filename, row.names = FALSE)
+        }
+        if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
+            if (report_progress == TRUE) cat("\nSave true CN profiles in wide format...\n")
+            cn_profiles_wide <- simulation$sample$cn_profiles_wide
+            filename <- paste(model, "_cn_profiles_wide_", iteration, ".csv", sep = "")
+            write.csv(cn_profiles_wide, filename, row.names = FALSE)
+        }
+    }
+    #----------------------Save the table of CN events in cell phylogeny
+    if (internal_nodes_cn_info == TRUE) {
+        if (report_progress == TRUE) cat("\nSave table of CN events in cell phylogeny...\n")
+        hclust_CN_events <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events
+        filename <- paste(model, "_cn_events_", iteration, ".csv", sep = "")
+        write.csv(hclust_CN_events, filename, row.names = FALSE)
+    }
+    #-----------------------------------------Save the noisy CN profiles
+    if (model_readcount == TRUE) {
+        if (save_cn_profile == TRUE) {
+            if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
+                if (report_progress == TRUE) cat("\nSave noisy CN profiles in long format...\n")
+                noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
+                filename <- paste(model, "_noisy_cn_profiles_long_", iteration, ".csv", sep = "")
+                write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
+            }
+            if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
+                if (report_progress == TRUE) cat("\nSave noisy CN profiles in wide format...\n")
+                noisy_cn_profiles_wide <- simulation$sample$noisy_cn_profiles_wide
+                filename <- paste(model, "_noisy_cn_profiles_wide_", iteration, ".csv", sep = "")
+                write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
+            }
+        }
+        if (report_progress == TRUE) cat("\nSave noisy CN profiles in WIG format...\n")
+        sample_cell_ID <- simulation$sample$sample_cell_ID
+        noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
+        for (cell in 1:length(sample_cell_ID)) {
+            cell_ID <- sample_cell_ID[cell]
+            filename <- paste(model, "/", model, "_noisy_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
+            p2_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
+        }
+    }
+    #-----------------------------Save the sampled cells' phylogeny tree
+    if (save_newick_tree == TRUE) {
+        if (report_progress == TRUE) cat("\nSave sampled cells' phylogeny in Newick format...\n")
+        cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
+        filename <- paste(model, "_cell_phylogeny_", iteration, ".newick", sep = "")
+        write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
+    }
 }
