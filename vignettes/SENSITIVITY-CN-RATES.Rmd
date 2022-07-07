@@ -12,9 +12,10 @@ library(plyr)
 library(matrixStats)
 library(parallel)
 library(RColorBrewer)
+library(hrbrthemes)
+library(viridis)
 
-
-
+library(dplyr)
 #-----------------------------------------------------------------------
 setwd("/Users/dinhngockhanh/CancerSimulator/R/")
 files_sources <- list.files(pattern = "*.r$")
@@ -33,9 +34,7 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 
-Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(3),Age_sample=c(80))
-
-# Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(500),Age_sample=c(80))
+Table_sample <- data.frame(Sample_ID=c('SA01'),Cell_count=c(500),Age_sample=c(80))
 
 T_tau_step                          <- cell_lifespan/2
 CN_bin_length                       <- 500000
@@ -135,96 +134,82 @@ model_variables   <- BUILD_initial_population(model_variables=model_variables,ce
 
 
 
+# #==================================================   STUDY FOR CN RATES
+# model_variables_base        <- model_variables
+# var1_name                   <- 'rate_WGD'
+# var1_vals                   <- c(1e-5, 1e-4, 5e-4)
+# # var1_vals                   <- c(1e-5, 3e-5, 6e-5, 9e-5, 1e-4, 3e-4, 6e-4, 9e-4, 1e-3)
+# var2_name                   <- 'rate_missegregation'
+# var2_vals                   <- c(1e-4, 5e-4, 9e-4)
+# # var2_vals                   <- (1:9)*1e-4
+# n_simulations_per_batch     <- 10
+# stage_final                 <- 2
+# model_name_prefix           <- 'SENSITIVITY-CN-RATES'
+```
 
-#==================================================   STUDY FOR CN RATES
+
+
+
+
+```{r}
+#==================================================
 model_variables_base        <- model_variables
 var1_name                   <- 'rate_WGD'
-var1_vals                   <- c(1e-6,2e-6,3e-6)
-# c(1e-6,1e-5,1e-4,1e-3)
+var1_vals                   <- (1:6)*1e-5
+# var1_vals                   <- (1:9)*1e-5
 var2_name                   <- 'rate_missegregation'
-var2_vals                   <- c(1e-4,2e-4)
-# seq(1, 9, by = 2)*1e-4
-n_simulations_per_batch     <- 3
+var2_vals                   <- (1:9)*1e-4
+n_simulations_per_batch     <- 10
+stage_final                 <- 2
 model_name_prefix           <- 'SENSITIVITY-CN-RATES'
 
 
+
+
+
+#=====================================================CREATE SIMULATIONS
+start_time = Sys.time()
 simulator_multivar(model_prefix=model_name_prefix,
     model_variables_base=model_variables_base,
     var1_name=var1_name,var1_vals=var1_vals,
     var2_name=var2_name,var2_vals=var2_vals,
     n_simulations_per_batch=n_simulations_per_batch,
     compute_parallel=TRUE,
-    stage_final=2,n_clones_min=1,n_clones_max=Inf)
-
-
-
-#     #   Save statistics of the simulation batch
-#     simulation_statistics_all[[batch]] <- simulation_statistics
-#     end_time_here <- Sys.time()
-#     print("RUN TIME:")
-#     print(end_time_here - start_time_here)
-# }
-# #   Plot the comparison
-# plot_comparison(simulation_statistics_all,
-#     vec_time_points = seq(0, 80, by = 1),
-#     legend_batches = paste('WGD rate = ', vec_rate_WGD, sep = ''),
-#     plotfile_prefix = model_name_prefix)
+    stage_final=stage_final,n_clones_min=1,n_clones_max=Inf,
+    seed=10)
+end_time = Sys.time()
+print(end_time - start_time)
+```
 
 
 
 
 
-
-
-
-
-# #=======================================   STUDY FOR MISSEGREGATION RATE
-# rate_WGD                    <- 1e-4
-# vec_rate_missegregation     <- seq(1, 9, by = 2)*1e-4
-# n_simulations_per_batch     <- 100
-# model_name_prefix           <- 'SENSITIVITY-MISSEGREGATION'
-# simulation_statistics_all   <- list()
-# pb <- txtProgressBar(
-#     min = 1, max = length(vec_rate_missegregation),
-#     style = 3, width = 50, char = "="
-# )
-# for (batch in 1:length(vec_rate_missegregation)){
-#     setTxtProgressBar(pb, batch)
-#     model_variables_batch   <- model_variables
-#     #   Fix value for rate of WGD
-#     model_variables_batch$general_variables$Value[which(model_variables_batch$general_variables$Variable=='prob_CN_whole_genome_duplication')] <- rate_WGD
-#     #   Fix value for rate of missegregation
-#     model_variables_batch$general_variables$Value[which(model_variables_batch$general_variables$Variable=='prob_CN_missegregation')] <- vec_rate_missegregation[batch]
-#     #   Save parameter set
-#     model_name              <- paste(model_name_prefix,'-',batch,sep='')
-#     SAVE_model_variables(model_name=model_name,model_variables=model_variables_batch)
-#     #   Run batch of simulations
-#     stage_final             <- 2
-#     n_clones_min            <- 1
-#     n_clones_max            <- Inf
-#     n_simulations           <- n_simulations_per_batch
-#     start_time_here <- Sys.time()
-#     simulation_statistics   <- simulator_full_program(model = model_name,
-#         n_simulations = n_simulations,
-#         stage_final = stage_final,
-#         n_clones_min = n_clones_min,
-#         n_clones_max = n_clones_max,
-#         save_simulation = FALSE,
-#         save_newick_tree = FALSE,
-#         save_cn_profile = FALSE,
-#         format_cn_profile = "both",
-#         internal_nodes_cn_info = FALSE,
-#         model_readcount = FALSE,
-#         report_progress = TRUE)
-#     #   Save statistics of the simulation batch
-#     simulation_statistics_all[[batch]] <- simulation_statistics
-#     end_time_here <- Sys.time()
-#     print("RUN TIME:")
-#     print(end_time_here - start_time_here)
-# }
-# #   Plot the comparison
-# plot_comparison(simulation_statistics_all,
-#     vec_time_points = seq(0, 80, by = 1),
-#     legend_batches = paste('Miss. rate = ', vec_rate_missegregation, sep = ''),
-#     plotfile_prefix = model_name_prefix)
+```{r}
+#==================================================
+model_variables_base        <- model_variables
+var1_name                   <- 'rate_WGD'
+# var1_vals                   <- (1:2)*1e-5
+var1_vals                   <- (1:9)*1e-5
+var2_name                   <- 'rate_missegregation'
+# var2_vals                   <- (1:2)*1e-4
+var2_vals                   <- (1:9)*1e-4
+# n_simulations_per_batch     <- 10
+n_simulations_per_batch     <- 20
+stage_final                 <- 2
+model_name_prefix           <- 'SENSITIVITY-CN-RATES'
+#=======================================PLOT STATISTICS FROM SIMULATIONS
+start_time = Sys.time()
+# statistics_multivar(model_prefix=model_name_prefix,
+#     var1_name=var1_name,var1_vals=var1_vals,
+#     var2_name=var2_name,var2_vals=var2_vals,
+#     n_simulations_per_batch=n_simulations_per_batch,
+#     stage_final=stage_final)
+plot_multivar_all(model_prefix=model_name_prefix,
+    var1_name=var1_name,var1_vals=var1_vals,
+    var2_name=var2_name,var2_vals=var2_vals,
+    n_simulations_per_batch=n_simulations_per_batch,
+    stage_final=stage_final)
+end_time = Sys.time()
+print(end_time - start_time)
 ```

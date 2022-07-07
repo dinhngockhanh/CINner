@@ -1,4 +1,4 @@
-p2_reads_from_cn <- function(simulation, report_progress) {
+p2_readcount_model <- function(simulation, report_progress) {
     noisy_cn_profiles_long <- simulation$sample$cn_profiles_long
     #-------------------Find true_CN and BAF for every bin in every cell
     #   Find true_CN and BAF for every bin in every cell

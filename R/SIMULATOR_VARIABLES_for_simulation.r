@@ -5,7 +5,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     filename <- paste(model, "-input-variables.csv", sep = "")
     TABLE_VARIABLES <- read.table(filename, header = TRUE, sep = ",")
     #---Save file for GC content and mappability per CN bin
-    filename <- paste(model_name, "-input-gc.csv", sep = "")
+    filename <- paste(model, "-input-gc.csv", sep = "")
     TABLE_GC <- read.table(filename, header = TRUE, sep = ",")
     #---Input table of total population dynamics
     filename <- paste(model, "-input-population-dynamics.csv", sep = "")

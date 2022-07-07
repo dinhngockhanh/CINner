@@ -268,10 +268,11 @@ simulator_full_program(
     save_simulation = TRUE,
     internal_nodes_cn_info = TRUE,
     save_newick_tree = TRUE,
+
     save_cn_profile = TRUE,
+    model_readcount = TRUE,
     format_cn_profile = "both",
 
-    model_readcount = FALSE,
     apply_HMM = FALSE,
     apply_UMAP_on_HMM = FALSE,
 
