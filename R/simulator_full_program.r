@@ -56,7 +56,8 @@ simulator_full_program <- function(model = "",
         #   Start parallel cluster
         numCores <- detectCores()
         cl <- makePSOCKcluster(numCores - 1)
-        setDefaultCluster(cl)
+        # setDefaultCluster(cl)
+        cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores, " CORES...\n", sep = ""))
         #   Prepare input parameters for CancerSimulator
         model <<- model
         stage_final <<- stage_final
@@ -69,7 +70,7 @@ simulator_full_program <- function(model = "",
         format_cn_profile <<- format_cn_profile
         model_readcount <<- model_readcount
         report_progress <<- report_progress
-        clusterExport(NULL, varlist = c(
+        clusterExport(cl, varlist = c(
             "model",
             "stage_final",
             "n_clones_min",
@@ -82,6 +83,8 @@ simulator_full_program <- function(model = "",
             "model_readcount",
             "report_progress",
             "one_simulation",
+            # "as.phylo",
+            "hc2Newick_MODIFIED",
             "SIMULATOR_VARIABLES_for_simulation",
             "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
             "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
@@ -89,8 +92,21 @@ simulator_full_program <- function(model = "",
             "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
             "get_cn_profile", "rbindlist", "p2_cn_profiles_long", "p2_readcount_model"
         ))
+        #############################
+        #############################
+        #############################
+        #############################
+        #############################
+        library(ape)
+        # clusterEvalQ(cl, library("ape"))
+        clusterEvalQ(cl = cl, require(ape))
+        #############################
+        #############################
+        #############################
+        #############################
+        #############################
         #   Run CancerSimulator in parallel
-        parLapply(NULL, 1:n_simulations, function(iteration) {
+        parLapply(cl, 1:n_simulations, function(iteration) {
             one_simulation(
                 iteration,
                 model,
