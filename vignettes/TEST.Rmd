@@ -32,13 +32,11 @@ library(RColorBrewer)
 
 library(ape)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# devtools::load_all()
-# devtools::document()
+devtools::install_github("dinhngockhanh/CancerSimulator")
 ```
 
 # Set up model variables
