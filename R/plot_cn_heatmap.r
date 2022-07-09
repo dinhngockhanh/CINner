@@ -1,4 +1,5 @@
 # =================================PLOT HEATMAP OF CN PROFILES IN SAMPLE
+#' @export
 plot_cn_heatmap <- function(model = "",
                             n_simulations = 0,
                             plotcol = "",

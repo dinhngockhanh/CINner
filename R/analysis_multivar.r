@@ -1,3 +1,4 @@
+#' @export
 simulator_multivar <- function(model_prefix = "",
                                model_variables_base = list(),
                                var1_name = "",
@@ -74,7 +75,7 @@ simulator_multivar <- function(model_prefix = "",
     }
     cat("\n")
 }
-
+#' @export
 statistics_multivar <- function(model_prefix = "",
                                 var1_name = "",
                                 var1_vals = c(),
@@ -109,7 +110,7 @@ statistics_multivar <- function(model_prefix = "",
     # =========================================SAVE MATRIX OF STATISTICS
     save(mat_simulation_statistics, file = paste(model_prefix, "_statistics.rda", sep = ""))
 }
-
+#' @export
 simulation_stats <- function(simulation, stage_final) {
     simulation$statistics <- list()
     #-------------------------Statistics from phase 1 (clonal evolution)

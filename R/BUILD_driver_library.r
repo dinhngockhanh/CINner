@@ -1,3 +1,4 @@
+#' @export
 BUILD_driver_library <- function(model_variables = list(),
                                  vec_driver_genes = c(),
                                  vec_driver_role = c(),

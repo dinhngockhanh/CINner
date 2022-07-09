@@ -1,3 +1,4 @@
+#' @export
 plot_clonal_perc <- function(model = "",
                              n_simulations = 0,
                              width = 1000,

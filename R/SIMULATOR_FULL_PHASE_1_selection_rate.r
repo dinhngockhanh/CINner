@@ -1,4 +1,5 @@
 # ==================================COMPUTE THE SELECTION RATE OF A CLONE
+#' @export
 SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
     #---------------------Cell is not viable if losing whole chromosomes
     #--------------------------------or exceeding maximum average ploidy

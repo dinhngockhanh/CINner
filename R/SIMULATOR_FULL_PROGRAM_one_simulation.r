@@ -1,4 +1,5 @@
 # ==================================================CREATE ONE SIMULATION
+#' @export
 SIMULATOR_FULL_PROGRAM_one_simulation <- function(model = "",
                                                   stage_final = 0,
                                                   N_clones_min = 0,

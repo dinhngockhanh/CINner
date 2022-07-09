@@ -1,4 +1,5 @@
 # ==============PLOT TOTAL POPULATION SIZE - SIMULATION VS INPUT DYNAMICS
+#' @export
 plot_tot_pop_vs_input <- function(model = "",
                                   n_simulations = 0,
                                   vec_time = c(0),

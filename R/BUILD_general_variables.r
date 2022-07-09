@@ -1,3 +1,4 @@
+#' @export
 BUILD_general_variables <- function(model_name = "MODEL",
                                     cell_lifespan = 4,
                                     T_0 = list(0, "year"),

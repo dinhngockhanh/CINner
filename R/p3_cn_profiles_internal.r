@@ -1,3 +1,4 @@
+#' @export
 p3_cn_profiles_internal <- function(simulation) {
     sample_genotype_internal_nodes <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_internal_genotypes
     package_clonal_evolution <- simulation$clonal_evolution

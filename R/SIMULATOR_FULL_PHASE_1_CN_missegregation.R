@@ -1,4 +1,5 @@
 # ================================================SIMULATE MISSEGREGATION
+#' @export
 SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react, genotype_daughter_1, genotype_daughter_2) {
     #------------------------------------Find the new CN and driver profiles
     #   Find the daughter cells' current CN and driver profiles

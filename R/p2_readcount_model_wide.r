@@ -1,3 +1,4 @@
+#' @export
 p2_readcount_model_wide <- function(simulation, report_progress) {
     noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
 

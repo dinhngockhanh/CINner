@@ -1,3 +1,4 @@
+#' @export
 SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     #---------------------------------------------------Input CN event rates
     prob_CN_WGD <- prob_CN_whole_genome_duplication

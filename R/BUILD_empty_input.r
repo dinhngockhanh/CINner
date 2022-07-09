@@ -1,3 +1,4 @@
-BUILD_empty_input <- function(){
-    
+#' @export
+BUILD_empty_input <- function() {
+
 }

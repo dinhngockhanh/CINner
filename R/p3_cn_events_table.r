@@ -1,3 +1,4 @@
+#' @export
 p3_cn_events_table <- function(simulation) {
     # hclust_internal_genotypes <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_internal_genotypes
     hclust_CN_events <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events

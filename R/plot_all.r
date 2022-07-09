@@ -1,3 +1,4 @@
+#' @export
 plot_all <- function(model = "",
                      n_simulations = 0) {
     #-------------------------------Plot total CN profile - ground truth

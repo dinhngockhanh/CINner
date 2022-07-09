@@ -1,3 +1,4 @@
+#' @export
 hc2Newick_MODIFIED <- function(hc, flat = TRUE) {
     dist <- 0
     if (is.null(hc$labels)) {

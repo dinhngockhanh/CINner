@@ -1,4 +1,5 @@
 # =====================================PLOT CLONAL EVOLUTION AS FISH PLOT
+#' @export
 plot_clonal_fishplot <- function(model = "",
                                  n_simulations = 0,
                                  vec_time = c(0),

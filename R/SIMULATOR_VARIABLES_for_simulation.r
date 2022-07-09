@@ -1,4 +1,5 @@
 # =============================SET ALL PARAMETERS REQUIRED FOR SIMULATION
+#' @export
 SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #--------------------------------------Set up variables for cancer model
     #---Input table of variables from file

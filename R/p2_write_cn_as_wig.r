@@ -1,3 +1,4 @@
+#' @export
 p2_write_cn_as_wig <- function(filename, noisy_cn_profiles_long, cell_ID) {
     #-----------------------------------Extract readcounts for this cell
     noisy_cn_profiles_long <- noisy_cn_profiles_long[noisy_cn_profiles_long$cell_id == cell_ID, ]

@@ -1,4 +1,5 @@
 # =============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
+#' @export
 SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample) {
     #-----------------------------------------Input the clonal evolution
     T_final <- package_clonal_evolution$T_current

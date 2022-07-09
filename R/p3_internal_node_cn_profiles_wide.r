@@ -1,3 +1,4 @@
+#' @export
 p3_internal_node_cn_profiles_wide <- function(simulation) {
     cn_profiles_wide <- simulation$sample$cn_profiles_wide
 

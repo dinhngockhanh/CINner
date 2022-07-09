@@ -1,3 +1,4 @@
+#' @export
 append_with_hmm <- function(model = "",
                             n_simulations = 0,
                             UMAP = TRUE,

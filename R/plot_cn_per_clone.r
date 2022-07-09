@@ -47,9 +47,9 @@ plot_cn_per_clone <- function(model = "",
 #' @param svalpha the alpha scaling of the SV lines, default = 0.5
 #' @param genes vector of genes to annotate, will add a dashed vertical line and label
 #' @param tickwidth Spacing of ticks (in Mb) when only 1 chromosome is plotted
-#' @chrstart Start of region (in Mb) when plotting a single chromosome
-#' @chrend End of region (in Mb) when plotting a single chromosome
-#' @shape shape for plotting
+#' @param chrstart Start of region (in Mb) when plotting a single chromosome
+#' @param chrend End of region (in Mb) when plotting a single chromosome
+#' @param shape shape for plotting
 #'
 #' @return ggplot2 plot
 #'

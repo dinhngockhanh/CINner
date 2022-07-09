@@ -1,3 +1,4 @@
+#' @export
 plot_multivar_all <- function(model_prefix,
                               var1_name, var1_vals,
                               var2_name, var2_vals,

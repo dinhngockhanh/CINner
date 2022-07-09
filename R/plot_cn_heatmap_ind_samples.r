@@ -1,3 +1,4 @@
+#' @export
 plot_cn_heatmap_ind_samples <- function(model = "",
                                         n_simulations = 0,
                                         plotcol = "",

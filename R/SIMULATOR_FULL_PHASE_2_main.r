@@ -1,4 +1,5 @@
 # =============================================PHASE 2: SAMPLE PHYLOGENY
+#' @export
 SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progress) {
     #-----------------------------------------Input the clonal evolution
     T_current <- package_clonal_evolution$T_current

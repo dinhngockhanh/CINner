@@ -1,4 +1,5 @@
 # ================================PLOT CLONAL EVOLUTION AS PHYLOGENY TREE
+#' @export
 plot_clonal_phylo <- function(model = "",
                               n_simulations = 0,
                               width = 1000,

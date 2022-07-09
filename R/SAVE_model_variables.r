@@ -1,3 +1,4 @@
+#' @export
 SAVE_model_variables <- function(model_name = "",
                                  model_variables = list()) {
     TABLE_CHROMOSOME_CN_INFO <- model_variables$cn_info

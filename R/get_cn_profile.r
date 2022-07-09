@@ -1,3 +1,4 @@
+#' @export
 get_cn_profile <- function(package_clonal_evolution, clone_ID) {
     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- package_clonal_evolution$genotype_list_ploidy_block

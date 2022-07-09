@@ -1,3 +1,4 @@
+#' @export
 p2_cn_profiles_long <- function(simulation) {
     sample_cell_ID <- simulation$sample$sample_cell_ID
 
