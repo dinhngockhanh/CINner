@@ -67,6 +67,12 @@ plotCNprofile_MODIFIED(
 \item{genes}{vector of genes to annotate, will add a dashed vertical line and label}
 
 \item{tickwidth}{Spacing of ticks (in Mb) when only 1 chromosome is plotted}
+
+\item{chrstart}{Start of region (in Mb) when plotting a single chromosome}
+
+\item{chrend}{End of region (in Mb) when plotting a single chromosome}
+
+\item{shape}{shape for plotting}
 }
 \value{
 ggplot2 plot
