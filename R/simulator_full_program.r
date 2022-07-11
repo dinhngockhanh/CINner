@@ -39,7 +39,6 @@ simulator_full_program <- function(model = "",
     if (apply_HMM == TRUE) {
         save_simulation <- TRUE
     }
-    print("TESTING NEW VERSION")
     # =================CREATE WORKSPACE DIRECTORY FOR CN INFERENCE WORKS
     if (model_readcount == TRUE) {
         dir.create(model)

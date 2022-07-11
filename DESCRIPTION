@@ -1,12 +1,30 @@
 Package: CancerSimulator
-Type: Package
-Title: Simulate Cancer Evolution
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Simulating Cancer Evolution as a Selective Model driven by Driver Mutations and Copy Number Aberrations
+Version: 0.0.0.9000
+Authors@R:
+    person(given = "Khanh", family = "Dinh",
+           role = c("aut", "cre"),
+           email = "khanhdinh1991@gmail.com"))
+Description: What the package does (one paragraph).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
 Encoding: UTF-8
 LazyData: true
+Imports:
+      ggplot2,
+      ggtree,
+      signals,
+      dendextend,
+      fishplot,
+      ctc,
+      adephylo,
+      data.table,
+      HMMcopy,
+      plyr,
+      matrixStats,
+      parallel,
+      RColorBrewer,
+      hrbrthemes,
+      viridis,
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2

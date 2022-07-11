@@ -1,3 +1,4 @@
+#' @export
 plot_cn_per_clone <- function(model = "",
                               n_simulations = 0,
                               CN_data = "TRUTH",
@@ -27,36 +28,6 @@ plot_cn_per_clone <- function(model = "",
     }
 }
 
-#' Plot a single cell copy number profile
-#'
-#' @param CNbins Single cell copy number dataframe with the following columns: `cell_id`, `chr`, `start`, `end`, `state`, `copy`
-#' @param cellid Which cell to plot, if no cell is specific will plot the first cell in the dataframe
-#' @param chrfilt Vector of chromosomes to plot, if NULL (default) will plot all chromosomes
-#' @param pointsize The point size in the plot
-#' @param alphaval Alpha value of points
-#' @param maxCN The maximum on the y axis, if any points are above this value they will be winsorized rather than removed
-#' @param cellidx idx of cell to plot if cellid = NULL
-#' @param statecol The colour mapping, default is to map colours to the `state` column
-#' @param returnlist Return a list rather than the ggplot object
-#' @param raster use ggrastr or not, default = FALSE
-#' @param y_axis_trans What transformation to use on the y-axis, default is identity, the other option is "squashy" which uses a tanh transformation
-#' @param xaxis_order Default is "genome_position"
-#' @param legend.position Where to place the legend, default is "bottom"
-#' @param annotateregions Dataframe with chr start and end positions to annotate, will draw a dashed vertical line at this position
-#' @param SV Default is NULL. If a dataframe with structural variant position is passed it will add rearrangement links between bins.
-#' @param svalpha the alpha scaling of the SV lines, default = 0.5
-#' @param genes vector of genes to annotate, will add a dashed vertical line and label
-#' @param tickwidth Spacing of ticks (in Mb) when only 1 chromosome is plotted
-#' @param chrstart Start of region (in Mb) when plotting a single chromosome
-#' @param chrend End of region (in Mb) when plotting a single chromosome
-#' @param shape shape for plotting
-#'
-#' @return ggplot2 plot
-#'
-#' @examples
-#'
-#' plotCNprofile_MODIFIED(CNbins)
-#' @md
 #' @export
 plotCNprofile_MODIFIED <- function(CNbins,
                                    cellid = NULL,
@@ -149,8 +120,8 @@ plotCNprofile_MODIFIED <- function(CNbins,
                 ncol = 6, byrow = TRUE,
                 override.aes = list(alpha = 1, size = 3, shape = 15)
             ))
-            # +
-            # ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = legend.position)
+        # +
+        # ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = legend.position)
     } else {
         gCN <- pl$CNbins %>%
             dplyr::mutate(state = ifelse(state >= 11, "11+", paste0(state))) %>%
@@ -180,8 +151,8 @@ plotCNprofile_MODIFIED <- function(CNbins,
                 ncol = 6, byrow = TRUE,
                 override.aes = list(alpha = 1, size = 3, shape = 15)
             ))
-             # +
-            # ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = legend.position)
+        # +
+        # ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = legend.position)
     }
 
     if (!is.null(genes)) {
