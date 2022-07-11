@@ -23,6 +23,7 @@
 #' @param prob_CN_cnloh_terminal_length ...
 #' @param rate_driver ...
 #' @param rate_passenger ...
+#' @param selection_model ...
 #' @param bound_driver ...
 #' @param bound_average_ploidy ...
 #' @param bound_homozygosity ...
@@ -61,6 +62,7 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     prob_CN_cnloh_terminal_length = 0.1,
                                     rate_driver = 0,
                                     rate_passenger = 0,
+                                    selection_model = "",
                                     bound_driver = 3,
                                     bound_average_ploidy = 5,
                                     bound_homozygosity = 0,
@@ -75,7 +77,7 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     gc_int = 0,
                                     sigma1 = 0.1,
                                     num_reads = 1e6) {
-    #---------------------------Build model input file for general variables
+    #-----------------------Build model input file for general variables
     columns <- c("Variable", "Value", "Unit", "Note")
     TABLE_VARIABLES <- data.frame(matrix(nrow = 0, ncol = length(columns)))
     colnames(TABLE_VARIABLES) <- columns
@@ -110,7 +112,6 @@ BUILD_general_variables <- function(model_name = "MODEL",
     if (age_birth_unit != age_end_unit) {
         print("START AND END TIMES DO NOT USE THE SAME UNIT")
     }
-
     if (age_end_unit == "day") {
         T_end_time <- age_end
     } else {
@@ -171,13 +172,6 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("rate_driver", rate_driver, "per bp per cell division", "Poisson rate of getting new driver mutations")
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("rate_passenger", rate_passenger, "per bp per cell division", "Poisson rate of getting new passenger mutations")
-    #   Set up upper limits for driver and local CN for viable cells
-    N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("bound_driver", bound_driver, "driver count", "Maximum driver count in viable cells (cells exceeding this will die)")
-    N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("bound_average_ploidy", bound_average_ploidy, "", "Maximum average ploidy across genome (cells exceeding this will die)")
-    N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("bound_homozygosity", bound_homozygosity, "", "Maximum number of bins under homozygosity (cells exceeding this will die)")
     #   Set up variables for read count model
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("gc_slope", gc_slope, "", "Slope for linear GC model")
@@ -200,8 +194,41 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("lower_limit_alt_counts", lower_limit_alt_counts, "", "Lower limit of alternate read counts for mutations to be detected")
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("lower_limit_tot_counts", lower_limit_tot_counts, "", "Lower limit of total read counts for mutations to be detected")
-    #-----------------------Build model input file for chromosome bin counts
-    #-----------------------------------------------and centromere locations
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    #-------------------------Build model input file for selection model
+    columns <- c("Variable", "Value", "Unit", "Note")
+    TABLE_SELECTION <- data.frame(matrix(nrow = 0, ncol = length(columns)))
+    colnames(TABLE_SELECTION) <- columns
+    N_row <- 0
+    N_row <- N_row + 1
+    TABLE_SELECTION[N_row, ] <- c("selection_model", selection_model, "", "Choice of selection model")
+    N_row <- N_row + 1
+    TABLE_SELECTION[N_row, ] <- c("bound_driver", bound_driver, "driver count", "Maximum driver count in viable cells (cells exceeding this will die)")
+    N_row <- N_row + 1
+    TABLE_SELECTION[N_row, ] <- c("bound_average_ploidy", bound_average_ploidy, "", "Maximum average ploidy across genome (cells exceeding this will die)")
+    N_row <- N_row + 1
+    TABLE_SELECTION[N_row, ] <- c("bound_homozygosity", bound_homozygosity, "", "Maximum number of bins under homozygosity (cells exceeding this will die)")
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    ##########################
+    #-------------------Build model input file for chromosome bin counts
+    #-------------------------------------------and centromere locations
     vec_chromosome_name <- c(1:22, "X", "Y")
     vec_chromosome_bp <- c(
         248956422, 242193529, 198295559, 190214555,
@@ -222,10 +249,10 @@ BUILD_general_variables <- function(model_name = "MODEL",
     vec_bin_count <- ceiling(vec_chromosome_bp / CN_bin_length)
     vec_centromere_location <- round(vec_centromere_bp / CN_bin_length)
     #   Set up table of chromosome bin counts and centromere locations
-    columns <- c("Chromosome", "Bin_count", "Centromere_location")
     TABLE_CHROMOSOME_CN_INFO <- data.frame(vec_chromosome_name, vec_bin_count, vec_centromere_location)
+    columns <- c("Chromosome", "Bin_count", "Centromere_location")
     colnames(TABLE_CHROMOSOME_CN_INFO) <- columns
-    #-------------------------Build model input file for population dynamics
+    #---------------------Build model input file for population dynamics
     vec_time_points <- table_population_dynamics[, 1]
     vec_cell_count <- table_population_dynamics[, 2]
     if (age_birth_unit == "day") {
@@ -246,7 +273,7 @@ BUILD_general_variables <- function(model_name = "MODEL",
     columns <- c("Age_in_day", "Total_cell_count")
     TABLE_POPULATION_DYNAMICS <- data.frame(vec_time_points, vec_cell_count)
     colnames(TABLE_POPULATION_DYNAMICS) <- columns
-    #------------------------Build model input file for sampling information
+    #--------------------Build model input file for sampling information
     TABLE_SAMPLING_INFO <- Table_sample
     if (age_birth_unit == "day") {
         TABLE_SAMPLING_INFO$T_sample <- 1 * TABLE_SAMPLING_INFO$Age_sample
@@ -263,9 +290,10 @@ BUILD_general_variables <- function(model_name = "MODEL",
             }
         }
     }
-    #----------------------------------------Output the model variable files
+    #------------------------------------Output the model variable files
     MODEL_VARIABLES <- list()
     MODEL_VARIABLES$general_variables <- TABLE_VARIABLES
+    MODEL_VARIABLES$selection_model <- TABLE_SELECTION
     MODEL_VARIABLES$cn_info <- TABLE_CHROMOSOME_CN_INFO
     MODEL_VARIABLES$population_dynamics <- TABLE_POPULATION_DYNAMICS
     MODEL_VARIABLES$sampling_info <- TABLE_SAMPLING_INFO

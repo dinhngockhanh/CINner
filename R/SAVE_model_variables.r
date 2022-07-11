@@ -20,6 +20,9 @@ SAVE_model_variables <- function(model_name = "",
     #---Save file for general variables
     filename <- paste(model_name, "-input-variables.csv", sep = "")
     write.csv(model_variables$general_variables, filename, row.names = FALSE)
+    #---Save file for selection model
+    filename <- paste(model_name, "-input-selection-model.csv", sep = "")
+    write.csv(model_variables$selection_model, filename, row.names = FALSE)
     #---Save file for GC content and mappability per CN bin
     filename <- paste(model_name, "-input-gc.csv", sep = "")
     write.csv(model_variables$gc_and_mappability, filename, row.names = FALSE)

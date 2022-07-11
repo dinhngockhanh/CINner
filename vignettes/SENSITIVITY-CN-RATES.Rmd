@@ -51,6 +51,7 @@ CN_bin_length                       <- 500000
             rate_driver                         <- 8e-16
 
 rate_passenger                      <- 1e-11
+selection_model                     <- 'old'
 bound_driver                        <- 3
             bound_average_ploidy    <- 4.5
             bound_homozygosity      <- 500
@@ -85,6 +86,7 @@ model_variables   <- BUILD_general_variables(
     prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
     rate_driver=rate_driver,
     rate_passenger=rate_passenger,
+    selection_model=selection_model,
     bound_driver=bound_driver,
     bound_average_ploidy=bound_average_ploidy,
     bound_homozygosity=bound_homozygosity,

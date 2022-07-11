@@ -5,6 +5,15 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #---Input table of variables from file
     filename <- paste(model, "-input-variables.csv", sep = "")
     TABLE_VARIABLES <- read.table(filename, header = TRUE, sep = ",")
+    #---Input table of selection model from file
+    filename <- paste(model, "-input-selection-model.csv", sep = "")
+    TABLE_SELECTION <- read.table(filename, header = TRUE, sep = ",")
+
+
+
+
+
+
     #---Save file for GC content and mappability per CN bin
     filename <- paste(model, "-input-gc.csv", sep = "")
     TABLE_GC <- read.table(filename, header = TRUE, sep = ",")
@@ -36,6 +45,15 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     }
     standard_time_unit <<- TABLE_VARIABLES$Unit[TABLE_VARIABLES$Variable == "age_end"]
     assign("standard_time_unit", standard_time_unit, envir = .GlobalEnv)
+
+
+    for (i in 1:nrow(TABLE_SELECTION)) {
+        if (is.na(suppressWarnings(as.numeric(TABLE_SELECTION[i, 2])))) {
+            assign(TABLE_SELECTION[i, 1], TABLE_SELECTION[i, 2], envir = .GlobalEnv)
+        } else {
+            assign(TABLE_SELECTION[i, 1], as.numeric(TABLE_SELECTION[i, 2]), envir = .GlobalEnv)
+        }
+    }
 
 
     Table_sampling <<- TABLE_SAMPLING_INFO
@@ -74,7 +92,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #---Set up table of GC content and mappability per CN bin
     table_gc <<- TABLE_GC
 
-    #-----------------------------------Set up initial state for simulations
+    #-------------------------------Set up initial state for simulations
     #   Get number of clones in the initial population
     initial_N_clones <<- nrow(TABLE_INITIAL_OTHERS)
     vec_header <- names(TABLE_INITIAL_COPY_NUMBER_PROFILES)
@@ -222,10 +240,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         selection_rate <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
         initial_selection_rate[clone] <<- selection_rate
     }
-
-
-
-
     #---Set up total population dynamics as function of age (in days)
     for (i in 1:ncol(TABLE_POPULATION_DYNAMICS)) {
         assign(colnames(TABLE_POPULATION_DYNAMICS)[i], TABLE_POPULATION_DYNAMICS[, i], envir = .GlobalEnv)
