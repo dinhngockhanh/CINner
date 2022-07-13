@@ -25,6 +25,9 @@ library(CancerSimulator)
 #   Get the gain-loss map from PCAWG
 
 ```{r}
+system.file("extdata", "PCAWG_OV-AU.csv", package = "CancerSimulator")
+
+
 carSpeeds <- read.csv(file = 'PCAWG_OV-AU.csv')
 head(carSpeeds)
 ```
