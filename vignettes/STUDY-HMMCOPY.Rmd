@@ -1,0 +1,285 @@
+---
+title: "How to use Cancer Simulator"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to use Cancer Simulator}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE, message = FALSE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ggplot2)
+library(ggtree)
+library(signals)
+library(dendextend)
+library(fishplot)
+library(ctc)
+library(adephylo)
+library(data.table)
+library(HMMcopy)
+library(plyr)
+library(matrixStats)
+library(parallel)
+library(RColorBrewer)
+library(ape)
+#-----------------------------------------------------------------------
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
+#-----------------------------------------------------------------------
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
+```
+
+# Create one simulation
+
+Save parameters to build one simulation:
+
+```{r}
+cell_lifespan                       <- 30
+T_0                                 <- list(0,'year')
+T_end                               <- list(80,'year')
+Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
+# Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
+T_tau_step                          <- cell_lifespan/2
+CN_bin_length                       <- 500000
+
+prob_CN_whole_genome_duplication    <- 1e-4
+prob_CN_missegregation              <- 7e-4
+prob_CN_chrom_arm_missegregation    <- 2e-4
+prob_CN_focal_amplification         <- 7e-4
+prob_CN_focal_deletion              <- 2e-4
+prob_CN_cnloh_interstitial          <- 4e-4
+prob_CN_cnloh_terminal              <- 6e-4
+# prob_CN_whole_genome_duplication    <- 3e-4
+# prob_CN_missegregation              <- 7e-4
+# prob_CN_chrom_arm_missegregation    <- 2e-4
+# prob_CN_focal_amplification         <- 7e-4
+# prob_CN_focal_deletion              <- 2e-4
+# prob_CN_cnloh_interstitial          <- 4e-4
+# prob_CN_cnloh_terminal              <- 6e-4
+prob_CN_focal_amplification_length  <- 0.5
+prob_CN_focal_deletion_length       <- 0.5
+prob_CN_cnloh_interstitial_length   <- 0.5
+prob_CN_cnloh_terminal_length       <- 0.5
+rate_driver                         <- 8e-16
+rate_passenger                      <- 1e-11
+selection_model                     <- 'old'
+bound_driver                        <- 3
+bound_average_ploidy                <- 4.5
+bound_homozygosity                  <- 500
+vec_time                            <- T_0[[1]]:T_end[[1]]
+L                                   <- 10000
+t_0                                 <- 20
+k                                   <- 0.3
+vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
+table_population_dynamics           <- cbind(vec_time,vec_cell_count)
+gc                                  <- read.csv(file = '../data/gc_map_500kb.csv')
+gc_slope                            <- 1.2
+gc_int                              <- 0
+sigma1                              <- 0.1
+num_reads                           <- 2e6
+model_variables                     <- BUILD_general_variables(
+    cell_lifespan=cell_lifespan,
+    T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,
+    Table_sample=Table_sample,
+    CN_bin_length=CN_bin_length,
+    prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
+    prob_CN_missegregation=prob_CN_missegregation,
+    prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
+    prob_CN_focal_amplification=prob_CN_focal_amplification,
+    prob_CN_focal_deletion=prob_CN_focal_deletion,
+    prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
+    prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
+    prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
+    prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
+    prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
+    prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
+    rate_driver=rate_driver,
+    rate_passenger=rate_passenger,
+    selection_model=selection_model,
+    bound_driver=bound_driver,
+    bound_average_ploidy=bound_average_ploidy,
+    bound_homozygosity=bound_homozygosity,
+    table_population_dynamics=table_population_dynamics,
+    gc=gc,
+    gc_slope=gc_slope,
+    gc_int=gc_int,
+    sigma1=sigma1,
+    num_reads=num_reads
+)
+vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
+    'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
+vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
+    'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
+vec_driver_s      <- rep(0.007,length(vec_driver_genes))
+vec_driver_s[1]   <- 0.01
+vec_driver_s[2]   <- 0.009
+vec_driver_s[3]   <- 0.009
+model_variables   <- BUILD_driver_library(model_variables=model_variables,
+    vec_driver_genes=vec_driver_genes,
+    vec_driver_role=vec_driver_role,
+    vec_driver_s=vec_driver_s)
+cell_count        <- 20
+CN_matrix         <- BUILD_cn_normal_XX(model_variables$cn_info)
+drivers           <- list()
+model_variables   <- BUILD_initial_population(model_variables=model_variables,
+    cell_count=cell_count,
+    CN_matrix=CN_matrix,
+    drivers=drivers)
+model_name        <- 'HMMCOPY-STUDY'
+SAVE_model_variables(model_name=model_name,model_variables=model_variables)
+```
+
+Create one simulation:
+
+```{r}
+start_time = Sys.time()
+n_simulations     <- 1
+stage_final       <- 3
+n_clones_min      <- 1
+n_clones_max      <- Inf
+simulator_full_program(
+    model = model_name,
+    n_simulations = n_simulations,
+    stage_final = stage_final,
+    n_clones_min = n_clones_min,
+    n_clones_max = n_clones_max,
+    save_simulation = TRUE,
+    internal_nodes_cn_info = FALSE,
+    save_newick_tree = TRUE,
+    save_cn_profile = TRUE,
+    model_readcount = FALSE,
+    format_cn_profile = "both",
+    apply_HMM = FALSE,
+    apply_UMAP_on_HMM = FALSE,
+    report_progress = TRUE,
+    seed = 10,
+    compute_parallel = FALSE
+)
+end_time = Sys.time()
+print(end_time - start_time)
+```
+
+Make plots for this "original" simulation:
+
+```{r}
+plot_all(model = model_name,n_simulations = n_simulations)
+```
+
+# Create noisy readcounts with varying parameters
+
+Rename the "original" simulation and its plots:
+
+```{r}
+file.rename(paste(model_name, "_simulation_1.rda", sep = ""), paste(model_name, "_simulation_original.rda", sep = ""))
+
+file.rename(paste(model_name, "_sim1_clonal_fishplot.jpeg", sep = ""), paste(model_name, "_original_clonal_fishplot.jpeg", sep = ""))
+file.rename(paste(model_name, "_sim1_clonal_phylo.jpeg", sep = ""), paste(model_name, "_original_clonal_phylo.jpeg", sep = ""))
+file.rename(paste(model_name, "_sim1_CN_minor_cnTRUTH_phyloTRUTH.jpeg", sep = ""), paste(model_name, "_original_CN_minor.jpeg", sep = ""))
+file.rename(paste(model_name, "_sim1_CN_total_cnTRUTH_phyloTRUTH.jpeg", sep = ""), paste(model_name, "_original_CN_total.jpeg", sep = ""))
+file.rename(paste(model_name, "_sim1_tot_pop.jpeg", sep = ""), paste(model_name, "_original_tot_pop.jpeg", sep = ""))
+```
+
+Load the "original" simulation:
+
+```{r}
+load(paste(model_name, "_simulation_original.rda", sep = ""))
+simulation_original <- simulation
+```
+
+Create a folder as workplace to store files containing noisy readcounts and HMMcopy results:
+
+```{r}
+dir.create(model_name)
+```
+
+Save data for GC content and mappability as wig files to be used during HMMcopy:
+
+```{r}
+SIMULATOR_VARIABLES_for_simulation(model_name)
+p2_write_gc_map_as_wig(filename_gc = paste(model_name, "_gc.wig", sep = ""), filename_map = paste(model_name, "_map.wig", sep = ""))
+```
+
+Set up variables for the noisy readcount model:
+
+```{r}
+table_gc            <<- read.table(paste(model_name, "-input-gc.csv", sep = ""), header = TRUE, sep = ",")
+gc_int              <<- 0
+num_reads           <<- 2e6
+vec.gc_slope        <- c(1)
+vec.sigma1          <- c(1e-3,1e-2,1e-1)
+```
+
+Create noisy readcounts for each parameter set:
+
+```{r}
+ind                 <- 0
+for (row in 1:length(vec.gc_slope)){
+    for (col in 1:length(vec.sigma1)){
+        ind         <- ind+1
+        file.copy(paste(model_name, "_simulation_original.rda", sep = ""), paste(model_name, "_simulation_", ind,".rda", sep = ""))
+        #   Load variables for the noisy readcount model
+        gc_slope    <<- vec.gc_slope[row]
+        sigma1      <<- vec.sigma1[col]
+        #   Create noisy readcounts
+        simulation  <- p2_readcount_model(simulation_original, TRUE)
+        simulation  <- p2_readcount_model_wide(simulation, TRUE)
+        #   Save noisy readcounts
+        sample_cell_ID          <- simulation$sample$sample_cell_ID
+        noisy_cn_profiles_long  <- simulation$sample$noisy_cn_profiles_long
+        noisy_cn_profiles_wide  <- simulation$sample$noisy_cn_profiles_wide
+        filename                <- paste(model_name, "_noisy_cn_profiles_long_", ind, ".csv", sep = "")
+        write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
+        filename                <- paste(model_name, "_noisy_cn_profiles_wide_", ind, ".csv", sep = "")
+        write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
+        for (cell in 1:length(sample_cell_ID)) {
+            cell_ID             <- sample_cell_ID[cell]
+            filename            <- paste(model_name, "/", model_name, "_noisy_cn_profiles_long_", ind, "_", cell_ID, ".wig", sep = "")
+            p2_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
+        }
+    }
+}
+```
+
+# Run HMMcopy on noisy readcounts
+
+Run file `hmmcopy.bash` which runs HMMcopy for each parameter set:
+
+```{r}
+start_time = Sys.time()
+n_trials            <- length(vec.gc_slope)*length(vec.sigma1)
+flag_parallel       <- 1
+system("chmod -x hmmcopy.bash")
+system(paste("bash hmmcopy.bash ", model_name, " ", n_trials, " ", flag_parallel, sep = ""))
+end_time = Sys.time()
+print(end_time - start_time)
+```
+
+Incorporate HMMcopy results back into simulation files:
+
+```{r}
+append_with_hmm(model = model_name, n_simulations = n_trials, UMAP = TRUE, pseudo_corrected_readcount = FALSE)
+```
+
+Plot the total CN profiles inferred from HMMcopy:
+
+```{r}
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_trials,
+    plotcol = "total-copy",
+    CN_data = "HMM",
+    phylo = "TRUTH",
+    width = 1000,
+    height = 1000
+)
+```

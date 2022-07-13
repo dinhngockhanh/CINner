@@ -30,14 +30,14 @@ plot_cn_heatmap <- function(model = "",
                 grep("Internal-node-", sample_genotype_profiles$cell_id, value = FALSE),
                 grep("Initial-clone-", sample_genotype_profiles$cell_id, value = FALSE)
             )
-            sample_genotype_profiles <- sample_genotype_profiles[-vec_delete, ]
+            if (length(vec_delete) > 0) {
+                sample_genotype_profiles <- sample_genotype_profiles[-vec_delete, ]
+            }
         }
         if (CN_data == "HMM") {
-            package_sample <- simulation$sample
             #---Extract CN profiles from HMMcopy
             sample_genotype_profiles <- simulation$sample$cn_profiles_long_hmm
         }
-        print(sample_genotype_profiles)
         #-------------------------------Extract clustering and phylogeny
         if (phylo == "TRUTH") {
             #---Extract clustering and phylogeny from GROUND TRUTH
