@@ -25,11 +25,8 @@ library(CancerSimulator)
 #   Get the gain-loss map from PCAWG
 
 ```{r}
-system.file("extdata", "PCAWG_OV-AU.csv", package = "CancerSimulator")
-
-
-carSpeeds <- read.csv(file = 'PCAWG_OV-AU.csv')
-head(carSpeeds)
+copynumber_PCAWG <- read.csv(file = system.file("extdata", "PCAWG_OV-AU.csv", package = "CancerSimulator"))
+head(copynumber_PCAWG)
 ```
 
 
@@ -75,7 +72,7 @@ t_0                                 <- 20
 k                                   <- 0.3
 vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
 table_population_dynamics           <- cbind(vec_time,vec_cell_count)
-gc                                  <- read.csv(file = '../data/gc_map_500kb.csv')
+gc                                  <- read.csv(file = system.file("extdata", "gc_map_500kb-AU.csv", package = "CancerSimulator"))
 gc_slope                            <- 1.2
 gc_int                              <- 0
 sigma1                              <- 0.1
