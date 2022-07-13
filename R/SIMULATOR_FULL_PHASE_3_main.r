@@ -704,7 +704,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
     output <- list()
     output$phylogeny_clustering_truth <- phylogeny_clustering_truth
+
+
     output$cell_phylogeny_hclust <- phylogeny_hclust
+    output$clone_phylogeny_hclust <- clone_phylogeny_hclust
+
+    
     output$package_cell_phylogeny_hclust_extra <- package_cell_phylogeny_hclust_extra
     output$clone_phylogeny_phylo <- clone_phylogeny_phylo
     output$package_cell_phylogeny <- package_cell_phylogeny

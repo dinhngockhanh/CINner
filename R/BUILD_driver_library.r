@@ -12,7 +12,7 @@ BUILD_driver_library <- function(model_variables = list(),
     #-----------------------------according to choice of selection model
     if (selection_model == "old") {
         #---Input the Cancer Gene Census
-        DATA_cancer_gene_census <- read.csv("../data/cancer_gene_census.csv")
+        DATA_cancer_gene_census <- read.csv(file = system.file("extdata", "cancer_gene_census.csv", package = "CancerSimulator"))
         #---Build the driver library
         columns <- c("Gene_ID", "Gene_role", "Selective_strength")
         TABLE_CANCER_GENES <- data.frame(vec_driver_genes, vec_driver_role, vec_driver_s)

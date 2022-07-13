@@ -103,8 +103,7 @@ simulator_full_program <- function(model = "",
             "model_readcount",
             "report_progress",
             "one_simulation",
-            # "as.phylo",
-            "hc2Newick_MODIFIED",
+            "hc2Newick_MODIFIED", "hc2Newick",
             "SIMULATOR_VARIABLES_for_simulation",
             "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
             "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
@@ -112,19 +111,8 @@ simulator_full_program <- function(model = "",
             "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
             "get_cn_profile", "rbindlist", "p2_cn_profiles_long", "p2_readcount_model"
         ))
-        #############################
-        #############################
-        #############################
-        #############################
-        #############################
         library(ape)
-        # clusterEvalQ(cl, library("ape"))
         clusterEvalQ(cl = cl, require(ape))
-        #############################
-        #############################
-        #############################
-        #############################
-        #############################
         #   Run CancerSimulator in parallel
         parLapply(cl, 1:n_simulations, function(iteration) {
             one_simulation(
@@ -327,5 +315,10 @@ one_simulation <- function(iteration,
         cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
         filename <- paste(model, "_cell_phylogeny_", iteration, ".newick", sep = "")
         write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
+
+        clone_phylogeny_hclust <- simulation$sample_phylogeny$clone_phylogeny_hclust
+        filename <- paste(model, "_clone_phylogeny_", iteration, ".newick", sep = "")
+        write(hc2Newick(clone_phylogeny_hclust), file = filename)
+        # write(hc2Newick_MODIFIED(clone_phylogeny_hclust), file = filename)
     }
 }
