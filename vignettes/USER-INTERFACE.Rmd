@@ -133,7 +133,7 @@ table_population_dynamics           <- cbind(vec_time,vec_cell_count)
 Parameters for the sequencing noise and bias model:
 
 ```{r}
-gc                                  <- read.csv(file = system.file("extdata", "gc_map_500kb-AU.csv", package = "CancerSimulator"))
+gc                                  <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
 gc_slope                            <- 1.2
 gc_int                              <- 0
 sigma1                              <- 0.1

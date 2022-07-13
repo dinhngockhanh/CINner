@@ -82,7 +82,7 @@ t_0                                 <- 20
 k                                   <- 0.3
 vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
 table_population_dynamics           <- cbind(vec_time,vec_cell_count)
-gc                                  <- read.csv(file = system.file("extdata", "gc_map_500kb-AU.csv", package = "CancerSimulator"))
+gc                                  <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
 gc_slope                            <- 1.2
 gc_int                              <- 0
 sigma1                              <- 0.1
