@@ -14,12 +14,12 @@ library(parallel)
 library(RColorBrewer)
 library(ape)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+devtools::install_github("dinhngockhanh/CancerSimulator")
+library(CancerSimulator)
 ```
 
 #   Get the gain-loss map from PCAWG
@@ -147,33 +147,36 @@ SAVE_model_variables(model_name=model_name,model_variables=model_variables)
 Then create the same number of simulations as the sample count in PCAWG cohort:
 
 ```{r}
-stage_final       <- 3
+stage_final       <- 2
 n_clones_min      <- 1
 n_clones_max      <- Inf
 n_simulations     <- length(unique(copynumber_PCAWG$donor_unique_id))
-print(n_simulations)
-
-
-
-n_simulations     <- 1
 simulator_full_program(
     model = model_name,
     n_simulations = n_simulations,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
-                save_newick_tree = TRUE,
-    compute_parallel = FALSE
+    save_cn_profile = TRUE,
+    format_cn_profile = 'long',
+    compute_parallel = TRUE
 )
 ```
 
+Combine all simulations into one variable:
 
+```{r}
+copynumber_CancerSimulator  <- list()
+for (i in 1:n_simulations){
+    load(paste(model_name, "_simulation_", i, ".rda", sep = ""))
+    copynumber_CancerSimulator[[i]] <- simulation
+}
+```
 
 #   Compare the gain-loss map between PCAWG and simulations
 
-Then plot the gain-loss map from this cohort:
+Plot the comparison between gain-loss maps from simulations and PCAWG:
 
 ```{r}
-# top_annotation <- plot_gainloss_PCAWG(copynumber_PCAWG)
-# ComplexHeatmap::draw(top_annotation)
+top_annotation<-plot_gainloss(copynumber_CancerSimulator,copynumber_PCAWG)
 ```
