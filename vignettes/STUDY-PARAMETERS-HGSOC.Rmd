@@ -166,10 +166,18 @@ simulator_full_program(
 Combine all simulations into one variable:
 
 ```{r}
-copynumber_CancerSimulator  <- list()
-for (i in 1:n_simulations){
-    copynumber_CancerSimulator[[i]] <- read.csv(file = paste(model_name, "_cn_profiles_long_", i, ".csv", sep = ""))
-}
+numCores <- detectCores()
+cl <- makePSOCKcluster(numCores - 1)
+clusterExport(cl, varlist = c(
+    "model_name"
+))
+copynumber_CancerSimulator <- parLapply(cl, 1:n_simulations, function(iteration) {
+    read.csv(file = paste(model_name, "_cn_profiles_long_", iteration, ".csv", sep = ""))
+})
+# copynumber_CancerSimulator  <- list()
+# for (i in 1:n_simulations){
+#     copynumber_CancerSimulator[[i]] <- read.csv(file = paste(model_name, "_cn_profiles_long_", i, ".csv", sep = ""))
+# }
 ```
 
 #   Compare the gain-loss map between PCAWG and simulations
