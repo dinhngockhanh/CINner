@@ -178,16 +178,11 @@ copynumber_CancerSimulator <- parLapply(cl, 1:n_simulations, function(iteration)
     simulation_lite<-list()
     simulation_lite$all_sample_genotype<-simulation$sample$all_sample_genotype
     simulation_lite$sample_cell_ID<-simulation$sample$sample_cell_ID
-    # simulation_lite$cn_profiles_long<-simulation$sample$cn_profiles_long
     simulation_lite$sample_genotype_unique<-simulation$sample$sample_genotype_unique
     simulation_lite$sample_genotype_unique_profile<-simulation$sample$sample_genotype_unique_profile
     return(simulation_lite)
 })
 stopCluster(cl)
-# copynumber_CancerSimulator  <- list()
-# for (i in 1:n_simulations){
-#     copynumber_CancerSimulator[[i]] <- read.csv(file = paste(model_name, "_cn_profiles_long_", i, ".csv", sep = ""))
-# }
 ```
 
 #   Compare the gain-loss map between PCAWG and simulations
