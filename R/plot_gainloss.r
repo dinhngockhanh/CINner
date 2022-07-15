@@ -7,10 +7,10 @@ plot_gainloss <- function(copynumber_sims,
     #---------------------------Get gain/loss consensus from simulations
     CNbins_list_sims <- vector("list", length = length(copynumber_sims))
     for (iteration in 1:length(copynumber_sims)) {
-        simulation <- copynumber_sims[[iteration]]
-        all_sample_genotype <- simulation$sample$all_sample_genotype
-        sample_cell_ID <- simulation$sample$sample_cell_ID
-        cn_profiles_long <- simulation$sample$cn_profiles_long
+        # simulation <- copynumber_sims[[iteration]]
+        # all_sample_genotype <- simulation$sample$all_sample_genotype
+        # sample_cell_ID <- simulation$sample$sample_cell_ID
+        cn_profiles_long <- copynumber_sims[[iteration]]
         #   Get the genotype with the highest clonal percentage in sample
         tmp <- as.data.frame(table(all_sample_genotype))
         max_freq <- max(tmp$Freq)

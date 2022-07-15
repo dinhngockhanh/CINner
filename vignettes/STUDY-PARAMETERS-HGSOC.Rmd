@@ -168,8 +168,7 @@ Combine all simulations into one variable:
 ```{r}
 copynumber_CancerSimulator  <- list()
 for (i in 1:n_simulations){
-    load(paste(model_name, "_simulation_", i, ".rda", sep = ""))
-    copynumber_CancerSimulator[[i]] <- simulation
+    copynumber_CancerSimulator[[i]] <- read.csv(file = paste(model_name, "_cn_profiles_long_", i, ".csv", sep = ""))
 }
 ```
 
