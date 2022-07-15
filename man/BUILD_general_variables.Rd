@@ -28,6 +28,7 @@ BUILD_general_variables(
   prob_CN_cnloh_terminal_length = 0.1,
   rate_driver = 0,
   rate_passenger = 0,
+  selection_model = "",
   bound_driver = 3,
   bound_average_ploidy = 5,
   bound_homozygosity = 0,
@@ -90,6 +91,8 @@ BUILD_general_variables(
 \item{rate_driver}{...}
 
 \item{rate_passenger}{...}
+
+\item{selection_model}{...}
 
 \item{bound_driver}{...}
 

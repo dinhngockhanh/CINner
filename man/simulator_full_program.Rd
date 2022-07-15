@@ -10,7 +10,7 @@ simulator_full_program(
   stage_final = 0,
   n_clones_min = 0,
   n_clones_max = Inf,
-  save_simulation = FALSE,
+  save_simulation = TRUE,
   internal_nodes_cn_info = FALSE,
   save_newick_tree = FALSE,
   save_cn_profile = FALSE,
