@@ -91,35 +91,24 @@ plot_gainloss <- function(copynumber_sims,
     )
     #---Normalize ploidy of each sample to 2
     copynumber_data <- normalize_cell_ploidy(copynumber_data)
+    #---Replace previously NA in each sample with ploidy 2
+    for (sample in 1:length(samplelist_data)) {
+        sample_id <- samplelist_data[sample]
+        NA_list <- NA_list_data[[sample]]
+        vec_loc <- which(NA_iteration == 1)
+        if (length(vec_loc) > 0) {
+            tmp <- copynumber_data[sample_id]
+            tmp[vec_loc, ] <- 2
+            copynumber_data[sample_id] <- tmp
+        }
+    }
     #---Find gain_sims/loss_sims maps
     n_samples <- ncol(copynumber_data) - 4
     f1_data <- rowSums(copynumber_data[, 5:ncol(copynumber_data)] > cutoff) / n_samples
     f2_data <- -rowSums(copynumber_data[, 5:ncol(copynumber_data)] < cutoff) / n_samples
     attr(f1_data, "names") <- NULL
     attr(f2_data, "names") <- NULL
-    # #----------------------------------------------Rework the data frame
-    # #   Conform data frame into format required by signals
-    # CNbins_sims <- copynumber_sims_PCAWG[c("chromosome", "start", "end", "total_cn", "minor_cn", "major_cn", "donor_unique_id")]
-    #
-    # # CNbins_sims <- CNbins_sims[which(CNbins_sims$donor_unique_id == CNbins_sims$donor_unique_id[1]), ]
-    #
-    # CNbins_sims$state <- CNbins_sims$total_cn
-    # CNbins_sims <- CNbins_sims[, c(1, 2, 3, 4, 8, 5, 6, 7)]
-    # colnames(CNbins_sims) <- c("chr", "start", "end", "copy", "state", "Min", "Maj", "cell_id")
-    # #
-    #
-
-
-
-    # tmp <- unique(CNbins_sims$cell_id)
-    # for (i in 1:length(tmp)) {
-    #     print(mean(CNbins_sims$copy[which(CNbins_sims$cell_id == tmp[i])]))
-    #     print(var(CNbins_sims$copy[which(CNbins_sims$cell_id == tmp[i])]))
-    # }
-
-
-    #------------------------------------Make genome-wide gain_sims/loss_sims plot
-    #-------------------------Make genome-wide gain_sims/loss_sims plot comparison
+    #---------------Make genome-wide gain_sims/loss_sims plot comparison
     df_plot <- data.frame(
         x = 1:length(f1_sims),
         gain_sims = f1_sims,
@@ -182,15 +171,9 @@ plot_gainloss <- function(copynumber_sims,
         limits = c(0, nrow(df_plot)), expand = c(0, 0)
     ) +
         theme(axis.text.x = element_text(size = 10))
-
-    grid.arrange(
-        p_sims,
-        p_data,
-        ncol = 1
-    )
-
+    #---Print the two plots
+    grid.arrange(p_sims, p_data, ncol = 1)
     p <- arrangeGrob(p_sims, p_data, ncol = 1)
-
     print(p)
 }
 
@@ -208,7 +191,6 @@ calc_state_mode <- function(states) {
 normalize_cell_ploidy <- function(copynumber_sims) {
     cell_ids <- colnames(copynumber_sims)
     cell_ids <- cell_ids[!(cell_ids %in% c("chr", "start", "end", "width"))]
-
     for (cell_id in cell_ids) {
         state_mode <- calc_state_mode(copynumber_sims[[cell_id]])
         copynumber_sims[[cell_id]] <- as.integer(ceiling(
