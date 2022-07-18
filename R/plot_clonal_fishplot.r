@@ -223,9 +223,11 @@ plot_clonal_fishplot <- function(model = "",
         filename <- paste(model, "_sim", i, "_clonal_fishplot", ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
         #---Set clonal colors
+        # vec_cols <- rainbow(nrow(table_clonal_populations))
         qual_col_pals <- brewer.pal.info[brewer.pal.info$category == "qual", ]
         col_vector <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
         vec_cols <- sample(col_vector, nrow(table_clonal_populations))
+        vec_cols[which(vec_clonal_labels == "Others")] <- "gray"
         #---Create fish object
         fish <- createFishObject(table_clonal_populations, vec_clonal_parentage, timepoints = vec_time, col = vec_cols)
         #---Set vertical time lines
@@ -235,15 +237,26 @@ plot_clonal_fishplot <- function(model = "",
         vlines_tit <- c("T=0", vlines_tit)
         #---Create fish plot for clonal evolution
         fish <- layoutClones(fish)
-        p <- fishPlot(fish, shape = "polygon", vlines = vlines_pos, vlab = vlines_tit, cex.vlab = 3, bg.type = "solid")
+        p <- fishPlot(fish,
+            shape = "polygon",
+            pad.left = 0,
+            border = 0.1,
+            col.border = "black",
+            vlines = vlines_pos,
+            vlab = vlines_tit,
+            col.vline = "black",
+            cex.vlab = 3,
+            bg.type = "solid",
+            bg.col = "white"
+        )
         #---Draw legend
         vec_legend_leaf <- vec_clonal_labels[which(vec_clonal_labels %in% clone_phylogeny_labels)]
         vec_legend_others <- setdiff(vec_clonal_labels, vec_legend_leaf)
         #   Draw legend for leaf clones
         n_clones_per_row <- 19
-        x_start <- -15
+        x_start <- 5
+        x_space <- (floor(vec_time[length(vec_time)] - x_start) / n_clones_per_row)
         y_start <- 20
-        x_space <- 5
         y_space <- 5
         for (ind in 1:length(vec_legend_leaf)) {
             lab <- vec_legend_leaf[ind]
@@ -258,12 +271,13 @@ plot_clonal_fishplot <- function(model = "",
             x <- x_start + (column - 1) * x_space
             y <- y_start - (row - 1) * y_space
             p <- p + points(x = x, y = y, pch = 21, col = "black", bg = col, cex = 5)
-            p <- p + text(x = x + 2, y = y, labels = lab, cex = 2, adj = c(0, NA))
+            p <- p + text(x = x + 1, y = y, labels = lab, cex = 2, adj = c(0, NA))
         }
         #   Draw legend for other clones
         n_clones_per_row <- 5
+        x_start <- 5
+        x_space <- (floor(vec_time[length(vec_time)] - x_start) / n_clones_per_row)
         y_start <- y - y_space
-        x_space <- 20
         y_space <- 5
         for (ind in 1:length(vec_legend_others)) {
             lab <- vec_legend_others[ind]
@@ -278,7 +292,7 @@ plot_clonal_fishplot <- function(model = "",
             x <- x_start + (column - 1) * x_space
             y <- y_start - (row - 1) * y_space
             p <- p + points(x = x, y = y, pch = 21, col = "black", bg = col, cex = 5)
-            p <- p + text(x = x + 2, y = y, labels = lab, cex = 2, adj = c(0, NA))
+            p <- p + text(x = x + 1, y = y, labels = lab, cex = 2, adj = c(0, NA))
         }
         #---Print complete plot
         tmp <- print(p)

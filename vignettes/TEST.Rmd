@@ -305,12 +305,12 @@ A variety of plots from the simulation:
 ```{r}
 # plot_all(model = model_name,n_simulations = n_simulations)
 
-# n_simulations<-1
+n_simulations<-1
 
 plot_clonal_fishplot(
     model = model_name,
     n_simulations = n_simulations,
-    vec_time = seq(0, 80, by = 1),
+    vec_time = seq(0, 80, by = 0.1),
     unit_time = "year",
     width = 2000,
     height = 1000
