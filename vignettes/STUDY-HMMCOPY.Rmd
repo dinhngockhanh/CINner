@@ -48,7 +48,6 @@ cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
 Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
-# Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
 T_tau_step                          <- cell_lifespan/2
 CN_bin_length                       <- 500000
 
@@ -181,7 +180,6 @@ Rename the "original" simulation and its plots:
 
 ```{r}
 file.rename(paste(model_name, "_simulation_1.rda", sep = ""), paste(model_name, "_simulation_original.rda", sep = ""))
-
 file.rename(paste(model_name, "_sim1_clonal_fishplot.jpeg", sep = ""), paste(model_name, "_original_clonal_fishplot.jpeg", sep = ""))
 file.rename(paste(model_name, "_sim1_clonal_phylo.jpeg", sep = ""), paste(model_name, "_original_clonal_phylo.jpeg", sep = ""))
 file.rename(paste(model_name, "_sim1_CN_minor_cnTRUTH_phyloTRUTH.jpeg", sep = ""), paste(model_name, "_original_CN_minor.jpeg", sep = ""))
@@ -216,7 +214,8 @@ table_gc            <<- read.table(paste(model_name, "-input-gc.csv", sep = ""),
 gc_int              <<- 0
 num_reads           <<- 2e6
 vec.gc_slope        <- c(1)
-vec.sigma1          <- c(1e-3,1e-2,1e-1)
+vec.sigma1          <- c(1e-3)
+# vec.sigma1          <- c(1e-3,1e-2,1e-1)
 ```
 
 Create noisy readcounts for each parameter set:

@@ -35,7 +35,6 @@ plot_clonal_fishplot <- function(model = "",
         evolution_traj_population <- simulation$clonal_evolution$evolution_traj_population
         #-------------------------------------Input the clonal phylogeny
         clone_phylogeny_labels <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_labels
-        clone_phylogeny_ID <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_ID
         clone_phylogeny_origin <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_origin
         clone_phylogeny_genotype <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_genotype
         clone_hclust_nodes <- simulation$sample_phylogeny$package_clone_phylogeny$clone_hclust_nodes
@@ -169,33 +168,120 @@ plot_clonal_fishplot <- function(model = "",
             vec_row[vec_fix] <- 100
             table_clonal_populations[row, ] <- vec_row
         }
+        #--------------------------------------Name the ancestral clones
+        vec_ancestral_clones <- which(vec_clonal_labels == "")
+        for (j in 1:length(vec_ancestral_clones)) {
+            ancestral_clone <- vec_ancestral_clones[j]
+            vec_children_ind <- which(vec_clonal_parentage == ancestral_clone)
+            vec_children <- vec_clonal_labels[vec_children_ind]
+            while ("" %in% vec_children) {
+                vec_loc <- which(vec_children == "")
+                vec_ind <- vec_children_ind[vec_loc]
+                vec_children_ind <- vec_children_ind[-vec_loc]
+                for (k in 1:length(vec_ind)) {
+                    vec_children_ind <- c(vec_children_ind, which(vec_clonal_parentage == vec_ind[k]))
+                }
+                vec_children <- vec_clonal_labels[vec_children_ind]
+            }
+            label <- paste("Ancestor(", vec_children[1], sep = "")
+            if (length(vec_children) >= 2) {
+                for (k in 2:length(vec_children)) {
+                    label <- paste(label, ", ", vec_children[k], sep = "")
+                }
+            }
+            label <- paste(label, ")", sep = "")
+            vec_clonal_labels[ancestral_clone] <- label
+        }
+        #---------------------------------------------Reorder the clones
+        #   Reorder labels alphabetically
+        vec_clonal_labels_new <- c(clone_phylogeny_labels, sort(setdiff(vec_clonal_labels, clone_phylogeny_labels)))
+        #   Reorder table of clonal percentages
+        table_clonal_populations_new <- matrix(0, nrow = nrow(table_clonal_populations), ncol = ncol(table_clonal_populations))
+        for (j in 1:length(vec_clonal_labels_new)) {
+            label <- vec_clonal_labels_new[j]
+            loc <- which(vec_clonal_labels == label)
+            table_clonal_populations_new[j, ] <- table_clonal_populations[loc, ]
+        }
+        #   Reorder vector of clonal parentage
+        vec_clonal_parentage_new <- rep(0, length = length(vec_clonal_parentage))
+        for (j in 1:length(vec_clonal_labels_new)) {
+            label <- vec_clonal_labels_new[j]
+            loc <- which(vec_clonal_labels == label)
+            parent_old <- vec_clonal_parentage[loc]
+            if (parent_old == 0) {
+                parent_new <- 0
+            } else {
+                parent_new <- which(vec_clonal_labels_new == vec_clonal_labels[parent_old])
+            }
+            vec_clonal_parentage_new[j] <- parent_new
+        }
+        #   Reorder everything
+        vec_clonal_labels <- vec_clonal_labels_new
+        table_clonal_populations <- table_clonal_populations_new
+        vec_clonal_parentage <- vec_clonal_parentage_new
         #--------------------------------------Plot the clonal evolution
-        #   Create fish object
-        # fish <- createFishObject(table_clonal_populations, vec_clonal_parentage, timepoints = vec_time)
-        fish <- createFishObject(table_clonal_populations, vec_clonal_parentage, timepoints = vec_time, clone.labels = vec_clonal_labels)
-        #   Set clonal colors
-        qual_col_pals <- brewer.pal.info[brewer.pal.info$category == "qual", ]
-        col_vector <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
-        cols <- sample(col_vector, nrow(table_clonal_populations))
-        fish <- setCol(fish, cols)
-
-
-        #
-        vlines_pos <- Table_sampling$Age_sample
-        vlines_sample_id <- Table_sampling$Sample_ID
-        vlines_tit <- paste(vlines_sample_id, " (T=", as.character(vlines_pos), ")", sep = "")
-        vlines_pos <- c(0, vlines_pos)
-        vlines_tit <- c("T=0", vlines_tit)
-
-        #   Create fish plot for clonal evolution
-        fish <- layoutClones(fish)
         filename <- paste(model, "_sim", i, "_clonal_fishplot", ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
+        #---Set clonal colors
+        qual_col_pals <- brewer.pal.info[brewer.pal.info$category == "qual", ]
+        col_vector <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+        vec_cols <- sample(col_vector, nrow(table_clonal_populations))
+        #---Create fish object
+        fish <- createFishObject(table_clonal_populations, vec_clonal_parentage, timepoints = vec_time, col = vec_cols)
+        #---Set vertical time lines
+        vlines_pos <- Table_sampling$Age_sample
+        vlines_tit <- paste(Table_sampling$Sample_ID, " (T=", as.character(vlines_pos), ")", sep = "")
+        vlines_pos <- c(0, vlines_pos)
+        vlines_tit <- c("T=0", vlines_tit)
+        #---Create fish plot for clonal evolution
+        fish <- layoutClones(fish)
         p <- fishPlot(fish, shape = "polygon", vlines = vlines_pos, vlab = vlines_tit, cex.vlab = 3, bg.type = "solid")
-
-        drawLegend(fish, xpos = -20, ypos = 25, cex = 4)
-
-        print(p)
+        #---Draw legend
+        vec_legend_leaf <- vec_clonal_labels[which(vec_clonal_labels %in% clone_phylogeny_labels)]
+        vec_legend_others <- setdiff(vec_clonal_labels, vec_legend_leaf)
+        #   Draw legend for leaf clones
+        n_clones_per_row <- 19
+        x_start <- -15
+        y_start <- 20
+        x_space <- 5
+        y_space <- 5
+        for (ind in 1:length(vec_legend_leaf)) {
+            lab <- vec_legend_leaf[ind]
+            col <- vec_cols[which(vec_clonal_labels == lab)]
+            column <- ind %% n_clones_per_row
+            if (column == 0) {
+                column <- n_clones_per_row
+                row <- ind %/% n_clones_per_row
+            } else {
+                row <- ind %/% n_clones_per_row + 1
+            }
+            x <- x_start + (column - 1) * x_space
+            y <- y_start - (row - 1) * y_space
+            p <- p + points(x = x, y = y, pch = 21, col = "black", bg = col, cex = 5)
+            p <- p + text(x = x + 2, y = y, labels = lab, cex = 2, adj = c(0, NA))
+        }
+        #   Draw legend for other clones
+        n_clones_per_row <- 5
+        y_start <- y - y_space
+        x_space <- 20
+        y_space <- 5
+        for (ind in 1:length(vec_legend_others)) {
+            lab <- vec_legend_others[ind]
+            col <- vec_cols[which(vec_clonal_labels == lab)]
+            column <- ind %% n_clones_per_row
+            if (column == 0) {
+                column <- n_clones_per_row
+                row <- ind %/% n_clones_per_row
+            } else {
+                row <- ind %/% n_clones_per_row + 1
+            }
+            x <- x_start + (column - 1) * x_space
+            y <- y_start - (row - 1) * y_space
+            p <- p + points(x = x, y = y, pch = 21, col = "black", bg = col, cex = 5)
+            p <- p + text(x = x + 2, y = y, labels = lab, cex = 2, adj = c(0, NA))
+        }
+        #---Print complete plot
+        tmp <- print(p)
         dev.off()
     }
 }

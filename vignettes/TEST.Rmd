@@ -82,13 +82,21 @@ CN_bin_length                       <- 500000
 We have to set up the probability that each class of CN events occurs in a cell division. The local events (chromosome, chromosome-arm or focal level), if happening, will occur on a random location among eligible places.
 
 ```{r}
-prob_CN_whole_genome_duplication    <- 3e-4
-prob_CN_missegregation              <- 7e-4
-prob_CN_chrom_arm_missegregation    <- 2e-4
-prob_CN_focal_amplification         <- 7e-4
-prob_CN_focal_deletion              <- 2e-4
-prob_CN_cnloh_interstitial          <- 4e-4
-prob_CN_cnloh_terminal              <- 6e-4
+prob_CN_whole_genome_duplication    <- 0.5*3e-4
+prob_CN_missegregation              <- 0.5*7e-4
+prob_CN_chrom_arm_missegregation    <- 0.5*2e-4
+prob_CN_focal_amplification         <- 0.5*7e-4
+prob_CN_focal_deletion              <- 0.5*2e-4
+prob_CN_cnloh_interstitial          <- 0.5*4e-4
+prob_CN_cnloh_terminal              <- 0.5*6e-4
+
+# prob_CN_whole_genome_duplication    <- 3e-4
+# prob_CN_missegregation              <- 7e-4
+# prob_CN_chrom_arm_missegregation    <- 2e-4
+# prob_CN_focal_amplification         <- 7e-4
+# prob_CN_focal_deletion              <- 2e-4
+# prob_CN_cnloh_interstitial          <- 4e-4
+# prob_CN_cnloh_terminal              <- 6e-4
 ```
 
 The focal and CNLOH events require the geometric parameters for the length (in bin count) of the DNA region being affected.
@@ -264,36 +272,47 @@ stage_final       <- 3
 n_clones_min      <- 1
 n_clones_max      <- Inf
 
-start_time = Sys.time()
-simulator_full_program(
-    model = model_name,
-    n_simulations = n_simulations,
-    stage_final = stage_final,
-    n_clones_min = n_clones_min,
-    n_clones_max = n_clones_max,
-
-    save_simulation = FALSE,
-    internal_nodes_cn_info = FALSE,
-    save_newick_tree = FALSE,
-
-    save_cn_profile = FALSE,
-    model_readcount = FALSE,
-    format_cn_profile = "both",
-
-    apply_HMM = FALSE,
-    apply_UMAP_on_HMM = FALSE,
-
-    report_progress = TRUE,
-    seed = 10,
-
-    compute_parallel = FALSE
-)
-end_time = Sys.time()
-print(end_time - start_time)
+# start_time = Sys.time()
+# simulator_full_program(
+#     model = model_name,
+#     n_simulations = n_simulations,
+#     stage_final = stage_final,
+#     n_clones_min = n_clones_min,
+#     n_clones_max = n_clones_max,
+#
+#     save_simulation = TRUE,
+#     internal_nodes_cn_info = FALSE,
+#     save_newick_tree = FALSE,
+#
+#     save_cn_profile = FALSE,
+#     model_readcount = FALSE,
+#     format_cn_profile = "both",
+#
+#     apply_HMM = FALSE,
+#     apply_UMAP_on_HMM = FALSE,
+#
+#     report_progress = TRUE,
+#     seed = 10,
+#
+#     compute_parallel = FALSE
+# )
+# end_time = Sys.time()
+# print(end_time - start_time)
 ```
 
 A variety of plots from the simulation:
 
 ```{r}
-plot_all(model = model_name,n_simulations = n_simulations)
+# plot_all(model = model_name,n_simulations = n_simulations)
+
+# n_simulations<-1
+
+plot_clonal_fishplot(
+    model = model_name,
+    n_simulations = n_simulations,
+    vec_time = seq(0, 80, by = 1),
+    unit_time = "year",
+    width = 2000,
+    height = 1000
+)
 ```
