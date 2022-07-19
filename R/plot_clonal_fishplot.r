@@ -131,9 +131,11 @@ plot_clonal_fishplot <- function(model = "",
             vec_clonal_parentage[clone_daughter] <- clone_mother
         }
         #   Remove unnecessary clones from existence
-        table_clonal_populations <- table_clonal_populations[-vec_unnecessary_clones, ]
-        vec_clonal_parentage <- vec_clonal_parentage[-vec_unnecessary_clones]
-        vec_clonal_labels <- vec_clonal_labels[-vec_unnecessary_clones]
+        if (length(vec_unnecessary_clones) > 0) {
+            table_clonal_populations <- table_clonal_populations[-vec_unnecessary_clones, ]
+            vec_clonal_parentage <- vec_clonal_parentage[-vec_unnecessary_clones]
+            vec_clonal_labels <- vec_clonal_labels[-vec_unnecessary_clones]
+        }
         #   Correct clone indices for remaining clones
         for (node in 1:length(vec_clonal_parentage)) {
             mother_old <- vec_clonal_parentage[node]

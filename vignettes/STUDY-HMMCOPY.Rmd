@@ -47,24 +47,33 @@ Save parameters to build one simulation:
 cell_lifespan                       <- 30
 T_0                                 <- list(0,'year')
 T_end                               <- list(80,'year')
-Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
 T_tau_step                          <- cell_lifespan/2
 CN_bin_length                       <- 500000
+########################################################################
+########################################################################
+########################################################################
+Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=4,Age_sample=80)
+# Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
 
-prob_CN_whole_genome_duplication    <- 1e-4
-prob_CN_missegregation              <- 7e-4
-prob_CN_chrom_arm_missegregation    <- 2e-4
-prob_CN_focal_amplification         <- 7e-4
-prob_CN_focal_deletion              <- 2e-4
-prob_CN_cnloh_interstitial          <- 4e-4
-prob_CN_cnloh_terminal              <- 6e-4
-# prob_CN_whole_genome_duplication    <- 3e-4
+
+
+# prob_CN_whole_genome_duplication    <- 1e-4
 # prob_CN_missegregation              <- 7e-4
 # prob_CN_chrom_arm_missegregation    <- 2e-4
 # prob_CN_focal_amplification         <- 7e-4
 # prob_CN_focal_deletion              <- 2e-4
 # prob_CN_cnloh_interstitial          <- 4e-4
 # prob_CN_cnloh_terminal              <- 6e-4
+prob_CN_whole_genome_duplication    <- 3e-4
+prob_CN_missegregation              <- 7e-4
+prob_CN_chrom_arm_missegregation    <- 2e-4
+prob_CN_focal_amplification         <- 7e-4
+prob_CN_focal_deletion              <- 2e-4
+prob_CN_cnloh_interstitial          <- 4e-4
+prob_CN_cnloh_terminal              <- 6e-4
+########################################################################
+########################################################################
+########################################################################
 prob_CN_focal_amplification_length  <- 0.5
 prob_CN_focal_deletion_length       <- 0.5
 prob_CN_cnloh_interstitial_length   <- 0.5
@@ -154,7 +163,7 @@ simulator_full_program(
     n_clones_max = n_clones_max,
     save_simulation = TRUE,
     internal_nodes_cn_info = FALSE,
-    save_newick_tree = TRUE,
+    save_newick_tree = FALSE,
     save_cn_profile = TRUE,
     model_readcount = FALSE,
     format_cn_profile = "both",
@@ -213,9 +222,15 @@ Set up variables for the noisy readcount model:
 table_gc            <<- read.table(paste(model_name, "-input-gc.csv", sep = ""), header = TRUE, sep = ",")
 gc_int              <<- 0
 num_reads           <<- 2e6
-vec.gc_slope        <- c(1)
-vec.sigma1          <- c(1e-3)
+########################################################################
+########################################################################
+########################################################################
+vec.gc_slope        <- c(1,10)
+vec.sigma1          <- c(1e-2,1e-1)
 # vec.sigma1          <- c(1e-3,1e-2,1e-1)
+########################################################################
+########################################################################
+########################################################################
 ```
 
 Create noisy readcounts for each parameter set:
@@ -225,7 +240,8 @@ ind                 <- 0
 for (row in 1:length(vec.gc_slope)){
     for (col in 1:length(vec.sigma1)){
         ind         <- ind+1
-        file.copy(paste(model_name, "_simulation_original.rda", sep = ""), paste(model_name, "_simulation_", ind,".rda", sep = ""))
+        # filename_original   <- paste(model_name, "_simulation_original.rda", sep = "")
+        # file.copy(filename_original, filename_ind)
         #   Load variables for the noisy readcount model
         gc_slope    <<- vec.gc_slope[row]
         sigma1      <<- vec.sigma1[col]
@@ -233,6 +249,8 @@ for (row in 1:length(vec.gc_slope)){
         simulation  <- p2_readcount_model(simulation_original, TRUE)
         simulation  <- p2_readcount_model_wide(simulation, TRUE)
         #   Save noisy readcounts
+        filename_ind            <- paste(model_name, "_simulation_", ind,".rda", sep = "")
+        save(simulation, file = filename_ind)
         sample_cell_ID          <- simulation$sample$sample_cell_ID
         noisy_cn_profiles_long  <- simulation$sample$noisy_cn_profiles_long
         noisy_cn_profiles_wide  <- simulation$sample$noisy_cn_profiles_wide
@@ -256,7 +274,7 @@ Run file `hmmcopy.bash` which runs HMMcopy for each parameter set:
 ```{r}
 start_time = Sys.time()
 n_trials            <- length(vec.gc_slope)*length(vec.sigma1)
-flag_parallel       <- 1
+flag_parallel       <- 0
 system("chmod -x hmmcopy.bash")
 system(paste("bash hmmcopy.bash ", model_name, " ", n_trials, " ", flag_parallel, sep = ""))
 end_time = Sys.time()
@@ -281,4 +299,17 @@ plot_cn_heatmap(
     width = 1000,
     height = 1000
 )
+```
+
+```{r}
+plot_gc_readcount(
+    model = model_name,
+    n_simulations = n_trials,
+    width = 1000,
+    height = 1000
+)
+```
+
+```{r}
+
 ```

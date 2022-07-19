@@ -15,13 +15,15 @@ library(RColorBrewer)
 library(ape)
 
 library(gridExtra)
+
+library("readxl")
 #-----------------------------------------------------------------------
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
-library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
 ```
 
 #   Get the gain-loss map from PCAWG
@@ -117,27 +119,32 @@ model_variables   <- BUILD_general_variables(
 ########################################################################
 ##########################   2nd block: driver genes and selection rates
 ########################################################################
-vec_driver_genes  <- c(
-    'TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
-    'MLH1','PIK3R1','ERBB2','CTNNB1','PPP2R1A'
-)
-vec_driver_role   <- c(
-    'TSG','TSG','TSG','TSG','TSG','TSG',
-    'TSG','TSG','ONCOGENE','ONCOGENE','TSG'
-)
-vec_driver_s      <- rep(0.003,length(vec_driver_genes))
-vec_driver_s[1]   <- 0.01
-vec_driver_s[2]   <- 0.005
-vec_driver_s[3]   <- 0.005
-########################################################################
-########################################################################
-########################################################################
+driver_gene_list    <- read_excel("HGSOC_driver_genes.xlsx")
+vec_driver_genes    <- driver_gene_list$Gene_ID
+vec_driver_role     <- driver_gene_list$Gene_role
+vec_chromosome      <- driver_gene_list$Chromosome
+vec_bin             <- round(driver_gene_list$Start/CN_bin_length)
+
+
+
+vec_driver_s        <- rep(0.003,length(vec_driver_genes))
+vec_driver_s[which(vec_driver_genes=='TP53')]   <- 0.01
+vec_driver_s[which(vec_driver_genes=='BRCA1')]  <- 0.005
+vec_driver_s[which(vec_driver_genes=='BRCA2')]  <- 0.005
+
+
+
 model_variables   <- BUILD_driver_library(
     model_variables=model_variables,
     vec_driver_genes=vec_driver_genes,
     vec_driver_role=vec_driver_role,
+    vec_chromosome=vec_chromosome,
+    vec_bin=vec_bin,
     vec_driver_s=vec_driver_s
 )
+########################################################################
+########################################################################
+########################################################################
 cell_count        <- 20
 CN_matrix         <- BUILD_cn_normal_XX(model_variables$cn_info)
 drivers           <- list()

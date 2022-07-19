@@ -9,13 +9,13 @@ declare -a Cell_count
 INPUT="${model_name}-input-sampling.csv"
 i=0
 {
-    read
-    while IFS=, read -r next_Sample_ID next_Cell_count next_Age_sample next_T_sample
-    do
-          Sample_ID[$i]=$next_Sample_ID
-          Cell_count[$i]=$next_Cell_count
-          i=$((i+1))
-    done
+      read
+      while IFS=, read -r next_Sample_ID next_Cell_count next_Age_sample next_T_sample
+      do
+           Sample_ID[$i]=$next_Sample_ID
+           Cell_count[$i]=$next_Cell_count
+           i=$((i+1))
+      done
 } < ${INPUT}
 N_sample=${#Sample_ID[@]}
 #------------------------------Function to run HMMcopy for a single cell
@@ -71,6 +71,7 @@ var_map_filename="${model_name}_map.wig"
 #-----Run HMMcopy for each simulation/sample/cell
 if [[ $flag_parallel -eq 0 ]]
 then
+      #-----Run HMMcopy in sequential mode
       for (( simulation=1; simulation<=${n_simulations}; simulation++));
       do
             for (( sample=0; sample<${N_sample}; sample++ ));
@@ -87,6 +88,7 @@ then
             done
       done
 else
+      #-----Run HMMcopy in parallel mode
       for (( simulation=1; simulation<=${n_simulations}; simulation++));
       do
             for (( sample=0; sample<${N_sample}; sample++ ));
