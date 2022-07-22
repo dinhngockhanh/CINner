@@ -9,24 +9,6 @@ plot_gc_readcount <- function(model = "",
         load(filename)
         #----------------------Input the data frame of GC and readcounts
         noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
-<<<<<<< HEAD
-<<<<<<< HEAD
-        df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads")]
-        vec_delete <- which(df_plot$gc < 0 | df_plot$map < 0)
-        if (length(vec_delete) > 0) {
-            df_plot <- df_plot[-vec_delete, ]
-        }
-        #------------------------------Plot readcounts versus GC content
-        filename <- paste(model, "_sim", i, "_reads_vs_GC", ".jpeg", sep = "")
-        jpeg(file = filename, width = width, height = height)
-        p <- ggplot(df_plot, aes(x = gc, y = reads)) +
-            geom_point(colour = "blue", size = 2) +
-=======
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
-
-
-
         #-------------------------------Compute cell ploidy = average CN
         noisy_cn_profiles_long$true_ploidy <- 0
         list_cell_id <- unique(noisy_cn_profiles_long$cell_id)
@@ -36,9 +18,6 @@ plot_gc_readcount <- function(model = "",
         }
         noisy_cn_profiles_long$multiplier <- noisy_cn_profiles_long$true_CN / noisy_cn_profiles_long$true_ploidy
         noisy_cn_profiles_long$CN <- paste(noisy_cn_profiles_long$multiplier, "x ploidy", sep = "")
-
-
-
         #--------------------------------Extract data frame for plotting
         df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads", "CN")]
         df_plot$CN <- factor(df_plot$CN, levels = paste(sort(unique(noisy_cn_profiles_long$multiplier), decreasing = TRUE), "x ploidy", sep = ""))
@@ -46,18 +25,12 @@ plot_gc_readcount <- function(model = "",
         if (length(vec_delete) > 0) {
             df_plot <- df_plot[-vec_delete, ]
         }
-
-
         #------------------------------Plot readcounts versus GC content
         filename <- paste(model, "_sim", i, "_reads_vs_GC", ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
         p <- ggplot(df_plot, aes(x = gc, y = reads, col = CN)) +
             geom_point(alpha = 0.05) +
             geom_smooth(na.rm = TRUE, method = "lm", se = TRUE) +
-<<<<<<< HEAD
->>>>>>> 4990b5b... New driver list for HGSOC
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
             xlab("GC content") +
             ylab("Readcounts") +
             theme(panel.background = element_rect(fill = "white", colour = "grey50")) +

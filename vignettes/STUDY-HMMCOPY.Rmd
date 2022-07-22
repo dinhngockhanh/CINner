@@ -39,6 +39,33 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
+# Analyze the noise in DLP+ data
+
+```{r}
+#---ov2295_cell_cn.csv: downloaded from https://zenodo.org/record/3445364#.Ytq9ji-B3Pw
+ov2295_cn       <- read.csv(file = 'test_cell_cn.csv')
+# ov2295_cn       <- read.csv(file = 'ov2295_cell_cn.csv')
+gc              <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+
+analysis_dlp_cn(CNbins = ov2295_cn, gc = gc)
+
+```
+
+
+
+```{r}
+```
+
+
+
+
+
+
+
+
+
+
+
 # Create one simulation
 
 Save parameters to build one simulation:
@@ -52,17 +79,6 @@ CN_bin_length                       <- 500000
 ########################################################################
 ########################################################################
 ########################################################################
-<<<<<<< HEAD
-<<<<<<< HEAD
-Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=4,Age_sample=80)
-# Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
-
-
-
-# prob_CN_whole_genome_duplication    <- 1e-4
-=======
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
 Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
 # Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
 
@@ -84,36 +100,8 @@ prob_CN_cnloh_terminal              <- 0e-4
 # prob_CN_cnloh_interstitial          <- 4e-4
 # prob_CN_cnloh_terminal              <- 6e-4
 
-# prob_CN_whole_genome_duplication    <- 3e-4
->>>>>>> 4990b5b... New driver list for HGSOC
-# prob_CN_missegregation              <- 7e-4
-# prob_CN_chrom_arm_missegregation    <- 2e-4
-# prob_CN_focal_amplification         <- 7e-4
-# prob_CN_focal_deletion              <- 2e-4
-# prob_CN_cnloh_interstitial          <- 4e-4
-# prob_CN_cnloh_terminal              <- 6e-4
-<<<<<<< HEAD
-<<<<<<< HEAD
-prob_CN_whole_genome_duplication    <- 3e-4
-prob_CN_missegregation              <- 7e-4
-prob_CN_chrom_arm_missegregation    <- 2e-4
-prob_CN_focal_amplification         <- 7e-4
-prob_CN_focal_deletion              <- 2e-4
-prob_CN_cnloh_interstitial          <- 4e-4
-prob_CN_cnloh_terminal              <- 6e-4
-########################################################################
-########################################################################
-########################################################################
-prob_CN_focal_amplification_length  <- 0.5
-prob_CN_focal_deletion_length       <- 0.5
-prob_CN_cnloh_interstitial_length   <- 0.5
-prob_CN_cnloh_terminal_length       <- 0.5
-=======
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
-########################################################################
-########################################################################
-########################################################################
+
+
 prob_CN_focal_amplification_length  <- 0.1
 prob_CN_focal_deletion_length       <- 0.1
 prob_CN_cnloh_interstitial_length   <- 0.1
@@ -123,10 +111,9 @@ prob_CN_cnloh_terminal_length       <- 0.1
 # prob_CN_focal_deletion_length       <- 0.5
 # prob_CN_cnloh_interstitial_length   <- 0.5
 # prob_CN_cnloh_terminal_length       <- 0.5
-<<<<<<< HEAD
->>>>>>> 4990b5b... New driver list for HGSOC
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
+########################################################################
+########################################################################
+########################################################################
 rate_driver                         <- 8e-16
 rate_passenger                      <- 1e-11
 selection_model                     <- 'old'
@@ -274,21 +261,9 @@ num_reads           <<- 2e6
 ########################################################################
 ########################################################################
 ########################################################################
-<<<<<<< HEAD
-<<<<<<< HEAD
-vec.gc_slope        <- c(1,10)
-vec.sigma1          <- c(1e-2,1e-1)
-# vec.sigma1          <- c(1e-3,1e-2,1e-1)
-=======
 vec.sigma1          <- seq(1,9,by=2)*1e-2
 # vec.sigma1          <- c(1e-3,1e-2,1e-1)
 vec.gc_slope        <- c(1)
->>>>>>> 4990b5b... New driver list for HGSOC
-=======
-vec.sigma1          <- seq(1,9,by=2)*1e-2
-# vec.sigma1          <- c(1e-3,1e-2,1e-1)
-vec.gc_slope        <- c(1)
->>>>>>> 4990b5b (New driver list for HGSOC)
 ########################################################################
 ########################################################################
 ########################################################################
@@ -333,28 +308,18 @@ for (row in 1:length(vec.gc_slope)){
 Run file `hmmcopy.bash` which runs HMMcopy for each parameter set:
 
 ```{r}
-<<<<<<< HEAD
-<<<<<<< HEAD
-start_time = Sys.time()
-n_trials            <- length(vec.gc_slope)*length(vec.sigma1)
-flag_parallel       <- 0
-system("chmod -x hmmcopy.bash")
-system(paste("bash hmmcopy.bash ", model_name, " ", n_trials, " ", flag_parallel, sep = ""))
-end_time = Sys.time()
-print(end_time - start_time)
-=======
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
-#===========>   RUN ON GINSBURG
+#===========>   RUN ON GINSBURG:
 #   Step 1:     Copy hmmcopy_v0.0.45.sif to folder HMMCOPY-STUDY (or whatever workplace)
 #   Step 2:     Copy folder vignettes to Ginsburg/Terremoto
 #   Step 3:     sbatch ginsburg_hmmcopy.sh
-#===========>   HOW hmmcopy_v0.0.45.sif WAS CREATED
+#===========>   HOW hmmcopy_v0.0.45.sif WAS CREATED:
 #   On Ginsburg/Terremoto:
 #               module load singularity
 #               singularity pull docker://quay.io/mondrianscwgs/hmmcopy:v0.0.45
 
 
+
+#===========    IF RUNNING ON COMPUTER: (EXTREMELY SLOW ON MAC M1)
 # start_time = Sys.time()
 # n_trials            <- length(vec.gc_slope)*length(vec.sigma1)
 # flag_parallel       <- 1
@@ -362,15 +327,12 @@ print(end_time - start_time)
 # system(paste("bash hmmcopy.bash ", model_name, " ", n_trials, " ", flag_parallel, sep = ""))
 # end_time = Sys.time()
 # print(end_time - start_time)
-<<<<<<< HEAD
->>>>>>> 4990b5b... New driver list for HGSOC
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
 ```
 
 Incorporate HMMcopy results back into simulation files:
 
 ```{r}
+n_trials            <- length(vec.gc_slope)*length(vec.sigma1)
 append_with_hmm(model = model_name, n_simulations = n_trials, UMAP = TRUE, pseudo_corrected_readcount = FALSE)
 ```
 
@@ -409,23 +371,6 @@ plot_cn_heatmap(
 )
 ```
 
-
-
 ```{r}
-<<<<<<< HEAD
-<<<<<<< HEAD
-plot_gc_readcount(
-    model = model_name,
-    n_simulations = n_trials,
-    width = 1000,
-    height = 1000
-)
-```
-
-```{r}
-=======
->>>>>>> 4990b5b... New driver list for HGSOC
-=======
->>>>>>> 4990b5b (New driver list for HGSOC)
 
 ```
