@@ -1,5 +1,3 @@
-# =====================================CLEAN VECTOR OF CLONAL POPULATIONS
-# function SIMULATOR_FULL_PHASE_1_clonal_population_cleaning()
 #' @export
 SIMULATOR_FULL_PHASE_1_clonal_population_cleaning <- function() {
     vec_delete <- which(clonal_population_next == 0)
