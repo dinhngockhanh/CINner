@@ -10,6 +10,7 @@ plot_gc_readcount <- function(model = "",
         #----------------------Input the data frame of GC and readcounts
         noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
 <<<<<<< HEAD
+<<<<<<< HEAD
         df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads")]
         vec_delete <- which(df_plot$gc < 0 | df_plot$map < 0)
         if (length(vec_delete) > 0) {
@@ -21,6 +22,8 @@ plot_gc_readcount <- function(model = "",
         p <- ggplot(df_plot, aes(x = gc, y = reads)) +
             geom_point(colour = "blue", size = 2) +
 =======
+=======
+>>>>>>> 4990b5b (New driver list for HGSOC)
 
 
 
@@ -51,7 +54,10 @@ plot_gc_readcount <- function(model = "",
         p <- ggplot(df_plot, aes(x = gc, y = reads, col = CN)) +
             geom_point(alpha = 0.05) +
             geom_smooth(na.rm = TRUE, method = "lm", se = TRUE) +
+<<<<<<< HEAD
 >>>>>>> 4990b5b... New driver list for HGSOC
+=======
+>>>>>>> 4990b5b (New driver list for HGSOC)
             xlab("GC content") +
             ylab("Readcounts") +
             theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
