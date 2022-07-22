@@ -25,9 +25,10 @@ function HMMcopy_one_cell(){
       simulation=$3
       #-----Prepare variables for running HMMcopy
       var_cell_id="$sample_id-Library-${cell}-${cell}"
-      var_input_filename="${model_name}_noisy_cn_profiles_long_${simulation}_$sample_id-Library-${cell}-${cell}.wig"
+      var_input_filename="${model_name}_noisy_cn_profiles_long_${simulation}_$var_cell_id.wig"
       #-----Correct readcounts for GC/mapp biases
-      var_correction_filename="${model_name}_noisy_cn_profiles_long_${simulation}_$sample_id-Library-${cell}-${cell}_hmm_corrected.txt"
+      var_correction_filename="${model_name}_noisy_cn_profiles_long_${simulation}_${var_cell_id}_hmm_corrected.txt"
+      echo "PERFORMING CORRECT_READCOUNT FOR $var_cell_id IN SIMULATION $simulation"
       docker run -v $PWD:$PWD -w $PWD quay.io/mondrianscwgs/hmmcopy:v0.0.45  \
             hmmcopy_utils correct_readcount  \
             --infile $var_input_filename  \
@@ -37,12 +38,13 @@ function HMMcopy_one_cell(){
             --map_wig_file $var_map_filename  \
             --cell_id $var_cell_id
       #-----Infer CN states with HMMcopy
-      tempdir="output-$sample_id-Library-${cell}-${cell}"
-      reads="reads-$sample_id-Library-${cell}-${cell}.csv.gz"
-      metrics="metrics-$sample_id-Library-${cell}-${cell}.csv.gz"
-      params="params-$sample_id-Library-${cell}-${cell}.csv.gz"
-      segments="segments-$sample_id-Library-${cell}-${cell}.csv.gz"
-      var_hmmcopy_tarball="$sample_id-Library-${cell}-${cell}.tar.gz"
+      tempdir="output-$simulation-$var_cell_id"
+      reads="reads-$simulation-$var_cell_id.csv.gz"
+      metrics="metrics-$simulation-$var_cell_id.csv.gz"
+      params="params-$simulation-$var_cell_id.csv.gz"
+      segments="segments-$simulation-$var_cell_id.csv.gz"
+      var_hmmcopy_tarball="$simulation-$var_cell_id.tar.gz"
+      echo "PERFORMING HMMCOPY FOR $var_cell_id IN SIMULATION $simulation"
       docker run -v $PWD:$PWD -w $PWD quay.io/mondrianscwgs/hmmcopy:v0.0.45  \
             hmmcopy_utils run_hmmcopy  \
             --corrected_reads $var_correction_filename  \
@@ -58,8 +60,8 @@ function HMMcopy_one_cell(){
             # --params params.csv.gz \
             # --segments segments.csv.gz \
       #-----Move HMMcopy results outside
-      cp "$tempdir/0/reads.csv" "${model_name}_noisy_cn_profiles_long_${simulation}_$sample_id-Library-${cell}-${cell}_hmm_reads.csv"
-      cp "$tempdir/0/segs.csv" "${model_name}_noisy_cn_profiles_long_${simulation}_$sample_id-Library-${cell}-${cell}_hmm_segs.csv"
+      cp "$tempdir/0/reads.csv" "${model_name}_noisy_cn_profiles_long_${simulation}_${var_cell_id}_hmm_reads.csv"
+      cp "$tempdir/0/segs.csv" "${model_name}_noisy_cn_profiles_long_${simulation}_${var_cell_id}_hmm_segs.csv"
 }
 #----------------------------Run HMMcopy for each simulation/sample/cell
 #-----Copy GC and Mappability WIG files to workspace
@@ -84,7 +86,7 @@ then
                   do
                         HMMcopy_one_cell $cell $sample_id $simulation
                   done
-                  wait
+                  # wait
             done
       done
 else
@@ -101,7 +103,8 @@ else
                   do
                         HMMcopy_one_cell $cell $sample_id $simulation &
                   done
-                  wait
+                  # wait
             done
       done
+      wait
 fi

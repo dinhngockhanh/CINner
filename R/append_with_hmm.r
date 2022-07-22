@@ -50,7 +50,8 @@ append_with_hmm <- function(model = "",
             CNbins <- cn_profiles_long_hmm
 
             clustering_results <- umap_clustering(CNbins,
-                minPts = max(round(pctcells * ncells), 2),
+                minPts = 2,
+                # minPts = max(round(pctcells * ncells), 2),
                 field = "copy",
                 umapmetric = umapmetric,
                 seed = seed
