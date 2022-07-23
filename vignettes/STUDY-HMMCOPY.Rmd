@@ -30,6 +30,8 @@ library(matrixStats)
 library(parallel)
 library(RColorBrewer)
 library(ape)
+
+library(abc)
 #-----------------------------------------------------------------------
 setwd("/Users/dinhngockhanh/CancerSimulator/R/")
 files_sources <- list.files(pattern = "*.r$")
@@ -41,30 +43,13 @@ sapply(files_sources, source)
 
 # Analyze the noise in DLP+ data
 
-```{r}
-#---ov2295_cell_cn.csv: downloaded from https://zenodo.org/record/3445364#.Ytq9ji-B3Pw
-ov2295_cn       <- read.csv(file = 'test_cell_cn.csv')
-# ov2295_cn       <- read.csv(file = 'ov2295_cell_cn.csv')
-gc              <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
-
-analysis_dlp_cn(CNbins = ov2295_cn, gc = gc)
-
-```
-
-
+Here we analyze the noise level in `ov2295_cell_cn.csv`, from https://zenodo.org/record/3445364#.Ytq9ji-B3Pw.
 
 ```{r}
+# ov2295_cn       <<- read.csv(file = 'ov2295_cell_cn.csv')
+# vec_gc          <<- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+# analysis_dlp_cn(CNbins=ov2295_cn,gc=gc,filename_prefix='OV2295')
 ```
-
-
-
-
-
-
-
-
-
-
 
 # Create one simulation
 
@@ -80,7 +65,6 @@ CN_bin_length                       <- 500000
 ########################################################################
 ########################################################################
 Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
-# Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=200,Age_sample=80)
 
 
 
@@ -257,48 +241,35 @@ Set up variables for the noisy readcount model:
 ```{r}
 table_gc            <<- read.table(paste(model_name, "-input-gc.csv", sep = ""), header = TRUE, sep = ",")
 gc_int              <<- 0
-num_reads           <<- 2e6
-########################################################################
-########################################################################
-########################################################################
-vec.sigma1          <- seq(1,9,by=2)*1e-2
-# vec.sigma1          <- c(1e-3,1e-2,1e-1)
-vec.gc_slope        <- c(1)
-########################################################################
-########################################################################
-########################################################################
+gc_slope            <<- 1
+vec.sigma1          <- c(seq(1,9,by=2)*1e-2, rep(0.02642392,length=5))
+vec.num_reads       <- c(rep(3906632,length=5), seq(1,9,by=2)*1e6)
 ```
 
 Create noisy readcounts for each parameter set:
 
 ```{r}
-ind                 <- 0
-for (row in 1:length(vec.gc_slope)){
-    for (col in 1:length(vec.sigma1)){
-        ind         <- ind+1
-        # filename_original   <- paste(model_name, "_simulation_original.rda", sep = "")
-        # file.copy(filename_original, filename_ind)
-        #   Load variables for the noisy readcount model
-        gc_slope    <<- vec.gc_slope[row]
-        sigma1      <<- vec.sigma1[col]
-        #   Create noisy readcounts
-        simulation  <- p2_readcount_model(simulation_original, TRUE)
-        simulation  <- p2_readcount_model_wide(simulation, TRUE)
-        #   Save noisy readcounts
-        filename_ind            <- paste(model_name, "_simulation_", ind,".rda", sep = "")
-        save(simulation, file = filename_ind)
-        sample_cell_ID          <- simulation$sample$sample_cell_ID
-        noisy_cn_profiles_long  <- simulation$sample$noisy_cn_profiles_long
-        noisy_cn_profiles_wide  <- simulation$sample$noisy_cn_profiles_wide
-        filename                <- paste(model_name, "_noisy_cn_profiles_long_", ind, ".csv", sep = "")
-        write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
-        filename                <- paste(model_name, "_noisy_cn_profiles_wide_", ind, ".csv", sep = "")
-        write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
-        for (cell in 1:length(sample_cell_ID)) {
-            cell_ID             <- sample_cell_ID[cell]
-            filename            <- paste(model_name, "/", model_name, "_noisy_cn_profiles_long_", ind, "_", cell_ID, ".wig", sep = "")
-            p2_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
-        }
+ind                         <- 0
+for (ind in 1:length(vec.sigma1)){
+    sigma1                  <<- vec.sigma1[ind]
+    num_reads               <<- vec.num_reads[ind]
+    #   Create noisy readcounts
+    simulation              <- p2_readcount_model(simulation_original, TRUE)
+    simulation              <- p2_readcount_model_wide(simulation, TRUE)
+    #   Save noisy readcounts
+    filename_ind            <- paste(model_name, "_simulation_", ind,".rda", sep = "")
+    save(simulation, file = filename_ind)
+    sample_cell_ID          <- simulation$sample$sample_cell_ID
+    noisy_cn_profiles_long  <- simulation$sample$noisy_cn_profiles_long
+    noisy_cn_profiles_wide  <- simulation$sample$noisy_cn_profiles_wide
+    filename                <- paste(model_name, "_noisy_cn_profiles_long_", ind, ".csv", sep = "")
+    write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
+    filename                <- paste(model_name, "_noisy_cn_profiles_wide_", ind, ".csv", sep = "")
+    write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
+    for (cell in 1:length(sample_cell_ID)) {
+        cell_ID             <- sample_cell_ID[cell]
+        filename            <- paste(model_name, "/", model_name, "_noisy_cn_profiles_long_", ind, "_", cell_ID, ".wig", sep = "")
+        p2_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
     }
 }
 ```
@@ -310,12 +281,15 @@ Run file `hmmcopy.bash` which runs HMMcopy for each parameter set:
 ```{r}
 #===========>   RUN ON GINSBURG:
 #   Step 1:     Copy hmmcopy_v0.0.45.sif to folder HMMCOPY-STUDY (or whatever workplace)
+#   Step 2:     Change model_name & n_simulations in ginsburg_hmmcopy.sh
 #   Step 2:     Copy folder vignettes to Ginsburg/Terremoto
 #   Step 3:     sbatch ginsburg_hmmcopy.sh
 #===========>   HOW hmmcopy_v0.0.45.sif WAS CREATED:
 #   On Ginsburg/Terremoto:
 #               module load singularity
 #               singularity pull docker://quay.io/mondrianscwgs/hmmcopy:v0.0.45
+
+
 
 
 
@@ -350,15 +324,15 @@ plot_gc_readcount(
 Plot the total CN profiles inferred from HMMcopy:
 
 ```{r}
-# plot_cn_heatmap(
-#     model = model_name,
-#     n_simulations = n_trials,
-#     plotcol = "total-copy",
-#     CN_data = "HMM",
-#     phylo = "TRUTH",
-#     width = 1000,
-#     height = 1000
-# )
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_trials,
+    plotcol = "total-copy",
+    CN_data = "HMM",
+    phylo = "TRUTH",
+    width = 1000,
+    height = 1000
+)
 
 plot_cn_heatmap(
     model = model_name,
@@ -369,8 +343,4 @@ plot_cn_heatmap(
     width = 1000,
     height = 1000
 )
-```
-
-```{r}
-
 ```

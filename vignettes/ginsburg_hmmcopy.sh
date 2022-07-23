@@ -14,7 +14,7 @@
 module load singularity
 
 model_name="HMMCOPY-STUDY"
-n_simulations=5
+n_simulations=10
 #-------------------------------Find ID's and cell counts of each sample
 declare -a Sample_ID
 declare -a Cell_count
