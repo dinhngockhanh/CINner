@@ -52,7 +52,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         return(clone_selection_rate)
     }
     #--------------------------Compute selection rates for viable clones
-    if (selection_model == "old") {
+    if (selection_model == "ancient") {
         driver_library_copy <- driver_library
         driver_library_copy$Copy_WT <- 0
         driver_library_copy$Copy_MUT <- 0
@@ -75,15 +75,35 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             }
         }
         #   Compute selection rate
-        clone_selection_rate <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
+        clone_selection_rate <- (s_normalization^mean(vec_CN_all)) *
+            prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
             prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
-        # #   Compute selection rate
-        # clone_selection_rate <- (s_normalization^mean(vec_CN_all)) *
-        #     prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
-        #     prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
+    } else if (selection_model == "old") {
+        driver_library_copy <- driver_library
+        driver_library_copy$Copy_WT <- 0
+        driver_library_copy$Copy_MUT <- 0
+        #   Find WT and MUT allele counts for each driver
+        for (i_driver in 1:nrow(driver_library_copy)) {
+            chrom <- driver_library_copy$Chromosome[i_driver]
+            block <- driver_library_copy$Bin[i_driver]
+            no_strands <- ploidy_chrom[chrom]
+            driver_copy <- 0
+            for (strand in 1:no_strands) {
+                driver_copy <- driver_copy + ploidy_block[[chrom]][[strand]][block]
+            }
+            driver_library_copy$Copy_WT[i_driver] <- driver_copy
+        }
+        if (driver_count >= 1) {
+            for (i_driver in 1:driver_count) {
+                driver_ID <- driver_map[i_driver, 1]
+                driver_library_copy$Copy_MUT[driver_ID] <- driver_library_copy$Copy_MUT[driver_ID] + 1
+                driver_library_copy$Copy_WT[driver_ID] <- driver_library_copy$Copy_WT[driver_ID] - 1
+            }
+        }
+        #   Compute selection rate
+        clone_selection_rate <- (s_normalization^mean(vec_CN_all)) *
+            prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
+            prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     }
-
-
-
     return(clone_selection_rate)
 }

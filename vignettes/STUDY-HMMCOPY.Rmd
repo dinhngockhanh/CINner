@@ -33,12 +33,12 @@ library(ape)
 
 library(abc)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+devtools::install_github("dinhngockhanh/CancerSimulator")
+library(CancerSimulator)
 ```
 
 # Analyze the noise in DLP+ data
@@ -100,7 +100,7 @@ prob_CN_cnloh_terminal_length       <- 0.1
 ########################################################################
 rate_driver                         <- 8e-16
 rate_passenger                      <- 1e-11
-selection_model                     <- 'old'
+selection_model                     <- 'ancient'
 bound_driver                        <- 3
 bound_average_ploidy                <- 4.5
 bound_homozygosity                  <- 500
