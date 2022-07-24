@@ -18,7 +18,7 @@ plot_gc_readcount <- function(model = "",
         }
         noisy_cn_profiles_long$multiplier <- noisy_cn_profiles_long$true_CN / noisy_cn_profiles_long$true_ploidy
         #--------------------------------Extract data frame for plotting
-        df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads",'multiplier')]
+        df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads", "multiplier")]
         vec_delete <- which(df_plot$gc < 0 | df_plot$map < 0 | df_plot$reads == NA | df_plot$reads == NaN | df_plot$reads == Inf)
         if (length(vec_delete) > 0) {
             df_plot <- df_plot[-vec_delete, ]
@@ -40,4 +40,45 @@ plot_gc_readcount <- function(model = "",
         print(p)
         dev.off()
     }
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    # filename <- paste(model_name, "_inferred_ploidy_in_HMM_var=sigma.jpeg", sep = "")
+    # jpeg(file = filename, width = 2000, height = 1000)
+    df<-data.frame(
+        Sigma = rep(vec.sigma1[1:5], 2),
+        Percentage = c(
+            100 * hmm_stats$ploidy_small[1:5] / (hmm_stats$ploidy_small[1:5] + hmm_stats$ploidy_right[1:5] + hmm_stats$ploidy_big[1:5]),
+            100 * hmm_stats$ploidy_big[1:5] / (hmm_stats$ploidy_small[1:5] + hmm_stats$ploidy_right[1:5] + hmm_stats$ploidy_big[1:5])
+        ),
+        Group = c(rep("Inferred ploidy is too small", 5), rep("Inferred ploidy is too big", 5))
+    )
+    df$Sigma <- factor(df$Sigma, levels=vec.sigma1[1:5])
+    p <- ggplot(
+        data = df,
+        aes(x = Sigma, y = Percentage, fill = Group)
+    ) +
+        geom_bar(stat = "identity", position = position_dodge()) +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
+        theme(text = element_text(size = 20), legend.position = "bottom")
+
+    # print(p)
+    # dev.off()
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
 }

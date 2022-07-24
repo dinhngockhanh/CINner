@@ -640,4 +640,6 @@ plot_multivar_all <- function(model_prefix,
         print(p)
         dev.off()
     }
+}       dev.off()
+    }
 }
