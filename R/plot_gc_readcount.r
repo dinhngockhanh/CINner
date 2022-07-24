@@ -17,15 +17,15 @@ plot_gc_readcount <- function(model = "",
             noisy_cn_profiles_long$true_ploidy[vec_loc] <- round(mean(noisy_cn_profiles_long$true_CN[vec_loc]))
         }
         noisy_cn_profiles_long$multiplier <- noisy_cn_profiles_long$true_CN / noisy_cn_profiles_long$true_ploidy
-        noisy_cn_profiles_long$CN <- paste(noisy_cn_profiles_long$multiplier, "x ploidy", sep = "")
         #--------------------------------Extract data frame for plotting
-        df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads", "CN")]
-        df_plot$CN <- factor(df_plot$CN, levels = paste(sort(unique(noisy_cn_profiles_long$multiplier), decreasing = TRUE), "x ploidy", sep = ""))
+        df_plot <- noisy_cn_profiles_long[, c("gc", "map", "reads",'multiplier')]
         vec_delete <- which(df_plot$gc < 0 | df_plot$map < 0 | df_plot$reads == NA | df_plot$reads == NaN | df_plot$reads == Inf)
         if (length(vec_delete) > 0) {
             df_plot <- df_plot[-vec_delete, ]
         }
         #------------------------------Plot readcounts versus GC content
+        df_plot <- df_plot[which(((df_plot$multiplier %% 0.5) == 0) & (df_plot$multiplier <= 1.5)), ]
+        df_plot$CN <- factor(paste(df_plot$multiplier, "x ploidy", sep = ""), levels = paste(sort(unique(df_plot$multiplier), decreasing = TRUE), "x ploidy", sep = ""))
         filename <- paste(model, "_sim", i, "_reads_vs_GC", ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
         p <- ggplot(df_plot, aes(x = gc, y = reads, col = CN)) +
@@ -34,7 +34,9 @@ plot_gc_readcount <- function(model = "",
             xlab("GC content") +
             ylab("Readcounts") +
             theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-            theme(text = element_text(size = 20))
+            theme(text = element_text(size = 20)) +
+            scale_x_continuous(expand = c(0, 0)) +
+            scale_y_continuous(limits = c(0, 3000), expand = c(0, 0))
         print(p)
         dev.off()
     }

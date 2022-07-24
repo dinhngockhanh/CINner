@@ -33,12 +33,12 @@ library(ape)
 
 library(abc)
 #-----------------------------------------------------------------------
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
-library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
 ```
 
 # Analyze the noise in DLP+ data
@@ -148,10 +148,20 @@ vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
     'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
 vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
     'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
-vec_driver_s      <- rep(0.007,length(vec_driver_genes))
-vec_driver_s[1]   <- 0.01
-vec_driver_s[2]   <- 0.009
-vec_driver_s[3]   <- 0.009
+########################################################################
+########################################################################
+########################################################################
+vec_driver_s      <- rep(0.005,length(vec_driver_genes))
+# vec_driver_s[1]   <- 0.009
+
+
+# vec_driver_s      <- rep(0.007,length(vec_driver_genes))
+# vec_driver_s[1]   <- 0.01
+# vec_driver_s[2]   <- 0.009
+# vec_driver_s[3]   <- 0.009
+########################################################################
+########################################################################
+########################################################################
 model_variables   <- BUILD_driver_library(model_variables=model_variables,
     vec_driver_genes=vec_driver_genes,
     vec_driver_role=vec_driver_role,
@@ -244,6 +254,7 @@ gc_int              <<- 0
 gc_slope            <<- 1
 vec.sigma1          <- c(seq(1,9,by=2)*1e-2, rep(0.02642392,length=5))
 vec.num_reads       <- c(rep(3906632,length=5), seq(1,9,by=2)*1e6)
+n_trials            <- length(vec.sigma1)
 ```
 
 Create noisy readcounts for each parameter set:
@@ -306,7 +317,6 @@ Run file `hmmcopy.bash` which runs HMMcopy for each parameter set:
 Incorporate HMMcopy results back into simulation files:
 
 ```{r}
-n_trials            <- length(vec.gc_slope)*length(vec.sigma1)
 append_with_hmm(model = model_name, n_simulations = n_trials, UMAP = TRUE, pseudo_corrected_readcount = FALSE)
 ```
 
