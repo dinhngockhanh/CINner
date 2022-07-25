@@ -53,19 +53,6 @@ statistics_hmm <- function(model = "",
         vec_hmm_cn_big[i] <- hmm_cn_big
         #-----------------------------------------Save simulation record
         save(simulation, file = filename)
-
-
-
-        print("==============")
-        print(i)
-        print("--------------")
-        print(hmm_ploidy_small)
-        print(hmm_ploidy_right)
-        print(hmm_ploidy_big)
-        print("--------------")
-        print(hmm_cn_small)
-        print(hmm_cn_right)
-        print(hmm_cn_big)
     }
     hmm_stats <- list()
 

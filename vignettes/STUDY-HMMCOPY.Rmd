@@ -32,13 +32,14 @@ library(RColorBrewer)
 library(ape)
 
 library(abc)
+library(gridExtra)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+devtools::install_github("dinhngockhanh/CancerSimulator")
+library(CancerSimulator)
 ```
 
 # Analyze the noise in DLP+ data
@@ -46,9 +47,9 @@ sapply(files_sources, source)
 Here we analyze the noise level in `ov2295_cell_cn.csv`, from https://zenodo.org/record/3445364#.Ytq9ji-B3Pw.
 
 ```{r}
-# ov2295_cn       <<- read.csv(file = 'ov2295_cell_cn.csv')
-# vec_gc          <<- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
-# analysis_dlp_cn(CNbins=ov2295_cn,gc=gc,filename_prefix='OV2295')
+ov2295_cn       <<- read.csv(file = 'ov2295_cell_cn.csv')
+table_gc          <<- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+# analysis_dlp_cn(CNbins=ov2295_cn,table_gc=table_gc,filename_prefix='OV2295')
 ```
 
 # Create one simulation
