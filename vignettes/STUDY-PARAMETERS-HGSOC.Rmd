@@ -55,7 +55,7 @@ selection_model                     <- 'chrom-arm-selection'
 
 prob_CN_whole_genome_duplication    <- 0*1e-4
 
-prob_CN_missegregation              <- 0e-4
+prob_CN_missegregation              <- 2e-4
 prob_CN_chrom_arm_missegregation    <- 4e-4
 # prob_CN_missegregation              <- 2e-4
 # prob_CN_chrom_arm_missegregation    <- 8e-4
@@ -63,7 +63,7 @@ prob_CN_chrom_arm_missegregation    <- 4e-4
 # prob_CN_chrom_arm_missegregation    <- 4e-4
 
 prob_CN_focal_amplification         <- 0*1e-4
-prob_CN_focal_deletion              <- 0*2e-4
+prob_CN_focal_deletion              <- 0*1e-4
 prob_CN_cnloh_interstitial          <- 0*1e-4
 prob_CN_cnloh_terminal              <- 0*1e-4
 
