@@ -55,8 +55,8 @@ selection_model                     <- 'chrom-arm-selection'
 
 prob_CN_whole_genome_duplication    <- 0*1e-4
 
-prob_CN_missegregation              <- 0e-4
-prob_CN_chrom_arm_missegregation    <- 10e-4
+prob_CN_missegregation              <- 2e-4
+prob_CN_chrom_arm_missegregation    <- 2e-4
 # prob_CN_missegregation              <- 2e-4
 # prob_CN_chrom_arm_missegregation    <- 8e-4
 # prob_CN_missegregation              <- 4e-4
@@ -152,8 +152,8 @@ vec_end             <- c(model_variables$cn_info$Centromere_location, model_vari
 
 vec_arm_s           <- rep(1,length(vec_id))
 # vec_arm_s[which(vec_id=='1p')]  <- 1+0.03
-vec_arm_s[which(vec_id=='5p')]  <- 1+0.3
-vec_arm_s[which(vec_id=='5q')]  <- 1-0.3
+vec_arm_s[which(vec_id=='5p')]  <- 1+0.1
+vec_arm_s[which(vec_id=='5q')]  <- 1-0.1
 
 
 model_variables   <- BUILD_driver_library(
