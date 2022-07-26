@@ -18,6 +18,7 @@ library(gridExtra)
 
 library(readxl)
 library(phyloTop)
+library(pbapply)
 #-----------------------------------------------------------------------
 # setwd("/Users/dinhngockhanh/CancerSimulator/R/")
 # files_sources <- list.files(pattern = "*.r$")
@@ -54,8 +55,10 @@ selection_model                     <- 'chrom-arm-selection'
 
 prob_CN_whole_genome_duplication    <- 0*1e-4
 
-prob_CN_missegregation              <- 2e-4
-prob_CN_chrom_arm_missegregation    <- 8e-4
+prob_CN_missegregation              <- 0e-4
+prob_CN_chrom_arm_missegregation    <- 4e-4
+# prob_CN_missegregation              <- 2e-4
+# prob_CN_chrom_arm_missegregation    <- 8e-4
 # prob_CN_missegregation              <- 4e-4
 # prob_CN_chrom_arm_missegregation    <- 4e-4
 
@@ -196,42 +199,52 @@ SAVE_model_variables(model_name=model_name,model_variables=model_variables)
 Then create the same number of simulations as the sample count in PCAWG cohort:
 
 ```{r}
-stage_final       <- 3
-n_clones_min      <- 1
-n_clones_max      <- Inf
-n_simulations     <- length(unique(copynumber_PCAWG$donor_unique_id))
-simulator_full_program(
+stage_final         <- 3
+n_clones_min        <- 1
+n_clones_max        <- Inf
+n_simulations       <- length(unique(copynumber_PCAWG$donor_unique_id))
+start_time = Sys.time()
+simulations     <- simulator_full_program(
     model = model_name,
     n_simulations = n_simulations,
     stage_final = stage_final,
     n_clones_min = n_clones_min,
     n_clones_max = n_clones_max,
-    save_cn_profile = FALSE,
-    format_cn_profile = 'long',
-    compute_parallel = TRUE
+    save_simulation = FALSE,
+    compute_parallel = TRUE,
+    report_progress = TRUE,
+    output_variables = c(
+        'all_sample_genotype',
+        'sample_cell_ID',
+        'sample_genotype_unique',
+        'sample_genotype_unique_profile',
+        'cell_phylogeny_hclust'
+    )
 )
+end_time = Sys.time()
+print(end_time - start_time)
 ```
 
 Combine all simulations into one variable:
 
 ```{r}
-numCores <- detectCores()
-cl <- makePSOCKcluster(numCores - 1)
-clusterExport(cl, varlist = c(
-    "model_name", "as.phylo"
-))
-copynumber_CancerSimulator <- parLapply(cl, 1:n_simulations, function(iteration) {
-    load(file=paste(model_name, "_simulation_", iteration, ".rda", sep = ""))
-    simulation_lite<-list()
-    simulation_lite$all_sample_genotype<-simulation$sample$all_sample_genotype
-    simulation_lite$sample_cell_ID<-simulation$sample$sample_cell_ID
-    simulation_lite$sample_genotype_unique<-simulation$sample$sample_genotype_unique
-    simulation_lite$sample_genotype_unique_profile<-simulation$sample$sample_genotype_unique_profile
-
-    simulation_lite$cell_phylogeny<-as.phylo(simulation$sample_phylogeny$cell_phylogeny_hclust)
-    return(simulation_lite)
-})
-stopCluster(cl)
+# numCores <- detectCores()
+# cl <- makePSOCKcluster(numCores - 1)
+# clusterExport(cl, varlist = c(
+#     "model_name", "as.phylo"
+# ))
+# simulations <- parLapply(cl, 1:n_simulations, function(iteration) {
+#     load(file=paste(model_name, "_simulation_", iteration, ".rda", sep = ""))
+#     simulation_lite<-list()
+#     simulation_lite$all_sample_genotype<-simulation$sample$all_sample_genotype
+#     simulation_lite$sample_cell_ID<-simulation$sample$sample_cell_ID
+#     simulation_lite$sample_genotype_unique<-simulation$sample$sample_genotype_unique
+#     simulation_lite$sample_genotype_unique_profile<-simulation$sample$sample_genotype_unique_profile
+#
+#     simulation_lite$cell_phylogeny<-as.phylo(simulation$sample_phylogeny$cell_phylogeny_hclust)
+#     return(simulation_lite)
+# })
+# stopCluster(cl)
 ```
 
 #   Comparison between PCAWG and simulations
@@ -239,7 +252,7 @@ stopCluster(cl)
 Plot the comparison between gain-loss maps from simulations and PCAWG:
 
 ```{r}
-plot_gainloss(copynumber_CancerSimulator,copynumber_PCAWG)
+plot_gainloss(simulations,copynumber_PCAWG)
 ```
 
 #   Comparison between DLP and simulations
@@ -248,7 +261,7 @@ We compare the statistics for cell phylogenies between the simulations and DLP d
 
 ```{r}
 phylo_stats_data <- read.csv(file = system.file("extdata", "dlp_phylo_topology.csv", package = "CancerSimulator"))
-plot_phylo_stats(copynumber_CancerSimulator,phylo_stats_data)
+plot_phylo_stats(simulations,phylo_stats_data)
 ```
 
 

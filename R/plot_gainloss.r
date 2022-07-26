@@ -8,11 +8,11 @@ plot_gainloss <- function(copynumber_sims,
     CNbins_list_sims <- vector("list", length = length(copynumber_sims))
     for (iteration in 1:length(copynumber_sims)) {
         simulation <- copynumber_sims[[iteration]]
-        all_sample_genotype <- simulation$all_sample_genotype
-        sample_cell_ID <- simulation$sample_cell_ID
+        all_sample_genotype <- simulation$sample$all_sample_genotype
+        sample_cell_ID <- simulation$sample$sample_cell_ID
         # cn_profiles_long <- simulation$cn_profiles_long
-        sample_genotype_unique <- simulation$sample_genotype_unique
-        sample_genotype_unique_profile <- simulation$sample_genotype_unique_profile
+        sample_genotype_unique <- simulation$sample$sample_genotype_unique
+        sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
         #   Get the genotype with the highest clonal percentage in sample
         tmp <- as.data.frame(table(all_sample_genotype))
         max_freq <- max(tmp$Freq)

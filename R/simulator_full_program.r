@@ -34,7 +34,8 @@ simulator_full_program <- function(model = "",
                                    apply_UMAP_on_HMM = FALSE,
                                    report_progress = TRUE,
                                    compute_parallel = FALSE,
-                                   seed = Inf) {
+                                   seed = Inf,
+                                   output_variables = c()) {
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
     if (apply_HMM == TRUE) {
         save_simulation <- TRUE
@@ -51,12 +52,13 @@ simulator_full_program <- function(model = "",
     }
     if (compute_parallel == FALSE) {
         #-------------------------Run CancerSimulator in sequential mode
+        many_sims <- list()
         for (iteration in 1:n_simulations) {
             if (report_progress == TRUE) {
                 cat("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
                 cat(paste("BEGINNING SIMULATION-", iteration, "...\n", sep = ""))
             }
-            one_simulation(
+            many_sims[[iteration]] <- one_simulation(
                 iteration,
                 model,
                 stage_final,
@@ -68,7 +70,8 @@ simulator_full_program <- function(model = "",
                 save_cn_profile,
                 format_cn_profile,
                 model_readcount,
-                report_progress
+                report_progress,
+                output_variables
             )
         }
     } else {
@@ -77,7 +80,7 @@ simulator_full_program <- function(model = "",
         numCores <- detectCores()
         cl <- makePSOCKcluster(numCores - 1)
         # setDefaultCluster(cl)
-        cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores, " CORES...\n", sep = ""))
+        cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores - 1, " CORES...\n", sep = ""))
         #   Prepare input parameters for CancerSimulator
         model <<- model
         stage_final <<- stage_final
@@ -90,6 +93,7 @@ simulator_full_program <- function(model = "",
         format_cn_profile <<- format_cn_profile
         model_readcount <<- model_readcount
         report_progress <<- report_progress
+        output_variables <<- output_variables
         clusterExport(cl, varlist = c(
             "model",
             "stage_final",
@@ -103,6 +107,7 @@ simulator_full_program <- function(model = "",
             "model_readcount",
             "report_progress",
             "one_simulation",
+            "output_variables",
             "hc2Newick_MODIFIED", "hc2Newick",
             "SIMULATOR_VARIABLES_for_simulation",
             "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
@@ -114,22 +119,45 @@ simulator_full_program <- function(model = "",
         library(ape)
         clusterEvalQ(cl = cl, require(ape))
         #   Run CancerSimulator in parallel
-        parLapply(cl, 1:n_simulations, function(iteration) {
-            one_simulation(
-                iteration,
-                model,
-                stage_final,
-                n_clones_min,
-                n_clones_max,
-                save_simulation,
-                internal_nodes_cn_info,
-                save_newick_tree,
-                save_cn_profile,
-                format_cn_profile,
-                model_readcount,
-                report_progress
-            )
-        })
+        if (report_progress == TRUE) {
+            many_sims <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
+                one_sim <- one_simulation(
+                    iteration,
+                    model,
+                    stage_final,
+                    n_clones_min,
+                    n_clones_max,
+                    save_simulation,
+                    internal_nodes_cn_info,
+                    save_newick_tree,
+                    save_cn_profile,
+                    format_cn_profile,
+                    model_readcount,
+                    report_progress,
+                    output_variables
+                )
+                return(one_sim)
+            })
+        } else {
+            many_sims <- parLapply(cl, 1:n_simulations, function(iteration) {
+                one_sim <- one_simulation(
+                    iteration,
+                    model,
+                    stage_final,
+                    n_clones_min,
+                    n_clones_max,
+                    save_simulation,
+                    internal_nodes_cn_info,
+                    save_newick_tree,
+                    save_cn_profile,
+                    format_cn_profile,
+                    model_readcount,
+                    report_progress,
+                    output_variables
+                )
+                return(one_sim)
+            })
+        }
         #   Stop parallel cluster
         stopCluster(cl)
     }
@@ -155,6 +183,8 @@ simulator_full_program <- function(model = "",
         #   Append the simulation package RDA with HMMcopy inference
         append_with_hmm(model = model, n_simulations = n_simulations, UMAP = apply_UMAP_on_HMM, pseudo_corrected_readcount = pseudo_corrected_readcount)
     }
+    # ==================================OUTPUT COLLECTION OF SIMULATIONS
+    return(many_sims)
 }
 
 #' @export
@@ -169,7 +199,8 @@ one_simulation <- function(iteration,
                            save_cn_profile,
                            format_cn_profile,
                            model_readcount,
-                           report_progress) {
+                           report_progress,
+                           output_variables) {
     # =============================================LOAD MODEL PARAMETERS
     SIMULATOR_VARIABLES_for_simulation(model)
     # ============================================PRODUCE ONE SIMULATION
@@ -321,4 +352,26 @@ one_simulation <- function(iteration,
         write(hc2Newick(clone_phylogeny_hclust), file = filename)
         # write(hc2Newick_MODIFIED(clone_phylogeny_hclust), file = filename)
     }
+    #---------------------------------------Return the simulation result
+    if (length(output_variables) == 0) {
+        simulation_output <- simulation
+    } else {
+        simulation_output <- list()
+        if ("all_sample_genotype" %in% output_variables) {
+            simulation_output$sample$all_sample_genotype <- simulation$sample$all_sample_genotype
+        }
+        if ("sample_cell_ID" %in% output_variables) {
+            simulation_output$sample$sample_cell_ID <- simulation$sample$sample_cell_ID
+        }
+        if ("sample_genotype_unique" %in% output_variables) {
+            simulation_output$sample$sample_genotype_unique <- simulation$sample$sample_genotype_unique
+        }
+        if ("sample_genotype_unique_profile" %in% output_variables) {
+            simulation_output$sample$sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+        }
+        if ("cell_phylogeny_hclust" %in% output_variables) {
+            simulation_output$sample_phylogeny$cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
+        }
+    }
+    return(simulation_output)
 }

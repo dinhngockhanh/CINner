@@ -4,7 +4,8 @@ plot_phylo_stats <- function(copynumber_sims,
     #---------------------Get cell phylogeny statistics from simulations
     treeList <- list()
     for (iteration in 1:n_simulations) {
-        treeList[[iteration]] <- copynumber_sims[[iteration]]$cell_phylogeny
+        treeList[[iteration]] <- as.phylo(copynumber_sims[[iteration]]$sample_phylogeny$cell_phylogeny_hclust)
+        # treeList[[iteration]] <- copynumber_sims[[iteration]]$cell_phylogeny
     }
     stats_SIMS <- suppressWarnings(phyloTop(treeList))
     #--------------------------------------Create dataframe for plotting
