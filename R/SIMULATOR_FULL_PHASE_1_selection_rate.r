@@ -52,15 +52,9 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         chrom_arm_library_copy$cn <- 0
         #   Find average ploidy
         ploidy <- round(mean(vec_CN_all))
-
-
-        # print(ploidy)
-
-
         #   Find average CN per chromosome arm
         for (i_arm in 1:nrow(chrom_arm_library_copy)) {
             chrom <- which(vec_chromosome_id == chrom_arm_library_copy$Chromosome[i_arm])
-            # chrom <- chrom_arm_library_copy$Chromosome[i_arm]
             start <- chrom_arm_library_copy$Bin_start[i_arm]
             end <- chrom_arm_library_copy$Bin_end[i_arm]
             no_strands <- ploidy_chrom[chrom]
@@ -73,15 +67,10 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
                         vec_cn <- vec_cn + ploidy_block[[chrom]][[strand]]
                     }
                 }
-                cn <- round(mean(vec_cn))
+                cn <- round(mean(vec_cn[start:end]))
             }
             chrom_arm_library_copy$cn[i_arm] <- cn
         }
-
-
-        # print(chrom_arm_library_copy$cn / ploidy)
-
-
         #   Compute selection rate
         clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
     } else if (selection_model == "ancient") {
