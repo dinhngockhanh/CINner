@@ -46,13 +46,51 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             return(clone_selection_rate)
         }
     }
-    #------If driver library is empty, then viable cells have sel rate 1
-    if (nrow(driver_library) == 0) {
-        clone_selection_rate <- 1
-        return(clone_selection_rate)
-    }
     #--------------------------Compute selection rates for viable clones
-    if (selection_model == "ancient") {
+    if (selection_model == "chrom-arm-selection") {
+        chrom_arm_library_copy <- chrom_arm_library
+        chrom_arm_library_copy$cn <- 0
+        #   Find average ploidy
+        ploidy <- round(mean(vec_CN_all))
+
+
+        # print(ploidy)
+
+
+        #   Find average CN per chromosome arm
+        for (i_arm in 1:nrow(chrom_arm_library_copy)) {
+            chrom <- which(vec_chromosome_id == chrom_arm_library_copy$Chromosome[i_arm])
+            # chrom <- chrom_arm_library_copy$Chromosome[i_arm]
+            start <- chrom_arm_library_copy$Bin_start[i_arm]
+            end <- chrom_arm_library_copy$Bin_end[i_arm]
+            no_strands <- ploidy_chrom[chrom]
+            if (no_strands == 0) {
+                cn <- 0
+            } else {
+                vec_cn <- ploidy_block[[chrom]][[1]]
+                if (no_strands > 1) {
+                    for (strand in 2:no_strands) {
+                        vec_cn <- vec_cn + ploidy_block[[chrom]][[strand]]
+                    }
+                }
+                cn <- round(mean(vec_cn))
+            }
+            chrom_arm_library_copy$cn[i_arm] <- cn
+        }
+
+
+        # print(chrom_arm_library_copy$cn / ploidy)
+
+
+        #   Compute selection rate
+        clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
+    } else if (selection_model == "ancient") {
+        #--If driver library is empty, then viable cells have sel rate 1
+        if (nrow(driver_library) == 0) {
+            clone_selection_rate <- 1
+            return(clone_selection_rate)
+        }
+        #-----------------------------------------Compute selection rate
         driver_library_copy <- driver_library
         driver_library_copy$Copy_WT <- 0
         driver_library_copy$Copy_MUT <- 0
@@ -79,6 +117,12 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
             prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     } else if (selection_model == "old") {
+        #--If driver library is empty, then viable cells have sel rate 1
+        if (nrow(driver_library) == 0) {
+            clone_selection_rate <- 1
+            return(clone_selection_rate)
+        }
+        #-----------------------------------------Compute selection rate
         driver_library_copy <- driver_library
         driver_library_copy$Copy_WT <- 0
         driver_library_copy$Copy_MUT <- 0
@@ -104,8 +148,5 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         clone_selection_rate <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
             prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     }
-
-
-
     return(clone_selection_rate)
 }

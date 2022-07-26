@@ -4,13 +4,23 @@ BUILD_driver_library <- function(model_variables = list(),
                                  vec_driver_role = c(),
                                  vec_chromosome = -1,
                                  vec_bin = -1,
-                                 vec_driver_s = c()) {
+                                 vec_driver_s = c(),
+                                 vec_id = c(),
+                                 vec_start = c(),
+                                 vec_end = c(),
+                                 vec_arm_s = c()) {
     #------------------------------------Input choice of selection model
     TABLE_SELECTION <- model_variables$selection_model
     selection_model <- TABLE_SELECTION$Value[which(TABLE_SELECTION$Variable == "selection_model")]
     #---------------------Compute selection rates for each driver allele
     #-----------------------------according to choice of selection model
-    if (selection_model == "ancient") {
+    if (selection_model == "chrom-arm-selection") {
+        #---Build the arm driver library
+        TABLE_CANCER_ARMS <- data.frame(Arm_ID = vec_id, Chromosome = vec_chromosome, Bin_start = vec_start, Bin_end = vec_end, s_rate = vec_arm_s)
+        #--------------------------------Output the model variable files
+        model_variables$chromosome_arm_library <- TABLE_CANCER_ARMS
+        model_variables$selection_model <- TABLE_SELECTION
+    } else if (selection_model == "ancient") {
         #---Input the Cancer Gene Census
         DATA_cancer_gene_census <- read.csv(file = system.file("extdata", "cancer_gene_census.csv", package = "CancerSimulator"))
         #---Build the driver library
@@ -89,6 +99,9 @@ BUILD_driver_library <- function(model_variables = list(),
         N_row <- nrow(TABLE_SELECTION)
         N_row <- N_row + 1
         TABLE_SELECTION[N_row, ] <- c("s_normalization", s_normalization, "", "Normalization constant")
+        #--------------------------------Output the model variable files
+        model_variables$driver_library <- TABLE_CANCER_GENES
+        model_variables$selection_model <- TABLE_SELECTION
     } else if (selection_model == "old") {
         #---Input the Cancer Gene Census
         DATA_cancer_gene_census <- read.csv(file = system.file("extdata", "cancer_gene_census.csv", package = "CancerSimulator"))
@@ -181,9 +194,9 @@ BUILD_driver_library <- function(model_variables = list(),
         # N_row <- nrow(TABLE_SELECTION)
         # N_row <- N_row + 1
         # TABLE_SELECTION[N_row, ] <- c("s_normalization", s_normalization, "", "Normalization constant")
+        #--------------------------------Output the model variable files
+        model_variables$driver_library <- TABLE_CANCER_GENES
+        model_variables$selection_model <- TABLE_SELECTION
     }
-    #----------------------------------------Output the model variable files
-    model_variables$driver_library <- TABLE_CANCER_GENES
-    model_variables$selection_model <- TABLE_SELECTION
     return(model_variables)
 }

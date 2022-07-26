@@ -26,13 +26,22 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #---Input table of sampling information
     filename <- paste(model, "-input-sampling.csv", sep = "")
     TABLE_SAMPLING_INFO <- read.table(filename, header = TRUE, sep = ",")
-    #---Input table of mutational and CNA genes, Warning : Execute later because it is empty now
-    filename <- paste(model, "-input-cancer-genes.csv", sep = "")
-    if (file.size(filename) != 0) {
+    #---Input table of mutational and CNA genes
+    filename <- paste(model, "-input-selection-genes.csv", sep = "")
+    if (file.exists(filename)) {
         TABLE_CANCER_GENES <- read.table(filename, header = TRUE, sep = ",")
     } else {
         TABLE_CANCER_GENES <- data.frame()
     }
+
+    #---Input table of selection rates for individual chromosome arms
+    filename <- paste(model, "-input-selection-chrom-arm.csv", sep = "")
+    if (file.exists(filename)) {
+        TABLE_CANCER_ARMS <- read.table(filename, header = TRUE, sep = ",")
+    } else {
+        TABLE_CANCER_ARMS <- data.frame()
+    }
+
     #---Input table of CN profiles for the initial population
     filename <- paste(model, "-input-initial-cn-profiles.csv", sep = "")
     TABLE_INITIAL_COPY_NUMBER_PROFILES <- read.table(filename, header = TRUE, sep = ",")
@@ -88,6 +97,12 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     } else {
         driver_library <<- TABLE_CANCER_GENES
     }
+    if (length(TABLE_CANCER_ARMS) == 0) {
+        chrom_arm_library <<- data.frame()
+    } else {
+        chrom_arm_library <<- TABLE_CANCER_ARMS
+    }
+
 
     #---Set up table of GC content and mappability per CN bin
     table_gc <<- TABLE_GC
