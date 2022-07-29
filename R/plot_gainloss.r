@@ -1,6 +1,9 @@
 #' @export
 plot_gainloss <- function(copynumber_sims,
-                          copynumber_PCAWG) {
+                          copynumber_PCAWG,
+                          filename,
+                          height = 1000,
+                          width = 2000) {
     plotcol <- "state"
     fillna <- TRUE
     cutoff <- 2
@@ -108,6 +111,26 @@ plot_gainloss <- function(copynumber_sims,
     f2_data <- -rowSums(copynumber_data[, 5:ncol(copynumber_data)] < cutoff) / n_samples
     attr(f1_data, "names") <- NULL
     attr(f2_data, "names") <- NULL
+
+
+
+
+
+    stat_gain <- cor.test(f1_sims, f1_data, method = "spearman", exact = FALSE)
+    rho_gain <- stat_gain$estimate[["rho"]]
+    pval_gain <- stat_gain$p.value
+    stat_loss <- cor.test(f2_sims, f2_data, method = "spearman", exact = FALSE)
+    rho_loss <- stat_loss$estimate[["rho"]]
+    pval_loss <- stat_loss$p.value
+
+    print(rho_gain)
+    print(pval_gain)
+    print(rho_loss)
+    print(pval_loss)
+
+
+
+
     #---------------Make genome-wide gain_sims/loss_sims plot comparison
     df_plot <- data.frame(
         x = 1:length(f1_sims),
@@ -122,7 +145,7 @@ plot_gainloss <- function(copynumber_sims,
         geom_bar(aes(x = x, y = loss_sims), stat = "identity", colour = "#3182BD", fill = "#3182BD") +
         geom_hline(yintercept = 0, color = "antiquewhite3") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-        theme(text = element_text(size = 20)) +
+        theme(text = element_text(size = 30)) +
         scale_x_continuous(limits = c(0, nrow(df_plot)), expand = c(0, 0)) +
         scale_y_continuous(limits = c(-1, 1), expand = c(0, 0)) +
         ylab("Simulations") +
@@ -133,11 +156,18 @@ plot_gainloss <- function(copynumber_sims,
         geom_bar(aes(x = x, y = loss_data), stat = "identity", colour = "#3182BD", fill = "#3182BD") +
         geom_hline(yintercept = 0, color = "antiquewhite3") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-        theme(text = element_text(size = 20)) +
+        theme(text = element_text(size = 30)) +
         scale_x_continuous(limits = c(0, nrow(df_plot)), expand = c(0, 0)) +
         scale_y_continuous(limits = c(-1, 1), expand = c(0, 0)) +
         ylab("PCAWG") +
         xlab("")
+    #---Plot Spearman correlation scores
+    p_spearman_gain <- ggplot() +
+        annotate("text", x = 0, y = 0, size = 15, colour = "#E34A33", label = paste("GAIN: rho = ", round(rho_gain, 2), sep = "")) +
+        theme_void()
+    p_spearman_loss <- ggplot() +
+        annotate("text", x = 0, y = 0, size = 15, colour = "#3182BD", label = paste("LOSS: rho = ", round(rho_loss, 2), sep = "")) +
+        theme_void()
     #---Plot chromosomes
     #   Find chromosome information
     chr_id <- unique(copynumber_coordinates$chr)
@@ -164,16 +194,16 @@ plot_gainloss <- function(copynumber_sims,
         labels = chr_id,
         limits = c(0, nrow(df_plot)), expand = c(0, 0)
     ) +
-        theme(axis.text.x = element_text(size = 10))
+        theme(axis.text.x = element_text(size = 20))
     p_data <- p_data + scale_x_continuous(
         breaks = chr_ticks,
         labels = chr_id,
         limits = c(0, nrow(df_plot)), expand = c(0, 0)
     ) +
-        theme(axis.text.x = element_text(size = 10))
-    #---Print the two plots
-    grid.arrange(p_sims, p_data, ncol = 1)
-    p <- arrangeGrob(p_sims, p_data, ncol = 1)
+        theme(axis.text.x = element_text(size = 20))
+    #---Print the mini plots
+    jpeg(filename, width = width, height = height)
+    p <- grid.arrange(p_sims, arrangeGrob(p_spearman_gain, p_spearman_loss, nrow = 1), p_data, heights = c(5, 1, 5), ncol = 1)
     print(p)
 }
 

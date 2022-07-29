@@ -20,12 +20,12 @@ library(readxl)
 library(phyloTop)
 library(pbapply)
 #-----------------------------------------------------------------------
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
-library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
 ```
 
 #   Get the gain-loss map from PCAWG
@@ -149,11 +149,53 @@ vec_start           <- c(rep(1,length(model_variables$cn_info$Chromosome)), mode
 vec_end             <- c(model_variables$cn_info$Centromere_location, model_variables$cn_info$Bin_count)
 
 
-
 vec_arm_s           <- rep(1,length(vec_id))
-# vec_arm_s[which(vec_id=='1p')]  <- 1+0.03
-vec_arm_s[which(vec_id=='5p')]  <- 1+0.1
-vec_arm_s[which(vec_id=='5q')]  <- 1-0.1
+vec_arm_s[which(vec_id=="1p")]  <- 1+0.05
+vec_arm_s[which(vec_id=="1q")]  <- 1+0.065
+vec_arm_s[which(vec_id=="2p")]  <- 1+0.06
+vec_arm_s[which(vec_id=="2q")]  <- 1+0.05
+vec_arm_s[which(vec_id=="3p")]  <- 1+0.02
+vec_arm_s[which(vec_id=="3q")]  <- 1+0.095
+vec_arm_s[which(vec_id=="4p")]  <- 1-0.013
+vec_arm_s[which(vec_id=="4q")]  <- 1-0.016
+vec_arm_s[which(vec_id=="5p")]  <- 1+0.18
+vec_arm_s[which(vec_id=="5q")]  <- 1-0.1
+vec_arm_s[which(vec_id=="6p")]  <- 1+0.2
+vec_arm_s[which(vec_id=="6q")]  <- 1-0.17
+vec_arm_s[which(vec_id=="7p")]  <- 1+0.02
+vec_arm_s[which(vec_id=="7q")]  <- 1+0.1
+vec_arm_s[which(vec_id=="8p")]  <- 1-0.14
+vec_arm_s[which(vec_id=="8q")]  <- 1+0.2
+vec_arm_s[which(vec_id=="9p")]  <- 1+0.022
+vec_arm_s[which(vec_id=="9q")]  <- 1+0.022
+vec_arm_s[which(vec_id=="10p")]  <- 1+0.03
+vec_arm_s[which(vec_id=="10q")]  <- 1+0.035
+vec_arm_s[which(vec_id=="11p")]  <- 1-0.15
+vec_arm_s[which(vec_id=="11q")]  <- 1+0.13
+vec_arm_s[which(vec_id=="12p")]  <- 1+0.08
+vec_arm_s[which(vec_id=="12q")]  <- 1+0.04
+vec_arm_s[which(vec_id=="13p")]  <- 1+0.03
+vec_arm_s[which(vec_id=="13q")]  <- 1+0.022
+vec_arm_s[which(vec_id=="14p")]  <- 1+0.022
+vec_arm_s[which(vec_id=="14q")]  <- 1+0.016
+vec_arm_s[which(vec_id=="15p")]  <- 1+0.02
+vec_arm_s[which(vec_id=="15q")]  <- 1+0.01
+vec_arm_s[which(vec_id=="16p")]  <- 1+0.01
+vec_arm_s[which(vec_id=="16q")]  <- 1-0.08
+vec_arm_s[which(vec_id=="17p")]  <- 1-0.07
+vec_arm_s[which(vec_id=="17q")]  <- 1+0.01
+vec_arm_s[which(vec_id=="18p")]  <- 1-0.04
+vec_arm_s[which(vec_id=="18q")]  <- 1-0.03
+vec_arm_s[which(vec_id=="19p")]  <- 1+0.06
+vec_arm_s[which(vec_id=="19q")]  <- 1+0.06
+vec_arm_s[which(vec_id=="20p")]  <- 1+0.05
+vec_arm_s[which(vec_id=="20q")]  <- 1+0.06
+vec_arm_s[which(vec_id=="21p")]  <- 1-0.22
+vec_arm_s[which(vec_id=="21q")]  <- 1+0.08
+vec_arm_s[which(vec_id=="22p")]  <- 1-0.02
+vec_arm_s[which(vec_id=="22q")]  <- 1-0.02
+vec_arm_s[which(vec_id=="Xp")]  <- 1-0.04
+vec_arm_s[which(vec_id=="Xq")]  <- 1-0.04
 
 
 model_variables   <- BUILD_driver_library(
@@ -204,7 +246,7 @@ n_clones_min        <- 1
 n_clones_max        <- Inf
 n_simulations       <- length(unique(copynumber_PCAWG$donor_unique_id))
 start_time = Sys.time()
-simulations     <- simulator_full_program(
+simulations         <- simulator_full_program(
     model = model_name,
     n_simulations = n_simulations,
     stage_final = stage_final,
@@ -225,34 +267,14 @@ end_time = Sys.time()
 print(end_time - start_time)
 ```
 
-Combine all simulations into one variable:
-
-```{r}
-# numCores <- detectCores()
-# cl <- makePSOCKcluster(numCores - 1)
-# clusterExport(cl, varlist = c(
-#     "model_name", "as.phylo"
-# ))
-# simulations <- parLapply(cl, 1:n_simulations, function(iteration) {
-#     load(file=paste(model_name, "_simulation_", iteration, ".rda", sep = ""))
-#     simulation_lite<-list()
-#     simulation_lite$all_sample_genotype<-simulation$sample$all_sample_genotype
-#     simulation_lite$sample_cell_ID<-simulation$sample$sample_cell_ID
-#     simulation_lite$sample_genotype_unique<-simulation$sample$sample_genotype_unique
-#     simulation_lite$sample_genotype_unique_profile<-simulation$sample$sample_genotype_unique_profile
-#
-#     simulation_lite$cell_phylogeny<-as.phylo(simulation$sample_phylogeny$cell_phylogeny_hclust)
-#     return(simulation_lite)
-# })
-# stopCluster(cl)
-```
-
 #   Comparison between PCAWG and simulations
 
 Plot the comparison between gain-loss maps from simulations and PCAWG:
 
 ```{r}
-plot_gainloss(simulations,copynumber_PCAWG)
+plot_gainloss(simulations,copynumber_PCAWG,
+    filename = "HGSOC_gainloss.jpeg"
+)
 ```
 
 #   Comparison between DLP and simulations
@@ -263,6 +285,31 @@ We compare the statistics for cell phylogenies between the simulations and DLP d
 phylo_stats_data <- read.csv(file = system.file("extdata", "dlp_phylo_topology.csv", package = "CancerSimulator"))
 plot_phylo_stats(simulations,phylo_stats_data)
 ```
+
+#   Analysis of one simulation
+
+```{r}
+stage_final         <- 3
+n_clones_min        <- 1
+n_clones_max        <- Inf
+n_simulations       <- 1
+simulations         <- simulator_full_program(
+    model = model_name,
+    n_simulations = n_simulations,
+    stage_final = stage_final,
+    n_clones_min = n_clones_min,
+    n_clones_max = n_clones_max,
+    save_simulation = TRUE,
+    save_newick_tree = TRUE,
+    save_cn_profile = TRUE,
+    format_cn_profile = "both",
+    report_progress = TRUE,
+    compute_parallel = FALSE,
+    seed = 10
+)
+plot_all(model = model_name,n_simulations = n_simulations)
+```
+
 
 
 ```{r}
