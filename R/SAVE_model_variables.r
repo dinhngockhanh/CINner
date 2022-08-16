@@ -48,13 +48,14 @@ SAVE_model_variables <- function(model_name = "",
     #---Save file for sampling information
     filename <- paste(model_name, "-input-sampling.csv", sep = "")
     write.csv(model_variables$sampling_info, filename, row.names = FALSE)
+
+
+
     #---Save file for driver library
     if (!is.null(model_variables$driver_library)) {
         filename <- paste(model_name, "-input-selection-genes.csv", sep = "")
         write.csv(model_variables$driver_library, filename, row.names = FALSE)
     }
-
-
     #---Save file for chromosome arm selection library
     if (!is.null(model_variables$chromosome_arm_library)) {
         filename <- paste(model_name, "-input-selection-chrom-arm.csv", sep = "")

@@ -33,10 +33,11 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal <- function(genotype_to_react, genotype
             }
         }
         #       Choose the length of the terminal CN-LOH
-        cnloh_length <- max_length + 1
-        while (cnloh_length > max_length) {
-            cnloh_length <- 1 + rgeom(n = 1, prob_CN_cnloh_terminal_length)
-        }
+        cnloh_length <- min(max_length, 1 + rgeom(n = 1, prob_CN_cnloh_terminal_length))
+        # cnloh_length <- max_length + 1
+        # while (cnloh_length > max_length) {
+        #     cnloh_length <- 1 + rgeom(n = 1, prob_CN_cnloh_terminal_length)
+        # }
         #       Choose the region to harbor the terminal CN-LOH
         if (chrom_arm == 1) {
             block_start <- 1

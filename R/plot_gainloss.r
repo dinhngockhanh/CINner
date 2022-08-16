@@ -97,7 +97,7 @@ plot_gainloss <- function(copynumber_sims,
     #---Replace previously NA in each sample with ploidy 2
     for (sample in 1:length(samplelist_data)) {
         sample_id <- samplelist_data[sample]
-        NA_list <- NA_list_data[[sample]]
+        NA_iteration <- NA_list_data[[sample]]
         vec_loc <- which(NA_iteration == 1)
         if (length(vec_loc) > 0) {
             tmp <- copynumber_data[sample_id]
@@ -111,26 +111,12 @@ plot_gainloss <- function(copynumber_sims,
     f2_data <- -rowSums(copynumber_data[, 5:ncol(copynumber_data)] < cutoff) / n_samples
     attr(f1_data, "names") <- NULL
     attr(f2_data, "names") <- NULL
-
-
-
-
-
     stat_gain <- cor.test(f1_sims, f1_data, method = "spearman", exact = FALSE)
     rho_gain <- stat_gain$estimate[["rho"]]
     pval_gain <- stat_gain$p.value
     stat_loss <- cor.test(f2_sims, f2_data, method = "spearman", exact = FALSE)
     rho_loss <- stat_loss$estimate[["rho"]]
     pval_loss <- stat_loss$p.value
-
-    print(rho_gain)
-    print(pval_gain)
-    print(rho_loss)
-    print(pval_loss)
-
-
-
-
     #---------------Make genome-wide gain_sims/loss_sims plot comparison
     df_plot <- data.frame(
         x = 1:length(f1_sims),
@@ -205,10 +191,14 @@ plot_gainloss <- function(copynumber_sims,
     jpeg(filename, width = width, height = height)
     p <- grid.arrange(p_sims, arrangeGrob(p_spearman_gain, p_spearman_loss, nrow = 1), p_data, heights = c(5, 1, 5), ncol = 1)
     print(p)
+    dev.off()
 }
 
 calc_state_mode <- function(states) {
     state_levels <- unique(states)
+
+    state_levels <- state_levels[!(state_levels %in% c(0))]
+
     state_mode <- state_levels[
         which.max(tabulate(match(states, state_levels)))
     ]

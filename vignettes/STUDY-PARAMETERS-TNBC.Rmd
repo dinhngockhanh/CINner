@@ -20,12 +20,12 @@ library(readxl)
 library(phyloTop)
 library(pbapply)
 #-----------------------------------------------------------------------
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
-library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
 ```
 
 #   Get the gain-loss map from PCAWG
@@ -192,7 +192,7 @@ cell_count        <- 20
 CN_matrix         <- BUILD_cn_normal_XX(model_variables$cn_info)
 drivers           <- list()
 model_variables   <- BUILD_initial_population(model_variables=model_variables,cell_count=cell_count,CN_matrix=CN_matrix,drivers=drivers)
-model_name        <- 'HGSOC'
+model_name        <- 'TNBC'
 SAVE_model_variables(model_name=model_name,model_variables=model_variables)
 ```
 
@@ -252,7 +252,9 @@ Combine all simulations into one variable:
 Plot the comparison between gain-loss maps from simulations and PCAWG:
 
 ```{r}
-plot_gainloss(simulations,copynumber_PCAWG)
+plot_gainloss(simulations,copynumber_PCAWG,
+    filename = "TNBC_gainloss.jpeg"
+)
 ```
 
 #   Comparison between DLP and simulations

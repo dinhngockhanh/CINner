@@ -1,5 +1,7 @@
 #' @export
 BUILD_driver_library <- function(model_variables = list(),
+                                 table_arm_selection_rates = list(),
+                                 table_gene_selection_rates = list(),
                                  vec_driver_genes = c(),
                                  vec_driver_role = c(),
                                  vec_chromosome = -1,
@@ -16,15 +18,74 @@ BUILD_driver_library <- function(model_variables = list(),
     #-----------------------------according to choice of selection model
     if (selection_model == "chrom-arm-selection") {
         #---Build the arm driver library
-        TABLE_CANCER_ARMS <- data.frame(Arm_ID = vec_id, Chromosome = vec_chromosome, Bin_start = vec_start, Bin_end = vec_end, s_rate = vec_arm_s)
+        TABLE_CANCER_ARMS <- table_arm_selection_rates
         #--------------------------------Output the model variable files
         model_variables$chromosome_arm_library <- TABLE_CANCER_ARMS
+        model_variables$selection_model <- TABLE_SELECTION
+    } else if (selection_model == "driver-gene-selection") {
+        #---Build the gene driver library
+        TABLE_CANCER_GENES <- table_gene_selection_rates
+        TABLE_CANCER_GENES$s_rate_WT <- 0
+        TABLE_CANCER_GENES$s_rate_MUT <- 0
+        #   Compute selection rates for TSGs
+        list_TSG <- which(TABLE_CANCER_GENES$Gene_role == "TSG")
+        if (length(list_TSG) > 0) {
+            for (driver in 1:length(list_TSG)) {
+                row <- list_TSG[driver]
+                driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
+                TABLE_CANCER_GENES$s_rate_WT[row] <- 1 / driver_sel_rate
+                TABLE_CANCER_GENES$s_rate_MUT[row] <- 1
+            }
+        }
+        #   Compute selection rates for ONCOGENEs
+        list_ONCOGENE <- which(TABLE_CANCER_GENES$Gene_role == "ONCOGENE")
+        if (length(list_ONCOGENE) > 0) {
+            for (driver in 1:length(list_ONCOGENE)) {
+                row <- list_ONCOGENE[driver]
+                driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
+                TABLE_CANCER_GENES$s_rate_WT[row] <- driver_sel_rate
+                TABLE_CANCER_GENES$s_rate_MUT[row] <- driver_sel_rate^2
+            }
+        }
+        #--------------------------------Output the model variable files
+        model_variables$driver_library <- TABLE_CANCER_GENES
+        model_variables$selection_model <- TABLE_SELECTION
+    } else if (selection_model == "chrom-arm-and-driver-gene-selection") {
+        #---Build the arm driver library
+        TABLE_CANCER_ARMS <- table_arm_selection_rates
+        #---Build the gene driver library
+        TABLE_CANCER_GENES <- table_gene_selection_rates
+        TABLE_CANCER_GENES$s_rate_WT <- 0
+        TABLE_CANCER_GENES$s_rate_MUT <- 0
+        #   Compute selection rates for TSGs
+        list_TSG <- which(TABLE_CANCER_GENES$Gene_role == "TSG")
+        if (length(list_TSG) > 0) {
+            for (driver in 1:length(list_TSG)) {
+                row <- list_TSG[driver]
+                driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
+                TABLE_CANCER_GENES$s_rate_WT[row] <- 1 / driver_sel_rate
+                TABLE_CANCER_GENES$s_rate_MUT[row] <- 1
+            }
+        }
+        #   Compute selection rates for ONCOGENEs
+        list_ONCOGENE <- which(TABLE_CANCER_GENES$Gene_role == "ONCOGENE")
+        if (length(list_ONCOGENE) > 0) {
+            for (driver in 1:length(list_ONCOGENE)) {
+                row <- list_ONCOGENE[driver]
+                driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
+                TABLE_CANCER_GENES$s_rate_WT[row] <- driver_sel_rate
+                TABLE_CANCER_GENES$s_rate_MUT[row] <- driver_sel_rate ^ 2
+            }
+        }
+        #--------------------------------Output the model variable files
+        model_variables$chromosome_arm_library <- TABLE_CANCER_ARMS
+        model_variables$driver_library <- TABLE_CANCER_GENES
         model_variables$selection_model <- TABLE_SELECTION
     } else if (selection_model == "ancient") {
         #---Input the Cancer Gene Census
         DATA_cancer_gene_census <- read.csv(file = system.file("extdata", "cancer_gene_census.csv", package = "CancerSimulator"))
         #---Build the driver library
-        columns <- c("Gene_ID", "Gene_role", "Selective_strength")
+        columns <- c("Gene_ID", "Gene_role", "s_rate")
         TABLE_CANCER_GENES <- data.frame(vec_driver_genes, vec_driver_role, vec_driver_s)
         colnames(TABLE_CANCER_GENES) <- columns
         if (any(vec_chromosome == -1)) {
@@ -106,7 +167,7 @@ BUILD_driver_library <- function(model_variables = list(),
         #---Input the Cancer Gene Census
         DATA_cancer_gene_census <- read.csv(file = system.file("extdata", "cancer_gene_census.csv", package = "CancerSimulator"))
         #---Build the driver library
-        columns <- c("Gene_ID", "Gene_role", "Selective_strength")
+        columns <- c("Gene_ID", "Gene_role", "s_rate")
         TABLE_CANCER_GENES <- data.frame(vec_driver_genes, vec_driver_role, vec_driver_s)
         colnames(TABLE_CANCER_GENES) <- columns
         if (any(vec_chromosome == -1)) {
