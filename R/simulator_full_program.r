@@ -35,7 +35,8 @@ simulator_full_program <- function(model = "",
                                    report_progress = TRUE,
                                    compute_parallel = FALSE,
                                    seed = Inf,
-                                   output_variables = c()) {
+                                   output_variables = c(),
+                                   n_cores = NULL) {
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
     if (apply_HMM == TRUE) {
         save_simulation <- TRUE
@@ -77,7 +78,11 @@ simulator_full_program <- function(model = "",
     } else {
         #---------------------------Run CancerSimulator in parallel mode
         #   Start parallel cluster
-        numCores <- detectCores()
+        if (is.null(n_cores)) {
+            numCores <- detectCores()
+        } else {
+            numCores <- n_cores
+        }
         cl <- makePSOCKcluster(numCores - 1)
         # setDefaultCluster(cl)
         cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores - 1, " CORES...\n", sep = ""))
