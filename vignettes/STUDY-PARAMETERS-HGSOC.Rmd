@@ -20,12 +20,12 @@ library(readxl)
 library(phyloTop)
 library(pbapply)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+devtools::install_github("dinhngockhanh/CancerSimulator")
+library(CancerSimulator)
 ```
 
 #   Get the gain-loss map from PCAWG
@@ -250,10 +250,8 @@ gene_s        <- rep(1,length(gene_id))
 
 arm_s[which(arm_id=="8p")]  <- 1-0.11
 arm_s[which(arm_id=="8q")]  <- 1+0.001
-# arm_s[which(arm_id=="8q")]  <- 1+0.005
 
 gene_s[which(gene_id=='MYC')]   <- 1+0.1
-# gene_s[which(gene_id=='MYC')]   <- 1+0.097
 
 
 
