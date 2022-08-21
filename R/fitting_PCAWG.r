@@ -146,7 +146,6 @@ fitting_PCAWG <- function(model_name,
         PCAWG_N_cases <<- PCAWG_N_cases
         sim_param <<- sim_param
         func_ABC <<- func_ABC
-        normalize_cell_ploidy<<-normalize_cell_ploidy
         clusterExport(cl, varlist = c(
             "model_variables_chrom", "PCAWG_N_cases", "sim_param", "hg19_chrlength",
             "func_ABC", "BUILD_driver_library", "simulator_full_program", "gainloss_SIMS", "one_simulation", "createCNmatrix", "normalize_cell_ploidy", "calc_state_mode",
@@ -538,4 +537,31 @@ gainloss_SIMS <- function(copynumber_sims,
     output$delta_gain <- f1_sims
     output$delta_loss <- f2_sims
     return(output)
+}
+
+#' @export
+calc_state_mode <- function(states) {
+    state_levels <- unique(states)
+    state_mode <- state_levels[
+        which.max(tabulate(match(states, state_levels)))
+    ]
+    if (!is.finite(state_mode)) {
+        state_mode <- 2
+    }
+    return(state_mode)
+}
+
+#' @export
+normalize_cell_ploidy <- function(copynumber) {
+    cell_ids <- colnames(copynumber)
+    cell_ids <- cell_ids[!(cell_ids %in% c("chr", "start", "end", "width"))]
+
+    for (cell_id in cell_ids) {
+        state_mode <- calc_state_mode(copynumber[[cell_id]])
+        copynumber[[cell_id]] <- as.integer(ceiling(
+            copynumber[[cell_id]] / (state_mode / 2)
+        ))
+        copynumber[[cell_id]][copynumber[[cell_id]] > 11] <- 11
+    }
+    return(copynumber)
 }
