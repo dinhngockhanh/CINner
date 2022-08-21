@@ -111,6 +111,7 @@ fitting_PCAWG <- function(model_name,
                 stage_final = 2,
                 save_simulation = FALSE,
                 report_progress = FALSE,
+                save_cn_profile = FALSE,
                 compute_parallel = FALSE,
                 output_variables = c(
                     "all_sample_genotype",
