@@ -55,26 +55,28 @@ BUILD_driver_library <- function(model_variables = list(),
         TABLE_CANCER_ARMS <- table_arm_selection_rates
         #---Build the gene driver library
         TABLE_CANCER_GENES <- table_gene_selection_rates
-        TABLE_CANCER_GENES$s_rate_WT <- 0
-        TABLE_CANCER_GENES$s_rate_MUT <- 0
-        #   Compute selection rates for TSGs
-        list_TSG <- which(TABLE_CANCER_GENES$Gene_role == "TSG")
-        if (length(list_TSG) > 0) {
-            for (driver in 1:length(list_TSG)) {
-                row <- list_TSG[driver]
-                driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
-                TABLE_CANCER_GENES$s_rate_WT[row] <- 1 / driver_sel_rate
-                TABLE_CANCER_GENES$s_rate_MUT[row] <- 1
+        if (nrow(TABLE_CANCER_GENES) > 0) {
+            TABLE_CANCER_GENES$s_rate_WT <- 0
+            TABLE_CANCER_GENES$s_rate_MUT <- 0
+            #   Compute selection rates for TSGs
+            list_TSG <- which(TABLE_CANCER_GENES$Gene_role == "TSG")
+            if (length(list_TSG) > 0) {
+                for (driver in 1:length(list_TSG)) {
+                    row <- list_TSG[driver]
+                    driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
+                    TABLE_CANCER_GENES$s_rate_WT[row] <- 1 / driver_sel_rate
+                    TABLE_CANCER_GENES$s_rate_MUT[row] <- 1
+                }
             }
-        }
-        #   Compute selection rates for ONCOGENEs
-        list_ONCOGENE <- which(TABLE_CANCER_GENES$Gene_role == "ONCOGENE")
-        if (length(list_ONCOGENE) > 0) {
-            for (driver in 1:length(list_ONCOGENE)) {
-                row <- list_ONCOGENE[driver]
-                driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
-                TABLE_CANCER_GENES$s_rate_WT[row] <- driver_sel_rate
-                TABLE_CANCER_GENES$s_rate_MUT[row] <- driver_sel_rate^2
+            #   Compute selection rates for ONCOGENEs
+            list_ONCOGENE <- which(TABLE_CANCER_GENES$Gene_role == "ONCOGENE")
+            if (length(list_ONCOGENE) > 0) {
+                for (driver in 1:length(list_ONCOGENE)) {
+                    row <- list_ONCOGENE[driver]
+                    driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
+                    TABLE_CANCER_GENES$s_rate_WT[row] <- driver_sel_rate
+                    TABLE_CANCER_GENES$s_rate_MUT[row] <- driver_sel_rate^2
+                }
             }
         }
         #--------------------------------Output the model variable files
