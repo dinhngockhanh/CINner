@@ -158,7 +158,8 @@ fitting_PCAWG <- function(model_name,
             "get_cn_profile", "rbindlist", "p2_cn_profiles_long", "p2_readcount_model"
         ))
         library(ape)
-        clusterEvalQ(cl = cl, require(ape))
+        library(data.table)
+        clusterEvalQ(cl = cl, require(ape, data.table))
         sim_stat_list <- pblapply(cl = cl, X = 1:fit_ABC_count, FUN = function(iteration) {
             parameters <- sim_param[iteration, ]
             stat <- func_ABC(parameters)
@@ -492,7 +493,7 @@ gainloss_SIMS <- function(copynumber_sims,
     fillna <- TRUE
     cutoff <- 2
     #---------------------------Get gain/loss consensus from simulations
-    CNbins_list_sims <- vector("list", length = length(copynumber_sims))
+    # CNbins_list_sims <- vector("list", length = length(copynumber_sims))
     for (iteration in 1:length(copynumber_sims)) {
         simulation <- copynumber_sims[[iteration]]
         all_sample_genotype <- simulation$sample$all_sample_genotype
@@ -513,9 +514,14 @@ gainloss_SIMS <- function(copynumber_sims,
         #   Add record for this cell to list
         CNbins_iteration <- sample_genotype_unique_profile[[max_genotype]]
         CNbins_iteration$cell_id <- paste("SIMULATION", iteration, "-Library-1-1", sep = "")
-        CNbins_list_sims[[iteration]] <- CNbins_iteration
+        # CNbins_list_sims[[iteration]] <- CNbins_iteration
+        if (iteration == 1) {
+            CNbins_sims <- CNbins_iteration
+        } else {
+            CNbins_sims <- rbind(CNbins_sims, CNbins_iteration)
+        }
     }
-    CNbins_sims <- rbindlist(CNbins_list_sims, use.names = FALSE, fill = FALSE, idcol = NULL)
+    # CNbins_sims <- rbindlist(CNbins_list_sims, use.names = FALSE, fill = FALSE, idcol = NULL)
     class(CNbins_sims) <- "data.frame"
     #---Transform CN table into copynumber_sims object
     copynumber_sims <- createCNmatrix(CNbins_sims,
