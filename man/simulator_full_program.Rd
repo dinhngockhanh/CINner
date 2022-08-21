@@ -6,6 +6,7 @@
 \usage{
 simulator_full_program(
   model = "",
+  model_prefix = "",
   n_simulations = 0,
   stage_final = 0,
   n_clones_min = 0,
@@ -21,7 +22,9 @@ simulator_full_program(
   apply_UMAP_on_HMM = FALSE,
   report_progress = TRUE,
   compute_parallel = FALSE,
-  seed = Inf
+  seed = Inf,
+  output_variables = c(),
+  n_cores = NULL
 )
 }
 \arguments{
