@@ -250,8 +250,11 @@ gene_s        <- rep(1,length(gene_id))
 
 arm_s[which(arm_id=="8p")]  <- 1-0.11
 arm_s[which(arm_id=="8q")]  <- 1+0.001
-
 gene_s[which(gene_id=='MYC')]   <- 1+0.1
+
+arm_s[which(arm_id=="7p")]  <- 1+0.00
+arm_s[which(arm_id=="7q")]  <- 1+0.09
+gene_s[which(gene_id=='EGFR')]   <- 1+0.05
 
 
 

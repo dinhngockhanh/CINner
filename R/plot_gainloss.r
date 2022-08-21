@@ -111,6 +111,7 @@ plot_gainloss <- function(copynumber_sims,
     f2_data <- -rowSums(copynumber_data[, 5:ncol(copynumber_data)] < cutoff) / n_samples
     attr(f1_data, "names") <- NULL
     attr(f2_data, "names") <- NULL
+    #-----------Find Spearman correlations between PCAWG and simulations
     stat_gain <- cor.test(f1_sims, f1_data, method = "spearman", exact = FALSE)
     rho_gain <- stat_gain$estimate[["rho"]]
     pval_gain <- stat_gain$p.value

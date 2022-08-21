@@ -676,6 +676,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
         clone_hclust_height <- clone_hclust_height / 2
     } else {
         clone_phylogeny_phylo <- list()
+        clone_phylogeny_hclust <- list()
     }
     #-----------------------------Output package of data from simulation
     package_cell_phylogeny_hclust_extra <- list()

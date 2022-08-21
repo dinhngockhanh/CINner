@@ -9,6 +9,9 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react, genotype
     driver_count <- genotype_list_driver_count[genotype_daughter]
     driver_map <- genotype_list_driver_map[[genotype_daughter]]
     #   Find information about the focal deletion
+    if (max(ploidy_chrom) == 0) {
+        return()
+    }
     while (1) {
         #       Choose the chromosome to be focally deleted
         chrom <- sample.int(N_chromosomes, size = 1)

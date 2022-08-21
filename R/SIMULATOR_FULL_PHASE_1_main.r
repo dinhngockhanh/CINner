@@ -130,6 +130,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                     }
                 }
                 N_events_current <- N_events_current + count_new_events
+
                 count_event_types <- rmultinom(n = 1, size = count_new_events, prob = c((1 - prob_division), prob_division * (1 - prob_new_genotype), prob_division * prob_new_genotype))
                 count_deaths <- count_event_types[1]
                 count_div_old <- count_event_types[2]
@@ -142,7 +143,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                 #-----------Perform division events with new genotype
                 if (count_div_new_tmp >= 1) {
                     for (j in 1:count_div_new_tmp) {
-                        #               Find what events lead to the new genotype
+                        #   Find what events lead to the new genotype
                         flag_drivers <- 0
                         flag_whole_genome_duplication <- 0
                         flag_missegregation <- 0
@@ -163,6 +164,15 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                             flag_cnloh_terminal <- as.numeric(runif(1) < (prob_CN_cnloh_t / prob_new_genotype))
                             vec_flag <- c(flag_drivers, flag_whole_genome_duplication, flag_missegregation, flag_chrom_arm_missegregation, flag_amplification, flag_deletion, flag_cnloh_interstitial, flag_cnloh_terminal)
                         }
+                        # print("-----------------")
+                        # print(flag_drivers)
+                        # print(flag_whole_genome_duplication)
+                        # print(flag_missegregation)
+                        # print(flag_chrom_arm_missegregation)
+                        # print(flag_amplification)
+                        # print(flag_deletion)
+                        # print(flag_cnloh_interstitial)
+                        # print(flag_cnloh_terminal)
                         #               Initiate the two new genotypes
                         output <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react)
                         genotype_daughter_1 <- output[[1]]

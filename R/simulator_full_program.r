@@ -19,6 +19,7 @@
 #' @param seed ...
 #' @export
 simulator_full_program <- function(model = "",
+                                   model_prefix = "",
                                    n_simulations = 0,
                                    stage_final = 0,
                                    n_clones_min = 0,
@@ -37,6 +38,12 @@ simulator_full_program <- function(model = "",
                                    seed = Inf,
                                    output_variables = c(),
                                    n_cores = NULL) {
+    if (class(model) == "character") {
+        model_parameters <- model
+        model_prefix <- model
+    } else if (class(model) == "list") {
+        model_parameters <- model
+    }
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
     if (apply_HMM == TRUE) {
         save_simulation <- TRUE
@@ -61,7 +68,8 @@ simulator_full_program <- function(model = "",
             }
             many_sims[[iteration]] <- one_simulation(
                 iteration,
-                model,
+                model_parameters,
+                model_prefix,
                 stage_final,
                 n_clones_min,
                 n_clones_max,
@@ -85,9 +93,12 @@ simulator_full_program <- function(model = "",
         }
         cl <- makePSOCKcluster(numCores - 1)
         # setDefaultCluster(cl)
-        cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores - 1, " CORES...\n", sep = ""))
+        if (report_progress == TRUE) {
+            cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores - 1, " CORES...\n", sep = ""))
+        }
         #   Prepare input parameters for CancerSimulator
-        model <<- model
+        model_parameters <<- model_parameters
+        model_prefix <<- model_prefix
         stage_final <<- stage_final
         n_clones_min <<- n_clones_min
         n_clones_max <<- n_clones_max
@@ -100,7 +111,8 @@ simulator_full_program <- function(model = "",
         report_progress <<- report_progress
         output_variables <<- output_variables
         clusterExport(cl, varlist = c(
-            "model",
+            "model_parameters",
+            "model_prefix",
             "stage_final",
             "n_clones_min",
             "n_clones_max",
@@ -128,7 +140,8 @@ simulator_full_program <- function(model = "",
             many_sims <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
                 one_sim <- one_simulation(
                     iteration,
-                    model,
+                    model_parameters,
+                    model_prefix,
                     stage_final,
                     n_clones_min,
                     n_clones_max,
@@ -147,7 +160,8 @@ simulator_full_program <- function(model = "",
             many_sims <- parLapply(cl, 1:n_simulations, function(iteration) {
                 one_sim <- one_simulation(
                     iteration,
-                    model,
+                    model_parameters,
+                    model_prefix,
                     stage_final,
                     n_clones_min,
                     n_clones_max,
@@ -194,7 +208,8 @@ simulator_full_program <- function(model = "",
 
 #' @export
 one_simulation <- function(iteration,
-                           model,
+                           model_parameters,
+                           model_prefix,
                            stage_final,
                            n_clones_min,
                            n_clones_max,
@@ -207,7 +222,7 @@ one_simulation <- function(iteration,
                            report_progress,
                            output_variables) {
     # =============================================LOAD MODEL PARAMETERS
-    SIMULATOR_VARIABLES_for_simulation(model)
+    SIMULATOR_VARIABLES_for_simulation(model_parameters)
     # ============================================PRODUCE ONE SIMULATION
     flag_success <- 0
     while (flag_success == 0) {
@@ -296,20 +311,20 @@ one_simulation <- function(iteration,
     #----------------------------------------Save the simulation package
     if (save_simulation == TRUE) {
         if (report_progress == TRUE) cat("\nSave simulation package...\n")
-        save(simulation, file = paste(model, "_simulation_", iteration, ".rda", sep = ""))
+        save(simulation, file = paste(model_prefix, "_simulation_", iteration, ".rda", sep = ""))
     }
     #---------------------------------------Save the sampled CN profiles
     if (save_cn_profile == TRUE) {
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("\nSave true CN profiles in long format...\n")
             cn_profiles_long <- simulation$sample$cn_profiles_long
-            filename <- paste(model, "_cn_profiles_long_", iteration, ".csv", sep = "")
+            filename <- paste(model_prefix, "_cn_profiles_long_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_long, filename, row.names = FALSE)
         }
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("\nSave true CN profiles in wide format...\n")
             cn_profiles_wide <- simulation$sample$cn_profiles_wide
-            filename <- paste(model, "_cn_profiles_wide_", iteration, ".csv", sep = "")
+            filename <- paste(model_prefix, "_cn_profiles_wide_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_wide, filename, row.names = FALSE)
         }
     }
@@ -317,7 +332,7 @@ one_simulation <- function(iteration,
     if (internal_nodes_cn_info == TRUE) {
         if (report_progress == TRUE) cat("\nSave table of CN events in cell phylogeny...\n")
         hclust_CN_events <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events
-        filename <- paste(model, "_cn_events_", iteration, ".csv", sep = "")
+        filename <- paste(model_prefix, "_cn_events_", iteration, ".csv", sep = "")
         write.csv(hclust_CN_events, filename, row.names = FALSE)
     }
     #-----------------------------------------Save the noisy CN profiles
@@ -326,13 +341,13 @@ one_simulation <- function(iteration,
             if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
                 if (report_progress == TRUE) cat("\nSave noisy CN profiles in long format...\n")
                 noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
-                filename <- paste(model, "_noisy_cn_profiles_long_", iteration, ".csv", sep = "")
+                filename <- paste(model_prefix, "_noisy_cn_profiles_long_", iteration, ".csv", sep = "")
                 write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
             }
             if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
                 if (report_progress == TRUE) cat("\nSave noisy CN profiles in wide format...\n")
                 noisy_cn_profiles_wide <- simulation$sample$noisy_cn_profiles_wide
-                filename <- paste(model, "_noisy_cn_profiles_wide_", iteration, ".csv", sep = "")
+                filename <- paste(model_prefix, "_noisy_cn_profiles_wide_", iteration, ".csv", sep = "")
                 write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
             }
         }
@@ -341,7 +356,7 @@ one_simulation <- function(iteration,
         noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
         for (cell in 1:length(sample_cell_ID)) {
             cell_ID <- sample_cell_ID[cell]
-            filename <- paste(model, "/", model, "_noisy_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
+            filename <- paste(model_prefix, "/", model_prefix, "_noisy_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
             p2_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
         }
     }
@@ -349,11 +364,11 @@ one_simulation <- function(iteration,
     if (save_newick_tree == TRUE) {
         if (report_progress == TRUE) cat("\nSave sampled cells' phylogeny in Newick format...\n")
         cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
-        filename <- paste(model, "_cell_phylogeny_", iteration, ".newick", sep = "")
+        filename <- paste(model_prefix, "_cell_phylogeny_", iteration, ".newick", sep = "")
         write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
 
         clone_phylogeny_hclust <- simulation$sample_phylogeny$clone_phylogeny_hclust
-        filename <- paste(model, "_clone_phylogeny_", iteration, ".newick", sep = "")
+        filename <- paste(model_prefix, "_clone_phylogeny_", iteration, ".newick", sep = "")
         write(hc2Newick(clone_phylogeny_hclust), file = filename)
         # write(hc2Newick_MODIFIED(clone_phylogeny_hclust), file = filename)
     }

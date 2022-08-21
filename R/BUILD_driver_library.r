@@ -74,7 +74,7 @@ BUILD_driver_library <- function(model_variables = list(),
                 row <- list_ONCOGENE[driver]
                 driver_sel_rate <- TABLE_CANCER_GENES$s_rate[row]
                 TABLE_CANCER_GENES$s_rate_WT[row] <- driver_sel_rate
-                TABLE_CANCER_GENES$s_rate_MUT[row] <- driver_sel_rate ^ 2
+                TABLE_CANCER_GENES$s_rate_MUT[row] <- driver_sel_rate^2
             }
         }
         #--------------------------------Output the model variable files
