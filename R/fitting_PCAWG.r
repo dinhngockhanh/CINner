@@ -146,6 +146,7 @@ fitting_PCAWG <- function(model_name,
         PCAWG_N_cases <<- PCAWG_N_cases
         sim_param <<- sim_param
         func_ABC <<- func_ABC
+        normalize_cell_ploidy<<-normalize_cell_ploidy
         clusterExport(cl, varlist = c(
             "model_variables_chrom", "PCAWG_N_cases", "sim_param", "hg19_chrlength",
             "func_ABC", "BUILD_driver_library", "simulator_full_program", "gainloss_SIMS", "one_simulation", "createCNmatrix", "normalize_cell_ploidy", "calc_state_mode",
