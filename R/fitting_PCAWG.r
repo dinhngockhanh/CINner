@@ -228,7 +228,7 @@ fitting_PCAWG <- function(model_name,
     filename <- paste(model_name, "_fitting_genome.jpeg", sep = "")
     plot_gainloss(copynumber_sims, copynumber_PCAWG, filename)
 }
-
+#' @export
 plot_fitting_PCAWG <- function(filename,
                                ABC) {
     #----------------------------------------------Input ABC information
@@ -410,7 +410,7 @@ plot_fitting_PCAWG <- function(filename,
     print(p)
     dev.off()
 }
-
+#' @export
 gainloss_PCAWG <- function(copynumber_PCAWG,
                            copynumber_coordinates) {
     plotcol <- "state"
@@ -485,7 +485,7 @@ gainloss_PCAWG <- function(copynumber_PCAWG,
     output$delta_loss <- f2_data
     return(output)
 }
-
+#' @export
 gainloss_SIMS <- function(copynumber_sims,
                           copynumber_coordinates) {
     plotcol <- "state"
