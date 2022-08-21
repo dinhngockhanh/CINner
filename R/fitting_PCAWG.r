@@ -159,8 +159,7 @@ fitting_PCAWG <- function(model_name,
             "get_cn_profile", "p2_cn_profiles_long", "p2_readcount_model"
         ))
         library(ape)
-        library(data.table)
-        clusterEvalQ(cl = cl, require(ape, data.table))
+        clusterEvalQ(cl = cl, require(ape))
         sim_stat_list <- pblapply(cl = cl, X = 1:fit_ABC_count, FUN = function(iteration) {
             parameters <- sim_param[iteration, ]
             stat <- func_ABC(parameters)
