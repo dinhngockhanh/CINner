@@ -135,8 +135,13 @@ fitting_PCAWG <- function(model_name,
 
     sim_stat <- matrix(0, nrow = fit_ABC_count, ncol = length(target_PCAWG))
     for (row in 1:fit_ABC_count) {
+        start_time_chrom <- Sys.time()
+
         print(paste("Fitting chrom=", chromosome_target, "; simulation=", row, "/", fit_ABC_count, sep = ""))
         sim_stat[row, ] <- func_ABC(sim_param[row, ])
+
+        end_time_chrom <- Sys.time()
+        print(end_time_chrom - start_time_chrom)
     }
 
     end_time <- Sys.time()
