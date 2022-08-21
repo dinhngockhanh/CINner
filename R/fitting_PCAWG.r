@@ -60,6 +60,9 @@ fitting_PCAWG <- function(model_name,
         numCores <- n_cores
     }
     cl <- makePSOCKcluster(numCores - 1)
+    clusterExport(cl, varlist = c(
+        'data.table','rbindlist'
+    )
     tmp <- pblapply(cl = cl, X = 1:10, FUN = function(iteration) {
         DT1 <- data.table(A = 1:3, B = letters[1:3])
         DT2 <- data.table(A = 4:5, B = letters[4:5])
