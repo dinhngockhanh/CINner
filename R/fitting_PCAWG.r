@@ -37,6 +37,12 @@ fitting_PCAWG <- function(model_name,
     model_variables_fitting$general_variables$Value[which(model_variables_fitting$general_variables$Variable == "prob_CN_cnloh_terminal")] <- prob_CN_cnloh_terminal
     model_variables_fitting$general_variables$Value[which(model_variables_fitting$general_variables$Variable == "rate_driver")] <- rate_driver
     #---------------------------------------------------Fitting with ABC
+
+
+    # .libPaths("/burg/iicd/users/knd2127/rpackages")
+    # .libPaths()
+
+
     list_chromosomes <- model_variables_fitting$cn_info$Chromosome
     range_arm_s <- c(0.5, 1.5)
     range_gene_s <- c(1, 1.5)
@@ -47,29 +53,6 @@ fitting_PCAWG <- function(model_name,
 
     fit_ABC_count <- 1000
     fit_ABC_tol <- 0.1
-    ################################################################ TEST
-    print("RBINDLIST - NORMAL")
-    DT1 <- data.table(A = 1:3, B = letters[1:3])
-    DT2 <- data.table(A = 4:5, B = letters[4:5])
-    l <- list(DT1, DT2)
-    rbindlist(l)
-    print("RBINDLIST - PARALLEL")
-    if (is.null(n_cores)) {
-        numCores <- detectCores()
-    } else {
-        numCores <- n_cores
-    }
-    cl <- makePSOCKcluster(numCores - 1)
-    clusterExport(cl, varlist = c(
-        'data.table','rbindlist'
-    )
-    tmp <- pblapply(cl = cl, X = 1:10, FUN = function(iteration) {
-        DT1 <- data.table(A = 1:3, B = letters[1:3])
-        DT2 <- data.table(A = 4:5, B = letters[4:5])
-        l <- list(DT1, DT2)
-        l <- rbindlist(l)
-    })
-    ####################################################################
 
 
 
@@ -181,8 +164,81 @@ fitting_PCAWG <- function(model_name,
             "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
             "get_cn_profile", "p2_cn_profiles_long", "p2_readcount_model", "rbindlist"
         ))
+
+        e <- new.env()
+        e$libs <- .libPaths()
+        clusterExport(cl, "libs", envir = e)
+        clusterEvalQ(cl, .libPaths(libs))
+
+        # print("1")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(ggplot2))
+        # print("2")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(ggtree))
+        # print("3")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(signals))
+        # print("4")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(dendextend))
+        # print("5")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(fishplot))
+        # print("6")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(ctc))
+        # print("7")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(adephylo))
+        # print("8")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(data.table))
+        # print("9")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(plyr))
+        # print("10")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(matrixStats))
+        # print("11")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(ape))
+        # print("12")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(gridExtra))
+        # print("13")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(readxl))
+        # print("14")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(phyloTop))
+        # print("15")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(pbapply))
+        # print("16")
+        # clusterExport(cl, "libs", envir = e)
+        # clusterEvalQ(cl, .libPaths(libs))
+        # clusterEvalQ(cl = cl, require(abc))
+
         library(ape)
         clusterEvalQ(cl = cl, require(ape))
+        # clusterEvalQ(cl = cl, require(ape, dplyr, data.table))
+
         sim_stat_list <- pblapply(cl = cl, X = 1:fit_ABC_count, FUN = function(iteration) {
             parameters <- sim_param[iteration, ]
             stat <- func_ABC(parameters)
@@ -477,9 +533,17 @@ gainloss_PCAWG <- function(copynumber_PCAWG,
         CNbins_list_data[[iteration]] <- CNbins_iteration
         NA_list_data[[iteration]] <- NA_iteration
     }
-    CNbins_data <- rbindlist(CNbins_list_data, use.names = FALSE, fill = FALSE, idcol = NULL)
-    class(CNbins_data) <- "data.frame"
+    # CNbins_data <- rbindlist(CNbins_list_data, use.names = FALSE, fill = FALSE, idcol = NULL)
+    # class(CNbins_data) <- "data.frame"
     #---Transform CN table into copynumber_sims object
+    # copynumber_data <- CNbins_list_data[[1]]
+    # copynumber_data <- copynumber_data[, 1:3]
+    # copynumber_data$width <- copynumber_data$end - copynumber_data$start + 1
+    # for (iteration in 1:length(CNbins_list_data)) {
+    #     CNbins_iteration <- CNbins_list_data[[iteration]]
+    #     cell_id <- CNbins_iteration$cell_id[1]
+    #     copynumber_data[[cell_id]] <- CNbins_iteration$copy
+    # }
     copynumber_data <- createCNmatrix(CNbins_data,
         field = plotcol, wholegenome = TRUE,
         fillnaplot = fillna, centromere = FALSE
@@ -509,6 +573,7 @@ gainloss_PCAWG <- function(copynumber_PCAWG,
     output$delta_loss <- f2_data
     return(output)
 }
+
 #' @export
 gainloss_SIMS <- function(copynumber_sims,
                           copynumber_coordinates) {
@@ -516,7 +581,7 @@ gainloss_SIMS <- function(copynumber_sims,
     fillna <- TRUE
     cutoff <- 2
     #---------------------------Get gain/loss consensus from simulations
-    # CNbins_list_sims <- vector("list", length = length(copynumber_sims))
+    CNbins_list_sims <- vector("list", length = length(copynumber_sims))
     for (iteration in 1:length(copynumber_sims)) {
         simulation <- copynumber_sims[[iteration]]
         all_sample_genotype <- simulation$sample$all_sample_genotype
@@ -537,20 +602,23 @@ gainloss_SIMS <- function(copynumber_sims,
         #   Add record for this cell to list
         CNbins_iteration <- sample_genotype_unique_profile[[max_genotype]]
         CNbins_iteration$cell_id <- paste("SIMULATION", iteration, "-Library-1-1", sep = "")
-        # CNbins_list_sims[[iteration]] <- CNbins_iteration
-        if (iteration == 1) {
-            CNbins_sims <- CNbins_iteration
-        } else {
-            CNbins_sims <- rbind(CNbins_sims, CNbins_iteration)
-        }
+        CNbins_list_sims[[iteration]] <- CNbins_iteration
     }
     # CNbins_sims <- rbindlist(CNbins_list_sims, use.names = FALSE, fill = FALSE, idcol = NULL)
-    class(CNbins_sims) <- "data.frame"
+    # class(CNbins_sims) <- "data.frame"
     #---Transform CN table into copynumber_sims object
-    copynumber_sims <- createCNmatrix(CNbins_sims,
-        field = plotcol, wholegenome = TRUE,
-        fillnaplot = fillna, centromere = FALSE
-    )
+    copynumber_sims <- CNbins_list_sims[[1]]
+    copynumber_sims <- copynumber_sims[, 1:3]
+    copynumber_sims$width <- copynumber_sims$end - copynumber_sims$start + 1
+    for (iteration in 1:length(CNbins_list_sims)) {
+        CNbins_iteration <- CNbins_list_sims[[iteration]]
+        cell_id <- CNbins_iteration$cell_id[1]
+        copynumber_sims[[cell_id]] <- CNbins_iteration$copy
+    }
+    # copynumber_sims <- createCNmatrix(CNbins_sims,
+    #     field = plotcol, wholegenome = TRUE,
+    #     fillnaplot = fillna, centromere = FALSE
+    # )
     #---Normalize ploidy of each sample to 2
     copynumber_sims <- normalize_cell_ploidy(copynumber_sims)
     #---Get genome coordinates
