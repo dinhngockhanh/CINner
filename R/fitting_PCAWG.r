@@ -37,12 +37,6 @@ fitting_PCAWG <- function(model_name,
     model_variables_fitting$general_variables$Value[which(model_variables_fitting$general_variables$Variable == "prob_CN_cnloh_terminal")] <- prob_CN_cnloh_terminal
     model_variables_fitting$general_variables$Value[which(model_variables_fitting$general_variables$Variable == "rate_driver")] <- rate_driver
     #---------------------------------------------------Fitting with ABC
-
-
-    # .libPaths("/burg/iicd/users/knd2127/rpackages")
-    # .libPaths()
-
-
     list_chromosomes <- model_variables_fitting$cn_info$Chromosome
     range_arm_s <- c(0.5, 1.5)
     range_gene_s <- c(1, 1.5)
@@ -60,6 +54,7 @@ fitting_PCAWG <- function(model_name,
 
     #---Fit individual chromosomes with ABC-rejection
     model_variables_best <- model_variables
+    # for (i in 1:length(list_chromosomes)) {
     for (i in 1:length(list_chromosomes)) {
         chromosome_target <- list_chromosomes[i]
         #---Tailor the model variables for this chromosome
@@ -142,6 +137,7 @@ fitting_PCAWG <- function(model_name,
             }
         }
         #   Simulate gain/loss map for each parameter set
+        start_time <- Sys.time()
         if (is.null(n_cores)) {
             numCores <- detectCores()
         } else {
@@ -164,90 +160,28 @@ fitting_PCAWG <- function(model_name,
             "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
             "get_cn_profile", "p2_cn_profiles_long", "p2_readcount_model", "rbindlist"
         ))
-
         e <- new.env()
         e$libs <- .libPaths()
         clusterExport(cl, "libs", envir = e)
         clusterEvalQ(cl, .libPaths(libs))
-
-        # print("1")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(ggplot2))
-        # print("2")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(ggtree))
-        # print("3")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(signals))
-        # print("4")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(dendextend))
-        # print("5")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(fishplot))
-        # print("6")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(ctc))
-        # print("7")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(adephylo))
-        # print("8")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(data.table))
-        # print("9")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(plyr))
-        # print("10")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(matrixStats))
-        # print("11")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(ape))
-        # print("12")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(gridExtra))
-        # print("13")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(readxl))
-        # print("14")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(phyloTop))
-        # print("15")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(pbapply))
-        # print("16")
-        # clusterExport(cl, "libs", envir = e)
-        # clusterEvalQ(cl, .libPaths(libs))
-        # clusterEvalQ(cl = cl, require(abc))
-
         library(ape)
         clusterEvalQ(cl = cl, require(ape))
-        # clusterEvalQ(cl = cl, require(ape, dplyr, data.table))
 
-        sim_stat_list <- pblapply(cl = cl, X = 1:fit_ABC_count, FUN = function(iteration) {
+
+
+        sim_results_list <- pblapply(cl = cl, X = 1:fit_ABC_count, FUN = function(iteration) {
             parameters <- sim_param[iteration, ]
             stat <- func_ABC(parameters)
             return(stat)
         })
         sim_stat <- matrix(0, nrow = fit_ABC_count, ncol = length(target_PCAWG))
         for (row in 1:fit_ABC_count) {
-            sim_stat[row, ] <- sim_stat_list[[row]]
+            #   Statistics = gain/loss map from simulations
+            stat <- sim_results_list[[row]]
+            sim_stat[row, ] <- stat
         }
+        end_time <- Sys.time()
+        print(end_time - start_time)
         #   Perform ABC
         ABC <- abc(target = target_PCAWG, param = sim_param, sumstat = sim_stat, tol = fit_ABC_tol, method = "rejection")
         #   Save results of ABC
@@ -490,6 +424,7 @@ plot_fitting_PCAWG <- function(filename,
     print(p)
     dev.off()
 }
+
 #' @export
 gainloss_PCAWG <- function(copynumber_PCAWG,
                            copynumber_coordinates) {
@@ -533,8 +468,8 @@ gainloss_PCAWG <- function(copynumber_PCAWG,
         CNbins_list_data[[iteration]] <- CNbins_iteration
         NA_list_data[[iteration]] <- NA_iteration
     }
-    # CNbins_data <- rbindlist(CNbins_list_data, use.names = FALSE, fill = FALSE, idcol = NULL)
-    # class(CNbins_data) <- "data.frame"
+    CNbins_data <- rbindlist(CNbins_list_data, use.names = FALSE, fill = FALSE, idcol = NULL)
+    class(CNbins_data) <- "data.frame"
     #---Transform CN table into copynumber_sims object
     # copynumber_data <- CNbins_list_data[[1]]
     # copynumber_data <- copynumber_data[, 1:3]
@@ -545,7 +480,7 @@ gainloss_PCAWG <- function(copynumber_PCAWG,
     #     copynumber_data[[cell_id]] <- CNbins_iteration$copy
     # }
     copynumber_data <- createCNmatrix(CNbins_data,
-        field = plotcol, wholegenome = TRUE,
+        field = plotcol, wholegenome = FALSE,
         fillnaplot = fillna, centromere = FALSE
     )
     #---Normalize ploidy of each sample to 2
@@ -616,7 +551,7 @@ gainloss_SIMS <- function(copynumber_sims,
         copynumber_sims[[cell_id]] <- CNbins_iteration$copy
     }
     # copynumber_sims <- createCNmatrix(CNbins_sims,
-    #     field = plotcol, wholegenome = TRUE,
+    #     field = plotcol, wholegenome = FALSE,
     #     fillnaplot = fillna, centromere = FALSE
     # )
     #---Normalize ploidy of each sample to 2
