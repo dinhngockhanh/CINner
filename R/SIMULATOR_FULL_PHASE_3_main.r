@@ -1,11 +1,11 @@
 # =============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
 #' @export
-SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample) {
+SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample, report_progress) {
     #-----------------------------------------Input the clonal evolution
     T_final <- package_clonal_evolution$T_current
     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- package_clonal_evolution$genotype_list_ploidy_block
-    genotype_list_ploidy_allele <- package_clonal_evolution$genotype_list_ploidy_allele
+    genotype_list_ploidy_allele                  <- package_clonal_evolution$genotype_list_ploidy_allele
     evolution_traj_time <- package_clonal_evolution$evolution_traj_time
     evolution_traj_divisions <- package_clonal_evolution$evolution_traj_divisions
     evolution_traj_clonal_ID <- package_clonal_evolution$evolution_traj_clonal_ID
@@ -75,7 +75,16 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     phylogeny_genotype[N_sample:(2 * N_sample - 1)] <- sample_clone_ID
     #-------------------------------Build the sample cell phylogeny tree
     node_mother_next <- N_sample - 1
+    if (report_progress == TRUE) {
+        pb <- txtProgressBar(
+            min = 1, max = length(evolution_traj_divisions),
+            style = 3, width = 50, char = "="
+        )
+    }
     for (i in seq(length(evolution_traj_divisions), 1, -1)) {
+        if (report_progress == TRUE) {
+            setTxtProgressBar(pb, length(evolution_traj_divisions) - i + 1)
+        }
         #   Get time point
         time <- evolution_traj_time[i]
         #   Get list of eligible nodes
@@ -353,6 +362,9 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             }
         }
     }
+    if (report_progress == TRUE) {
+        cat("\n")
+    }
     #----------------------------------------Complete the unmerged nodes
     #-------------------------i.e. there is more than one ancestral cell
     #   Find all unmerged nodes
@@ -483,9 +495,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
         #   Substract the duration from length of leaf merging in phylo
         phylogeny_phylo$edge.length[leaf_row] <- phylogeny_phylo$edge.length[leaf_row] - (T_final - T_sample)
     }
-
-
-
     #   Create object containing both phylo-style tree and clustering
     phylogeny_clustering_truth <- list()
     phylogeny_clustering_truth$tree <- phylogeny_phylo

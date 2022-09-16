@@ -31,12 +31,12 @@ library(parallel)
 library(RColorBrewer)
 library(ape)
 #-----------------------------------------------------------------------
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
-library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
 ```
 
 # Set up model variables
@@ -265,7 +265,7 @@ stage_final       <- 3
 n_clones_min      <- 1
 n_clones_max      <- Inf
 
-simulator_full_program(
+tmp               <- simulator_full_program(
     model = model_name,
     n_simulations = n_simulations,
     stage_final = stage_final,
@@ -276,6 +276,7 @@ simulator_full_program(
     save_newick_tree = TRUE,
 
     save_cn_profile = TRUE,
+    save_cn_clones = TRUE,
     model_readcount = TRUE,
     format_cn_profile = "both",
 

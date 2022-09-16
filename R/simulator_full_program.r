@@ -28,6 +28,7 @@ simulator_full_program <- function(model = "",
                                    internal_nodes_cn_info = FALSE,
                                    save_newick_tree = FALSE,
                                    save_cn_profile = FALSE,
+                                   save_cn_clones = FALSE,
                                    format_cn_profile = "both",
                                    model_readcount = FALSE,
                                    pseudo_corrected_readcount = FALSE,
@@ -50,7 +51,7 @@ simulator_full_program <- function(model = "",
     }
     # =================CREATE WORKSPACE DIRECTORY FOR CN INFERENCE WORKS
     if (model_readcount == TRUE) {
-        dir.create(model)
+        dir.create(model_prefix)
     }
     # ======================================MAIN LOOP OF CANCERSIMULATOR
     if (seed == Inf) {
@@ -77,6 +78,7 @@ simulator_full_program <- function(model = "",
                 internal_nodes_cn_info,
                 save_newick_tree,
                 save_cn_profile,
+                save_cn_clones,
                 format_cn_profile,
                 model_readcount,
                 report_progress,
@@ -106,6 +108,7 @@ simulator_full_program <- function(model = "",
         internal_nodes_cn_info <<- internal_nodes_cn_info
         save_newick_tree <<- save_newick_tree
         save_cn_profile <<- save_cn_profile
+        save_cn_clones <<- save_cn_clones
         format_cn_profile <<- format_cn_profile
         model_readcount <<- model_readcount
         report_progress <<- report_progress
@@ -120,6 +123,7 @@ simulator_full_program <- function(model = "",
             "internal_nodes_cn_info",
             "save_newick_tree",
             "save_cn_profile",
+            "save_cn_clones",
             "format_cn_profile",
             "model_readcount",
             "report_progress",
@@ -149,6 +153,7 @@ simulator_full_program <- function(model = "",
                     internal_nodes_cn_info,
                     save_newick_tree,
                     save_cn_profile,
+                    save_cn_clones,
                     format_cn_profile,
                     model_readcount,
                     report_progress,
@@ -169,6 +174,7 @@ simulator_full_program <- function(model = "",
                     internal_nodes_cn_info,
                     save_newick_tree,
                     save_cn_profile,
+                    save_cn_clones,
                     format_cn_profile,
                     model_readcount,
                     report_progress,
@@ -183,7 +189,7 @@ simulator_full_program <- function(model = "",
     # ================================SAVE GC & MAPPABILITY AS WIG FILES
     if (model_readcount == TRUE) {
         if (report_progress == TRUE) cat("\nSave GC & mappability in WIG format...\n")
-        p2_write_gc_map_as_wig(filename_gc = paste(model, "_gc.wig", sep = ""), filename_map = paste(model, "_map.wig", sep = ""))
+        p2_write_gc_map_as_wig(filename_gc = paste(model_prefix, "_gc.wig", sep = ""), filename_map = paste(model_prefix, "_map.wig", sep = ""))
     }
     # ======================INFER CN FROM NOISY READCOUNTS USING HMMCOPY
     if (apply_HMM == TRUE) {
@@ -198,7 +204,7 @@ simulator_full_program <- function(model = "",
             flag_parallel <- 0
         }
         system("chmod -x hmmcopy.bash")
-        system(paste("bash hmmcopy.bash ", model, " ", n_simulations, " ", flag_parallel, sep = ""))
+        system(paste("bash hmmcopy.bash ", model_prefix, " ", n_simulations, " ", flag_parallel, sep = ""))
         #   Append the simulation package RDA with HMMcopy inference
         append_with_hmm(model = model, n_simulations = n_simulations, UMAP = apply_UMAP_on_HMM, pseudo_corrected_readcount = pseudo_corrected_readcount)
     }
@@ -217,6 +223,7 @@ one_simulation <- function(iteration,
                            internal_nodes_cn_info,
                            save_newick_tree,
                            save_cn_profile,
+                           save_cn_clones,
                            format_cn_profile,
                            model_readcount,
                            report_progress,
@@ -249,7 +256,7 @@ one_simulation <- function(iteration,
         #---------------------------Simulate the phylogeny of the sample
         if (stage_final >= 3) {
             if (report_progress == TRUE) cat("\nStage 3: sample phylogeny...\n")
-            package_sample_phylogeny <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution, package_sample)
+            package_sample_phylogeny <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution, package_sample, report_progress)
         }
     }
     # ======================PREPARE DATA FROM PHASE 1 (CLONAL EVOLUTION)
@@ -327,6 +334,13 @@ one_simulation <- function(iteration,
             filename <- paste(model_prefix, "_cn_profiles_wide_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_wide, filename, row.names = FALSE)
         }
+    }
+    #---------------------------Save the clonal identities of every cell
+    if (save_cn_clones == TRUE) {
+        if (report_progress == TRUE) cat("\nSave table of cell-clone mapping...\n")
+        table_cell_clone <- simulation$sample$table_cell_clone
+        filename <- paste(model_prefix, "_cn_profiles_clonal_mapping_", iteration, ".csv", sep = "")
+        write.csv(table_cell_clone, filename, row.names = FALSE)
     }
     #----------------------Save the table of CN events in cell phylogeny
     if (internal_nodes_cn_info == TRUE) {

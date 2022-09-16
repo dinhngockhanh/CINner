@@ -120,463 +120,21 @@ fitting_PCAWG <- function(model_name,
     # fit_ABC_tol <- 0.03
 
     fit_ABC_routine <- "abc-rf"
-    fit_ABC_count_arms <- 10000
-    fit_ABC_count_genes <- 100
+    fit_ABC_count <- 1000
     # n_samples <- 200
     # fit_ABC_tol <- 0.03
 
 
 
 
+
+    #--------------------------------Fit individual chromosomes with ABC
+    model_variables_best <- model_variables
     if (is.null(n_samples) == TRUE) {
         PCAWG_N_cases <- length(unique(copynumber_PCAWG$donor_unique_id))
     } else {
         PCAWG_N_cases <- n_samples
     }
-    #---------------------------Initiate table of best fitted parameters
-    model_variables_best <- model_variables
-    #---------------------------------------Fit chromosome arms with ABC
-    #---Make reference table for fitting
-    #   Tailor the model variables for one chromosome
-    chromosome_target <- list_chromosomes[1]
-    model_variables_chrom_arms <- model_variables_arms
-    model_variables_chrom_arms$gc_and_mappability <- model_variables_chrom_arms$gc_and_mappability[which(model_variables_chrom_arms$gc_and_mappability$chr == chromosome_target), ]
-    model_variables_chrom_arms$cn_info <- model_variables_chrom_arms$cn_info[which(model_variables_chrom_arms$cn_info$Chromosome == chromosome_target), ]
-    model_variables_chrom_arms$driver_library <- model_variables_chrom_arms$driver_library[which(model_variables_chrom_arms$driver_library$Chromosome == chromosome_target), ]
-    model_variables_chrom_arms$chromosome_arm_library <- model_variables_chrom_arms$chromosome_arm_library[which(model_variables_chrom_arms$chromosome_arm_library$Chromosome == chromosome_target), ]
-    model_variables_chrom_arms$initial_cn <- model_variables_chrom_arms$initial_cn[which(model_variables_chrom_arms$initial_cn$Chromosome == chromosome_target), ]
-    #    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #    !!!!!  LATER: CHANGE model_variables_chrom_genes$initial_others  !!!!
-    #    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    list_arms <- model_variables_chrom_arms$chromosome_arm_library$Arm_ID
-    #   Define objective function for ABC fitting
-    func_ABC_arm <- function(parameters, model_variables) {
-        parameters <- c(parameters, rep(1, len = length(list_arms)))
-        #   Assign selection rates to arms and genes
-        for (para in 1:length(parameters)) {
-            model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Arm_ID == list_arms[para])] <- parameters[para]
-        }
-        model_variables <- BUILD_driver_library(
-            model_variables = model_variables,
-            table_arm_selection_rates = model_variables$chromosome_arm_library,
-            table_gene_selection_rates = model_variables$driver_library
-        )
-        #   Make simulations
-        SIMS_chromosome <- simulator_full_program(
-            model = model_variables,
-            model_prefix = "",
-            n_simulations = PCAWG_N_cases,
-            stage_final = 2,
-            save_simulation = FALSE,
-            report_progress = FALSE,
-            save_cn_profile = FALSE,
-            compute_parallel = FALSE,
-            output_variables = c(
-                "all_sample_genotype",
-                "sample_cell_ID",
-                "sample_genotype_unique",
-                "sample_genotype_unique_profile"
-            )
-        )
-        #   Get gain/loss map from the simulations
-        SIMS_delta <- gainloss_SIMS(SIMS_chromosome, ploidy_normalization = FALSE)
-        #   Statistics = gain/loss map from simulations
-        stat <- c(
-            SIMS_delta$delta_gain[1],
-            SIMS_delta$delta_gain[length(SIMS_delta$delta_gain)],
-            SIMS_delta$delta_loss[1],
-            SIMS_delta$delta_loss[length(SIMS_delta$delta_loss)]
-        )
-        return(stat)
-    }
-    # #   Simulate table of parameters
-    # sim_param <- matrix(0, nrow = fit_ABC_count_arms, ncol = 2)
-    # for (col in 1:2) {
-    #     sim_param[, col] <- runif(fit_ABC_count_arms, min = range_arm_s[1], max = range_arm_s[2])
-    # }
-    # #   Make reference table
-    # start_time <- Sys.time()
-    # cl <- makePSOCKcluster(n_cores)
-    # cat("=================================================================================\n")
-    # cat("=================================================================================\n")
-    # cat("=================================================================================\n")
-    # cat(paste("Creating reference table for fitting chromosome arms (", n_cores, " cores, ", fit_ABC_count_arms, " simulations)\n", sep = ""))
-    # model_variables_chrom_arms <<- model_variables_chrom_arms
-    # PCAWG_N_cases <<- PCAWG_N_cases
-    # sim_param <<- sim_param
-    # func_ABC_arm <<- func_ABC_arm
-    # clusterExport(cl, varlist = c(
-    #     "model_variables_chrom_arms", "PCAWG_N_cases", "sim_param", "hg19_chrlength",
-    #     "func_ABC_arm", "BUILD_driver_library", "simulator_full_program", "gainloss_SIMS", "one_simulation", "createCNmatrix", "normalize_cell_ploidy", "calc_state_mode",
-    #     "hc2Newick_MODIFIED", "hc2Newick",
-    #     "SIMULATOR_VARIABLES_for_simulation",
-    #     "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
-    #     "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
-    #     "SIMULATOR_FULL_PHASE_1_genotype_cleaning", "SIMULATOR_FULL_PHASE_1_genotype_comparison", "SIMULATOR_FULL_PHASE_1_genotype_initiation", "SIMULATOR_FULL_PHASE_1_genotype_update", "SIMULATOR_FULL_PHASE_1_selection_rate",
-    #     "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
-    #     "get_cn_profile", "p2_cn_profiles_long", "p2_readcount_model", "rbindlist"
-    # ))
-    # e <- new.env()
-    # e$libs <- .libPaths()
-    # clusterExport(cl, "libs", envir = e)
-    # clusterEvalQ(cl, .libPaths(libs))
-    # library(ape)
-    # clusterEvalQ(cl = cl, require(ape))
-    # pbo <- pboptions(type = "txt")
-    # sim_results_list <- pblapply(cl = cl, X = 1:fit_ABC_count_arms, FUN = function(iteration) {
-    #     parameters <- sim_param[iteration, ]
-    #     stat <- func_ABC_arm(parameters, model_variables_chrom_arms)
-    #     return(stat)
-    # })
-    # stopCluster(cl)
-    # sim_stat <- matrix(0, nrow = fit_ABC_count_arms, ncol = length(sim_results_list[[1]]))
-    # for (row in 1:fit_ABC_count_arms) {
-    #     stat <- sim_results_list[[row]]
-    #     sim_stat[row, ] <- stat
-    # }
-    # end_time <- Sys.time()
-    # print(end_time - start_time)
-    # #   Train the chromosome arm model
-    # vec_para_alias <- paste("para", 1:2, sep = "")
-    # vec_bin_alias <- paste("gainloss_", 1:4, sep = "")
-    # vec_data_rf <- list()
-    # vec_model_rf <- list()
-    # for (para in 1:2) {
-    #     data_rf <- data.frame(sim_param[, para], sim_stat)
-    #     colnames(data_rf) <- c(vec_para_alias[para], vec_bin_alias)
-    #     f <- as.formula(paste(vec_para_alias[para], "~.", sep = ""))
-    #     model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
-    #     vec_data_rf[[para]] <- data_rf
-    #     vec_model_rf[[para]] <- model_rf
-    # }
-    #---Make predictions for chromosome arms
-    for (i in 1:length(list_chromosomes)) {
-        chromosome_target <- list_chromosomes[i]
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################# TEMPORARY ####
-        load(paste(model_name,                                      ####
-            "_fitting_chr",                                         ####
-            chromosome_target,                                      ####
-            "_arms.rda",                                            ####
-            sep = ""))                                              ####
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        #-----------------Tailor the model variables for this chromosome
-        model_variables_chrom_arms <- model_variables_arms
-        model_variables_chrom_arms$gc_and_mappability <- model_variables_chrom_arms$gc_and_mappability[which(model_variables_chrom_arms$gc_and_mappability$chr == chromosome_target), ]
-        model_variables_chrom_arms$cn_info <- model_variables_chrom_arms$cn_info[which(model_variables_chrom_arms$cn_info$Chromosome == chromosome_target), ]
-        model_variables_chrom_arms$driver_library <- model_variables_chrom_arms$driver_library[which(model_variables_chrom_arms$driver_library$Chromosome == chromosome_target), ]
-        model_variables_chrom_arms$chromosome_arm_library <- model_variables_chrom_arms$chromosome_arm_library[which(model_variables_chrom_arms$chromosome_arm_library$Chromosome == chromosome_target), ]
-        model_variables_chrom_arms$initial_cn <- model_variables_chrom_arms$initial_cn[which(model_variables_chrom_arms$initial_cn$Chromosome == chromosome_target), ]
-        #------------------------Find the PCAWG data for this chromosome
-        vec_loc <- which(copynumber_coordinates$chr == chromosome_target)
-        #   Restrict PCAWG data on arm level
-        PCAWG_delta_arms <- list()
-        PCAWG_delta_arms$delta_gain <- PCAWG_delta_genome_arms$delta_gain[vec_loc]
-        PCAWG_delta_arms$delta_loss <- PCAWG_delta_genome_arms$delta_loss[vec_loc]
-        #---------------------------------------Prepare data for fitting
-        #---Get list of arms to fit for
-        list_arms <- model_variables_chrom_arms$chromosome_arm_library$Arm_ID
-        # #---Target statistics = gain/loss map from PCAWG
-        # target_PCAWG_arms <- c(
-        #     PCAWG_delta_arms$delta_gain[1],
-        #     PCAWG_delta_arms$delta_gain[length(PCAWG_delta_arms$delta_gain)],
-        #     PCAWG_delta_arms$delta_loss[1],
-        #     PCAWG_delta_arms$delta_loss[length(PCAWG_delta_arms$delta_loss)]
-        # )
-        # obs_rf <- data.frame(matrix(target_PCAWG_arms, nrow = 1))
-        # colnames(obs_rf) <- vec_bin_alias
-        # #---Get posterior distributions for this chromosome
-        # ABC_RF <- list()
-        for (para in 1:2) {
-            #   Create training dataset for this parameter
-            para_ID <- list_arms[para]
-        #     cat(paste("Performing ABC random forests for parameter ", para, "/", ncol(sim_param), " (", para_ID, ")\n", sep = ""))
-        #     model_rf <- vec_model_rf[[para]]
-        #     data_rf <- vec_data_rf[[para]]
-        #     post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
-        #     #   Find best selection rate from posterior distribution
-        #     best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
-        #     #   Save results for this parameter
-        #     ABC_RF[[paste("data_", para_ID, sep = "")]] <- data_rf
-        #     ABC_RF[[paste("model_", para_ID, sep = "")]] <- model_rf
-        #     ABC_RF[[paste("obs_", para_ID, sep = "")]] <- obs_rf
-        #     ABC_RF[[paste("post_", para_ID, sep = "")]] <- post_rf
-        #     ABC_RF[[paste("best_", para_ID, sep = "")]] <- best_rf
-            ############################################################
-            ############################################################
-            ############################################################
-            ############################################# TEMPORARY ####
-            data_rf <- ABC_RF[[paste("data_", para_ID, sep = "")]]  ####
-            model_rf <- ABC_RF[[paste("model_", para_ID, sep = "")]]####
-            obs_rf <- ABC_RF[[paste("obs_", para_ID, sep = "")]]    ####
-            post_rf <- ABC_RF[[paste("post_", para_ID, sep = "")]]  ####
-            best_rf <- ABC_RF[[paste("best_", para_ID, sep = "")]]  ####
-            ############################################################
-            ############################################################
-            ############################################################
-            ############################################################
-            #   Save best selection rate for this chromosome arm
-            model_variables_best$chromosome_arm_library$s_rate[which(model_variables_best$chromosome_arm_library$Arm_ID == list_arms[para])] <- post_rf$expectation
-            model_variables_best <- BUILD_driver_library(
-                model_variables = model_variables_best,
-                table_arm_selection_rates = model_variables_best$chromosome_arm_library,
-                table_gene_selection_rates = model_variables_best$driver_library
-            )
-        }
-        # #   Save results of ABC-random forests
-        # filename <- paste(model_name, "_fitting_chr", chromosome_target, "_arms.rda", sep = "")
-        # ABC_RF$target_PCAWG <- target_PCAWG_arms
-        # ABC_RF$PCAWG_delta <- PCAWG_delta_arms
-        # ABC_RF$sim_param <- sim_param
-        # ABC_RF$sim_stat <- sim_stat
-        # ABC_RF$list_arms <- list_arms
-        # ABC_RF$list_genes <- c()
-        # ABC_RF$model_variables <- model_variables_chrom_arms
-        # ABC_RF$PCAWG_N_cases <- PCAWG_N_cases
-        # ABC_RF$chromosome_arm_library <- model_variables_chrom_arms$chromosome_arm_library
-        # ABC_RF$driver_library <- c()
-        # save(ABC_RF, file = filename)
-        # #---Plot the result of fitting thic chromosome to PCAWG
-        # filename <- paste(model_name, "_fitting_chr", chromosome_target, "_arms.jpeg", sep = "")
-        # plot_fitting_PCAWG(filename, ABC_RF, fit_ABC_routine)
-    }
-    #--------------------------------------Fit chromosome genes with ABC
-    # model_variables_chrom_genes$chromosome_arm_library <- model_variables_best$chromosome_arm_library
-    for (i in 1:length(list_chromosomes)) {
-        chromosome_target <- list_chromosomes[i]
-        #-----------------Tailor the model variables for this chromosome
-        #   Model variables for fitting chromosome genes
-        model_variables_chrom_genes <- model_variables_genes
-        model_variables_chrom_genes$gc_and_mappability <- model_variables_chrom_genes$gc_and_mappability[which(model_variables_chrom_genes$gc_and_mappability$chr == chromosome_target), ]
-        model_variables_chrom_genes$cn_info <- model_variables_chrom_genes$cn_info[which(model_variables_chrom_genes$cn_info$Chromosome == chromosome_target), ]
-        model_variables_chrom_genes$driver_library <- model_variables_chrom_genes$driver_library[which(model_variables_chrom_genes$driver_library$Chromosome == chromosome_target), ]
-        model_variables_chrom_genes$chromosome_arm_library <- model_variables_chrom_genes$chromosome_arm_library[which(model_variables_best$chromosome_arm_library$Chromosome == chromosome_target), ]
-        model_variables_chrom_genes$initial_cn <- model_variables_chrom_genes$initial_cn[which(model_variables_chrom_genes$initial_cn$Chromosome == chromosome_target), ]
-        #    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #    !!!!!  LATER: CHANGE model_variables_chrom_genes$initial_others  !!!!
-        #    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #------------------------Find the PCAWG data for this chromosome
-        vec_loc <- which(copynumber_coordinates$chr == chromosome_target)
-        #   Restrict PCAWG data on bin level
-        PCAWG_delta_genes <- list()
-        PCAWG_delta_genes$delta_gain <- PCAWG_delta_genome_bins$delta_gain[vec_loc]
-        PCAWG_delta_genes$delta_loss <- PCAWG_delta_genome_bins$delta_loss[vec_loc]
-        #---------------------------------------Prepare data for fitting
-        #---Get list of genes to fit for
-        list_arms <- model_variables_chrom_genes$chromosome_arm_library$Arm_ID
-        list_genes <- model_variables_chrom_genes$driver_library$Gene_ID
-        if (length(list_genes)==0){
-            next
-        }
-        #---Target statistics = gain/loss map from PCAWG
-        target_PCAWG_genes <- c(PCAWG_delta_genes$delta_gain, PCAWG_delta_genes$delta_loss)
-        #---Define objective function for ABC fitting
-        func_ABC_gene <- function(parameters, model_variables) {
-            parameters <- c(parameters, rep(1, len = (length(list_arms) + length(list_genes) - length(parameters))))
-            #   Assign selection rates to arms and genes
-            i_para <- 0
-            if (length(list_arms) > 0) {
-                for (arm in 1:length(list_arms)) {
-                    i_para <- i_para + 1
-                    model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Arm_ID == list_arms[arm])] <- parameters[i_para]
-                }
-            }
-            if (length(list_genes) > 0) {
-                for (gene in 1:length(list_genes)) {
-                    i_para <- i_para + 1
-                    model_variables$driver_library$s_rate[which(model_variables$driver_library$Gene_ID == list_genes[gene])] <- parameters[i_para]
-                }
-            }
-            model_variables <- BUILD_driver_library(
-                model_variables = model_variables,
-                table_arm_selection_rates = model_variables$chromosome_arm_library,
-                table_gene_selection_rates = model_variables$driver_library
-            )
-            #   Make simulations
-            SIMS_chromosome <- simulator_full_program(
-                model = model_variables,
-                model_prefix = "",
-                n_simulations = PCAWG_N_cases,
-                stage_final = 2,
-                save_simulation = FALSE,
-                report_progress = FALSE,
-                save_cn_profile = FALSE,
-                compute_parallel = FALSE,
-                output_variables = c(
-                    "all_sample_genotype",
-                    "sample_cell_ID",
-                    "sample_genotype_unique",
-                    "sample_genotype_unique_profile"
-                )
-            )
-            #   Get gain/loss map from the simulations
-            SIMS_delta <- gainloss_SIMS(SIMS_chromosome, ploidy_normalization = FALSE)
-            #   Statistics = gain/loss map from simulations
-            stat <- c(SIMS_delta$delta_gain, SIMS_delta$delta_loss)
-            return(stat)
-        }
-        #---Simulate table of parameters
-        sim_param <- matrix(0, nrow = fit_ABC_count_genes, ncol = (length(list_arms) + length(list_genes)))
-        for (col in 1:ncol(sim_param)) {
-            if (col <= length(list_arms)) {
-                #   Assign found selection rates for each arm
-                sim_param[, col] <- model_variables_best$chromosome_arm_library$s_rate[which(model_variables_best$chromosome_arm_library$Arm_ID == list_arms[col])]
-            } else {
-                #   Simulate parameters for driver genes
-                gene_role <- model_variables_chrom_genes$driver_library$Gene_role[col - length(list_arms)]
-                if (gene_role == "ONCOGENE") {
-                    sim_param[, col] <- runif(fit_ABC_count_genes, min = range_gene_s[1], max = range_gene_s[2])
-                } else if (gene_role == "TSG") {
-                    sim_param[, col] <- 1 / runif(fit_ABC_count_genes, min = 1 / range_gene_s[2], max = 1 / range_gene_s[1])
-                }
-            }
-        }
-        #---Make reference table
-        start_time <- Sys.time()
-        cl <- makePSOCKcluster(n_cores)
-        cat("=================================================================================\n")
-        cat("=================================================================================\n")
-        cat("=================================================================================\n")
-        cat(paste("Creating reference table for genes on chromosome ",chromosome_target," (", n_cores, " cores, ", fit_ABC_count_genes, " simulations)\n", sep = ""))
-        model_variables_chrom_genes <<- model_variables_chrom_genes
-        PCAWG_N_cases <<- PCAWG_N_cases
-        sim_param <<- sim_param
-        func_ABC_gene <<- func_ABC_gene
-        clusterExport(cl, varlist = c(
-            "model_variables_chrom_genes", "PCAWG_N_cases", "sim_param", "hg19_chrlength",
-            "func_ABC_gene", "BUILD_driver_library", "simulator_full_program", "gainloss_SIMS", "one_simulation", "createCNmatrix", "normalize_cell_ploidy", "calc_state_mode",
-            "hc2Newick_MODIFIED", "hc2Newick",
-            "SIMULATOR_VARIABLES_for_simulation",
-            "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
-            "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
-            "SIMULATOR_FULL_PHASE_1_genotype_cleaning", "SIMULATOR_FULL_PHASE_1_genotype_comparison", "SIMULATOR_FULL_PHASE_1_genotype_initiation", "SIMULATOR_FULL_PHASE_1_genotype_update", "SIMULATOR_FULL_PHASE_1_selection_rate",
-            "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
-            "get_cn_profile", "p2_cn_profiles_long", "p2_readcount_model", "rbindlist"
-        ))
-        e <- new.env()
-        e$libs <- .libPaths()
-        clusterExport(cl, "libs", envir = e)
-        clusterEvalQ(cl, .libPaths(libs))
-        library(ape)
-        clusterEvalQ(cl = cl, require(ape))
-        pbo <- pboptions(type = "txt")
-        sim_results_list <- pblapply(cl = cl, X = 1:fit_ABC_count_genes, FUN = function(iteration) {
-            parameters <- sim_param[iteration, ]
-            stat <- func_ABC_gene(parameters, model_variables_chrom_genes)
-            return(stat)
-        })
-        stopCluster(cl)
-        sim_stat <- matrix(0, nrow = fit_ABC_count_genes, ncol = length(target_PCAWG_genes))
-        for (row in 1:fit_ABC_count_genes) {
-            stat <- sim_results_list[[row]]
-            sim_stat[row, ] <- stat
-        }
-        end_time <- Sys.time()
-        print(end_time - start_time)
-        #   Prepare ingredients for ABC-random forests
-        vec_para_alias <- paste("para", 1:length(list_genes), sep = "")
-        vec_bin_alias <- paste("gainloss_", 1:length(target_PCAWG_genes), sep = "")
-        obs_rf <- data.frame(matrix(target_PCAWG_genes, nrow = 1))
-        colnames(obs_rf) <- vec_bin_alias
-        #   Perform ABC-random forests
-        load(paste(model_name, "_fitting_chr", chromosome_target, "_arms.rda", sep = ""))
-        for (para in 1:length(list_genes)) {
-            #   For each parameter...
-            #   Create training dataset for this parameter
-            para_ID <- list_genes[para]
-            cat(paste("Performing ABC random forests for parameter ", para, "/", length(list_genes), " (", para_ID, ")\n", sep = ""))
-            data_rf <- data.frame(sim_param[, para + length(list_arms)], sim_stat)
-            colnames(data_rf) <- c(vec_para_alias[para], vec_bin_alias)
-            #   Perform regression random forest for this parameter
-            f <- as.formula(paste(vec_para_alias[para], "~.", sep = ""))
-            model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
-            #   Get posterior statistics for this parameter
-            post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
-            #   Find best selection rate from posterior distribution
-            best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
-            #   Save results for this parameter
-            ABC_RF[[paste("data_", para_ID, sep = "")]] <- data_rf
-            ABC_RF[[paste("model_", para_ID, sep = "")]] <- model_rf
-            ABC_RF[[paste("obs_", para_ID, sep = "")]] <- obs_rf
-            ABC_RF[[paste("post_", para_ID, sep = "")]] <- post_rf
-            ABC_RF[[paste("best_", para_ID, sep = "")]] <- best_rf
-            #   Save best selection rate for this gene
-            model_variables_best$driver_library$s_rate[which(model_variables_best$driver_library$Gene_ID == list_genes[para])] <- post_rf$expectation
-            model_variables_best <- BUILD_driver_library(
-                model_variables = model_variables_best,
-                table_arm_selection_rates = model_variables_best$chromosome_arm_library,
-                table_gene_selection_rates = model_variables_best$driver_library
-            )
-        }
-        #   Save results of ABC-random forests
-        filename <- paste(model_name, "_fitting_chr", chromosome_target, "_genes.rda", sep = "")
-        ABC_RF$target_PCAWG <- target_PCAWG_genes
-        ABC_RF$PCAWG_delta <- PCAWG_delta_genes
-        ABC_RF$sim_param <- sim_param
-        ABC_RF$sim_stat <- sim_stat
-        ABC_RF$list_arms <- list_arms
-        ABC_RF$list_genes <- list_genes
-        ABC_RF$model_variables <- model_variables_chrom_genes
-        ABC_RF$PCAWG_N_cases <- PCAWG_N_cases
-        ABC_RF$chromosome_arm_library <- model_variables_chrom_genes$chromosome_arm_library
-        ABC_RF$driver_library <- model_variables_chrom_genes$driver_library
-        save(ABC_RF, file = filename)
-        #---Plot the result of fitting thic chromosome to PCAWG
-        filename <- paste(model_name, "_fitting_chr", chromosome_target, "_genes.jpeg", sep = "")
-        plot_fitting_PCAWG(filename, ABC_RF, fit_ABC_routine)
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    return()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # for (i in 1:length(list_chromosomes)) {
     for (i in 10:10) {
         chromosome_target <- list_chromosomes[i]
@@ -720,9 +278,6 @@ fitting_PCAWG <- function(model_name,
             # }
             # end_time <- Sys.time()
             # print(end_time - start_time)
-
-
-
             # #   Prepare ingredients for ABC-random forests
             # vec_para_alias <- paste("para", 1:length(list_arms), sep = "")
             # vec_bin_alias <- paste("gainloss_", 1:length(target_PCAWG_arms), sep = "")
@@ -1003,17 +558,39 @@ get_best_para <- function(data_rf,
                           model_rf,
                           obs_rf,
                           post_rf) {
-    df_dist <- densityPlot_df(
-        model_rf,
-        obs_rf,
-        data_rf
-    )
-    best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
-    # resp <- df_dist$dist_raw
-    # weights.std <- df_dist$weight_posterior
-    # # best_para <- resp[which(weights.std == max(weights.std))]
-    # dens <- density(resp, weights = weights.std, kernel = "gaussian")
-    # best_para <- max(dens$y)
+    findweights <- getFromNamespace("findweights", "abcrf")
+
+    object <- model_rf
+    obs <- obs_rf
+    training <- data_rf
+    x <- obs
+    mf <- match.call(expand.dots = FALSE)
+    mf <- mf[1]
+    mf$formula <- object$formula
+    mf$data <- training
+    training <- mf$data
+    mf[[1L]] <- as.name("model.frame")
+    mf <- eval(mf, parent.frame())
+    mt <- attr(mf, "terms")
+    resp <- model.response(mf)
+    obj <- object$model.rf
+    inbag <- matrix(unlist(obj$inbag.counts, use.names = FALSE), ncol = obj$num.trees, byrow = FALSE)
+    ncores <- max(detectCores() - 1, 1)
+    obj[["origNodes"]] <- predict(obj, training, predict.all = TRUE, num.threads = max(detectCores() - 1, 1))$predictions
+    obj[["origObs"]] <- model.response(mf)
+    origObs <- obj$origObs
+    origNodes <- obj$origNodes
+    nodes <- predict(obj, x, predict.all = TRUE, num.threads = ncores)$predictions
+    if (is.null(dim(nodes))) nodes <- matrix(nodes, nrow = 1)
+    ntree <- obj$num.trees
+    nobs <- object$model.rf$num.samples
+    nnew <- nrow(x)
+
+    ntree <- obj$num.trees
+    weights <- findweights(origNodes, nodes, inbag, as.integer(nobs), as.integer(nnew), as.integer(ntree)) # cpp function call
+    weights.std <- weights / ntree
+
+    print(weights.std)
 }
 
 #' @export
@@ -1031,43 +608,25 @@ plot_fitting_PCAWG <- function(filename,
     # PCAWG_chromosome <- ABC$PCAWG_chromosome
     PCAWG_N_cases <- ABC$PCAWG_N_cases
     #   Prepare posterior distributions and best parameter set
-    best_param <- rep(0, len = (length(list_arms) + length(list_genes)))
-    for (para in 1:length(best_param)) {
-        if (para <= length(list_arms)) {
-            para_ID <- list_arms[para]
-        } else {
-            para_ID <- list_genes[para - length(list_arms)]
+    if (fit_ABC_routine == "abc-rejection") {
+        #   Prepare posterior distributions
+        posterior <- ABC$unadj.values
+        #   Prepare best parameter set
+        dist <- ABC$dist
+        best_param <- param[which(dist == min(dist)), ]
+    } else if (fit_ABC_routine == "abc-rf") {
+        #   Prepare best parameter set
+        best_param <- rep(0, len = (length(list_arms) + length(list_genes)))
+        for (para in 1:length(best_param)) {
+            if (para <= length(list_arms)) {
+                para_ID <- list_arms[para]
+            } else {
+                para_ID <- list_genes[para - length(list_arms)]
+            }
+            post_rf <- ABC[[paste("post_", para_ID, sep = "")]]
+            best_param[para] <- post_rf$expectation
         }
-        best_param[para] <- ABC[[paste("best_", para_ID, sep = "")]]
     }
-    # if (fit_ABC_routine == "abc-rejection") {
-    #     #   Prepare posterior distributions
-    #     posterior <- ABC$unadj.values
-    #     #   Prepare best parameter set
-    #     dist <- ABC$dist
-    #     best_param <- param[which(dist == min(dist)), ]
-    # } else if (fit_ABC_routine == "abc-rf") {
-    #     #   Prepare best parameter set
-    #     best_param <- rep(0, len = (length(list_arms) + length(list_genes)))
-    #     for (para in 1:length(best_param)) {
-    #         if (para <= length(list_arms)) {
-    #             para_ID <- list_arms[para]
-    #         } else {
-    #             para_ID <- list_genes[para - length(list_arms)]
-    #         }
-    #         data_rf <- ABC[[paste("data_", para_ID, sep = "")]]
-    #         model_rf <- ABC[[paste("model_", para_ID, sep = "")]]
-    #         obs_rf <- ABC[[paste("obs_", para_ID, sep = "")]]
-    #         post_rf <- ABC[[paste("post_", para_ID, sep = "")]]
-    #         # best_param[para] <- post_rf$expectation
-    #         best_param[para] <- get_best_para(
-    #             data_rf,
-    #             model_rf,
-    #             obs_rf,
-    #             post_rf
-    #         )
-    #     }
-    # }
     #----------------------------Make simulations for best parameter set
     #   Assign selection rates to arms and genes
     i_para <- 0
@@ -1275,7 +834,7 @@ plot_fitting_PCAWG <- function(filename,
                 data_rf <- ABC[[paste("data_", para_ID, sep = "")]]
                 model_rf <- ABC[[paste("model_", para_ID, sep = "")]]
                 obs_rf <- ABC[[paste("obs_", para_ID, sep = "")]]
-                if (gene_role == "ONCOGENE") {                    
+                if (gene_role == "ONCOGENE") {
                     #   Plot distributions of selection rates for this gene
                     p_genes[[gene]] <- densityPlot_MODIFIED(model_rf,
                         obs_rf,

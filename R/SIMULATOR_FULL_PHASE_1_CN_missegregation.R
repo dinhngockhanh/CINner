@@ -196,4 +196,3 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react, genotype
         }
     }
 }
-print("")

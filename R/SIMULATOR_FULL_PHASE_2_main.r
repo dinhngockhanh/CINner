@@ -91,8 +91,6 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
             }
         }
     }
-
-
     table_clone_ID_vs_letters <- data.frame(sample_clone_ID_unique_numeric, sample_clone_ID_unique_letters)
     colnames(table_clone_ID_vs_letters) <- c("Clone_ID_number", "Clone_ID_letter")
     sample_clone_ID_letters <- c()
@@ -102,11 +100,18 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
         vec_cell_ID <- which(sample_clone_ID_numeric == clone_ID_numeric)
         sample_clone_ID_letters[vec_cell_ID] <- clone_ID_letters
     }
+    #----------------------------Create data frame of cell-clone mapping
+    sample_clone_ID_letters <- c()
+    for (i in 1:length(sample_clone_ID_numeric)) {
+        sample_clone_ID_letters[i] <- table_clone_ID_vs_letters$Clone_ID_letter[which(table_clone_ID_vs_letters$Clone_ID_number == sample_clone_ID_numeric[i])]
+    }
+    table_cell_clone <- data.frame(Cell = sample_cell_ID, Clone = sample_clone_ID_letters)
     #-----------------------------Output package of data from simulation
     output <- list()
     output$sample_cell_ID <- sample_cell_ID
     output$sample_clone_ID <- sample_clone_ID
     output$sample_clone_ID_letters <- sample_clone_ID_letters
+    output$table_cell_clone <- table_cell_clone
     output$table_clone_ID_vs_letters <- table_clone_ID_vs_letters
     output$sample_time <- sample_time
 

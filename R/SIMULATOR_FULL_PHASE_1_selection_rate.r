@@ -18,7 +18,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             clone_selection_rate <- 0
             return(clone_selection_rate)
         }
-        vec_CN_all <- c(vec_CN_all, vec_CN)
+        vec_CN_all    <- c(vec_CN_all, vec_CN)
     }
     if (mean(vec_CN_all) > bound_average_ploidy) {
         clone_selection_rate <- 0
@@ -162,8 +162,62 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy)) *
             prod(driver_library_copy$s_rate_WT^(2 * driver_library_copy$Copy_WT / ploidy)) *
             prod(driver_library_copy$s_rate_MUT^(2 * driver_library_copy$Copy_MUT / ploidy))
-
-        # clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
+    } else if (selection_model == "chrom-arm-and-driver-gene-selection-diploid-base") {
+        #--------------------------------------------Find average ploidy
+        ploidy <- 2
+        #-----------------------------------------Compute selection rate
+        #   Find average CN per chromosome arm
+        chrom_arm_library_copy <- chrom_arm_library
+        chrom_arm_library_copy$cn <- 0
+        for (i_arm in 1:nrow(chrom_arm_library_copy)) {
+            chrom <- which(vec_chromosome_id == chrom_arm_library_copy$Chromosome[i_arm])
+            start <- chrom_arm_library_copy$Bin_start[i_arm]
+            end <- chrom_arm_library_copy$Bin_end[i_arm]
+            no_strands <- ploidy_chrom[chrom]
+            if (no_strands == 0) {
+                cn <- 0
+            } else {
+                vec_cn <- ploidy_block[[chrom]][[1]]
+                if (no_strands > 1) {
+                    for (strand in 2:no_strands) {
+                        vec_cn <- vec_cn + ploidy_block[[chrom]][[strand]]
+                    }
+                }
+                cn <- round(mean(vec_cn[start:end]))
+            }
+            chrom_arm_library_copy$cn[i_arm] <- cn
+        }
+        #   If driver library is empty, then viable cells have sel rate 1
+        if (nrow(driver_library) == 0) {
+            clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
+            return(clone_selection_rate)
+        }
+        #   Find WT and MUT allele counts for each driver
+        driver_library_copy <- driver_library
+        driver_library_copy$Copy_WT <- 0
+        driver_library_copy$Copy_MUT <- 0
+        for (i_driver in 1:nrow(driver_library_copy)) {
+            chrom <- which(vec_chromosome_id == driver_library_copy$Chromosome[i_driver])
+            # chrom <- driver_library_copy$Chromosome[i_driver]
+            block <- driver_library_copy$Bin[i_driver]
+            no_strands <- ploidy_chrom[chrom]
+            driver_copy <- 0
+            for (strand in 1:no_strands) {
+                driver_copy <- driver_copy + ploidy_block[[chrom]][[strand]][block]
+            }
+            driver_library_copy$Copy_WT[i_driver] <- driver_copy
+        }
+        if (driver_count >= 1) {
+            for (i_driver in 1:driver_count) {
+                driver_ID <- driver_map[i_driver, 1]
+                driver_library_copy$Copy_MUT[driver_ID] <- driver_library_copy$Copy_MUT[driver_ID] + 1
+                driver_library_copy$Copy_WT[driver_ID] <- driver_library_copy$Copy_WT[driver_ID] - 1
+            }
+        }
+        #   Compute selection rate
+        clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy)) *
+            prod(driver_library_copy$s_rate_WT^(2 * driver_library_copy$Copy_WT / ploidy)) *
+            prod(driver_library_copy$s_rate_MUT^(2 * driver_library_copy$Copy_MUT / ploidy))
     } else if (selection_model == "ancient") {
         #--If driver library is empty, then viable cells have sel rate 1
         if (nrow(driver_library) == 0) {

@@ -56,6 +56,12 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     prob_CN_focal_deletion = 0,
                                     prob_CN_cnloh_interstitial = 0,
                                     prob_CN_cnloh_terminal = 0,
+                                    model_CN_focal_amplification_length = 'geom',
+                                    model_CN_focal_deletion_length = 'geom',
+                                    prob_CN_focal_amplification_length_shape_1 = 0,
+                                    prob_CN_focal_amplification_length_shape_2 = 0,
+                                    prob_CN_focal_deletion_length_shape_1 = 0,
+                                    prob_CN_focal_deletion_length_shape_2 = 0,
                                     prob_CN_focal_amplification_length = 0.1,
                                     prob_CN_focal_deletion_length = 0.1,
                                     prob_CN_cnloh_interstitial_length = 0.1,
@@ -158,11 +164,29 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial", prob_CN_cnloh_interstitial, "per cell division", "Probability for a cell division to harbor an interstitial CN-LOH event")
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal", prob_CN_cnloh_terminal, "per cell division", "Probability for a cell division to harbor a terminal CN-LOH event")
-    #   Set up geometric parameters for lengths of local CN events
+    #   Set up parameters for distributions of lengths of local CN events
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_amplification_length", prob_CN_focal_amplification_length, "", "Geometric parameter for the block length of a focal amplification event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_focal_amplification_length", model_CN_focal_amplification_length, "", "Choice of distribution for the block length of a focal amplification event")
+    if (model_CN_focal_amplification_length=='geom'){
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_amplification_length", prob_CN_focal_amplification_length, "", "Geometric parameter for the block length of a focal amplification event")
+    } else if (model_CN_focal_amplification_length=='beta'){
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_amplification_length_shape_1", prob_CN_focal_amplification_length_shape_1, "", "Beta parameter shape 1 for the block length of a focal amplification event")
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_amplification_length_shape_2", prob_CN_focal_amplification_length_shape_2, "", "Beta parameter shape 2 for the block length of a focal amplification event")
+    }
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion_length", prob_CN_focal_deletion_length, "", "Geometric parameter for the block length of a focal deletion event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_focal_deletion_length", model_CN_focal_deletion_length, "", "Choice of distribution for the block length of a focal deletion event")
+    if (model_CN_focal_deletion_length=='geom'){
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion_length", prob_CN_focal_deletion_length, "", "Geometric parameter for the block length of a focal deletion event")
+    } else if (model_CN_focal_deletion_length=='beta'){
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion_length_shape_1", prob_CN_focal_deletion_length_shape_1, "", "Beta parameter shape 1 for the block length of a focal deletion event")
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion_length_shape_2", prob_CN_focal_deletion_length_shape_2, "", "Beta parameter shape 2 for the block length of a focal deletion event")
+    }
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial_length", prob_CN_cnloh_interstitial_length, "", "Geometric parameter for the block length of an interstitial CN-LOH event")
     N_row <- N_row + 1

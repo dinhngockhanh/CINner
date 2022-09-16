@@ -33,8 +33,7 @@ plot_cn_heatmap <- function(model = "",
             if (length(vec_delete) > 0) {
                 sample_genotype_profiles <- sample_genotype_profiles[-vec_delete, ]
             }
-        }
-        if (CN_data == "HMM") {
+        } else if (CN_data == "HMM") {
             #---Extract CN profiles from HMMcopy
             sample_genotype_profiles <- simulation$sample$cn_profiles_long_hmm
         }
@@ -43,8 +42,7 @@ plot_cn_heatmap <- function(model = "",
             #---Extract clustering and phylogeny from GROUND TRUTH
             sample_clustering <- simulation$sample_phylogeny$phylogeny_clustering_truth$clustering
             sample_tree <- simulation$sample_phylogeny$phylogeny_clustering_truth$tree
-        }
-        if (phylo == "UMAP") {
+        } else if (phylo == "UMAP") {
             #---Find clustering and phylogeny from UMAP
             sample_clustering <- simulation$sample_phylogeny$phylogeny_clustering_umap_on_hmm$clustering
             sample_tree <- simulation$sample_phylogeny$phylogeny_clustering_umap_on_hmm$tree

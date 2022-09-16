@@ -34,17 +34,14 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react, genotype
             }
         }
         #       Choose the length of the focal deletion
-
-
-
-        # focal_length <- min(max_length, 1 + rgeom(n = 1, prob_CN_focal_deletion_length))
         focal_length <- max_length + 1
-        while (focal_length > max_length) {
-            focal_length <- 1 + rgeom(n = 1, prob = prob_CN_focal_deletion_length)
+        while ((focal_length > max_length) | (focal_length<=0)) {
+            if (model_CN_focal_deletion_length=='geom'){
+                focal_length <- rgeom(n = 1, prob_CN_focal_deletion_length)
+            } else if (model_CN_focal_deletion_length=='beta'){
+                focal_length <- round(rbeta(n=1, prob_CN_focal_deletion_length_shape_1, prob_CN_focal_deletion_length_shape_2)*max_length)
+            }
         }
-
-
-
         #       Choose the region to be focally deleted
         block_start <- (chrom_arm - 1) * centromere + sample.int(max_length - focal_length + 1, size = 1)
         block_end <- block_start + focal_length - 1

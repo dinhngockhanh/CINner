@@ -6,11 +6,13 @@
 vignettes/.DS_Store
 vignettes/hmmcopy_v0.0.45.sif
 vignettes/ov2295_cell_cn.csv
+vignettes/__pycache__
 scripts/hmmcopy_v0.0.45.sif
 scripts/ov2295_cell_cn.csv
 
 vignettes/batch_ginsburg.sh
 vignettes/batch_terremoto.sh
+vignettes/batch_short.sh
 vignettes/ginsburg_hmmcopy.sh
 vignettes/hmmcopy.bash
 vignettes/hmmcopy_ORIGINAL.bash

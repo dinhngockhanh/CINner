@@ -96,7 +96,7 @@ p3_cn_events_table <- function(simulation) {
     hclust_CN_events$Mother_genotype <- NULL
     hclust_CN_events$Daughter_genotype <- NULL
     #------------------------------------------Output table of CN events
-    print(hclust_CN_events)
+    # print(hclust_CN_events)
     simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events <- hclust_CN_events
 
     return(simulation)
