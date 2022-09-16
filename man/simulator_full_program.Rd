@@ -15,6 +15,7 @@ simulator_full_program(
   internal_nodes_cn_info = FALSE,
   save_newick_tree = FALSE,
   save_cn_profile = FALSE,
+  save_cn_clones = FALSE,
   format_cn_profile = "both",
   model_readcount = FALSE,
   pseudo_corrected_readcount = FALSE,
@@ -45,6 +46,8 @@ simulator_full_program(
 \item{save_newick_tree}{...}
 
 \item{save_cn_profile}{...}
+
+\item{save_cn_clones}{...}
 
 \item{format_cn_profile}{...}
 
