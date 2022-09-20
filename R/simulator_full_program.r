@@ -407,6 +407,20 @@ one_simulation <- function(iteration,
         if ("cell_phylogeny_hclust" %in% output_variables) {
             simulation_output$sample_phylogeny$cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
         }
+        if ("cn_profiles_long" %in% output_variables) {
+            sample <- simulation$sample
+            if (is.null(sample[["cn_profiles_long"]])) {
+                simulation <- p2_cn_profiles_long(simulation)
+            }
+            simulation_output$sample$cn_profiles_long <- simulation$sample$cn_profiles_long
+        }
+        if ("cn_profiles_wide" %in% output_variables) {
+            sample <- simulation$sample
+            if (is.null(sample[["cn_profiles_wide"]])) {
+                simulation <- p2_cn_profiles_wide(simulation)
+            }
+            simulation_output$sample$cn_profiles_wide <- simulation$sample$cn_profiles_wide
+        }
     }
     return(simulation_output)
 }
