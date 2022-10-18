@@ -32,6 +32,20 @@ fitting_DLP <- function(model_name,
         }
         parameters_truth <- as.numeric(parameters_truth)
     }
+    #-----------Define function to assign parameters to proper positions
+    assign_paras_DLP <- function(model_variables, parameter_IDs, parameters) {
+        for (i in 1:length(parameter_IDs)) {
+            parameter_ID <- parameter_IDs[i]
+            if (parameter_ID %in% model_variables$general_variables$Variable) {
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == parameter_ID)] <- parameters[i]
+            } else if (parameter_ID %in% model_variables$chromosome_arm_library$Arm_ID) {
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Arm_ID == parameter_ID)] <- parameters[i]
+            } else if (parameter_ID %in% model_variables$driver_library$Gene_ID) {
+                model_variables$driver_library$s_rate[which(model_variables$driver_library$Gene_ID == parameter_ID)] <- parameters[i]
+            }
+        }
+        return(model_variables)
+    }
     #--------------------------Define objective function for ABC fitting
     func_ABC <- function(parameters, parameter_IDs, copynumber_DLP_mat, model_variables) {
         #   Assign parameters in model variables
@@ -142,20 +156,6 @@ fitting_DLP <- function(model_name,
     save(ABC_output, file = filename)
     #---------------------------------------------------Plot ABC results
     plot_fitting_DLP(ABC_input, ABC_output, plot_truth, parameters_truth)
-}
-
-assign_paras_DLP <- function(model_variables, parameter_IDs, parameters) {
-    for (i in 1:length(parameter_IDs)) {
-        parameter_ID <- parameter_IDs[i]
-        if (parameter_ID %in% model_variables$general_variables$Variable) {
-            model_variables$general_variables$Value[which(model_variables$general_variables$Variable == parameter_ID)] <- parameters[i]
-        } else if (parameter_ID %in% model_variables$chromosome_arm_library$Arm_ID) {
-            model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Arm_ID == parameter_ID)] <- parameters[i]
-        } else if (parameter_ID %in% model_variables$driver_library$Gene_ID) {
-            model_variables$driver_library$s_rate[which(model_variables$driver_library$Gene_ID == parameter_ID)] <- parameters[i]
-        }
-    }
-    return(model_variables)
 }
 
 plot_fitting_DLP <- function(ABC_input,
