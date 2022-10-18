@@ -256,11 +256,12 @@ fitting_PCAWG <- function(model_name,
         ################################################################
         ################################################################
         ################################################# TEMPORARY ####
-        load(paste(model_name,                                      ####
-            "_fitting_chr",                                         ####
-            chromosome_target,                                      ####
-            "_arms.rda",                                            ####
-            sep = ""))                                              ####
+        load(paste(model_name, ####
+            "_fitting_chr", ####
+            chromosome_target, ####
+            "_arms.rda", ####
+            sep = ""
+        )) ####
         ################################################################
         ################################################################
         ################################################################
@@ -295,27 +296,27 @@ fitting_PCAWG <- function(model_name,
         for (para in 1:2) {
             #   Create training dataset for this parameter
             para_ID <- list_arms[para]
-        #     cat(paste("Performing ABC random forests for parameter ", para, "/", ncol(sim_param), " (", para_ID, ")\n", sep = ""))
-        #     model_rf <- vec_model_rf[[para]]
-        #     data_rf <- vec_data_rf[[para]]
-        #     post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
-        #     #   Find best selection rate from posterior distribution
-        #     best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
-        #     #   Save results for this parameter
-        #     ABC_RF[[paste("data_", para_ID, sep = "")]] <- data_rf
-        #     ABC_RF[[paste("model_", para_ID, sep = "")]] <- model_rf
-        #     ABC_RF[[paste("obs_", para_ID, sep = "")]] <- obs_rf
-        #     ABC_RF[[paste("post_", para_ID, sep = "")]] <- post_rf
-        #     ABC_RF[[paste("best_", para_ID, sep = "")]] <- best_rf
+            #     cat(paste("Performing ABC random forests for parameter ", para, "/", ncol(sim_param), " (", para_ID, ")\n", sep = ""))
+            #     model_rf <- vec_model_rf[[para]]
+            #     data_rf <- vec_data_rf[[para]]
+            #     post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
+            #     #   Find best selection rate from posterior distribution
+            #     best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
+            #     #   Save results for this parameter
+            #     ABC_RF[[paste("data_", para_ID, sep = "")]] <- data_rf
+            #     ABC_RF[[paste("model_", para_ID, sep = "")]] <- model_rf
+            #     ABC_RF[[paste("obs_", para_ID, sep = "")]] <- obs_rf
+            #     ABC_RF[[paste("post_", para_ID, sep = "")]] <- post_rf
+            #     ABC_RF[[paste("best_", para_ID, sep = "")]] <- best_rf
             ############################################################
             ############################################################
             ############################################################
             ############################################# TEMPORARY ####
-            data_rf <- ABC_RF[[paste("data_", para_ID, sep = "")]]  ####
-            model_rf <- ABC_RF[[paste("model_", para_ID, sep = "")]]####
-            obs_rf <- ABC_RF[[paste("obs_", para_ID, sep = "")]]    ####
-            post_rf <- ABC_RF[[paste("post_", para_ID, sep = "")]]  ####
-            best_rf <- ABC_RF[[paste("best_", para_ID, sep = "")]]  ####
+            data_rf <- ABC_RF[[paste("data_", para_ID, sep = "")]] ####
+            model_rf <- ABC_RF[[paste("model_", para_ID, sep = "")]] ####
+            obs_rf <- ABC_RF[[paste("obs_", para_ID, sep = "")]] ####
+            post_rf <- ABC_RF[[paste("post_", para_ID, sep = "")]] ####
+            best_rf <- ABC_RF[[paste("best_", para_ID, sep = "")]] ####
             ############################################################
             ############################################################
             ############################################################
@@ -370,7 +371,7 @@ fitting_PCAWG <- function(model_name,
         #---Get list of genes to fit for
         list_arms <- model_variables_chrom_genes$chromosome_arm_library$Arm_ID
         list_genes <- model_variables_chrom_genes$driver_library$Gene_ID
-        if (length(list_genes)==0){
+        if (length(list_genes) == 0) {
             next
         }
         #---Target statistics = gain/loss map from PCAWG
@@ -442,7 +443,7 @@ fitting_PCAWG <- function(model_name,
         cat("=================================================================================\n")
         cat("=================================================================================\n")
         cat("=================================================================================\n")
-        cat(paste("Creating reference table for genes on chromosome ",chromosome_target," (", n_cores, " cores, ", fit_ABC_count_genes, " simulations)\n", sep = ""))
+        cat(paste("Creating reference table for genes on chromosome ", chromosome_target, " (", n_cores, " cores, ", fit_ABC_count_genes, " simulations)\n", sep = ""))
         model_variables_chrom_genes <<- model_variables_chrom_genes
         PCAWG_N_cases <<- PCAWG_N_cases
         sim_param <<- sim_param
@@ -1275,7 +1276,7 @@ plot_fitting_PCAWG <- function(filename,
                 data_rf <- ABC[[paste("data_", para_ID, sep = "")]]
                 model_rf <- ABC[[paste("model_", para_ID, sep = "")]]
                 obs_rf <- ABC[[paste("obs_", para_ID, sep = "")]]
-                if (gene_role == "ONCOGENE") {                    
+                if (gene_role == "ONCOGENE") {
                     #   Plot distributions of selection rates for this gene
                     p_genes[[gene]] <- densityPlot_MODIFIED(model_rf,
                         obs_rf,
