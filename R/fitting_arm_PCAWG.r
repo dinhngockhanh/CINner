@@ -97,111 +97,111 @@ fitting_arm_PCAWG <- function(model_name,
     #   Get the target statistics (= gain/loss on each chromosome arm)
     PCAWG_arm_gainloss <- get_arm_gainloss(PCAWG_delta_genome_arms, copynumber_coordinates, list_targets)
     PCAWG_target <- c(PCAWG_arm_gainloss$delta_gain, PCAWG_arm_gainloss$delta_loss)
-    # ==============================================CREATE REFERENCE DATA
-    # #---------------------------------------Simulate table of parameters
-    # sim_param <- matrix(0, nrow = ABC_simcount, ncol = nrow(list_parameters))
-    # for (col in 1:ncol(sim_param)) {
-    #     sim_param[, col] <- runif(ABC_simcount, min = as.numeric(list_parameters$Lower_bound[col]), max = as.numeric(list_parameters$Upper_bound[col]))
-    # }
-    # #-----------------------------------------------Make reference table
-    # start_time <- Sys.time()
-    # #   Configure parallel pool
-    # cl <- makePSOCKcluster(n_cores)
-    # cat("Creating reference table for ABC...\n")
-    # sim_param <<- sim_param
-    # parameter_IDs <<- parameter_IDs
-    # model_variables <<- model_variables
-    # gainloss_SIMS <<- gainloss_SIMS
-    # func_ABC <<- func_ABC
-    # assign_paras_PCAWG <<- assign_paras_PCAWG
-    # clusterExport(cl, varlist = c(
-    #     "sim_param", "parameter_IDs", "model_variables", "gainloss_SIMS", "func_ABC", "assign_paras_PCAWG",
-    #     "BUILD_driver_library", "simulator_full_program", "one_simulation",
-    #     "SIMULATOR_VARIABLES_for_simulation",
-    #     "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
-    #     "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
-    #     "SIMULATOR_FULL_PHASE_1_genotype_cleaning", "SIMULATOR_FULL_PHASE_1_genotype_comparison", "SIMULATOR_FULL_PHASE_1_genotype_initiation", "SIMULATOR_FULL_PHASE_1_genotype_update", "SIMULATOR_FULL_PHASE_1_selection_rate",
-    #     "SIMULATOR_FULL_PHASE_2_main",
-    #     "SIMULATOR_FULL_PHASE_3_main",
-    #     "get_cn_profile", "p2_cn_profiles_long", "p2_cn_profiles_wide", "p2_readcount_model"
-    # ))
-    # e <- new.env()
-    # e$libs <- .libPaths()
-    # clusterExport(cl, "libs", envir = e)
-    # clusterEvalQ(cl, .libPaths(libs))
-    # #   Create simulated statistics in parallel
-    # pbo <- pboptions(type = "txt")
-    # sim_results_list <- pblapply(cl = cl, X = 1:ABC_simcount, FUN = function(iteration) {
-    #     parameters <- sim_param[iteration, ]
-    #     stat <- func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets)
-    #     return(stat)
-    # })
-    # stopCluster(cl)
-    # #   Group simulated statistics into one table
-    # sim_stat <- matrix(0, nrow = ABC_simcount, ncol = length(PCAWG_target))
-    # for (row in 1:ABC_simcount) {
-    #     stat <- sim_results_list[[row]]
-    #     sim_stat[row, ] <- stat
-    # }
-    # end_time <- Sys.time()
-    # print(end_time - start_time)
-    # #---------------------------Save the parameters and their statistics
-    # ABC_input <- list()
-    # ABC_input$model_variables <- model_variables
-    # ABC_input$n_samples <- n_samples
-    # ABC_input$parameter_IDs <- parameter_IDs
-    # ABC_input$sim_param <- sim_param
-    # ABC_input$sim_stat <- sim_stat
-    # ABC_input$PCAWG_target <- PCAWG_target
-    # filename <- paste(model_name, "_ABC_input.rda", sep = "")
-    # save(ABC_input, file = filename)
-    # =====================================FITTING WITH ABC RANDOM FOREST
-    # #--------------------------------------------Fit parameters with ABC
-    # #   Dataframe for parameters for reference
-    # all_paras <- data.frame(sim_param)
-    # colnames(all_paras) <- parameter_IDs
-    # #   Dataframe for corresponding statistics for reference
-    # all_data <- data.frame(sim_stat)
-    # colnames(all_data) <- paste("gainloss_", 1:ncol(all_data), sep = "")
-    # #   Dataframe for PCAWG observation
-    # obs_rf <- data.frame(matrix(PCAWG_target, nrow = 1))
-    # colnames(obs_rf) <- paste("gainloss_", 1:ncol(obs_rf), sep = "")
-    # #   Fit each parameter with ABC-rf
-    # for (para in 1:length(parameter_IDs)) {
-    #     para_ID <- parameter_IDs[para]
-    #     cat(paste("ABC for parameter ", para_ID, "\n", sep = ""))
-    #     #   Train the random forest
-    #     data_rf <- cbind(all_paras[para_ID], all_data)
-    #     colnames(data_rf)[1] <- "para"
-    #     f <- as.formula("para ~.")
-    #     model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
-    #     #   Predict posterior distribution based on found random forest
-    #     post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
-    #     #   Choose best value from posterior distribution
-    #     best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
-    #     #   Save results for fitting this parameter
-    #     ABC_output <- list()
-    #     ABC_output$para_ID <- para_ID
-    #     ABC_output$data_rf <- data_rf
-    #     ABC_output$model_rf <- model_rf
-    #     ABC_output$obs_rf <- obs_rf
-    #     ABC_output$post_rf <- post_rf
-    #     ABC_output$best_rf <- best_rf
-    #     filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
-    #     save(ABC_output, file = filename)
-    #     #   Plot the prior, posterior and chosen best parameter
-    #     filename <- paste("ABC_", para_ID, ".jpeg", sep = "")
-    #     jpeg(filename, width = 2000, height = 1000)
-    #     p <- densityPlot_MODIFIED(
-    #         model_rf, obs_rf, data_rf,
-    #         protocol = "arm",
-    #         chosen_para = best_rf,
-    #         color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
-    #         main = para_ID
-    #     )
-    #     print(p)
-    #     dev.off()
-    # }
+    # =============================================CREATE REFERENCE DATA
+    #---------------------------------------Simulate table of parameters
+    sim_param <- matrix(0, nrow = ABC_simcount, ncol = nrow(list_parameters))
+    for (col in 1:ncol(sim_param)) {
+        sim_param[, col] <- runif(ABC_simcount, min = as.numeric(list_parameters$Lower_bound[col]), max = as.numeric(list_parameters$Upper_bound[col]))
+    }
+    #-----------------------------------------------Make reference table
+    start_time <- Sys.time()
+    #   Configure parallel pool
+    cl <- makePSOCKcluster(n_cores)
+    cat("Creating reference table for ABC...\n")
+    sim_param <<- sim_param
+    parameter_IDs <<- parameter_IDs
+    model_variables <<- model_variables
+    gainloss_SIMS <<- gainloss_SIMS
+    func_ABC <<- func_ABC
+    assign_paras_PCAWG <<- assign_paras_PCAWG
+    clusterExport(cl, varlist = c(
+        "sim_param", "parameter_IDs", "model_variables", "gainloss_SIMS", "func_ABC", "assign_paras_PCAWG",
+        "BUILD_driver_library", "simulator_full_program", "one_simulation",
+        "SIMULATOR_VARIABLES_for_simulation",
+        "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
+        "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
+        "SIMULATOR_FULL_PHASE_1_genotype_cleaning", "SIMULATOR_FULL_PHASE_1_genotype_comparison", "SIMULATOR_FULL_PHASE_1_genotype_initiation", "SIMULATOR_FULL_PHASE_1_genotype_update", "SIMULATOR_FULL_PHASE_1_selection_rate",
+        "SIMULATOR_FULL_PHASE_2_main",
+        "SIMULATOR_FULL_PHASE_3_main",
+        "get_cn_profile", "p2_cn_profiles_long", "p2_cn_profiles_wide", "p2_readcount_model"
+    ))
+    e <- new.env()
+    e$libs <- .libPaths()
+    clusterExport(cl, "libs", envir = e)
+    clusterEvalQ(cl, .libPaths(libs))
+    #   Create simulated statistics in parallel
+    pbo <- pboptions(type = "txt")
+    sim_results_list <- pblapply(cl = cl, X = 1:ABC_simcount, FUN = function(iteration) {
+        parameters <- sim_param[iteration, ]
+        stat <- func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets)
+        return(stat)
+    })
+    stopCluster(cl)
+    #   Group simulated statistics into one table
+    sim_stat <- matrix(0, nrow = ABC_simcount, ncol = length(PCAWG_target))
+    for (row in 1:ABC_simcount) {
+        stat <- sim_results_list[[row]]
+        sim_stat[row, ] <- stat
+    }
+    end_time <- Sys.time()
+    print(end_time - start_time)
+    #---------------------------Save the parameters and their statistics
+    ABC_input <- list()
+    ABC_input$model_variables <- model_variables
+    ABC_input$n_samples <- n_samples
+    ABC_input$parameter_IDs <- parameter_IDs
+    ABC_input$sim_param <- sim_param
+    ABC_input$sim_stat <- sim_stat
+    ABC_input$PCAWG_target <- PCAWG_target
+    filename <- paste(model_name, "_ABC_input.rda", sep = "")
+    save(ABC_input, file = filename)
+    # ====================================FITTING WITH ABC RANDOM FOREST
+    #--------------------------------------------Fit parameters with ABC
+    #   Dataframe for parameters for reference
+    all_paras <- data.frame(sim_param)
+    colnames(all_paras) <- parameter_IDs
+    #   Dataframe for corresponding statistics for reference
+    all_data <- data.frame(sim_stat)
+    colnames(all_data) <- paste("gainloss_", 1:ncol(all_data), sep = "")
+    #   Dataframe for PCAWG observation
+    obs_rf <- data.frame(matrix(PCAWG_target, nrow = 1))
+    colnames(obs_rf) <- paste("gainloss_", 1:ncol(obs_rf), sep = "")
+    #   Fit each parameter with ABC-rf
+    for (para in 1:length(parameter_IDs)) {
+        para_ID <- parameter_IDs[para]
+        cat(paste("ABC for parameter ", para_ID, "\n", sep = ""))
+        #   Train the random forest
+        data_rf <- cbind(all_paras[para_ID], all_data)
+        colnames(data_rf)[1] <- "para"
+        f <- as.formula("para ~.")
+        model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
+        #   Predict posterior distribution based on found random forest
+        post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
+        #   Choose best value from posterior distribution
+        best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
+        #   Save results for fitting this parameter
+        ABC_output <- list()
+        ABC_output$para_ID <- para_ID
+        ABC_output$data_rf <- data_rf
+        ABC_output$model_rf <- model_rf
+        ABC_output$obs_rf <- obs_rf
+        ABC_output$post_rf <- post_rf
+        ABC_output$best_rf <- best_rf
+        filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
+        save(ABC_output, file = filename)
+        #   Plot the prior, posterior and chosen best parameter
+        filename <- paste("ABC_", para_ID, ".jpeg", sep = "")
+        jpeg(filename, width = 2000, height = 1000)
+        p <- densityPlot_MODIFIED(
+            model_rf, obs_rf, data_rf,
+            protocol = "arm",
+            chosen_para = best_rf,
+            color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
+            main = para_ID
+        )
+        print(p)
+        dev.off()
+    }
     # ========================================ANALYSIS OF FITTING RESULTS
     #------------------Choose the best parameter set from all posteriors
     parameters_best <- rep(0, length(parameter_IDs))
@@ -212,21 +212,21 @@ fitting_arm_PCAWG <- function(model_name,
         best_rf <- ABC_output$best_rf
         parameters_best[para] <- best_rf
     }
-    # #-----------------------Analysis of fitted CN profiles against PCAWG
-    # #   Assign parameters in model variables
-    # model_variables <- assign_paras_PCAWG(model_variables, parameter_IDs, parameters_best)
-    # #   Make simulations using best parameters
-    # SIMS_chromosome <- simulator_full_program(
-    #     model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
-    #     save_simulation = FALSE, report_progress = TRUE, compute_parallel = TRUE,
-    #     output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
-    # )
-    # #   Plot comparison vs bin-level PCAWG
-    # filename <- paste(model_name, "_against_bin_PCAWG.jpeg", sep = "")
-    # plot_gainloss(SIMS_chromosome, copynumber_PCAWG, filename, arm_level = FALSE, pos_centromeres = cn_info)
-    # #   Plot comparison vs arm-level PCAWG
-    # filename <- paste(model_name, "_against_arm_PCAWG.jpeg", sep = "")
-    # plot_gainloss(SIMS_chromosome, copynumber_PCAWG, filename, arm_level = TRUE, pos_centromeres = cn_info)
+    #-----------------------Analysis of fitted CN profiles against PCAWG
+    #   Assign parameters in model variables
+    model_variables <- assign_paras_PCAWG(model_variables, parameter_IDs, parameters_best)
+    #   Make simulations using best parameters
+    SIMS_chromosome <- simulator_full_program(
+        model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
+        save_simulation = FALSE, report_progress = TRUE, compute_parallel = TRUE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+    )
+    #   Plot comparison vs bin-level PCAWG
+    filename <- paste(model_name, "_against_bin_PCAWG.jpeg", sep = "")
+    plot_gainloss(SIMS_chromosome, copynumber_PCAWG, filename, arm_level = FALSE, pos_centromeres = cn_info)
+    #   Plot comparison vs arm-level PCAWG
+    filename <- paste(model_name, "_against_arm_PCAWG.jpeg", sep = "")
+    plot_gainloss(SIMS_chromosome, copynumber_PCAWG, filename, arm_level = TRUE, pos_centromeres = cn_info)
     #--------------------------------------Analysis of fitted parameters
     #   Prepare dataframe of fitted selection rates and amp/del freqs
     plot_table <- data.frame(Arm = list_targets)
@@ -239,9 +239,6 @@ fitting_arm_PCAWG <- function(model_name,
         plot_table$Del_freq_spec[row] <- -PCAWG_target[which(list_targets == arm) + length(list_targets)]
         plot_table$Selection_rate[row] <- parameters_best[which(list_parameters == arm)]
     }
-
-    print(plot_table)
-
     #   Configuration for subplots
     layout <- matrix(NA, nrow = 1, ncol = 2)
     gs <- list()
