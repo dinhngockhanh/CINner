@@ -1,0 +1,48 @@
+```{r setup}
+library(ggplot2)
+library(ggtree)
+library(signals)
+library(dendextend)
+library(fishplot)
+library(ctc)
+library(adephylo)
+library(data.table)
+library(HMMcopy)
+library(plyr)
+library(matrixStats)
+library(parallel)
+library(RColorBrewer)
+library(ape)
+
+library(grid)
+library(gridExtra)
+
+library(readxl)
+library(phyloTop)
+library(pbapply)
+
+library(abc)
+library(abcrf)
+
+library(reticulate)
+library(fitdistrplus)
+library(ggrepel)
+#-----------------------------------------------------------------------
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
+#-----------------------------------------------------------------------
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
+```
+
+#   Get the Copy Number data from TCGA
+
+We load the pan-cancer arm-level gain/loss data from TCGA:
+
+```{r}
+copynumber_TCGA <- data.frame(read_excel(file = system.file("extdata", "Davoli_Charm_score.xlsx", package = "CancerSimulator")))
+
+# CHARM_table <- data.frame(read_excel("Davoli_Charm_score.xlsx"))
+print(copynumber_TCGA)
+```

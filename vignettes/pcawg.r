@@ -28,19 +28,21 @@ library(reticulate)
 library(fitdistrplus)
 library(ggrepel)
 #-----------------------------------------------------------------------
-tmp <- getwd()
-setwd("/burg/home/knd2127/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
-setwd(tmp)
+# tmp <- getwd()
+# setwd("/burg/home/knd2127/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
+# setwd(tmp)
 
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+
+
+devtools::install_github("dinhngockhanh/CancerSimulator")
+library(CancerSimulator)
 #-----------------------------------------------------------------------
 
 
 
-copynumber_PCAWG <- read.csv(file = system.file("extdata", "PCAWG_OV-AU.csv", package = "CancerSimulator"))
+copynumber_PCAWG <- read.csv(file = system.file("extdata", "PCAWG_BRCA-UK.csv", package = "CancerSimulator"))
 
 
 
@@ -143,7 +145,7 @@ cell_count <- 20
 CN_matrix <- BUILD_cn_normal_XX(model_variables$cn_info)
 drivers <- list()
 model_variables <- BUILD_initial_population(model_variables = model_variables, cell_count = cell_count, CN_matrix = CN_matrix, drivers = drivers)
-model_name <- "HGSOC"
+model_name <- "TNBC"
 model_variables <- CHECK_model_variables(model_variables)
 
 
@@ -170,6 +172,5 @@ fitting_arm_PCAWG(
     copynumber_PCAWG,
     list_parameters,
     list_targets,
-    ABC_method = "rf",
-    ABC_simcount = 10000
+    ABC_simcount = 100
 )

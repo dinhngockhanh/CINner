@@ -28,12 +28,12 @@ library(reticulate)
 library(fitdistrplus)
 library(ggrepel)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+devtools::install_github("dinhngockhanh/CancerSimulator")
+library(CancerSimulator)
 ```
 
 #   Get the Copy Number data from PCAWG
@@ -181,15 +181,6 @@ fitting_arm_PCAWG(
     copynumber_PCAWG,
     list_parameters,
     list_targets,
-    ABC_simcount = 10
+    ABC_simcount = 10000
 )
-```
-
-
-
-
-
-
-
-```{r}
 ```
