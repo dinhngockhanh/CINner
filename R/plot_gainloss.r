@@ -2,13 +2,16 @@
 plot_gainloss <- function(copynumber_sims,
                           copynumber_PCAWG,
                           filename,
+                          arm_level = FALSE,
+                          pos_centromeres = c(),
                           height = 1000,
                           width = 2000) {
     plotcol <- "state"
     fillna <- TRUE
     cutoff <- 2
     #---------------------------Get gain/loss consensus from simulations
-    delta_sims <- gainloss_SIMS(copynumber_sims,
+    delta_sims <- gainloss_SIMS(
+        copynumber_sims,
         ploidy_normalization = TRUE,
         use_rbindlist = TRUE,
         get_coordinates = TRUE
@@ -17,10 +20,12 @@ plot_gainloss <- function(copynumber_sims,
     f2_sims <- delta_sims$delta_loss
     copynumber_coordinates <- delta_sims$copynumber_coordinates
     #---------------------------------Get gain/loss consensus from PCAWG
-    delta_PCAWG <- gainloss_PCAWG(copynumber_PCAWG,
+    delta_PCAWG <- gainloss_PCAWG(
+        copynumber_PCAWG,
         copynumber_coordinates,
         ploidy_normalization = TRUE,
-        use_rbindlist = TRUE
+        use_rbindlist = TRUE,
+        arm_level = arm_level, pos_centromeres = pos_centromeres
     )
     f1_data <- delta_PCAWG$delta_gain
     f2_data <- delta_PCAWG$delta_loss
@@ -363,6 +368,7 @@ densityPlot_MODIFIED <- function(object,
         paral,
         ncores
     )
+
     p_plot <- ggplot(df_plot) +
         geom_area(aes(x = x, y = y_prior), color = color_prior, fill = color_prior, alpha = 0.3) +
         geom_area(aes(x = x, y = y_posterior), color = color_posterior, fill = color_posterior, alpha = 0.3) +
@@ -376,10 +382,10 @@ densityPlot_MODIFIED <- function(object,
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0))
 
-    if (protocol == "arm") {
-        p_plot <- p_plot +
-            geom_vline(aes(xintercept = 1), color = color_vline, size = 1)
-    }
+    # if (protocol == "arm") {
+    #     p_plot <- p_plot +
+    #         geom_vline(aes(xintercept = 1), color = color_vline, size = 1)
+    # }
 
     if (is.null(chosen_para) == FALSE) {
         p_plot <- p_plot +
@@ -532,7 +538,6 @@ densityPlot_df <- function(object,
     if (protocol == "TSG") {
         resp <- 1 / resp
     }
-
     dist_prior <- density(resp, weights = rep(1 / length(resp), length(resp)))
     dist_posterior <- density(resp, weights = weights.std[, i])
 

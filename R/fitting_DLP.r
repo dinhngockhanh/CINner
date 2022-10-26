@@ -118,6 +118,8 @@ fitting_DLP <- function(model_name,
     e$libs <- .libPaths()
     clusterExport(cl, "libs", envir = e)
     clusterEvalQ(cl, .libPaths(libs))
+    library(RcppHungarian)
+    clusterEvalQ(cl = cl, require(RcppHungarian))
     pbo <- pboptions(type = "txt")
     sim_results_list <- pblapply(cl = cl, X = 1:ABC_simcount, FUN = function(iteration) {
         parameters <- sim_param[iteration, ]
@@ -147,6 +149,7 @@ fitting_DLP <- function(model_name,
         }
         #   Perform ABC-rejection
         ABC_output <- abc(target = 0, param = sim_param, sumstat = sim_stat, tol = ABC_tol, method = "rejection")
+        #   Choose best parameter set from posteriors
     }
     #   Save ABC output package
     ABC_output$ABC_method <- ABC_method

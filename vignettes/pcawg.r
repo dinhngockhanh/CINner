@@ -1,6 +1,3 @@
-# ======================================================================
-# ======================================================================
-# ============================================================= GINSBURG
 .libPaths("/burg/iicd/users/knd2127/rpackages")
 .libPaths()
 library(ggplot2)
@@ -35,12 +32,14 @@ tmp <- getwd()
 setwd("/burg/home/knd2127/R/")
 files_sources <- list.files(pattern = "*.r$")
 sapply(files_sources, source)
-print(tmp)
 setwd(tmp)
 
 # devtools::install_github("dinhngockhanh/CancerSimulator")
 # library(CancerSimulator)
 #-----------------------------------------------------------------------
+
+
+
 copynumber_PCAWG <- read.csv(file = system.file("extdata", "PCAWG_OV-AU.csv", package = "CancerSimulator"))
 
 
@@ -52,67 +51,28 @@ Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(Inf), Age_sampl
 T_tau_step <- cell_lifespan / 2
 CN_bin_length <- 500000
 selection_model <- "chrom-arm-and-driver-gene-selection"
-
-
-
+#------------------------------------------------------CNA PROBABILITIES
 prob_CN_whole_genome_duplication <- 0e-4
-###########################################
-prob_CN_missegregation <- 3e-5
-prob_CN_chrom_arm_missegregation <- 5e-5
-
-prob_CN_focal_amplification <- 3e-3
-prob_CN_focal_deletion <- 3e-3
-# prob_CN_focal_amplification         <- 3e-4
-# prob_CN_focal_deletion              <- 3e-4
-###########################################
+prob_CN_missegregation <- 5e-5
+prob_CN_chrom_arm_missegregation <- 0e-5
+prob_CN_focal_amplification <- 0e-5
+prob_CN_focal_deletion <- 0e-5
 prob_CN_cnloh_interstitial <- 0e-5
 prob_CN_cnloh_terminal <- 0e-5
-
 model_CN_focal_amplification_length <- "beta"
 model_CN_focal_deletion_length <- "beta"
-
 prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
 prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
 prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
 prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
 prob_CN_cnloh_interstitial_length <- 0.005
 prob_CN_cnloh_terminal_length <- 0.005
-
-# prob_CN_focal_amplification_length  <- 0.005
-# prob_CN_focal_deletion_length       <- 0.005
-# prob_CN_cnloh_interstitial_length   <- 0.005
-# prob_CN_cnloh_terminal_length       <- 0.005
-
-# prob_CN_focal_amplification_length  <- 0.01
-# prob_CN_focal_deletion_length       <- 0.01
-# prob_CN_cnloh_interstitial_length   <- 0.01
-# prob_CN_cnloh_terminal_length       <- 0.01
-# =====================================CURRENT STANDARD
-# prob_CN_missegregation              <- 3e-5
-# prob_CN_chrom_arm_missegregation    <- 5e-5
-# prob_CN_focal_amplification         <- 3e-5
-# prob_CN_focal_deletion              <- 3e-5
-# prob_CN_cnloh_interstitial          <- 0e-5
-# prob_CN_cnloh_terminal              <- 0e-5
-# prob_CN_focal_amplification_length  <- 0.005
-# prob_CN_focal_deletion_length       <- 0.005
-# prob_CN_cnloh_interstitial_length   <- 0.005
-# prob_CN_cnloh_terminal_length       <- 0.005
-
-
-
 rate_driver <- 0
-
-
-
+#-----------------------------------------------------------------------
 rate_passenger <- 1e-11
 bound_driver <- 3
 bound_average_ploidy <- 4.5
-
 bound_homozygosity <- 10
-# bound_homozygosity                  <- 500
-
-
 
 vec_time <- T_0[[1]]:T_end[[1]]
 L <- 10000
@@ -143,8 +103,6 @@ model_variables <- BUILD_general_variables(
     prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
     prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
     prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
-    # prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
-    # prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
     prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
     prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
     rate_driver = rate_driver,
@@ -190,5 +148,28 @@ model_variables <- CHECK_model_variables(model_variables)
 
 
 
+list_parameters <- data.frame(matrix(ncol = 3, nrow = 0))
+colnames(list_parameters) <- c("Variable", "Lower_bound", "Upper_bound")
+list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_chrom_arm_missegregation", 1e-5, 1e-4)
+for (i in 1:length(model_variables$chromosome_arm_library$Arm_ID)) {
+    list_parameters[nrow(list_parameters) + 1, ] <- c(
+        model_variables$chromosome_arm_library$Arm_ID[i],
+        0.5, 1.5
+    )
+}
 
-fitting_PCAWG(model_name, model_variables, copynumber_PCAWG)
+
+
+list_targets <- model_variables$chromosome_arm_library$Arm_ID
+
+
+
+fitting_arm_PCAWG(
+    model_name,
+    model_variables,
+    copynumber_PCAWG,
+    list_parameters,
+    list_targets,
+    ABC_method = "rf",
+    ABC_simcount = 10000
+)
