@@ -38,10 +38,10 @@ library(CancerSimulator)
 
 #   Get the Copy Number data from PCAWG
 
-We load the Copy Number data from the OV-AU cohort from PCAWG:
+We load the Copy Number data from the BRCA-UK cohort from PCAWG:
 
 ```{r}
-copynumber_PCAWG <- read.csv(file = system.file("extdata", "PCAWG_OV-AU.csv", package = "CancerSimulator"))
+copynumber_PCAWG <- read.csv(file = system.file("extdata", "PCAWG_BRCA-UK.csv", package = "CancerSimulator"))
 ```
 
 #   Fitting the PCAWG copy number data with CancerSimulator

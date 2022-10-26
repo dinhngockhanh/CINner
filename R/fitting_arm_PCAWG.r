@@ -4,7 +4,6 @@ fitting_arm_PCAWG <- function(model_name,
                               copynumber_PCAWG,
                               list_parameters,
                               list_targets,
-                              ABC_method = "rf",
                               ABC_simcount = 10000,
                               n_cores = NULL,
                               n_samples = NULL) {
