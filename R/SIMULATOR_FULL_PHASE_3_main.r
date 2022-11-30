@@ -636,39 +636,58 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             }
         }
     }
-    #---Complete the unmerged nodes
-    #---i.e. there is more than one ancestral clone
-    #   Find all unmerged clone nodes
-    list_unmerged_nodes <- which(clone_phylogeny_origin == 0 & clone_hclust_nodes != 0)
-    list_unnecessary_nodes <- which(clone_phylogeny_origin == 0 & clone_hclust_nodes == 0)
-    N_unnecessary_nodes <- length(list_unnecessary_nodes)
-    #   Complete the phylogeny in hclust style
-    node_anchor <- list_unmerged_nodes[1]
-    clone_hclust_node_anchor <- clone_hclust_nodes[node_anchor]
+    #----------------------------------------Complete the unmerged nodes
+    #------------------------i.e. there is more than one ancestral clone
     #   Merge all unmerged nodes together at first time point
+    list_unmerged_nodes <- which(clone_phylogeny_origin == 0 & clone_hclust_nodes != 0)
+    node_anchor <- list_unmerged_nodes[1]
     if (length(list_unmerged_nodes) >= 2) {
         for (i in 2:length(list_unmerged_nodes)) {
-            clone_node <- list_unmerged_nodes[i]
-            clone_hclust_row <- clone_hclust_row + 1
-            clone_hclust_merge[clone_hclust_row, ] <- c(clone_hclust_node_anchor, clone_hclust_nodes[clone_node])
-            clone_hclust_node_anchor <- clone_hclust_row
-            clone_hclust_height[clone_hclust_row] <- T_final
-        }
-    }
-    #   Complete the phylogeny in our style
-    #   Merge all unmerged nodes together at first time point
-    clone_phylogeny_birthtime[list_unmerged_nodes] <- evolution_traj_time[1]
-    #   Delete unnecessary nodes
-    clone_phylogeny_origin <- clone_phylogeny_origin - N_unnecessary_nodes
-    clone_phylogeny_origin[list_unmerged_nodes] <- 0
-    if (length(list_unnecessary_nodes) > 0) {
-        clone_hclust_nodes <- clone_hclust_nodes[-list_unnecessary_nodes]
+            clone_node_2 <- list_unmerged_nodes[i]
 
-        clone_phylogeny_origin <- clone_phylogeny_origin[-list_unnecessary_nodes]
-        clone_phylogeny_genotype <- clone_phylogeny_genotype[-list_unnecessary_nodes]
-        clone_phylogeny_birthtime <- clone_phylogeny_birthtime[-list_unnecessary_nodes]
-        clone_phylogeny_deathtime <- clone_phylogeny_deathtime[-list_unnecessary_nodes]
+            clone_node_mother <- min(clone_current_node_list) - 1
+
+            clone_hclust_row <- clone_hclust_row + 1
+            clone_hclust_nodes[clone_node_mother] <- clone_hclust_row
+            clone_hclust_merge[clone_hclust_row, ] <- c(clone_hclust_nodes[node_anchor], clone_hclust_nodes[clone_node_2])
+            clone_hclust_height[clone_hclust_row] <- T_final
+
+            clone_phylogeny_origin[node_anchor] <- clone_node_mother
+            clone_phylogeny_origin[clone_node_2] <- clone_node_mother
+
+            clone_phylogeny_genotype[clone_node_mother] <- min(clone_phylogeny_origin[node_anchor], clone_phylogeny_genotype[clone_node_2])
+
+            clone_phylogeny_birthtime[node_anchor] <- evolution_traj_time[1]
+            clone_phylogeny_birthtime[clone_node_2] <- evolution_traj_time[1]
+            clone_phylogeny_deathtime[clone_node_mother] <- evolution_traj_time[1]
+
+            pos_delete <- c(which(clone_current_node_list == clone_node_2))
+
+            clone_current_node_list <- clone_current_node_list[-pos_delete]
+            clone_current_node_list <- c(clone_node_mother, clone_current_node_list)
+        }
+        # for (i in 2:length(list_unmerged_nodes)) {
+        #     clone_node <- list_unmerged_nodes[i]
+        #     clone_hclust_row <- clone_hclust_row + 1
+        #     clone_hclust_merge[clone_hclust_row, ] <- c(clone_hclust_node_anchor, clone_hclust_nodes[clone_node])
+        #     clone_hclust_node_anchor <- clone_hclust_row
+        #     clone_hclust_height[clone_hclust_row] <- T_final
+        # }
     }
+    # #   Delete unnecessary nodes
+    # list_unnecessary_nodes <- which(clone_phylogeny_origin == 0 & clone_hclust_nodes == 0)
+    # N_unnecessary_nodes <- length(list_unnecessary_nodes)
+    #
+    # clone_phylogeny_origin <- clone_phylogeny_origin - N_unnecessary_nodes
+    # clone_phylogeny_origin[list_unmerged_nodes] <- 0
+    # if (length(list_unnecessary_nodes) > 0) {
+    #     clone_hclust_nodes <- clone_hclust_nodes[-list_unnecessary_nodes]
+    #
+    #     clone_phylogeny_origin <- clone_phylogeny_origin[-list_unnecessary_nodes]
+    #     clone_phylogeny_genotype <- clone_phylogeny_genotype[-list_unnecessary_nodes]
+    #     clone_phylogeny_birthtime <- clone_phylogeny_birthtime[-list_unnecessary_nodes]
+    #     clone_phylogeny_deathtime <- clone_phylogeny_deathtime[-list_unnecessary_nodes]
+    # }
     #-----------------------Create clone phylogeny object in phylo style
     if (N_clones > 1) {
         clone_hclust_height <- 2 * clone_hclust_height

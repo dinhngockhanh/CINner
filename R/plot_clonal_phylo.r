@@ -4,6 +4,9 @@ plot_clonal_phylo <- function(model = "",
                               n_simulations = 0,
                               width = 1000,
                               height = 500) {
+    library(ggtree)
+    library(adephylo)
+    library(ggplot2)
     for (i in 1:n_simulations) {
         #------------------------------------------Input simulation file
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")
@@ -16,17 +19,11 @@ plot_clonal_phylo <- function(model = "",
 
         clone_phylogeny_genotype <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_genotype
         clone_phylogeny_origin <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_origin
-        clone_phylogeny_deathtime <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_deathtime
         #-----------------------------------Find labels of clonal leaves
-        # l_clonal_edge <- clone_phylogeny_deathtime[1]
         clone_phylogeny_labels <- simulation$sample_phylogeny$package_clone_phylogeny$clone_phylogeny_labels
         N_clones <- length(clone_phylogeny_labels)
         if (N_clones <= 1) {
             print("CANNOT PLOT CLONAL EVOLUTION FOR ONLY ONE CLONE")
-            return()
-        }
-        if (length(clone_phylogeny_origin) != (2 * N_clones - 1)) {
-            print("LENGTH OF CLONAL RECORD IS NOT 2*N_CLONES-1: REVISIT LATER")
             next
         }
         #--------------------------------------Plot clone phylogeny tree

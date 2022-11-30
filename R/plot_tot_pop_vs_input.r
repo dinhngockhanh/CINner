@@ -6,6 +6,7 @@ plot_tot_pop_vs_input <- function(model = "",
                                   unit_time = "year",
                                   width = 1000,
                                   height = 500) {
+    library(ggplot2)
     for (i in 1:n_simulations) {
         #------------------------------------------Input simulation file
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")

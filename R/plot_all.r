@@ -1,17 +1,46 @@
 #' @export
 plot_all <- function(model = "",
                      n_simulations = 0) {
-    # #-------------------------------Plot total CN profile - ground truth
-    # cat("Plotting total CN profile - GROUND TRUTH...\n")
-    # plot_cn_heatmap(
-    #     model = model,
-    #     n_simulations = n_simulations,
-    #     plotcol = "total-copy",
-    #     CN_data = "TRUTH",
-    #     phylo = "TRUTH",
-    #     width = 1000,
-    #     height = 1000
-    # )
+    #----------------------------Plot clonal evolution as phylogeny tree
+    cat("Plotting clonal evolution as phylogeny tree...\n")
+    plot_clonal_phylo(
+        model = model,
+        n_simulations = n_simulations,
+        width = 2000,
+        height = 2000
+    )
+    #----------------------------------------------Plot total population
+    cat("Plotting total population vs input dynamics...\n")
+    plot_tot_pop_vs_input(
+        model = model,
+        n_simulations = n_simulations,
+        unit_time = "year",
+        width = 1000,
+        height = 500
+    )
+    #---------------------------------Plot clonal evolution as fish plot
+    cat("Plotting clonal evolution as fish plot...\n")
+    plot_clonal_fishplot(
+        model = model,
+        n_simulations = n_simulations,
+        unit_time = "year",
+        width = 2000,
+        height = 1000
+    )
+
+
+
+    #-------------------------------Plot total CN profile - ground truth
+    cat("Plotting total CN profile - GROUND TRUTH...\n")
+    plot_cn_heatmap(
+        model = model,
+        n_simulations = n_simulations,
+        plotcol = "total-copy",
+        CN_data = "TRUTH",
+        phylo = "TRUTH",
+        width = 1000,
+        height = 1000
+    )
     # #-------------------------------Plot minor CN profile - GROUND TRUTH
     # cat("Plotting minor CN profile - GROUND TRUTH...\n")
     # plot_cn_heatmap(
@@ -72,39 +101,5 @@ plot_all <- function(model = "",
     #     phylo = TRUE,
     #     width = 1000,
     #     height = 1000
-    # )
-    #----------------------------Plot clonal evolution as phylogeny tree
-    cat("Plotting clonal evolution as phylogeny tree...\n")
-    plot_clonal_phylo(
-        model = model,
-        n_simulations = n_simulations,
-        width = 2000,
-        height = 2000
-    )
-    #----------------------------------------------Plot total population
-    cat("Plotting total population vs input dynamics...\n")
-    plot_tot_pop_vs_input(
-        model = model,
-        n_simulations = n_simulations,
-        unit_time = "year",
-        width = 1000,
-        height = 500
-    )
-    #---------------------------------Plot clonal evolution as fish plot
-    cat("Plotting clonal evolution as fish plot...\n")
-    plot_clonal_fishplot(
-        model = model,
-        n_simulations = n_simulations,
-        unit_time = "year",
-        width = 2000,
-        height = 1000
-    )
-    # #----------------------------------Plot clonal percentages over time
-    # cat("Plotting clonal percentages over time...\n")
-    # plot_clonal_perc(
-    #     model = model,
-    #     n_simulations = n_simulations,
-    #     width = 2000,
-    #     height = 2000
     # )
 }

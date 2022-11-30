@@ -64,7 +64,7 @@ Save parameters to build one simulation:
 cell_lifespan <- 30
 T_0 <- list(0, "year")
 T_end <- list(80, "year")
-Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(300), Age_sample = c(80))
+Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(3), Age_sample = c(80))
 T_tau_step <- cell_lifespan / 2
 CN_bin_length <- 500000
 ########################################################################
@@ -257,7 +257,7 @@ tmp <- simulator_full_program(
     model_readcount = TRUE,
     model_readcount_base = 'neuvar',
     apply_HMM = TRUE,
-    compute_parallel = TRUE,
+    compute_parallel = FALSE,
     seed = 10
 )
 end_time <- Sys.time()

@@ -6,6 +6,8 @@ plot_clonal_fishplot <- function(model = "",
                                  unit_time = "year",
                                  width = 1000,
                                  height = 500) {
+    library(RColorBrewer)
+    library(fishplot)
     for (i in 1:n_simulations) {
         #------------------------------------------Input simulation file
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")
@@ -50,12 +52,6 @@ plot_clonal_fishplot <- function(model = "",
         clone_hclust_nodes <- simulation$sample_phylogeny$package_clone_phylogeny$clone_hclust_nodes
         clone_hclust_merge <- simulation$sample_phylogeny$package_clone_phylogeny$clone_hclust_merge
         N_clones <- length(clone_phylogeny_labels)
-
-        if (length(clone_phylogeny_origin) != (2 * N_clones - 1)) {
-            print("LENGTH OF CLONAL RECORD IS NOT 2*N_CLONES-1: REVISIT LATER")
-            next
-        }
-
         #---------------------------Initialize the list of clonal labels
         vec_clonal_labels <- rep("", length = length(clone_phylogeny_genotype))
         vec_clonal_labels[(length(vec_clonal_labels) - N_clones + 1):length(vec_clonal_labels)] <- clone_phylogeny_labels

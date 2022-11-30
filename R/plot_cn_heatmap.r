@@ -8,6 +8,7 @@ plot_cn_heatmap <- function(model = "",
                             filename_suffix = NULL,
                             width = 1000,
                             height = 500) {
+    library(signals)
     for (i in 1:n_simulations) {
         #------------------------------------------Input simulation file
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")

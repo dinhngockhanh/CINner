@@ -1,5 +1,6 @@
 #' @export
 p2_cn_profiles_long <- function(simulation) {
+    library(data.table)
     sample_cell_ID <- simulation$sample$sample_cell_ID
     sample_clone_ID <- simulation$sample$sample_clone_ID
     sample_genotype_unique <- simulation$sample$sample_genotype_unique

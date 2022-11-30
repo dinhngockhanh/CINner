@@ -41,6 +41,7 @@ simulator_full_program <- function(model = "",
                                    seed = Inf,
                                    output_variables = c(),
                                    n_cores = NULL) {
+    library(data.table)
     if (class(model) == "character") {
         model_parameters <- model
         model_prefix <- model
@@ -110,6 +111,8 @@ simulator_full_program <- function(model = "",
             )
         }
     } else {
+        library(parallel)
+        library(ctc)
         #---------------------------Run CancerSimulator in parallel mode
         #   Start parallel cluster
         if (is.null(n_cores)) {
@@ -173,6 +176,7 @@ simulator_full_program <- function(model = "",
         clusterEvalQ(cl = cl, require(ape))
         #   Run CancerSimulator in parallel
         if (report_progress == TRUE) {
+            library(pbapply)
             many_sims <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
                 one_sim <- one_simulation(
                     iteration,

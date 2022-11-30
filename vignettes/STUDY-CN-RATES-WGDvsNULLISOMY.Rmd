@@ -1,18 +1,20 @@
 ```{r setup}
-library(ggplot2)
-library(ggtree)
-library(signals)
-library(dendextend)
-library(fishplot)
-library(ctc)
-library(adephylo)
-library(data.table)
-library(HMMcopy)
-library(plyr)
-library(matrixStats)
-library(parallel)
-library(RColorBrewer)
-library(ape)
+# library(ggplot2)
+# library(ggtree)
+# library(signals)
+# library(dendextend)
+# library(fishplot)
+# library(ctc)
+# library(adephylo)
+# library(data.table)
+# library(HMMcopy)
+# library(plyr)
+# library(matrixStats)
+# library(parallel)
+# library(RColorBrewer)
+# library(ape)
+
+library(readxl)
 #-----------------------------------------------------------------------
 setwd("/Users/dinhngockhanh/CancerSimulator/R/")
 files_sources <- list.files(pattern = "*.r$")
@@ -150,7 +152,7 @@ SAVE_model_variables(model_name = model_name, model_variables = model_variables)
 
 ```{r}
 start_time <- Sys.time()
-n_simulations <- 10
+n_simulations <- 100
 tmp <- simulator_full_program(
     model = model_name, n_simulations = n_simulations,
     # save_cn_profile = FALSE,
@@ -158,6 +160,7 @@ tmp <- simulator_full_program(
     # model_readcount = TRUE,
     # model_readcount_base = 'neuvar',
     # apply_HMM = TRUE,
+    compute_parallel=FALSE,
     stage_final=3,
     seed = 10
 )
