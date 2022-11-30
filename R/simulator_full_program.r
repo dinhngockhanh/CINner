@@ -68,6 +68,7 @@ simulator_full_program <- function(model = "",
     }
     if (apply_HMM == TRUE) {
         if (file.exists("hmmcopy_v0.0.45.sif") == FALSE) {
+            cat("INSTALLING HMMCOPY-V0.0.45...\n")
             system("singularity pull docker://quay.io/mondrianscwgs/hmmcopy:v0.0.45")
         }
         file.copy("hmmcopy_v0.0.45.sif", paste(model_prefix, "/hmmcopy_v0.0.45.sif", sep = ""))
