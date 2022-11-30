@@ -8,19 +8,20 @@ simulator_full_program(
   model = "",
   model_prefix = "",
   n_simulations = 0,
-  stage_final = 0,
+  stage_final = 1,
   n_clones_min = 0,
   n_clones_max = Inf,
   save_simulation = TRUE,
+  neutral_variations = FALSE,
   internal_nodes_cn_info = FALSE,
   save_newick_tree = FALSE,
   save_cn_profile = FALSE,
   save_cn_clones = FALSE,
-  format_cn_profile = "both",
+  format_cn_profile = "long",
   model_readcount = FALSE,
+  model_readcount_base = "all",
   pseudo_corrected_readcount = FALSE,
   apply_HMM = FALSE,
-  apply_UMAP_on_HMM = FALSE,
   report_progress = TRUE,
   compute_parallel = FALSE,
   seed = Inf,
@@ -41,6 +42,8 @@ simulator_full_program(
 
 \item{save_simulation}{...}
 
+\item{neutral_variations}{...}
+
 \item{internal_nodes_cn_info}{...}
 
 \item{save_newick_tree}{...}
@@ -56,8 +59,6 @@ simulator_full_program(
 \item{pseudo_corrected_readcount}{...}
 
 \item{apply_HMM}{...}
-
-\item{apply_UMAP_on_HMM}{...}
 
 \item{report_progress}{...}
 
