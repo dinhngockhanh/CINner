@@ -2,7 +2,7 @@
 #' @export
 plot_tot_pop_vs_input <- function(model = "",
                                   n_simulations = 0,
-                                  vec_time = c(0),
+                                  vec_time = NULL,
                                   unit_time = "year",
                                   width = 1000,
                                   height = 500) {
@@ -10,22 +10,34 @@ plot_tot_pop_vs_input <- function(model = "",
         #------------------------------------------Input simulation file
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")
         load(filename)
-        #----------------Find total population dynamics from input model
-        if (unit_time == "day") {
-            vec_time_expectation <- vec_time
+        #-----------------------------Transform time points if necessary
+        if (is.null(vec_time)) {
+            evolution_traj_time <- simulation$clonal_evolution$evolution_traj_time
+            T_0 <- evolution_traj_time[1]
+            T_end <- evolution_traj_time[length(evolution_traj_time)]
+            vec_time_expectation <- seq(T_0, T_end, by = ((T_end - T_0) / 100))
+            if (unit_time == "day") {
+                vec_time <- vec_time_expectation
+            } else if (unit_time == "week") {
+                vec_time <- vec_time_expectation / 7
+            } else if (unit_time == "month") {
+                vec_time <- vec_time_expectation / 30
+            } else if (unit_time == "year") {
+                vec_time <- vec_time_expectation / 365
+            }
         } else {
-            if (unit_time == "week") {
+            if (unit_time == "day") {
+                vec_time_expectation <- vec_time
+            } else if (unit_time == "week") {
                 vec_time_expectation <- 7 * vec_time
-            } else {
-                if (unit_time == "month") {
-                    vec_time_expectation <- 30 * vec_time
-                } else {
-                    if (unit_time == "year") {
-                        vec_time_expectation <- 365 * vec_time
-                    }
-                }
+            } else if (unit_time == "month") {
+                vec_time_expectation <- 30 * vec_time
+            } else if (unit_time == "year") {
+                vec_time_expectation <- 365 * vec_time
             }
         }
+        #----------------Find total population dynamics from input model
+        # vec_time_expectation <- vec_time
         SIMULATOR_VARIABLES_for_simulation(model)
         vec_cell_count_exp_plot <- func_expected_population(vec_time_expectation)
         #-----------------Find total population dynamics from simulation

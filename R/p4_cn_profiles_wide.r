@@ -1,12 +1,9 @@
 #' @export
-p2_cn_profiles_wide <- function(simulation) {
-    sample_cell_ID <- simulation$sample$sample_cell_ID
-
-    sample_clone_ID <- simulation$sample$sample_clone_ID
-    all_sample_sampled_time <- simulation$sample$all_sample_sampled_time
-    all_sample_id <- simulation$sample$all_sample_ID
-    sample_genotype_unique <- simulation$sample$sample_genotype_unique
-    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+p4_cn_profiles_wide <- function(simulation) {
+    sample_cell_ID <- simulation$neutral_variations$sample$sample_cell_ID
+    sample_clone_ID <- simulation$neutral_variations$sample$sample_clone_ID
+    sample_genotype_unique <- simulation$neutral_variations$sample$sample_genotype_unique
+    sample_genotype_unique_profile <- simulation$neutral_variations$sample$sample_genotype_unique_profile
     #--------------Initiate the CN profiles with genome location indices
     cn_profiles_wide <- sample_genotype_unique_profile[[1]][, 1:3]
     #-------------------Find the CN profiles for each cell in the sample
@@ -19,6 +16,6 @@ p2_cn_profiles_wide <- function(simulation) {
         cell_id <- sample_cell_ID[cell]
         cn_profiles_wide[cell_id] <- cell_genotype_profile$state
     }
-    simulation$sample$cn_profiles_wide <- cn_profiles_wide
+    simulation$neutral_variations$sample$cn_profiles_wide <- cn_profiles_wide
     return(simulation)
 }

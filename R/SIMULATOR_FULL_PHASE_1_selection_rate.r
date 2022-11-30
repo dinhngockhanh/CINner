@@ -18,7 +18,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             clone_selection_rate <- 0
             return(clone_selection_rate)
         }
-        vec_CN_all    <- c(vec_CN_all, vec_CN)
+        vec_CN_all <- c(vec_CN_all, vec_CN)
     }
     if (mean(vec_CN_all) > bound_average_ploidy) {
         clone_selection_rate <- 0

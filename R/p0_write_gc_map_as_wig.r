@@ -1,5 +1,5 @@
 #' @export
-p2_write_gc_map_as_wig <- function(filename_gc, filename_map) {
+p0_write_gc_map_as_wig <- function(filename_gc, filename_map) {
     #-----------------------Initialize data frame for GC and mappability
     vec_chr <- c()
     vec_start <- c()

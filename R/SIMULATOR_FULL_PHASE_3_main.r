@@ -5,7 +5,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     T_final <- package_clonal_evolution$T_current
     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- package_clonal_evolution$genotype_list_ploidy_block
-    genotype_list_ploidy_allele                  <- package_clonal_evolution$genotype_list_ploidy_allele
+    genotype_list_ploidy_allele <- package_clonal_evolution$genotype_list_ploidy_allele
     evolution_traj_time <- package_clonal_evolution$evolution_traj_time
     evolution_traj_divisions <- package_clonal_evolution$evolution_traj_divisions
     evolution_traj_clonal_ID <- package_clonal_evolution$evolution_traj_clonal_ID

@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(pbapply)
+library(ggimage)
 library(ggplot2)
 library(ggtree)
 library(signals)
@@ -31,15 +33,17 @@ library(parallel)
 library(RColorBrewer)
 library(ape)
 
-library(abc)
+library(readxl)
+
+# library(abc)
 library(gridExtra)
 #-----------------------------------------------------------------------
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
 #-----------------------------------------------------------------------
-devtools::install_github("dinhngockhanh/CancerSimulator")
-library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
 ```
 
 # Analyze the noise in DLP+ data
@@ -47,8 +51,8 @@ library(CancerSimulator)
 Here we analyze the noise level in `ov2295_cell_cn.csv`, from https://zenodo.org/record/3445364#.Ytq9ji-B3Pw.
 
 ```{r}
-ov2295_cn       <<- read.csv(file = 'ov2295_cell_cn.csv')
-table_gc          <<- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+# ov2295_cn       <<- read.csv(file = 'ov2295_cell_cn.csv')
+# table_gc          <<- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
 # analysis_dlp_cn(CNbins=ov2295_cn,table_gc=table_gc,filename_prefix='OV2295')
 ```
 
@@ -57,164 +61,281 @@ table_gc          <<- read.csv(file = system.file("extdata", "gc_map_500kb.csv",
 Save parameters to build one simulation:
 
 ```{r}
-cell_lifespan                       <- 30
-T_0                                 <- list(0,'year')
-T_end                               <- list(80,'year')
-T_tau_step                          <- cell_lifespan/2
-CN_bin_length                       <- 500000
+cell_lifespan <- 30
+T_0 <- list(0, "year")
+T_end <- list(80, "year")
+Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(300), Age_sample = c(80))
+T_tau_step <- cell_lifespan / 2
+CN_bin_length <- 500000
 ########################################################################
 ########################################################################
 ########################################################################
-Table_sample                        <- data.frame(Sample_ID='SA01',Cell_count=300,Age_sample=80)
+selection_model <- "chrom-arm-and-driver-gene-selection"
 
+prob_CN_whole_genome_duplication <- 0e-4
+prob_CN_missegregation <- 1e-4
+prob_CN_chrom_arm_missegregation <- 1e-4
+prob_CN_focal_amplification <- 1e-4
+prob_CN_focal_deletion <- 1e-4
+prob_CN_cnloh_interstitial <- 0e-5
+prob_CN_cnloh_terminal <- 0e-5
 
+prob_neutral_CN_whole_genome_duplication <- 0e-4
+prob_neutral_CN_missegregation <- 100*prob_CN_missegregation
+prob_neutral_CN_chrom_arm_missegregation <- 100*prob_CN_chrom_arm_missegregation
+prob_neutral_CN_focal_amplification <- 100*prob_CN_focal_amplification
+prob_neutral_CN_focal_deletion <- 100*prob_CN_focal_deletion
+prob_neutral_CN_cnloh_interstitial <- 100*prob_CN_cnloh_interstitial
+prob_neutral_CN_cnloh_terminal <- 100*prob_CN_cnloh_terminal
 
-prob_CN_whole_genome_duplication    <- 3.5e-5
-prob_CN_missegregation              <- 8e-4
-prob_CN_chrom_arm_missegregation    <- 8e-4
-prob_CN_focal_amplification         <- 8e-4
-prob_CN_focal_deletion              <- 0e-4
-prob_CN_cnloh_interstitial          <- 0e-4
-prob_CN_cnloh_terminal              <- 0e-4
-
-# prob_CN_whole_genome_duplication    <- 1e-4
-# prob_CN_missegregation              <- 7e-4
-# prob_CN_chrom_arm_missegregation    <- 2e-4
-# prob_CN_focal_amplification         <- 7e-4
-# prob_CN_focal_deletion              <- 2e-4
-# prob_CN_cnloh_interstitial          <- 4e-4
-# prob_CN_cnloh_terminal              <- 6e-4
-
-
-
-prob_CN_focal_amplification_length  <- 0.1
-prob_CN_focal_deletion_length       <- 0.1
-prob_CN_cnloh_interstitial_length   <- 0.1
-prob_CN_cnloh_terminal_length       <- 0.1
-
-# prob_CN_focal_amplification_length  <- 0.5
-# prob_CN_focal_deletion_length       <- 0.5
-# prob_CN_cnloh_interstitial_length   <- 0.5
-# prob_CN_cnloh_terminal_length       <- 0.5
+model_CN_focal_amplification_length <- "beta"
+model_CN_focal_deletion_length <- "beta"
+prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
+prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
+prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
+prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
+prob_CN_cnloh_interstitial_length <- 0.005
+prob_CN_cnloh_terminal_length <- 0.005
+rate_driver <- 0
 ########################################################################
 ########################################################################
 ########################################################################
-rate_driver                         <- 8e-16
-rate_passenger                      <- 1e-11
-selection_model                     <- 'ancient'
-bound_driver                        <- 3
-bound_average_ploidy                <- 4.5
-bound_homozygosity                  <- 500
-vec_time                            <- T_0[[1]]:T_end[[1]]
-L                                   <- 10000
-t_0                                 <- 20
-k                                   <- 0.3
-vec_cell_count                      <- L/(1+exp(-k*(vec_time-t_0)))
-table_population_dynamics           <- cbind(vec_time,vec_cell_count)
-gc                                  <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
-gc_slope                            <- 1.2
-gc_int                              <- 0
-sigma1                              <- 0.1
-num_reads                           <- 2e6
-model_variables                     <- BUILD_general_variables(
-    cell_lifespan=cell_lifespan,
-    T_0=T_0,T_end=T_end,T_tau_step=T_tau_step,
-    Table_sample=Table_sample,
-    CN_bin_length=CN_bin_length,
-    prob_CN_whole_genome_duplication=prob_CN_whole_genome_duplication,
-    prob_CN_missegregation=prob_CN_missegregation,
-    prob_CN_chrom_arm_missegregation=prob_CN_chrom_arm_missegregation,
-    prob_CN_focal_amplification=prob_CN_focal_amplification,
-    prob_CN_focal_deletion=prob_CN_focal_deletion,
-    prob_CN_cnloh_interstitial=prob_CN_cnloh_interstitial,
-    prob_CN_cnloh_terminal=prob_CN_cnloh_terminal,
-    prob_CN_focal_amplification_length=prob_CN_focal_amplification_length,
-    prob_CN_focal_deletion_length=prob_CN_focal_deletion_length,
-    prob_CN_cnloh_interstitial_length=prob_CN_cnloh_interstitial_length,
-    prob_CN_cnloh_terminal_length=prob_CN_cnloh_terminal_length,
-    rate_driver=rate_driver,
-    rate_passenger=rate_passenger,
-    selection_model=selection_model,
-    bound_driver=bound_driver,
-    bound_average_ploidy=bound_average_ploidy,
-    bound_homozygosity=bound_homozygosity,
-    table_population_dynamics=table_population_dynamics,
-    gc=gc,
-    gc_slope=gc_slope,
-    gc_int=gc_int,
-    sigma1=sigma1,
-    num_reads=num_reads
+rate_passenger <- 1e-11
+bound_driver <- 3
+bound_average_ploidy <- 4.5
+bound_homozygosity <- 0
+
+vec_time <- T_0[[1]]:T_end[[1]]
+L <- 10000
+t_0 <- 20
+k <- 0.3
+vec_cell_count <- L / (1 + exp(-k * (vec_time - t_0)))
+table_population_dynamics <- cbind(vec_time, vec_cell_count)
+
+gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+gc_slope <- 1.2
+gc_int <- 0
+sigma1 <- 0.02642392
+num_reads <- 3906632
+model_variables <- BUILD_general_variables(
+    cell_lifespan = cell_lifespan,
+    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    Table_sample = Table_sample,
+    CN_bin_length = CN_bin_length,
+
+    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
+    prob_CN_missegregation = prob_CN_missegregation,
+    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
+    prob_CN_focal_amplification = prob_CN_focal_amplification,
+    prob_CN_focal_deletion = prob_CN_focal_deletion,
+    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
+    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
+
+    prob_neutral_CN_whole_genome_duplication = prob_neutral_CN_whole_genome_duplication,
+    prob_neutral_CN_missegregation = prob_neutral_CN_missegregation,
+    prob_neutral_CN_chrom_arm_missegregation = prob_neutral_CN_chrom_arm_missegregation,
+    prob_neutral_CN_focal_amplification = prob_neutral_CN_focal_amplification,
+    prob_neutral_CN_focal_deletion = prob_neutral_CN_focal_deletion,
+    prob_neutral_CN_cnloh_interstitial = prob_neutral_CN_cnloh_interstitial,
+    prob_neutral_CN_cnloh_terminal = prob_neutral_CN_cnloh_terminal,
+
+    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
+    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
+    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
+    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
+    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
+    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
+    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
+    rate_driver = rate_driver,
+    rate_passenger = rate_passenger,
+    selection_model = selection_model,
+    bound_driver = bound_driver,
+    bound_average_ploidy = bound_average_ploidy,
+    bound_homozygosity = bound_homozygosity,
+    table_population_dynamics = table_population_dynamics,
+    gc = gc,
+    gc_slope = gc_slope,
+    gc_int = gc_int,
+    sigma1 = sigma1,
+    num_reads = num_reads
 )
-vec_driver_genes  <- c('TP53','BRCA1','BRCA2','MSH2','MSH6','ARID1A',
-    'STK11','BRAF','MLH1','PIK3R1','ERBB2','CTNNB1','AKT1','PPP2R1A')
-vec_driver_role   <- c('TSG','TSG','TSG','TSG','TSG','TSG',
-    'TSG','ONCOGENE','TSG','TSG','ONCOGENE','ONCOGENE','ONCOGENE','TSG')
 ########################################################################
 ########################################################################
 ########################################################################
-vec_driver_s      <- rep(0.005,length(vec_driver_genes))
-# vec_driver_s[1]   <- 0.009
+arm_id <- c(paste(model_variables$cn_info$Chromosome, "p", sep = ""), paste(model_variables$cn_info$Chromosome, "q", sep = ""))
+arm_chromosome <- rep(model_variables$cn_info$Chromosome, 2)
+arm_start <- c(rep(1, length(model_variables$cn_info$Chromosome)), model_variables$cn_info$Centromere_location + 1)
+arm_end <- c(model_variables$cn_info$Centromere_location, model_variables$cn_info$Bin_count)
+arm_s <- rep(1, length(arm_id))
+arm_s[which(arm_id == "1p")] <- 1 + 0.05
+arm_s[which(arm_id == "1q")] <- 1 + 0.065
+arm_s[which(arm_id == "2p")] <- 1 + 0.06
+arm_s[which(arm_id == "2q")] <- 1 + 0.05
+arm_s[which(arm_id == "3p")] <- 1 + 0.02
+arm_s[which(arm_id == "3q")] <- 1 + 0.095
+arm_s[which(arm_id == "4p")] <- 1 - 0.013
+arm_s[which(arm_id == "4q")] <- 1 - 0.016
+arm_s[which(arm_id == "5p")] <- 1 + 0.18
+arm_s[which(arm_id == "5q")] <- 1 - 0.1
+arm_s[which(arm_id == "6p")] <- 1 + 0.2
+arm_s[which(arm_id == "6q")] <- 1 - 0.17
+arm_s[which(arm_id == "7p")] <- 1 + 0.02
+arm_s[which(arm_id == "7q")] <- 1 + 0.1
+arm_s[which(arm_id == "8p")] <- 1 - 0.14
+arm_s[which(arm_id == "8q")] <- 1 + 0.2
+arm_s[which(arm_id == "9p")] <- 1 + 0.022
+arm_s[which(arm_id == "9q")] <- 1 + 0.022
+arm_s[which(arm_id == "10p")] <- 1 + 0.03
+arm_s[which(arm_id == "10q")] <- 1 + 0.035
+arm_s[which(arm_id == "11p")] <- 1 - 0.15
+arm_s[which(arm_id == "11q")] <- 1 + 0.13
+arm_s[which(arm_id == "12p")] <- 1 + 0.08
+arm_s[which(arm_id == "12q")] <- 1 + 0.04
+arm_s[which(arm_id == "13p")] <- 1 + 0.03
+arm_s[which(arm_id == "13q")] <- 1 + 0.022
+arm_s[which(arm_id == "14p")] <- 1 + 0.022
+arm_s[which(arm_id == "14q")] <- 1 + 0.016
+arm_s[which(arm_id == "15p")] <- 1 + 0.02
+arm_s[which(arm_id == "15q")] <- 1 + 0.01
+arm_s[which(arm_id == "16p")] <- 1 + 0.01
+arm_s[which(arm_id == "16q")] <- 1 - 0.08
+arm_s[which(arm_id == "17p")] <- 1 - 0.07
+arm_s[which(arm_id == "17q")] <- 1 + 0.01
+arm_s[which(arm_id == "18p")] <- 1 - 0.04
+arm_s[which(arm_id == "18q")] <- 1 - 0.03
+arm_s[which(arm_id == "19p")] <- 1 + 0.06
+arm_s[which(arm_id == "19q")] <- 1 + 0.06
+arm_s[which(arm_id == "20p")] <- 1 + 0.05
+arm_s[which(arm_id == "20q")] <- 1 + 0.06
+arm_s[which(arm_id == "21p")] <- 1 - 0.22
+arm_s[which(arm_id == "21q")] <- 1 + 0.08
+arm_s[which(arm_id == "22p")] <- 1 - 0.02
+arm_s[which(arm_id == "22q")] <- 1 - 0.02
+arm_s[which(arm_id == "Xp")] <- 1 - 0.04
+arm_s[which(arm_id == "Xq")] <- 1 - 0.04
 
+driver_gene_list <- read_excel("HGSOC_driver_genes.xlsx")
+gene_id <- driver_gene_list$Gene_ID
+gene_role <- driver_gene_list$Gene_role
+gene_chromosome <- driver_gene_list$Chromosome
+gene_bin <- round(driver_gene_list$Start / CN_bin_length)
+gene_s <- rep(1, length(gene_id))
 
-# vec_driver_s      <- rep(0.007,length(vec_driver_genes))
-# vec_driver_s[1]   <- 0.01
-# vec_driver_s[2]   <- 0.009
-# vec_driver_s[3]   <- 0.009
+table_arm_selection_rates <- data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
+table_gene_selection_rates <- data.frame(Gene_ID = gene_id, Gene_role = gene_role, s_rate = gene_s, Chromosome = gene_chromosome, Bin = gene_bin)
+model_variables <- BUILD_driver_library(
+    model_variables = model_variables,
+    table_arm_selection_rates = table_arm_selection_rates,
+    table_gene_selection_rates = table_gene_selection_rates
+)
 ########################################################################
 ########################################################################
 ########################################################################
-model_variables   <- BUILD_driver_library(model_variables=model_variables,
-    vec_driver_genes=vec_driver_genes,
-    vec_driver_role=vec_driver_role,
-    vec_driver_s=vec_driver_s)
-cell_count        <- 20
-CN_matrix         <- BUILD_cn_normal_XX(model_variables$cn_info)
-drivers           <- list()
-model_variables   <- BUILD_initial_population(model_variables=model_variables,
-    cell_count=cell_count,
-    CN_matrix=CN_matrix,
-    drivers=drivers)
-model_name        <- 'HMMCOPY-STUDY'
-SAVE_model_variables(model_name=model_name,model_variables=model_variables)
+cell_count <- 20
+CN_matrix <- BUILD_cn_normal_XX(model_variables$cn_info)
+drivers <- list()
+model_variables <- BUILD_initial_population(
+    model_variables = model_variables,
+    cell_count = cell_count,
+    CN_matrix = CN_matrix,
+    drivers = drivers
+)
+model_name <- "HMMCOPY-STUDY"
+SAVE_model_variables(model_name = model_name, model_variables = model_variables)
 ```
 
 Create one simulation:
 
 ```{r}
-start_time = Sys.time()
-n_simulations     <- 1
-stage_final       <- 3
-n_clones_min      <- 1
-n_clones_max      <- Inf
-simulator_full_program(
-    model = model_name,
-    n_simulations = n_simulations,
-    stage_final = stage_final,
-    n_clones_min = n_clones_min,
-    n_clones_max = n_clones_max,
-    save_simulation = TRUE,
-    internal_nodes_cn_info = FALSE,
-    save_newick_tree = FALSE,
-    save_cn_profile = TRUE,
-    model_readcount = FALSE,
-    format_cn_profile = "both",
-    apply_HMM = FALSE,
-    apply_UMAP_on_HMM = FALSE,
-    report_progress = TRUE,
-    seed = 10,
-    compute_parallel = FALSE
+start_time <- Sys.time()
+n_simulations <- 10
+tmp <- simulator_full_program(
+    model = model_name, n_simulations = n_simulations,
+    save_cn_profile = FALSE,
+    neutral_variations = TRUE,
+    model_readcount = TRUE,
+    model_readcount_base = 'neuvar',
+    apply_HMM = TRUE,
+    compute_parallel = TRUE,
+    seed = 10
 )
-end_time = Sys.time()
+end_time <- Sys.time()
 print(end_time - start_time)
 ```
 
 Make plots for this "original" simulation:
 
 ```{r}
-plot_all(model = model_name,n_simulations = n_simulations)
+# plot_all(model = model_name,n_simulations = n_simulations)
+
+
+
+plot_clonal_phylo(
+    model = model_name,
+    n_simulations = n_simulations,
+    width = 2000,
+    height = 2000
+)
+
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_simulations,
+    plotcol = "total-copy",
+    CN_data = "TRUTH",
+    phylo = "TRUTH",
+    width = 1000,
+    height = 1000
+)
+
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_simulations,
+    plotcol = "total-copy",
+    CN_data = "NEUTRAL-VARIATIONS",
+    phylo = "TRUTH",
+    width = 1000,
+    height = 1000
+)
+
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_simulations,
+    plotcol = "total-copy",
+    CN_data = "NEUTRAL-VARIATIONS",
+    phylo = "UMAP",
+    width = 1000,
+    height = 1000
+)
+
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_simulations,
+    plotcol = "total-copy",
+    CN_data = "NEUTRAL-VARIATIONS-HMM",
+    phylo = "TRUTH",
+    width = 1000,
+    height = 1000
+)
+
+plot_cn_heatmap(
+    model = model_name,
+    n_simulations = n_simulations,
+    plotcol = "total-copy",
+    CN_data = "NEUTRAL-VARIATIONS-HMM",
+    phylo = "UMAP",
+    width = 1000,
+    height = 1000
+)
 ```
 
-# Create noisy readcounts with varying parameters
+
+
+
+
+
+
+<!-- # Create noisy readcounts with varying parameters
 
 Rename the "original" simulation and its plots:
 
@@ -466,4 +587,8 @@ p <- ggplot(
     theme(text = element_text(size = 40), legend.position = "bottom")
 print(p)
 dev.off()
+``` -->
+
+
+```{r}
 ```

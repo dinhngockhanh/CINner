@@ -1,6 +1,9 @@
 # ================================================SIMULATE FOCAL DELETION
 #' @export
-SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react, genotype_daughter) {
+SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react,
+                                                     genotype_daughter,
+                                                     chromosomes_excluded = NULL,
+                                                     event = NULL) {
     #------------------------------------Find the new CN and driver profiles
     #   Initialize the daughter's CN and driver profiles
     ploidy_chrom <- genotype_list_ploidy_chrom[[genotype_daughter]]
@@ -12,40 +15,50 @@ SIMULATOR_FULL_PHASE_1_CN_focal_deletion <- function(genotype_to_react, genotype
     if (max(ploidy_chrom) == 0) {
         return()
     }
-    while (1) {
-        #       Choose the chromosome to be focally deleted
-        chrom <- sample.int(N_chromosomes, size = 1)
-        no_strands <- ploidy_chrom[chrom]
-        if (no_strands <= 0) {
-            next
-        }
-        #       Choose the strand to be focally deleted
-        strand <- sample.int(no_strands, size = 1)
-        #       Find the chromosome's centromere location and length
-        centromere <- vec_centromere_location[chrom]
-        chrom_length <- vec_CN_block_no[chrom]
-        #       Choose the chromosome arm to be focally deleted
-        chrom_arm <- sample.int(2, size = 1)
-        if (chrom_arm == 1) {
-            max_length <- centromere
-        } else {
-            if (chrom_arm == 2) {
-                max_length <- chrom_length - centromere
+    if (!is.null(event)) {
+        chrom <- strtoi(event[2])
+        strand <- strtoi(event[3])
+        block_start <- strtoi(event[4])
+        block_end <- strtoi(event[5])
+    } else {
+        while (1) {
+            #       Choose the chromosome to be focally deleted
+            chrom <- sample.int(N_chromosomes, size = 1)
+            if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
+                next
             }
-        }
-        #       Choose the length of the focal deletion
-        focal_length <- max_length + 1
-        while ((focal_length > max_length) | (focal_length<=0)) {
-            if (model_CN_focal_deletion_length=='geom'){
-                focal_length <- rgeom(n = 1, prob_CN_focal_deletion_length)
-            } else if (model_CN_focal_deletion_length=='beta'){
-                focal_length <- round(rbeta(n=1, prob_CN_focal_deletion_length_shape_1, prob_CN_focal_deletion_length_shape_2)*max_length)
+            no_strands <- ploidy_chrom[chrom]
+            if (no_strands <= 0) {
+                next
             }
+            #       Choose the strand to be focally deleted
+            strand <- sample.int(no_strands, size = 1)
+            #       Find the chromosome's centromere location and length
+            centromere <- vec_centromere_location[chrom]
+            chrom_length <- vec_CN_block_no[chrom]
+            #       Choose the chromosome arm to be focally deleted
+            chrom_arm <- sample.int(2, size = 1)
+            if (chrom_arm == 1) {
+                max_length <- centromere
+            } else {
+                if (chrom_arm == 2) {
+                    max_length <- chrom_length - centromere
+                }
+            }
+            #       Choose the length of the focal deletion
+            focal_length <- max_length + 1
+            while ((focal_length > max_length) | (focal_length <= 0)) {
+                if (model_CN_focal_deletion_length == "geom") {
+                    focal_length <- rgeom(n = 1, prob_CN_focal_deletion_length)
+                } else if (model_CN_focal_deletion_length == "beta") {
+                    focal_length <- round(rbeta(n = 1, prob_CN_focal_deletion_length_shape_1, prob_CN_focal_deletion_length_shape_2) * max_length)
+                }
+            }
+            #       Choose the region to be focally deleted
+            block_start <- (chrom_arm - 1) * centromere + sample.int(max_length - focal_length + 1, size = 1)
+            block_end <- block_start + focal_length - 1
+            break
         }
-        #       Choose the region to be focally deleted
-        block_start <- (chrom_arm - 1) * centromere + sample.int(max_length - focal_length + 1, size = 1)
-        block_end <- block_start + focal_length - 1
-        break
     }
     #   Find all drivers located on this region
     if ((driver_count == 0) || (length(intersect(which(driver_map[, 4] >= block_start), which(driver_map[, 4] <= block_end))) == 0)) {

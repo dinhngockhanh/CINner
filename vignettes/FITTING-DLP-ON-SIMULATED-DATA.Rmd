@@ -86,7 +86,6 @@ rate_passenger <- 1e-11
 bound_driver <- 3
 bound_average_ploidy <- 4.5
 bound_homozygosity <- 10
-
 vec_time <- T_0[[1]]:T_end[[1]]
 L <- 10000
 t_0 <- 20

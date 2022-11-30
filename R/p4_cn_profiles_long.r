@@ -1,9 +1,9 @@
 #' @export
-p2_cn_profiles_long <- function(simulation) {
-    sample_cell_ID <- simulation$sample$sample_cell_ID
-    sample_clone_ID <- simulation$sample$sample_clone_ID
-    sample_genotype_unique <- simulation$sample$sample_genotype_unique
-    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+p4_cn_profiles_long <- function(simulation) {
+    sample_cell_ID <- simulation$neutral_variations$sample$sample_cell_ID
+    sample_clone_ID <- simulation$neutral_variations$sample$sample_clone_ID
+    sample_genotype_unique <- simulation$neutral_variations$sample$sample_genotype_unique
+    sample_genotype_unique_profile <- simulation$neutral_variations$sample$sample_genotype_unique_profile
     #-------------------Find the CN profiles for each cell in the sample
     cn_profiles_long_list <- vector("list", length = length(sample_clone_ID))
     for (cell in 1:length(sample_clone_ID)) {
@@ -20,6 +20,6 @@ p2_cn_profiles_long <- function(simulation) {
     #-------------------------------Bind all cells' CN profiles together
     sample_genotype_profiles <- rbindlist(cn_profiles_long_list, use.names = FALSE, fill = FALSE, idcol = NULL)
     class(sample_genotype_profiles) <- "data.frame"
-    simulation$sample$cn_profiles_long <- sample_genotype_profiles
+    simulation$neutral_variations$sample$cn_profiles_long <- sample_genotype_profiles
     return(simulation)
 }

@@ -155,12 +155,13 @@ model_variables <- CHECK_model_variables(model_variables)
 We create a list of all parameters to be fitted, their types (CNA probabilities or chromosome-arm selection rates), and the bounds for their respective uniform prior distributions:
 
 ```{r}
-list_parameters <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(list_parameters) <- c("Variable", "Lower_bound", "Upper_bound")
-list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_chrom_arm_missegregation", 1e-5, 1e-4)
+list_parameters <- data.frame(matrix(ncol = 4, nrow = 0))
+colnames(list_parameters) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
+list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_chrom_arm_missegregation", "CNA_probability", 1e-5, 1e-4)
 for (i in 1:length(model_variables$chromosome_arm_library$Arm_ID)) {
     list_parameters[nrow(list_parameters) + 1, ] <- c(
         model_variables$chromosome_arm_library$Arm_ID[i],
+        "Arm_selection_rate",
         0.5, 1.5
     )
 }
@@ -175,12 +176,12 @@ list_targets <- model_variables$chromosome_arm_library$Arm_ID
 We then run the fitting routine:
 
 ```{r}
-fitting_arm_PCAWG(
-    model_name,
-    model_variables,
-    copynumber_PCAWG,
-    list_parameters,
-    list_targets,
+fitting_bulk_arm_CN(
+    model_name = model_name,
+    model_variables = model_variables,
+    copynumber_DATA = copynumber_PCAWG,
+    list_parameters = list_parameters,
+    list_targets = list_targets,
     ABC_simcount = 10000
 )
 ```

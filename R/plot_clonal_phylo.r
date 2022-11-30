@@ -35,8 +35,7 @@ plot_clonal_phylo <- function(model = "",
         #   Plot clone phylogeny tree
         p <- ggtree(clone_phylogeny_phylo, branch.length = "none")
         #   Plot clone ID
-        size_text <- floor(height / N_clones)
-        p <- p + geom_tiplab(as_ylab = TRUE, size = size_text)
+        p <- p + geom_tiplab(as_ylab = TRUE, size = 100)
         #   Plot phylogeny tree root edge
         p <- p + geom_rootedge(rootedge = 1)
         # p <- p + geom_rootedge(rootedge = l_clonal_edge)
@@ -432,16 +431,12 @@ plot_clonal_phylo <- function(model = "",
 
 
         #----------------------------------------------Add in the legend
-
-        row_spacing <- log(N_clones) / 5
-
+        x.range <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+        y.range <- ggplot_build(p)$layout$panel_params[[1]]$y.range
         for (row in 1:length(cols)) {
-            p <- p + annotate("point", -1, (N_clones - (row - 1) * row_spacing), size = 16, color = cols[row])
-            p <- p + annotate("text", 0, (N_clones - (row - 1) * row_spacing), size = 16, hjust = 0, label = names(cols)[row])
+            p <- p + annotate("point", x.range[1], (y.range[2] - row * (y.range[2] - y.range[1]) / 20), size = 16, color = cols[row])
+            p <- p + annotate("text", x.range[1] + (x.range[2] - x.range[1]) / 20, (y.range[2] - row * (y.range[2] - y.range[1]) / 20), size = 16, hjust = 0, label = names(cols)[row])
         }
-
-
-
         print(p)
         dev.off()
     }

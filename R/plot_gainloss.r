@@ -1,6 +1,7 @@
 #' @export
 plot_gainloss <- function(copynumber_sims,
-                          copynumber_PCAWG,
+                          copynumber_DATA,
+                          type_sample_DATA = "individual",
                           filename,
                           arm_level = FALSE,
                           pos_centromeres = c(),
@@ -20,15 +21,41 @@ plot_gainloss <- function(copynumber_sims,
     f2_sims <- delta_sims$delta_loss
     copynumber_coordinates <- delta_sims$copynumber_coordinates
     #---------------------------------Get gain/loss consensus from PCAWG
-    delta_PCAWG <- gainloss_PCAWG(
-        copynumber_PCAWG,
-        copynumber_coordinates,
-        ploidy_normalization = TRUE,
-        use_rbindlist = TRUE,
-        arm_level = arm_level, pos_centromeres = pos_centromeres
-    )
-    f1_data <- delta_PCAWG$delta_gain
-    f2_data <- delta_PCAWG$delta_loss
+    if (type_sample_DATA == "individual") {
+        delta_PCAWG <- gainloss_DATA(
+            copynumber_DATA,
+            copynumber_coordinates,
+            ploidy_normalization = TRUE,
+            use_rbindlist = TRUE,
+            arm_level = arm_level, pos_centromeres = pos_centromeres
+        )
+        f1_data <- delta_PCAWG$delta_gain
+        f2_data <- delta_PCAWG$delta_loss
+    } else if (type_sample_DATA == "average" & arm_level == TRUE) {
+        list_chr <- unique(copynumber_coordinates$chr)
+        tmp <- copynumber_coordinates
+        tmp$delta_gain <- 0
+        tmp$delta_loss <- 0
+        CNbin_length <- tmp$end[1] - tmp$start[1] + 1
+
+        for (i in 1:nrow(copynumber_DATA)) {
+            ID <- copynumber_DATA$Arm[i]
+            gain <- copynumber_DATA$Amp_freq_all[i]
+            loss <- -copynumber_DATA$Del_freq_all[i]
+            chr <- substr(ID, 1, nchar(ID) - 1)
+            arm <- substr(ID, nchar(ID), nchar(ID))
+            centromere <- pos_centromeres$Centromere_location[which(pos_centromeres$Chromosome == chr)]
+            if (arm == "p") {
+                vec_rows <- which((tmp$chr == chr) & (tmp$end <= centromere * CNbin_length))
+            } else if (arm == "q") {
+                vec_rows <- which((tmp$chr == chr) & (tmp$start > centromere * CNbin_length))
+            }
+            tmp$delta_gain[vec_rows] <- gain
+            tmp$delta_loss[vec_rows] <- loss
+        }
+        f1_data <- tmp$delta_gain
+        f2_data <- tmp$delta_loss
+    }
     #-----------Find Spearman correlations between PCAWG and simulations
     stat_gain <- cor.test(f1_sims, f1_data, method = "spearman", exact = FALSE)
     rho_gain <- stat_gain$estimate[["rho"]]
@@ -114,24 +141,24 @@ plot_gainloss <- function(copynumber_sims,
 }
 
 #' @export
-gainloss_PCAWG <- function(copynumber_PCAWG,
-                           copynumber_coordinates,
-                           ploidy_normalization = FALSE,
-                           use_rbindlist = FALSE,
-                           arm_level = FALSE,
-                           pos_centromeres) {
+gainloss_DATA <- function(copynumber_DATA,
+                          copynumber_coordinates,
+                          ploidy_normalization = FALSE,
+                          use_rbindlist = FALSE,
+                          arm_level = FALSE,
+                          pos_centromeres) {
     plotcol <- "state"
     fillna <- TRUE
     cutoff <- 2
     #---------------------------------Get gain/loss consensus from PCAWG
-    samplelist_data <- unique(copynumber_PCAWG$donor_unique_id)
+    samplelist_data <- unique(copynumber_DATA$donor_unique_id)
     CNbins_list_data <- vector("list", length = length(samplelist_data))
     NA_list_data <- vector("list", length = length(samplelist_data))
     CNbin_length <- copynumber_coordinates$end[1] - copynumber_coordinates$start[1] + 1
     for (iteration in 1:length(samplelist_data)) {
         sample_id <- samplelist_data[iteration]
         #   Get CN data for the sample
-        cn_profiles_data <- copynumber_PCAWG[which(copynumber_PCAWG$donor_unique_id == sample_id), ]
+        cn_profiles_data <- copynumber_DATA[which(copynumber_DATA$donor_unique_id == sample_id), ]
         #   Get uniform-bin CN data from the data
         CNbins_iteration <- data.frame(chr = copynumber_coordinates$chr, start = copynumber_coordinates$start, end = copynumber_coordinates$end)
         CNbins_iteration$copy <- 0

@@ -1,6 +1,6 @@
 #' @export
-p2_readcount_model <- function(simulation, report_progress) {
-    noisy_cn_profiles_long <- simulation$sample$cn_profiles_long
+p4_readcount_model <- function(simulation, report_progress) {
+    noisy_cn_profiles_long <- simulation$neutral_variations$sample$cn_profiles_long
     #-------------------Find true_CN and BAF for every bin in every cell
     #   Find true CN and BAF for every bin in every cell
     noisy_cn_profiles_long$true_CN <- noisy_cn_profiles_long$state
@@ -128,6 +128,6 @@ p2_readcount_model <- function(simulation, report_progress) {
         noisy_cn_profiles_long$reads[vec_work] -
         noisy_cn_profiles_long$minor_reads[vec_work]
     #-------------------------------------------Output noisy CN profiles
-    simulation$sample$noisy_cn_profiles_long <- noisy_cn_profiles_long
+    simulation$neutral_variations$sample$noisy_cn_profiles_long <- noisy_cn_profiles_long
     return(simulation)
 }

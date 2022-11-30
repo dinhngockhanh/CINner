@@ -1,5 +1,5 @@
 #' @export
-p2_write_cn_as_wig <- function(filename, noisy_cn_profiles_long, cell_ID) {
+p0_write_cn_as_wig <- function(filename, noisy_cn_profiles_long, cell_ID) {
     #-----------------------------------Extract readcounts for this cell
     noisy_cn_profiles_long <- noisy_cn_profiles_long[noisy_cn_profiles_long$cell_id == cell_ID, ]
     #--------------------------------------------Initialize the WIG file
@@ -9,12 +9,9 @@ p2_write_cn_as_wig <- function(filename, noisy_cn_profiles_long, cell_ID) {
     for (chrom in 1:length(list_chr)) {
         chrom_ID <- list_chr[chrom]
         write(paste("fixedStep chrom=", chrom_ID, " start=", 1, " step=", as.integer(size_CN_block_DNA), " span=", as.integer(size_CN_block_DNA), sep = ""), file = filename, append = TRUE, sep = "\n")
-        # write(paste("variableStep chrom=", chrom_ID, " span=", as.integer(size_CN_block_DNA), sep = ""), file = filename, append = TRUE, sep = "\n")
-        # write(paste("variableStep chrom=chr", chrom_ID, " span=", as.integer(size_CN_block_DNA), sep = ""), file = filename, append = TRUE, sep = "\n")
         vec_loc <- which(noisy_cn_profiles_long$chr == chrom_ID)
         for (loc in 1:length(vec_loc)) {
             write(noisy_cn_profiles_long$reads[vec_loc[loc]], file = filename, append = TRUE, sep = "\n")
-            # write(paste(noisy_cn_profiles_long$start[vec_loc[loc]], " ", noisy_cn_profiles_long$reads[vec_loc[loc]]), file = filename, append = TRUE, sep = "\n")
         }
     }
 }

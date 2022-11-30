@@ -20,4 +20,4 @@ pwd
 echo "Launching an R run"
 date
 
-R CMD BATCH --no-save --vanilla pcawg.r routput
+R CMD BATCH --no-save --vanilla program_pcawg.r routput

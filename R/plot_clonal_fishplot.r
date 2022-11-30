@@ -2,7 +2,7 @@
 #' @export
 plot_clonal_fishplot <- function(model = "",
                                  n_simulations = 0,
-                                 vec_time = c(0),
+                                 vec_time = NULL,
                                  unit_time = "year",
                                  width = 1000,
                                  height = 500) {
@@ -11,19 +11,29 @@ plot_clonal_fishplot <- function(model = "",
         filename <- paste(model, "_simulation_", i, ".rda", sep = "")
         load(filename)
         #-----------------------------Transform time points if necessary
-        if (unit_time == "day") {
-            vec_time_simulation <- vec_time
+        if (is.null(vec_time)) {
+            evolution_traj_time <- simulation$clonal_evolution$evolution_traj_time
+            T_0 <- evolution_traj_time[1]
+            T_end <- evolution_traj_time[length(evolution_traj_time)]
+            vec_time_simulation <- seq(T_0, T_end, by = ((T_end - T_0) / 100))
+            if (unit_time == "day") {
+                vec_time <- vec_time_simulation
+            } else if (unit_time == "week") {
+                vec_time <- vec_time_simulation / 7
+            } else if (unit_time == "month") {
+                vec_time <- vec_time_simulation / 30
+            } else if (unit_time == "year") {
+                vec_time <- vec_time_simulation / 365
+            }
         } else {
-            if (unit_time == "week") {
+            if (unit_time == "day") {
+                vec_time_simulation <- vec_time
+            } else if (unit_time == "week") {
                 vec_time_simulation <- 7 * vec_time
-            } else {
-                if (unit_time == "month") {
-                    vec_time_simulation <- 30 * vec_time
-                } else {
-                    if (unit_time == "year") {
-                        vec_time_simulation <- 365 * vec_time
-                    }
-                }
+            } else if (unit_time == "month") {
+                vec_time_simulation <- 30 * vec_time
+            } else if (unit_time == "year") {
+                vec_time_simulation <- 365 * vec_time
             }
         }
         #---------------------------------------Input the sampling table

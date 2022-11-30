@@ -1,6 +1,9 @@
 # ===============SIMULATE INTERSTITIAL COPY-NEUTRAL LOSS OF HETEROGENEITY
 #' @export
-SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react, genotype_daughter) {
+SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,
+                                                         genotype_daughter,
+                                                         chromosomes_excluded = NULL,
+                                                         event = NULL) {
     #------------------------------------Find the new CN and driver profiles
     #   Initialize the daughter's CN and driver profiles
     ploidy_chrom <- genotype_list_ploidy_chrom[[genotype_daughter]]
@@ -9,39 +12,50 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react, geno
     driver_count <- genotype_list_driver_count[genotype_daughter]
     driver_map <- genotype_list_driver_map[[genotype_daughter]]
     #   Find information about the interstitial CN-LOH
-    while (1) {
-        #       Choose the chromosome to harbor the interstitial CN-LOH
-        chrom <- sample.int(N_chromosomes, size = 1)
-        no_strands <- ploidy_chrom[chrom]
-        if (no_strands <= 1) {
-            next
-        }
-        #       Choose the strands to donate and receive the DNA
-        vec_strands <- sample.int(no_strands, size = 2)
-        strand_give <- vec_strands[1]
-        strand_take <- vec_strands[2]
-        #       Find the chromosome's centromere location and length
-        centromere <- vec_centromere_location[chrom]
-        chrom_length <- vec_CN_block_no[chrom]
-        #       Choose the chromosome arm to harbor the terminal CN-LOH
-        chrom_arm <- sample.int(2, size = 1)
-        if (chrom_arm == 1) {
-            max_length <- centromere
-        } else {
-            if (chrom_arm == 2) {
-                max_length <- chrom_length - centromere
+    if (!is.null(event)) {
+        chrom <- strtoi(event[2])
+        strand_give <- strtoi(event[3])
+        strand_take <- strtoi(event[4])
+        block_start <- strtoi(event[5])
+        block_end <- strtoi(event[6])
+    } else {
+        while (1) {
+            #       Choose the chromosome to harbor the interstitial CN-LOH
+            chrom <- sample.int(N_chromosomes, size = 1)
+            if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
+                next
             }
+            no_strands <- ploidy_chrom[chrom]
+            if (no_strands <= 1) {
+                next
+            }
+            #       Choose the strands to donate and receive the DNA
+            vec_strands <- sample.int(no_strands, size = 2)
+            strand_give <- vec_strands[1]
+            strand_take <- vec_strands[2]
+            #       Find the chromosome's centromere location and length
+            centromere <- vec_centromere_location[chrom]
+            chrom_length <- vec_CN_block_no[chrom]
+            #       Choose the chromosome arm to harbor the terminal CN-LOH
+            chrom_arm <- sample.int(2, size = 1)
+            if (chrom_arm == 1) {
+                max_length <- centromere
+            } else {
+                if (chrom_arm == 2) {
+                    max_length <- chrom_length - centromere
+                }
+            }
+            #       Choose the length of the interstitial CN-LOH
+            # cnloh_length <- min(max_length, 1 + rgeom(n = 1, prob_CN_cnloh_interstitial_length))
+            cnloh_length <- max_length + 1
+            while (cnloh_length > max_length) {
+                cnloh_length <- 1 + rgeom(n = 1, prob_CN_cnloh_interstitial_length)
+            }
+            #       Choose the region to harbor the interstitial CN-LOH
+            block_start <- (chrom_arm - 1) * centromere + sample.int(max_length - cnloh_length + 1, size = 1)
+            block_end <- block_start + cnloh_length - 1
+            break
         }
-        #       Choose the length of the interstitial CN-LOH
-        # cnloh_length <- min(max_length, 1 + rgeom(n = 1, prob_CN_cnloh_interstitial_length))
-        cnloh_length <- max_length + 1
-        while (cnloh_length > max_length) {
-            cnloh_length <- 1 + rgeom(n = 1, prob_CN_cnloh_interstitial_length)
-        }
-        #       Choose the region to harbor the interstitial CN-LOH
-        block_start <- (chrom_arm - 1) * centromere + sample.int(max_length - cnloh_length + 1, size = 1)
-        block_end <- block_start + cnloh_length - 1
-        break
     }
     #   Find all drivers to lose in the strand to receive the DNA
     if ((driver_count == 0) || (length(intersect(which(driver_map[, 4] >= block_start), which(driver_map[, 4] <= block_end))) == 0)) {

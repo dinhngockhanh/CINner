@@ -61,7 +61,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     sample_genotype_unique <- unique(all_sample_genotype)
     sample_genotype_unique_profile <- list()
     for (i_clone in 1:length(sample_genotype_unique)) {
-        #   Extract CN information for the clone from clonal evolution data
+        #   Extract CN information for the clone
         clone_ID <- sample_genotype_unique[i_clone]
         genotype_unique_profile <- get_cn_profile(package_clonal_evolution, clone_ID)
         sample_genotype_unique_profile[[i_clone]] <- genotype_unique_profile
