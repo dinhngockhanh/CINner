@@ -58,7 +58,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     T_current <- T_start_time
     T_goal <- T_end_time
     #   Count of cells still alive at current time
-    N_cells_current <- 1
+    N_cells_current <- sum(clonal_population_current)
     N_cells_goal <- Population_end
     #   Count of events
     N_events_current <- 0
@@ -82,19 +82,16 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         all_prob_division <- func_expected_population(T_current) / (func_expected_population(T_current) + N_cells_current) * sum(clonal_population_current) * clonal_portion / sum(clonal_portion * clonal_population_current)
 
         all_prob_division[which(all_prob_division > 1)] <- 1
-
         #       Find next time step and initiate next clonal population vector
         T_next <- T_current + T_tau_step
         clonal_population_next <<- clonal_population_current
         if ((N_cells_current <= 0) || (is.null(N_cells_current))) {
             flag_success <- 0
             break
-        } else {
-            if (T_next >= T_end_time) {
-                flag_success <- 1
-                T_current <- T_end_time
-                break
-            }
+        } else if (T_next >= T_end_time) {
+            flag_success <- 1
+            T_current <- T_end_time
+            break
         }
         #       Initialize the matrix of divisions for this step
         mat_divisions <- c()
@@ -320,10 +317,21 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     if (report_progress == TRUE) {
         cat("\n")
     }
+    if (T_goal > evolution_traj_time[length(evolution_traj_time)]) {
+        evolution_traj_count <- evolution_traj_count + 1
+
+        evolution_traj_time[evolution_traj_count] <- T_goal
+        evolution_traj_clonal_ID[[evolution_traj_count]] <- evolution_traj_clonal_ID[[evolution_traj_count - 1]]
+        evolution_traj_population[[evolution_traj_count]] <- evolution_traj_population[[evolution_traj_count - 1]]
+        evolution_traj_divisions[[evolution_traj_count - 1]] <- c()
+    }
     #---------------------------------Output package of data from simulation
     if (is.null(N_cells_current)) {
         flag_success <- 0
     }
+
+    print(evolution_traj_time)
+
     package_clonal_evolution <- list()
     package_clonal_evolution$T_current <- T_current
     package_clonal_evolution$N_cells_current <- N_cells_current

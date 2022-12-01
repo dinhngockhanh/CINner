@@ -3,6 +3,17 @@ plot_all <- function(model = "",
                      n_simulations = 0,
                      compute_parallel = TRUE,
                      n_cores = NULL) {
+    #---------------------------------Plot clonal evolution as fish plot
+    cat("Plotting clonal evolution as fish plot...\n")
+    plot_clonal_fishplot(
+        model = model,
+        n_simulations = n_simulations,
+        unit_time = "year",
+        width = 2000,
+        height = 1000,
+        compute_parallel = compute_parallel,
+        n_cores = n_cores
+    )
     #----------------------------Plot clonal evolution as phylogeny tree
     cat("Plotting clonal evolution as phylogeny tree...\n")
     plot_clonal_phylo(
@@ -24,15 +35,6 @@ plot_all <- function(model = "",
         compute_parallel = compute_parallel,
         n_cores = n_cores
     )
-    #---------------------------------Plot clonal evolution as fish plot
-    cat("Plotting clonal evolution as fish plot...\n")
-    plot_clonal_fishplot(
-        model = model,
-        n_simulations = n_simulations,
-        unit_time = "year",
-        width = 2000,
-        height = 1000
-    )
 
 
 
@@ -45,7 +47,9 @@ plot_all <- function(model = "",
         CN_data = "TRUTH",
         phylo = "TRUTH",
         width = 1000,
-        height = 1000
+        height = 1000,
+        compute_parallel = compute_parallel,
+        n_cores = n_cores
     )
     # #-------------------------------Plot minor CN profile - GROUND TRUTH
     # cat("Plotting minor CN profile - GROUND TRUTH...\n")

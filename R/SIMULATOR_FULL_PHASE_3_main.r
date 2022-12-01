@@ -25,24 +25,18 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
     if (standard_time_unit == "day") {
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real
-    } else {
-        if (standard_time_unit == "week") {
-            T_final <- T_final / 7
-            evolution_traj_time <- evolution_traj_time / 7
-            Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 7
-        } else {
-            if (standard_time_unit == "month") {
-                T_final <- T_final / 30
-                evolution_traj_time <- evolution_traj_time / 30
-                Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 30
-            } else {
-                if (standard_time_unit == "year") {
-                    T_final <- T_final / 365
-                    evolution_traj_time <- evolution_traj_time / 365
-                    Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 365
-                }
-            }
-        }
+    } else if (standard_time_unit == "week") {
+        T_final <- T_final / 7
+        evolution_traj_time <- evolution_traj_time / 7
+        Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 7
+    } else if (standard_time_unit == "month") {
+        T_final <- T_final / 30
+        evolution_traj_time <- evolution_traj_time / 30
+        Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 30
+    } else if (standard_time_unit == "year") {
+        T_final <- T_final / 365
+        evolution_traj_time <- evolution_traj_time / 365
+        Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 365
     }
     #-------------------------------Initialize phylogeny in hclust style
     #   Initialize information to build phylogeny in hclust style
@@ -669,9 +663,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 
             clone_node_1 <- clone_node_mother
         }
-
-
-
         # for (i in 2:length(list_unmerged_nodes)) {
         #     clone_node <- list_unmerged_nodes[i]
         #     clone_hclust_row <- clone_hclust_row + 1

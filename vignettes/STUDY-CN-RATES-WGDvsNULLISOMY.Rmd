@@ -31,7 +31,8 @@ sapply(files_sources, source)
 cell_lifespan <- 10
 T_0 <- list(0, "year")
 T_end <- list(1, "year")
-Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(Inf), Age_sample = c(1))
+Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(100), Age_sample = c(1))
+# Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(Inf), Age_sample = c(1))
 
 
 T_tau_step <- cell_lifespan / 2
@@ -115,8 +116,8 @@ arm_end <- c(model_variables$cn_info$Centromere_location, model_variables$cn_inf
 arm_s <- rep(1, length(arm_id))
 arm_gains <- sample(length(arm_s), round(length(arm_s) / 2), replace = FALSE)
 arm_losses <- setdiff(1:length(arm_s), arm_gains)
-arm_s[arm_gains] <- 1 + 0.15
-arm_s[arm_losses] <- 1 - 0.15
+arm_s[arm_gains] <- 1 + 0.3
+arm_s[arm_losses] <- 1 - 0.3
 
 driver_gene_list <- read_excel("HGSOC_driver_genes.xlsx")
 gene_id <- driver_gene_list$Gene_ID
@@ -155,12 +156,8 @@ start_time <- Sys.time()
 n_simulations <- 100
 tmp <- simulator_full_program(
     model = model_name, n_simulations = n_simulations,
-    # save_cn_profile = FALSE,
-    # neutral_variations = TRUE,
-    # model_readcount = TRUE,
-    # model_readcount_base = 'neuvar',
-    compute_parallel=TRUE,
-    stage_final=3,
+    compute_parallel = TRUE,
+    stage_final = 3,
     seed = 10
 )
 end_time <- Sys.time()
