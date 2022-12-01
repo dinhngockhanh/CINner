@@ -1,13 +1,17 @@
 #' @export
 plot_all <- function(model = "",
-                     n_simulations = 0) {
+                     n_simulations = 0,
+                     compute_parallel = TRUE,
+                     n_cores = NULL) {
     #----------------------------Plot clonal evolution as phylogeny tree
     cat("Plotting clonal evolution as phylogeny tree...\n")
     plot_clonal_phylo(
         model = model,
         n_simulations = n_simulations,
         width = 2000,
-        height = 2000
+        height = 2000,
+        compute_parallel = compute_parallel,
+        n_cores = n_cores
     )
     #----------------------------------------------Plot total population
     cat("Plotting total population vs input dynamics...\n")
@@ -16,7 +20,9 @@ plot_all <- function(model = "",
         n_simulations = n_simulations,
         unit_time = "year",
         width = 1000,
-        height = 500
+        height = 500,
+        compute_parallel = compute_parallel,
+        n_cores = n_cores
     )
     #---------------------------------Plot clonal evolution as fish plot
     cat("Plotting clonal evolution as fish plot...\n")
