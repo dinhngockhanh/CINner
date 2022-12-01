@@ -159,7 +159,6 @@ tmp <- simulator_full_program(
     # neutral_variations = TRUE,
     # model_readcount = TRUE,
     # model_readcount_base = 'neuvar',
-    # apply_HMM = TRUE,
     compute_parallel=TRUE,
     stage_final=3,
     seed = 10

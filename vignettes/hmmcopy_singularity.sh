@@ -8,13 +8,13 @@ declare -a Cell_count
 INPUT="${model_name}-input-sampling.csv"
 i=0
 {
-read
-while IFS=, read -r next_Sample_ID next_Cell_count next_Age_sample next_T_sample
-do
-      Sample_ID[$i]=$next_Sample_ID
-      Cell_count[$i]=$next_Cell_count
-      i=$((i+1))
-done
+      read
+      while IFS=, read -r next_Sample_ID next_Cell_count next_Age_sample next_T_sample
+      do
+            Sample_ID[$i]=$next_Sample_ID
+            Cell_count[$i]=$next_Cell_count
+            i=$((i+1))
+      done
 } < ${INPUT}
 N_sample=${#Sample_ID[@]}
 #-----------Move to workplace directory and prepare GC/MAPPABILITY files
@@ -37,7 +37,6 @@ do
                   #-----Correct readcounts for GC/mapp biases
                   var_correction_filename="${model_name}_noisy_cn_profiles_long_${simulation}_${var_cell_id}_hmm_corrected.txt"
                   echo "PERFORMING CORRECT_READCOUNT FOR $var_cell_id IN SIMULATION $simulation"
-                  # docker run -v $PWD:$PWD -w $PWD quay.io/mondrianscwgs/hmmcopy:v0.0.45  \
                   singularity exec hmmcopy_v0.0.45.sif  \
                         hmmcopy_utils correct_readcount  \
                         --infile $var_input_filename  \
@@ -54,7 +53,6 @@ do
                   segments="segments-$simulation-$var_cell_id.csv.gz"
                   var_hmmcopy_tarball="$simulation-$var_cell_id.tar.gz"
                   echo "PERFORMING HMMCOPY FOR $var_cell_id IN SIMULATION $simulation"
-                  # docker run -v $PWD:$PWD -w $PWD quay.io/mondrianscwgs/hmmcopy:v0.0.45  \
                   singularity exec hmmcopy_v0.0.45.sif  \
                         hmmcopy_utils run_hmmcopy  \
                         --corrected_reads $var_correction_filename  \
@@ -92,7 +90,6 @@ do
                   #-----Correct readcounts for GC/mapp biases
                   var_correction_filename="${model_name}_noisy_neuvar_cn_profiles_long_${simulation}_${var_cell_id}_hmm_corrected.txt"
                   echo "PERFORMING CORRECT_READCOUNT FOR $var_cell_id IN SIMULATION $simulation"
-                  # docker run -v $PWD:$PWD -w $PWD quay.io/mondrianscwgs/hmmcopy:v0.0.45  \
                   singularity exec hmmcopy_v0.0.45.sif  \
                         hmmcopy_utils correct_readcount  \
                         --infile $var_input_filename  \
@@ -109,7 +106,6 @@ do
                   segments="segments-$simulation-$var_cell_id.csv.gz"
                   var_hmmcopy_tarball="$simulation-$var_cell_id.tar.gz"
                   echo "PERFORMING HMMCOPY FOR $var_cell_id IN SIMULATION $simulation"
-                  # docker run -v $PWD:$PWD -w $PWD quay.io/mondrianscwgs/hmmcopy:v0.0.45  \
                   singularity exec hmmcopy_v0.0.45.sif  \
                         hmmcopy_utils run_hmmcopy  \
                         --corrected_reads $var_correction_filename  \

@@ -14,7 +14,7 @@
 #' @param format_cn_profile ...
 #' @param model_readcount ...
 #' @param pseudo_corrected_readcount ...
-#' @param apply_HMM ...
+#' @param HMM ...
 #' @param report_progress ...
 #' @param compute_parallel ...
 #' @param seed ...
@@ -35,7 +35,8 @@ simulator_full_program <- function(model = "",
                                    model_readcount = FALSE,
                                    model_readcount_base = "all",
                                    pseudo_corrected_readcount = FALSE,
-                                   apply_HMM = FALSE,
+                                   HMM = FALSE,
+                                   HMM_containner = "docker",
                                    report_progress = TRUE,
                                    compute_parallel = FALSE,
                                    seed = Inf,
@@ -49,7 +50,7 @@ simulator_full_program <- function(model = "",
         model_parameters <- model
     }
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
-    if (apply_HMM == TRUE) {
+    if (HMM == TRUE) {
         model_readcount <- TRUE
         stage_final <- max(stage_final, 2)
         save_simulation <- TRUE
@@ -67,12 +68,16 @@ simulator_full_program <- function(model = "",
     if (model_readcount == TRUE) {
         dir.create(model_prefix)
     }
-    if (apply_HMM == TRUE) {
-        if (file.exists("hmmcopy_v0.0.45.sif") == FALSE) {
-            cat("INSTALLING HMMCOPY-V0.0.45...\n")
-            system("singularity pull docker://quay.io/mondrianscwgs/hmmcopy:v0.0.45")
+    if (HMM == TRUE) {
+        if (HMM_containner == "singularity") {
+            if (file.exists("hmmcopy_v0.0.45.sif") == FALSE) {
+                cat("INSTALLING SINGULARITY FOR HMMCOPY-V0.0.45...\n")
+                system("singularity pull docker://quay.io/mondrianscwgs/hmmcopy:v0.0.45")
+            }
+            file.copy("hmmcopy_v0.0.45.sif", paste(model_prefix, "/hmmcopy_v0.0.45.sif", sep = ""))
+        } else if (HMM_containner == "docker") {
+            system("docker pull quay.io/mondrianscwgs/hmmcopy:v0.0.45")
         }
-        file.copy("hmmcopy_v0.0.45.sif", paste(model_prefix, "/hmmcopy_v0.0.45.sif", sep = ""))
     }
     # ======================================MAIN LOOP OF CANCERSIMULATOR
     if (seed == Inf) {
@@ -105,7 +110,8 @@ simulator_full_program <- function(model = "",
                 model_readcount,
                 model_readcount_base,
                 pseudo_corrected_readcount,
-                apply_HMM,
+                HMM,
+                HMM_containner,
                 report_progress,
                 output_variables
             )
@@ -121,7 +127,6 @@ simulator_full_program <- function(model = "",
             numCores <- n_cores
         }
         cl <- makePSOCKcluster(numCores - 1)
-        # setDefaultCluster(cl)
         if (report_progress == TRUE) {
             cat(paste("\nSTARTED PARALLEL CLUSTER WITH ", numCores - 1, " CORES...\n", sep = ""))
         }
@@ -141,7 +146,8 @@ simulator_full_program <- function(model = "",
         model_readcount <<- model_readcount
         model_readcount_base <<- model_readcount_base
         pseudo_corrected_readcount <<- pseudo_corrected_readcount
-        apply_HMM <<- apply_HMM
+        HMM <<- HMM
+        HMM_containner <<- HMM_containner
         report_progress <<- report_progress
         output_variables <<- output_variables
         clusterExport(cl, varlist = c(
@@ -160,7 +166,8 @@ simulator_full_program <- function(model = "",
             "model_readcount",
             "model_readcount_base",
             "pseudo_corrected_readcount",
-            "apply_HMM",
+            "HMM",
+            "HMM_containner",
             "report_progress",
             "one_simulation",
             "output_variables",
@@ -195,7 +202,8 @@ simulator_full_program <- function(model = "",
                     model_readcount,
                     model_readcount_base,
                     pseudo_corrected_readcount,
-                    apply_HMM,
+                    HMM,
+                    HMM_containner,
                     report_progress,
                     output_variables
                 )
@@ -220,7 +228,8 @@ simulator_full_program <- function(model = "",
                     model_readcount,
                     model_readcount_base,
                     pseudo_corrected_readcount,
-                    apply_HMM,
+                    HMM,
+                    HMM_containner,
                     report_progress,
                     output_variables
                 )
@@ -251,7 +260,8 @@ one_simulation <- function(iteration,
                            model_readcount,
                            model_readcount_base,
                            pseudo_corrected_readcount,
-                           apply_HMM,
+                           HMM,
+                           HMM_containner,
                            report_progress,
                            output_variables) {
     # =============================================LOAD MODEL PARAMETERS
@@ -381,11 +391,15 @@ one_simulation <- function(iteration,
         }
     }
     #------------------------------------Run HMMcopy on noisy readcounts
-    if (apply_HMM == TRUE) {
+    if (HMM == TRUE) {
         if (report_progress == TRUE) cat("Run HMMcopy on noisy CN profiles of all bases...\n")
         #   Run HMMcopy for each individual cell
         p0_write_gc_map_as_wig(filename_gc = paste(model_prefix, "/", model_prefix, "_gc_", iteration, ".wig", sep = ""), filename_map = paste(model_prefix, "/", model_prefix, "_map_", iteration, ".wig", sep = ""))
-        system(paste("sh hmmcopy_one_simulation.sh ", model_prefix, " ", iteration, sep = ""))
+        if (HMM_containner == "singularity") {
+            system(paste("sh hmmcopy_singularity.sh ", model_prefix, " ", iteration, sep = ""))
+        } else if (HMM_containner == "docker") {
+            system(paste("sh hmmcopy_docker.sh ", model_prefix, " ", iteration, sep = ""))
+        }
         #   Update the simulation with HMMcopy inferences
         simulation <- p0_append_with_hmm(
             simulation = simulation,
