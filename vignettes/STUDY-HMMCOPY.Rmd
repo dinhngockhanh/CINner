@@ -258,7 +258,7 @@ tmp <- simulator_full_program(
     model_readcount = TRUE,
     model_readcount_base = 'neuvar',
     HMM = TRUE,
-    HMM_containner = 'docker',
+    HMM_containner = 'singularity',
     compute_parallel = FALSE,
     seed = 10
 )
