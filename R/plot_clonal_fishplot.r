@@ -310,6 +310,12 @@ plot_clonal_fishplot_one_simulation <- function(model,
     vec_clonal_birth_order <- rep(0, length(vec_clonal_labels))
     for (clone in 1:nrow(table_clonal_populations)) {
         vec_clonal_birth_order[clone] <- which(table_clonal_populations[clone, ] > 0)[1]
+        #   In case there is a tie based on birth times, break tie by considering clonal ancestry
+        node <- clone
+        while (node > 0) {
+            vec_clonal_birth_order[clone] <- vec_clonal_birth_order[clone] + 0.001
+            node <- vec_clonal_parentage[node]
+        }
     }
     vec_clonal_order <- sort(vec_clonal_birth_order, index.return = TRUE)$ix
     #   Define clonal colors by order of birth times
@@ -318,7 +324,6 @@ plot_clonal_fishplot_one_simulation <- function(model,
     for (i in 1:length(vec_clonal_order)) {
         vec_cols[vec_clonal_order[i]] <- vec_color_order[i]
     }
-
     vec_cols[which(vec_clonal_labels == "Others")] <- "gray"
     #---Create fish object
     fish <- createFishObject(table_clonal_populations, vec_clonal_parentage, timepoints = vec_time, col = vec_cols)
