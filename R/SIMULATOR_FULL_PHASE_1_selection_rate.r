@@ -24,6 +24,10 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         clone_selection_rate <- 0
         return(clone_selection_rate)
     }
+    if (max(vec_CN_all) > bound_maximum_CN) {
+        clone_selection_rate <- 0
+        return(clone_selection_rate)
+    }
     #-----Cell is not viable if exceeding maximum length of homozygosity
     L_homozygosity <- 0
     for (chrom in 1:N_chromosomes) {

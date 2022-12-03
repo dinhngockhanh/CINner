@@ -181,7 +181,6 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                 ########################################################
                 ########################################################
                 ########################################################
-                eligible_nodes <- current_node_list[which(current_node_genotype == clonal_ID)]
                 #   Find total count of nodes to undergo divisions of all types
                 while (1) {
                     count_nodes_all <- rbinom(n = 1, size = sum(mat_division_sample_clone[3, ]), clonal_sample_population / clonal_total_population)

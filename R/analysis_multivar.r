@@ -11,52 +11,83 @@ simulator_multivar <- function(model_prefix = "",
                                stage_final = 3,
                                seed = Inf) {
     library(scales)
+    if (is.vector(var1_vals)) {
+        rows <- 1:length(var1_vals)
+    } else if (is.matrix(var1_vals)) {
+        rows <- 1:ncol(var1_vals)
+    }
+    if (is.vector(var2_vals)) {
+        cols <- 1:length(var2_vals)
+    } else if (is.matrix(var2_vals)) {
+        cols <- 1:ncol(var2_vals)
+    }
     ind <- 0
-    for (row in 1:length(var1_vals)) {
-        for (col in 1:length(var2_vals)) {
+    for (row in rows) {
+        for (col in cols) {
             ind <- ind + 1
             #   Initialize parameter set
             model_variables <- model_variables_base
             #   Fix variable 1 in parameter set
-            var1 <- var1_vals[row]
             if (var1_name == "prob_CN_whole_genome_duplication") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var1
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var1_vals[row]
             } else if (var1_name == "prob_CN_missegregation") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var1
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var1_vals[row]
             } else if (var1_name == "delta_selection") {
-                delta_selection_per_arm <- sqrt(1 + var1) - 1
+                delta_sel_gain_per_arm <- sqrt(1 + var1_vals[1, row]) - 1
+                delta_sel_loss_per_arm <- sqrt(1 + var1_vals[2, row]) - 1
                 chrom_gains <- sample(model_variables_base$cn_info$Chromosome, round(length(model_variables_base$cn_info$Chromosome) / 2), replace = FALSE)
                 chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
-                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_selection_per_arm
-                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_selection_per_arm)
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_sel_gain_per_arm + rnorm(1, 0, 0.1)
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_sel_loss_per_arm + rnorm(1, 0, 0.1))
             } else if (var1_name == "bound_homozygosity") {
-                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var1
+                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var1_vals[row]
             }
             #   Fix variable 2 in parameter set
-            var2 <- var2_vals[col]
             if (var2_name == "prob_CN_whole_genome_duplication") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var2
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var2_vals[col]
             } else if (var2_name == "prob_CN_missegregation") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var2
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var2_vals[col]
             } else if (var2_name == "delta_selection") {
-                delta_selection_per_arm <- sqrt(1 + var2) - 1
+                delta_sel_gain_per_arm <- sqrt(1 + var2_vals[1, col]) - 1
+                delta_sel_loss_per_arm <- sqrt(1 + var2_vals[2, col]) - 1
                 chrom_gains <- sample(model_variables_base$cn_info$Chromosome, round(length(model_variables_base$cn_info$Chromosome) / 2), replace = FALSE)
                 chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
-                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_selection_per_arm
-                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_selection_per_arm)
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_sel_gain_per_arm + rnorm(1, 0, 0.1)
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_sel_loss_per_arm + rnorm(1, 0, 0.1))
             } else if (var2_name == "bound_homozygosity") {
-                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var2
+                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var2_vals[col]
             }
             #   Save model variables
-            model_name <- paste(model_prefix, "_", var1_name, "=", scientific(var1), "_", var2_name, "=", scientific(var2), sep = "")
+            if (var1_name == "delta_selection") {
+                model_name <- paste(model_prefix, "_", var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]), "_", var2_name, "=", scientific(var2_vals[col]), sep = "")
+            } else if (var2_name == "delta_selection") {
+                model_name <- paste(model_prefix, "_", var1_name, "=", scientific(var1_vals[row]), "_", var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]), sep = "")
+            } else {
+                model_name <- paste(model_prefix, "_", var1_name, "=", scientific(var1_vals[row]), "_", var2_name, "=", scientific(var2_vals[col]), sep = "")
+            }
             SAVE_model_variables(model_name = model_name, model_variables = model_variables)
             #   Create simulations
             cat("=======================================================\n")
             cat("=======================================================\n")
             cat("=======================================================\n")
-            cat(paste("\nSIMULATIONS FOR BATCH ", ind, "/", length(var1_vals) * length(var2_vals), "...\n", sep = ""))
-            cat(paste(var1_name, " = ", scientific(var1), "\n", sep = ""))
-            cat(paste(var2_name, " = ", scientific(var2), "\n", sep = ""))
+            cat(paste("\nSIMULATIONS FOR BATCH ", ind, "/", length(rows) * length(cols), "...\n", sep = ""))
+            if (var1_name == "delta_selection") {
+                cat(paste(var1_name, " = ", scientific(var1_vals[1, row]), " & ", scientific(var1_vals[2, row]), "\n", sep = ""))
+            } else {
+                cat(paste(var1_name, " = ", scientific(var1_vals[row]), "\n", sep = ""))
+            }
+            if (var2_name == "delta_selection") {
+                cat(paste(var2_name, " = ", scientific(var2_vals[1, col]), " & ", scientific(var2_vals[2, col]), "\n", sep = ""))
+            } else {
+                cat(paste(var2_name, " = ", scientific(var2_vals[col]), "\n", sep = ""))
+            }
+
+            size_pie<-max(0.01,min(0.05,0.05*10/(N_clones)))
+            p <- p + geom_inset(
+                event_pie,
+                width = size_pie, height = size_pie, hjust = (hjust_start - (event - 1) * hjust_unit), x = "branch"
+            )
+
             start_time <- Sys.time()
             tmp <- simulator_full_program(
                 model = model_name, n_simulations = n_simulations_per_batch,

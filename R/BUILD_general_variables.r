@@ -78,6 +78,7 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     selection_model = "",
                                     bound_driver = 3,
                                     bound_average_ploidy = 5,
+                                    bound_maximum_CN = Inf,
                                     bound_homozygosity = 0,
                                     SFS_totalsteps = 25,
                                     prob_coverage = 0.05,
@@ -261,6 +262,8 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_SELECTION[N_row, ] <- c("bound_driver", bound_driver, "driver count", "Maximum driver count in viable cells (cells exceeding this will die)")
     N_row <- N_row + 1
     TABLE_SELECTION[N_row, ] <- c("bound_average_ploidy", bound_average_ploidy, "", "Maximum average ploidy across genome (cells exceeding this will die)")
+    N_row <- N_row + 1
+    TABLE_SELECTION[N_row, ] <- c("bound_maximum_CN", bound_maximum_CN, "", "Maximum CN at any bin (cells exceeding this will die)")
     N_row <- N_row + 1
     TABLE_SELECTION[N_row, ] <- c("bound_homozygosity", bound_homozygosity, "", "Maximum number of bins under homozygosity (cells exceeding this will die)")
     ##########################

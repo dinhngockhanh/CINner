@@ -385,7 +385,7 @@ plot_clonal_fishplot_one_simulation <- function(model,
         p <- p + text(x = x + x_pad, y = y, labels = lab, cex = 2, adj = c(0, NA))
     }
     #   Draw legend for other clones
-    n_row_max <- 3 + y_start / y_space - row
+    n_row_max <- max(1, 1 + y_start / y_space - row)
 
     n_clones_per_row <- 5
 
