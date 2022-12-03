@@ -1,79 +1,83 @@
 #' @export
 simulator_multivar <- function(model_prefix = "",
+                               folder_workplace = "",
                                model_variables_base = list(),
                                var1_name = "",
                                var1_vals = c(),
                                var2_name = "",
                                var2_vals = c(),
                                n_simulations_per_batch = 0,
-                               compute_parallel = FALSE,
+                               compute_parallel = TRUE,
                                stage_final = 3,
-                               n_clones_min = 1,
-                               n_clones_max = Inf,
                                seed = Inf) {
-    # ================================================CREATE SIMULATIONS
-    pb <- txtProgressBar(
-        min = 1, max = length(var1_vals) * length(var2_vals),
-        style = 3, width = 50, char = "="
-    )
-    # for (row in 1:length(var1_vals)) {
-    #     for (col in 1:length(var2_vals)) {
-    for (row in length(var1_vals):1) {
-        for (col in length(var2_vals):1) {
-            setTxtProgressBar(pb, ((row - 1) * length(var2_vals) + col))
+    library(scales)
+    ind <- 0
+    for (row in 1:length(var1_vals)) {
+        for (col in 1:length(var2_vals)) {
+            ind <- ind + 1
             #   Initialize parameter set
             model_variables <- model_variables_base
-            model_name <- paste(model_prefix, "-", row, "-", col, sep = "")
             #   Fix variable 1 in parameter set
             var1 <- var1_vals[row]
-            if (var1_name == "rate_WGD") {
+            if (var1_name == "prob_CN_whole_genome_duplication") {
                 model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var1
-            } else {
-                if (var1_name == "rate_missegregation") {
-                    model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var1
-                }
+            } else if (var1_name == "prob_CN_missegregation") {
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var1
+            } else if (var1_name == "delta_selection") {
+                delta_selection_per_arm <- sqrt(1 + var1) - 1
+                chrom_gains <- sample(model_variables_base$cn_info$Chromosome, round(length(model_variables_base$cn_info$Chromosome) / 2), replace = FALSE)
+                chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_selection_per_arm
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_selection_per_arm)
+            } else if (var1_name == "bound_homozygosity") {
+                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var1
             }
             #   Fix variable 2 in parameter set
             var2 <- var2_vals[col]
-            if (var2_name == "rate_WGD") {
+            if (var2_name == "prob_CN_whole_genome_duplication") {
                 model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var2
-            } else {
-                if (var2_name == "rate_missegregation") {
-                    model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var2
-                }
+            } else if (var2_name == "prob_CN_missegregation") {
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var2
+            } else if (var2_name == "delta_selection") {
+                delta_selection_per_arm <- sqrt(1 + var2) - 1
+                chrom_gains <- sample(model_variables_base$cn_info$Chromosome, round(length(model_variables_base$cn_info$Chromosome) / 2), replace = FALSE)
+                chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_selection_per_arm
+                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_selection_per_arm)
+            } else if (var2_name == "bound_homozygosity") {
+                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var2
             }
-            #   Save parameter set
-            model_name <- paste(model_prefix, "-", row, "-", col, sep = "")
+            #   Save model variables
+            model_name <- paste(model_prefix, "_", var1_name, "=", scientific(var1), "_", var2_name, "=", scientific(var2), sep = "")
             SAVE_model_variables(model_name = model_name, model_variables = model_variables)
-            #   Run simulations for the entry
-            n_simulations <- n_simulations_per_batch
-            if (seed == Inf) {
-                set.seed(Sys.time())
-            } else {
-                set.seed(seed)
-            }
-            simulator_full_program(
-                model = model_name,
-                n_simulations = n_simulations,
-                stage_final = stage_final,
-                n_clones_min = n_clones_min,
-                n_clones_max = n_clones_max,
-                save_simulation = TRUE,
-                # save_simulation = FALSE,
-                save_newick_tree = FALSE,
-                save_cn_profile = FALSE,
-                # format_cn_profile = "both",
-                internal_nodes_cn_info = FALSE,
-                model_readcount = FALSE,
-                apply_HMM = FALSE,
-                report_progress = FALSE,
+            #   Create simulations
+            cat("=======================================================\n")
+            cat("=======================================================\n")
+            cat("=======================================================\n")
+            cat(paste("\nSIMULATIONS FOR BATCH ", ind, "/", length(var1_vals) * length(var2_vals), "...\n", sep = ""))
+            cat(paste(var1_name, " = ", scientific(var1), "\n", sep = ""))
+            cat(paste(var2_name, " = ", scientific(var2), "\n", sep = ""))
+            start_time <- Sys.time()
+            tmp <- simulator_full_program(
+                model = model_name, n_simulations = n_simulations_per_batch,
+                folder_workplace = folder_workplace,
                 compute_parallel = compute_parallel,
-                pseudo_corrected_readcount = FALSE,
+                stage_final = stage_final,
                 seed = seed
+            )
+            end_time <- Sys.time()
+            print(end_time - start_time)
+
+
+
+            plot_all(
+                model = model_name,
+                n_simulations = n_simulations_per_batch,
+                unit_time = model_variables$general_variables$Unit[which(model_variables$general_variables$Variable == "T_end_time")],
+                folder_workplace = folder_workplace
             )
         }
     }
-    cat("\n")
 }
 #' @export
 statistics_multivar <- function(model_prefix = "",

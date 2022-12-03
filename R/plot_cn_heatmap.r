@@ -2,6 +2,7 @@
 #' @export
 plot_cn_heatmap <- function(model = "",
                             n_simulations = 0,
+                            folder_workplace,
                             plotcol = "",
                             CN_data = "TRUTH",
                             phylo = "TRUTH",
@@ -17,6 +18,7 @@ plot_cn_heatmap <- function(model = "",
             plot_cn_heatmap_one_simulation(
                 model,
                 iteration,
+                folder_workplace,
                 plotcol,
                 CN_data,
                 phylo,
@@ -37,6 +39,7 @@ plot_cn_heatmap <- function(model = "",
         cl <- makePSOCKcluster(numCores - 1)
         #   Prepare input parameters for plotting
         model <<- model
+        folder_workplace <<- folder_workplace
         plotcol <<- plotcol
         CN_data <<- CN_data
         phylo <<- phylo
@@ -47,6 +50,7 @@ plot_cn_heatmap <- function(model = "",
         clusterExport(cl, varlist = c(
             "plot_cn_heatmap_one_simulation",
             "model",
+            "folder_workplace",
             "width",
             "height"
         ))
@@ -56,6 +60,7 @@ plot_cn_heatmap <- function(model = "",
             plot_cn_heatmap_one_simulation(
                 model,
                 iteration,
+                folder_workplace,
                 plotcol,
                 CN_data,
                 phylo,
@@ -71,6 +76,7 @@ plot_cn_heatmap <- function(model = "",
 
 plot_cn_heatmap_one_simulation <- function(model,
                                            iteration,
+                                           folder_workplace,
                                            plotcol,
                                            CN_data,
                                            phylo,
@@ -78,7 +84,7 @@ plot_cn_heatmap_one_simulation <- function(model,
                                            width,
                                            height) {
     #------------------------------------------Input simulation file
-    filename <- paste(model, "_simulation_", iteration, ".rda", sep = "")
+    filename <- paste(folder_workplace, model, "_simulation_", iteration, ".rda", sep = "")
     load(filename)
     #-----------------------------------------Decide filename suffix
     if (is.null(filename_suffix)) {

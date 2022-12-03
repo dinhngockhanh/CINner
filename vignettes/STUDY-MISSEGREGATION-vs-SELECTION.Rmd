@@ -28,25 +28,36 @@ sapply(files_sources, source)
 
 ```{r,fig.height=5,fig.width=10}
 #====================================================   FIXED PARAMETERS
-cell_lifespan <- 10
-T_0 <- list(0, "year")
-T_end <- list(1, "year")
-Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(100), Age_sample = c(1))
-# Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(Inf), Age_sample = c(1))
-
+cell_lifespan <- 1
+T_0 <- list(0, "day")
+T_end <- list(200, "day")
+Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(200))
 
 T_tau_step <- cell_lifespan / 2
 CN_bin_length <- 500000
 
 selection_model <- "chrom-arm-and-driver-gene-selection"
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
 prob_CN_whole_genome_duplication <- 0e-4
-prob_CN_missegregation <- 5e-4
-# prob_CN_missegregation <- 5e-4
+prob_CN_missegregation <- 0e-4
 prob_CN_chrom_arm_missegregation <- 0e-4
 prob_CN_focal_amplification <- 0e-4
 prob_CN_focal_deletion <- 0e-4
 prob_CN_cnloh_interstitial <- 0e-4
 prob_CN_cnloh_terminal <- 0e-4
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
+########################################################################
 
 model_CN_focal_amplification_length <- "beta"
 model_CN_focal_deletion_length <- "beta"
@@ -73,7 +84,7 @@ gc_int <- 0
 sigma1 <- 0.02642392
 num_reads <- 3906632
 
-model_variables <- BUILD_general_variables(
+model_variables_base <- BUILD_general_variables(
     cell_lifespan = cell_lifespan,
     T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
     Table_sample = Table_sample,
@@ -109,15 +120,11 @@ model_variables <- BUILD_general_variables(
     num_reads = num_reads
 )
 
-arm_id <- c(paste(model_variables$cn_info$Chromosome, "p", sep = ""), paste(model_variables$cn_info$Chromosome, "q", sep = ""))
-arm_chromosome <- rep(model_variables$cn_info$Chromosome, 2)
-arm_start <- c(rep(1, length(model_variables$cn_info$Chromosome)), model_variables$cn_info$Centromere_location + 1)
-arm_end <- c(model_variables$cn_info$Centromere_location, model_variables$cn_info$Bin_count)
+arm_id <- c(paste(model_variables_base$cn_info$Chromosome, "p", sep = ""), paste(model_variables_base$cn_info$Chromosome, "q", sep = ""))
+arm_chromosome <- rep(model_variables_base$cn_info$Chromosome, 2)
+arm_start <- c(rep(1, length(model_variables_base$cn_info$Chromosome)), model_variables_base$cn_info$Centromere_location + 1)
+arm_end <- c(model_variables_base$cn_info$Centromere_location, model_variables_base$cn_info$Bin_count)
 arm_s <- rep(1, length(arm_id))
-arm_gains <- sample(length(arm_s), round(length(arm_s) / 2), replace = FALSE)
-arm_losses <- setdiff(1:length(arm_s), arm_gains)
-arm_s[arm_gains] <- 1 + 0.3
-arm_s[arm_losses] <- 1 - 0.3
 
 driver_gene_list <- read_excel("HGSOC_driver_genes.xlsx")
 gene_id <- driver_gene_list$Gene_ID
@@ -128,23 +135,26 @@ gene_s <- rep(1, length(gene_id))
 
 table_arm_selection_rates <- data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
 table_gene_selection_rates <- data.frame(Gene_ID = gene_id, Gene_role = gene_role, s_rate = gene_s, Chromosome = gene_chromosome, Bin = gene_bin)
-model_variables <- BUILD_driver_library(
-    model_variables = model_variables,
+model_variables_base <- BUILD_driver_library(
+    model_variables = model_variables_base,
     table_arm_selection_rates = table_arm_selection_rates,
     table_gene_selection_rates = table_gene_selection_rates
 )
 
 cell_count <- 1000
-CN_matrix <- BUILD_cn_normal_XX(model_variables$cn_info)
+CN_matrix <- BUILD_cn_normal_XX(model_variables_base$cn_info)
 drivers <- list()
-model_variables <- BUILD_initial_population(
-    model_variables = model_variables,
+model_variables_base <- BUILD_initial_population(
+    model_variables = model_variables_base,
     cell_count = cell_count,
     CN_matrix = CN_matrix,
     drivers = drivers
 )
-model_name <- "CN-STUDY-WGDvsNULLISOMY"
-SAVE_model_variables(model_name = model_name, model_variables = model_variables)
+model_prefix <- "MISSEGREGATION-vs-SELECTION"
+```
+
+```{r}
+folder_workplace <- model_prefix
 ```
 
 
@@ -152,20 +162,38 @@ SAVE_model_variables(model_name = model_name, model_variables = model_variables)
 
 
 ```{r}
-start_time <- Sys.time()
-n_simulations <- 100
-tmp <- simulator_full_program(
-    model = model_name, n_simulations = n_simulations,
-    compute_parallel = TRUE,
-    stage_final = 3,
-    seed = 10
+# n_simulations_per_batch <- 100
+# var1_name <- "prob_CN_missegregation"
+# var1_vals <- seq(1e-4,1e-3,by=1e-4)
+# var2_name <- "delta_selection"
+# var2_vals <- seq(0.01,0.1,by=0.01)
+
+
+
+
+
+#--------------------------------------------MISSEGREGATION vs SELECTION
+n_simulations_per_batch <- 7
+
+prob_CN_whole_genome_duplication <- 0e-4
+bound_homozygosity <- 0
+
+var1_name <- "prob_CN_missegregation"
+var1_vals <- c(1e-2)
+
+var2_name <- "delta_selection"
+var2_vals <- c(0.1)
+
+
+
+simulator_multivar(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    model_variables_base = model_variables_base,
+    var1_name = var1_name, var1_vals = var1_vals,
+    var2_name = var2_name, var2_vals = var2_vals,
+    n_simulations_per_batch = n_simulations_per_batch,
+    stage_final = 3, compute_parallel = TRUE
 )
-end_time <- Sys.time()
-print(end_time - start_time)
-
-
-
-plot_all(model = model_name, n_simulations = n_simulations)
 ```
 
 

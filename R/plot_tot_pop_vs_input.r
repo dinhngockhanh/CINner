@@ -2,6 +2,7 @@
 #' @export
 plot_tot_pop_vs_input <- function(model = "",
                                   n_simulations = 0,
+                                  folder_workplace = "",
                                   vec_time = NULL,
                                   unit_time = "year",
                                   width = 1000,
@@ -15,6 +16,7 @@ plot_tot_pop_vs_input <- function(model = "",
             plot_tot_pop_vs_input_one_simulation(
                 model,
                 iteration,
+                folder_workplace,
                 vec_time,
                 unit_time,
                 width,
@@ -33,6 +35,7 @@ plot_tot_pop_vs_input <- function(model = "",
         cl <- makePSOCKcluster(numCores - 1)
         #   Prepare input parameters for plotting
         model <<- model
+        folder_workplace <<- folder_workplace
         width <<- width
         height <<- height
         vec_time <<- vec_time
@@ -45,6 +48,7 @@ plot_tot_pop_vs_input <- function(model = "",
             "SIMULATOR_VARIABLES_for_simulation",
             "SIMULATOR_FULL_PHASE_1_selection_rate",
             "model",
+            "folder_workplace",
             "vec_time",
             "unit_time",
             "width",
@@ -56,6 +60,7 @@ plot_tot_pop_vs_input <- function(model = "",
             plot_tot_pop_vs_input_one_simulation(
                 model,
                 iteration,
+                folder_workplace,
                 vec_time,
                 unit_time,
                 width,
@@ -69,12 +74,13 @@ plot_tot_pop_vs_input <- function(model = "",
 
 plot_tot_pop_vs_input_one_simulation <- function(model,
                                                  iteration,
+                                                 folder_workplace,
                                                  vec_time,
                                                  unit_time,
                                                  width,
                                                  height) {
     #------------------------------------------Input simulation file
-    filename <- paste(model, "_simulation_", iteration, ".rda", sep = "")
+    filename <- paste(folder_workplace, model, "_simulation_", iteration, ".rda", sep = "")
     load(filename)
     #-----------------------------Transform time points if necessary
     if (is.null(vec_time)) {

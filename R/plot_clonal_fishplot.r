@@ -2,6 +2,7 @@
 #' @export
 plot_clonal_fishplot <- function(model = "",
                                  n_simulations = 0,
+                                 folder_workplace = "",
                                  vec_time = NULL,
                                  unit_time = "year",
                                  width = 1000,
@@ -17,6 +18,7 @@ plot_clonal_fishplot <- function(model = "",
             plot_clonal_fishplot_one_simulation(
                 model,
                 iteration,
+                folder_workplace,
                 vec_time,
                 unit_time,
                 width,
@@ -35,6 +37,7 @@ plot_clonal_fishplot <- function(model = "",
         cl <- makePSOCKcluster(numCores - 1)
         #   Prepare input parameters for plotting
         model <<- model
+        folder_workplace <<- folder_workplace
         width <<- width
         height <<- height
         vec_time <<- vec_time
@@ -43,6 +46,7 @@ plot_clonal_fishplot <- function(model = "",
         clusterExport(cl, varlist = c(
             "plot_clonal_fishplot_one_simulation",
             "model",
+            "folder_workplace",
             "vec_time",
             "unit_time",
             "width",
@@ -56,6 +60,7 @@ plot_clonal_fishplot <- function(model = "",
             plot_clonal_fishplot_one_simulation(
                 model,
                 iteration,
+                folder_workplace,
                 vec_time,
                 unit_time,
                 width,
@@ -69,12 +74,13 @@ plot_clonal_fishplot <- function(model = "",
 
 plot_clonal_fishplot_one_simulation <- function(model,
                                                 iteration,
+                                                folder_workplace,
                                                 vec_time,
                                                 unit_time,
                                                 width,
                                                 height) {
     #----------------------------------------------Input simulation file
-    filename <- paste(model, "_simulation_", iteration, ".rda", sep = "")
+    filename <- paste(folder_workplace, model, "_simulation_", iteration, ".rda", sep = "")
     load(filename)
     #---------------------------------Transform time points if necessary
     if (is.null(vec_time)) {
@@ -342,7 +348,7 @@ plot_clonal_fishplot_one_simulation <- function(model,
         vlines = vlines_pos,
         vlab = vlines_tit,
         col.vline = "black",
-        cex.vlab = 3,
+        cex.vlab = 2,
         bg.type = "solid",
         bg.col = "white"
     )

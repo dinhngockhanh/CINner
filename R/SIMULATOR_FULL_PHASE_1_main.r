@@ -329,9 +329,6 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     if (is.null(N_cells_current)) {
         flag_success <- 0
     }
-
-    print(evolution_traj_time)
-
     package_clonal_evolution <- list()
     package_clonal_evolution$T_current <- T_current
     package_clonal_evolution$N_cells_current <- N_cells_current

@@ -163,24 +163,49 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                 for (daughter in 1:2) {
                     vec_division_genotype_daughter <- mat_division_total_population[, daughter + 2]
                     vec_division <- which(vec_division_genotype_daughter == clonal_ID)
-                    mat_division_sample_clone_new <- rbind(matrix(vec_division, nrow = 1), matrix(rep(daughter, length(vec_division)), nrow = 1), matrix(mat_division_total_population[vec_division, 1], nrow = 1))
-                    # mat_division_sample_clone_new           <- cbind(vec_division,rep(daughter,length(vec_division)),mat_division_total_population[vec_division,1])
+                    mat_division_sample_clone_new <- rbind(
+                        matrix(vec_division, nrow = 1),
+                        matrix(rep(daughter, length(vec_division)), nrow = 1),
+                        matrix(mat_division_total_population[vec_division, 1], nrow = 1)
+                    )
                     mat_division_sample_clone <- cbind(mat_division_sample_clone, mat_division_sample_clone_new)
                 }
                 if (length(mat_division_sample_clone) == 0) {
                     next
                 }
-                #   Find total count of nodes of this clone to undergo divisions
+                #   Find total node count of this clone to undergo divisions
                 #   of each type, i.e. row 4 in mat_division_sample_clone
                 division_index_all <- mat_division_sample_clone[1, ]
                 count_nodes_each_max <- mat_division_total_population[division_index_all, 1]
                 freq <- sum(mat_division_sample_clone[3, ]) / clonal_total_population
+                ########################################################
+                ########################################################
+                ########################################################
+                eligible_nodes <- current_node_list[which(current_node_genotype == clonal_ID)]
                 #   Find total count of nodes to undergo divisions of all types
-                count_nodes_all <- rbinom(n = 1, size = clonal_sample_population, prob = freq)
+                while (1) {
+                    count_nodes_all <- rbinom(n = 1, size = sum(mat_division_sample_clone[3, ]), clonal_sample_population / clonal_total_population)
+                    if (count_nodes_all <= clonal_sample_population) break
+                }
                 #   Divide total count of nodes among different division types
-                count_nodes_each <- rmultinom(n = 1, size = count_nodes_all, mat_division_sample_clone[3, ] / sum(mat_division_sample_clone[3, ]))
+                count_nodes_each <- rep(-1, ncol(mat_division_sample_clone))
+                while (min(count_nodes_each) < 0) {
+                    count_nodes_each <- mat_division_sample_clone[3, ] - rmultinom(n = 1, size = (sum(mat_division_sample_clone[3, ]) - count_nodes_all), mat_division_sample_clone[3, ] / sum(mat_division_sample_clone[3, ]))
+                }
                 count_nodes_each <- matrix(count_nodes_each, nrow = 1)
                 mat_division_sample_clone <- rbind(mat_division_sample_clone, count_nodes_each)
+                ########################################################
+                ########################################################
+                ########################################################
+                # #   Find total count of nodes to undergo divisions of all types
+                # count_nodes_all <- rbinom(n = 1, size = clonal_sample_population, prob = freq)
+                # #   Divide total count of nodes among different division types
+                # count_nodes_each <- rmultinom(n = 1, size = count_nodes_all, mat_division_sample_clone[3, ] / sum(mat_division_sample_clone[3, ]))
+                # count_nodes_each <- matrix(count_nodes_each, nrow = 1)
+                # mat_division_sample_clone <- rbind(mat_division_sample_clone, count_nodes_each)
+                ########################################################
+                ########################################################
+                ########################################################
                 #   Check that node count in each position doesn't exceed limit in total population
                 if (any(count_nodes_each > count_nodes_each_max)) {
                     logic_correct <- -1
