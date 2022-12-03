@@ -11,17 +11,6 @@ plot_all <- function(model = "",
         dir.create(folder_workplace)
         folder_workplace <- paste(folder_workplace, "/", sep = "")
     }
-
-
-    plot_clonal_phylo(
-        model = model,
-        n_simulations = n_simulations,
-        folder_workplace = folder_workplace,
-        width = 2000,
-        height = 2000,
-        compute_parallel = FALSE
-    )
-
     #---------------------------------Plot clonal evolution as fish plot
     cat("Plotting clonal evolution as fish plot...\n")
     plot_clonal_fishplot(
