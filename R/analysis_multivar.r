@@ -82,7 +82,7 @@ simulator_multivar <- function(model_prefix = "",
                 cat(paste(var2_name, " = ", scientific(var2_vals[col]), "\n", sep = ""))
             }
 
-            size_pie<-max(0.01,min(0.05,0.05*10/(N_clones)))
+            size_pie <- max(0.01, min(0.05, 0.05 * 10 / (N_clones)))
             p <- p + geom_inset(
                 event_pie,
                 width = size_pie, height = size_pie, hjust = (hjust_start - (event - 1) * hjust_unit), x = "branch"
