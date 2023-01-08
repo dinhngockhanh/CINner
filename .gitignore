@@ -12,11 +12,20 @@ vignettes/hmmcopy_v0.0.45.sif
 vignettes/ov2295_cell_cn.csv
 vignettes/__pycache__
 vignettes/batch_dlp.sh
-vignettes/batch_neuvar.sh
-vignettes/batch_pancancer.sh
-vignettes/batch_pcawg.sh
 vignettes/program_dlp.r
-vignettes/program_pcawg.r
-vignettes/program_pancancer.r
+vignettes/batch_neuvar.sh
 vignettes/program_neuvar.r
+vignettes/batch_pancancer.sh
+vignettes/program_pancancer.r
+vignettes/batch_pcawg.sh
+vignettes/program_pcawg.r
+vignettes/batch_MISSvsSEL.sh
+vignettes/program_MISSvsSEL.r
+vignettes/batch_MISSvsWGD.sh
+vignettes/program_MISSvsWGD.r
+vignettes/batch_HMMCOPY.sh
+vignettes/program_HMMCOPY.r
+vignettes/batch_SPECTRUM.sh
+vignettes/program_SPECTRUM.r
 vignettes/WCND.py
+vignettes/Plan\ for\ vignettes.gdoc

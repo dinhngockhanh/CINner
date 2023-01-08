@@ -99,6 +99,14 @@ arm_start <- c(rep(1, length(model_variables_base$cn_info$Chromosome)), model_va
 arm_end <- c(model_variables_base$cn_info$Centromere_location, model_variables_base$cn_info$Bin_count)
 arm_s <- rep(1, length(arm_id))
 
+delta_selection <- c(0.25, 0.5)
+delta_sel_gain_per_arm <- sqrt(1 + delta_selection[1]) - 1
+delta_sel_loss_per_arm <- sqrt(1 + delta_selection[2]) - 1
+chrom_gains <- sample(model_variables_base$cn_info$Chromosome, round(length(model_variables_base$cn_info$Chromosome) / 2), replace = FALSE)
+chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
+arm_s[which(arm_chromosome %in% chrom_gains)] <- 1 + delta_sel_gain_per_arm
+arm_s[which(arm_chromosome %in% chrom_losses)] <- 1 / (1 + delta_sel_loss_per_arm)
+
 model_variables_base <- BUILD_driver_library(
     model_variables = model_variables_base,
     table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
@@ -114,7 +122,7 @@ model_variables_base <- BUILD_initial_population(
     drivers = drivers
 )
 
-model_prefix <- "MISSEGREGATION-vs-SELECTION"
+model_prefix <- "WGD-vs-MISSEGREGATION"
 folder_workplace <- model_prefix
 ```
 
@@ -124,11 +132,10 @@ folder_workplace <- model_prefix
 n_simulations_per_batch <- 1000
 
 var1_name <- "prob_CN_missegregation"
-var1_vals <- seq(0, 1e-2, by = 1e-3)
+var1_vals <- seq(1e-3, 1e-2, by = 1e-3)
 
-var2_name <- "delta_selection"
-var2_vals <- seq(0, 0.5, by = 0.05)
-var2_vals <- matrix(c(var2_vals, 2 * var2_vals), nrow = 2, byrow = TRUE)
+var2_name <- "prob_CN_whole_genome_duplication"
+var2_vals <- seq(1e-3, 1e-2, by = 1e-3)
 ```
 
 ```{r}
@@ -138,7 +145,8 @@ var2_vals <- matrix(c(var2_vals, 2 * var2_vals), nrow = 2, byrow = TRUE)
 #     var1_name = var1_name, var1_vals = var1_vals,
 #     var2_name = var2_name, var2_vals = var2_vals,
 #     n_simulations_per_batch = n_simulations_per_batch,
-#     stage_final = 3, compute_parallel = TRUE
+#     stage_final = 3, compute_parallel = TRUE,
+#     R_libPaths = "/burg/iicd/users/knd2127/rpackages"
 # )
 ```
 
@@ -156,8 +164,8 @@ var2_vals <- matrix(c(var2_vals, 2 * var2_vals), nrow = 2, byrow = TRUE)
 simulation_statistics_multivar(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
     model_variables_base = model_variables_base,
-    var1_name = var1_name, var1_vals = c(1e-3, 1e-2, 1e-2),
-    var2_name = var2_name, var2_vals = var2_vals[,c(6,6,11)],
+    var1_name = var1_name, var1_vals = c(2e-3, 1e-2, 2e-3, 1e-2),
+    var2_name = var2_name, var2_vals = c(1e-3, 1e-3, 1e-2, 1e-2),
     n_simulations = 10,
     compute_parallel = TRUE
 )

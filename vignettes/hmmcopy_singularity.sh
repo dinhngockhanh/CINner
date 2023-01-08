@@ -62,11 +62,6 @@ do
                         --params $params \
                         --segments $segments \
                         --output_tarball $var_hmmcopy_tarball
-                        # --tempdir output  \
-                        # --reads reads.csv.gz \
-                        # --metrics metrics.csv.gz \
-                        # --params params.csv.gz \
-                        # --segments segments.csv.gz \
                   #-----Move HMMcopy results outside
                   cp "$tempdir/0/reads.csv" "${model_name}_noisy_cn_profiles_long_${simulation}_${var_cell_id}_hmm_reads.csv"
                   cp "$tempdir/0/segs.csv" "${model_name}_noisy_cn_profiles_long_${simulation}_${var_cell_id}_hmm_segs.csv"
@@ -115,11 +110,6 @@ do
                         --params $params \
                         --segments $segments \
                         --output_tarball $var_hmmcopy_tarball
-                        # --tempdir output  \
-                        # --reads reads.csv.gz \
-                        # --metrics metrics.csv.gz \
-                        # --params params.csv.gz \
-                        # --segments segments.csv.gz \
                   #-----Move HMMcopy results outside
                   cp "$tempdir/0/reads.csv" "${model_name}_noisy_neuvar_cn_profiles_long_${simulation}_${var_cell_id}_hmm_reads.csv"
                   cp "$tempdir/0/segs.csv" "${model_name}_noisy_neuvar_cn_profiles_long_${simulation}_${var_cell_id}_hmm_segs.csv"

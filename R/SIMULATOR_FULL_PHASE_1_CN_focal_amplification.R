@@ -20,6 +20,8 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,
         strand <- strtoi(event[3])
         block_start <- strtoi(event[4])
         block_end <- strtoi(event[5])
+    } else if (length(unique(chromosomes_excluded)) >= N_chromosomes) {
+        return()
     } else {
         while (1) {
             #       Choose the chromosome to be focally amplified

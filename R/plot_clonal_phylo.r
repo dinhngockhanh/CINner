@@ -3,10 +3,12 @@
 plot_clonal_phylo <- function(model = "",
                               n_simulations = 0,
                               folder_workplace = "",
+                              folder_plots = "",
                               width = 1000,
                               height = 500,
                               compute_parallel = TRUE,
-                              n_cores = NULL) {
+                              n_cores = NULL,
+                              R_libPaths = NULL) {
     library(ggtree)
     library(adephylo)
     library(ggplot2)
@@ -17,12 +19,14 @@ plot_clonal_phylo <- function(model = "",
                 model,
                 iteration,
                 folder_workplace,
+                folder_plots,
                 width,
                 height
             )
         }
     } else {
         #-------------------------Plot clonal evolution in parallel mode
+        library(parallel)
         library(pbapply)
         #   Start parallel cluster
         if (is.null(n_cores)) {
@@ -31,9 +35,21 @@ plot_clonal_phylo <- function(model = "",
             numCores <- n_cores
         }
         cl <- makePSOCKcluster(numCores - 1)
+        if (is.null(R_libPaths) == FALSE) {
+            R_libPaths <<- R_libPaths
+            clusterExport(cl, varlist = c(
+                "R_libPaths"
+            ))
+            clusterEvalQ(cl = cl, .libPaths(R_libPaths))
+        }
+        clusterEvalQ(cl = cl, library(ggtree))
+        clusterEvalQ(cl = cl, library(adephylo))
+        clusterEvalQ(cl = cl, library(ggplot2))
+        clusterEvalQ(cl = cl, library(ggimage))
         #   Prepare input parameters for plotting
         model <<- model
         folder_workplace <<- folder_workplace
+        folder_plots <<- folder_plots
         width <<- width
         height <<- height
         plot_clonal_phylo_one_simulation <<- plot_clonal_phylo_one_simulation
@@ -41,18 +57,20 @@ plot_clonal_phylo <- function(model = "",
             "plot_clonal_phylo_one_simulation",
             "model",
             "folder_workplace",
+            "folder_plots",
             "width",
             "height"
         ))
-        clusterEvalQ(cl = cl, require(ggtree))
-        clusterEvalQ(cl = cl, require(adephylo))
-        clusterEvalQ(cl = cl, require(ggplot2))
+        if (is.null(R_libPaths) == FALSE) {
+            clusterEvalQ(cl = cl, .libPaths(R_libPaths))
+        }
         #   Plot in parallel
         pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
             plot_clonal_phylo_one_simulation(
                 model,
                 iteration,
                 folder_workplace,
+                folder_plots,
                 width,
                 height
             )
@@ -65,6 +83,7 @@ plot_clonal_phylo <- function(model = "",
 plot_clonal_phylo_one_simulation <- function(model,
                                              iteration,
                                              folder_workplace,
+                                             folder_plots,
                                              width,
                                              height) {
     #----------------------------------------------Input simulation file
@@ -96,6 +115,7 @@ plot_clonal_phylo_one_simulation <- function(model,
         "Interstitial_CNLOH" = "blueviolet",
         "Terminal_CNLOH" = "darkgray"
     )
+    cols_count <- rep(0, length(cols))
     #--------------------------------------------Identify nodes in phylo
     #---Find list of leaves for each internal node in phylo
     list_leaves_phylo <- listTips(clone_phylogeny_phylo)
@@ -159,7 +179,7 @@ plot_clonal_phylo_one_simulation <- function(model,
     }
     #------------------------------------------Plot clone phylogeny tree
     #   Initiate destination file for plot
-    jpeg(paste(model, "_sim", iteration, "_clonal_phylo", ".jpeg", sep = ""), width = width, height = height)
+    jpeg(paste(folder_plots, model, "_sim", iteration, "_clonal_phylo", ".jpeg", sep = ""), width = width, height = height)
     #   Plot clone phylogeny tree
     p <- ggtree(clone_phylogeny_phylo, branch.length = "none")
     #   Plot clone ID
@@ -247,27 +267,35 @@ plot_clonal_phylo_one_simulation <- function(model,
             Terminal_CNLOH <- 0
             if (event_type == "new-driver") {
                 Drivers <- 1
+                cols_count[which(names(cols) == "Drivers")] <- cols_count[which(names(cols) == "Drivers")] + 1
             }
             if (event_type == "whole-genome-duplication") {
                 WGD <- 1
+                cols_count[which(names(cols) == "WGD")] <- cols_count[which(names(cols) == "WGD")] + 1
             }
             if (event_type == "missegregation") {
                 Missegregation <- 1
+                cols_count[which(names(cols) == "Missegregation")] <- cols_count[which(names(cols) == "Missegregation")] + 1
             }
             if (event_type == "chromosome-arm-missegregation") {
                 Arm_Missegregation <- 1
+                cols_count[which(names(cols) == "Arm_Missegregation")] <- cols_count[which(names(cols) == "Arm_Missegregation")] + 1
             }
             if (event_type == "focal-amplification") {
                 Amplification <- 1
+                cols_count[which(names(cols) == "Amplification")] <- cols_count[which(names(cols) == "Amplification")] + 1
             }
             if (event_type == "focal-deletion") {
                 Deletion <- 1
+                cols_count[which(names(cols) == "Deletion")] <- cols_count[which(names(cols) == "Deletion")] + 1
             }
             if (event_type == "cnloh-interstitial") {
                 Interstitial_CNLOH <- 1
+                cols_count[which(names(cols) == "Interstitial_CNLOH")] <- cols_count[which(names(cols) == "Interstitial_CNLOH")] + 1
             }
             if (event_type == "cnloh-terminal") {
                 Terminal_CNLOH <- 1
+                cols_count[which(names(cols) == "Terminal_CNLOH")] <- cols_count[which(names(cols) == "Terminal_CNLOH")] + 1
             }
             #   Create pie chart for event accordingly
             dat <- data.frame(
@@ -297,9 +325,15 @@ plot_clonal_phylo_one_simulation <- function(model,
     #--------------------------------------------------Add in the legend
     x.range <- ggplot_build(p)$layout$panel_params[[1]]$x.range
     y.range <- ggplot_build(p)$layout$panel_params[[1]]$y.range
+    ind <- 0
     for (row in 1:length(cols)) {
-        p <- p + annotate("point", x.range[1], (y.range[2] - row * (y.range[2] - y.range[1]) / 20), size = 16, color = cols[row])
-        p <- p + annotate("text", x.range[1] + (x.range[2] - x.range[1]) / 20, (y.range[2] - row * (y.range[2] - y.range[1]) / 20), size = 16, hjust = 0, label = names(cols)[row])
+        if (cols_count[row] > 0) {
+            ind <- ind + 1
+            p <- p + annotate("point", x.range[1], (y.range[2] - ind * (y.range[2] - y.range[1]) / 20), size = 16, color = cols[row])
+            p <- p + annotate("text", x.range[1] + (x.range[2] - x.range[1]) / 20, (y.range[2] - ind * (y.range[2] - y.range[1]) / 20), size = 16, hjust = 0, label = names(cols)[row])
+        }
+        # p <- p + annotate("point", x.range[1], (y.range[2] - row * (y.range[2] - y.range[1]) / 20), size = 16, color = cols[row])
+        # p <- p + annotate("text", x.range[1] + (x.range[2] - x.range[1]) / 20, (y.range[2] - row * (y.range[2] - y.range[1]) / 20), size = 16, hjust = 0, label = names(cols)[row])
     }
     print(p)
     dev.off()

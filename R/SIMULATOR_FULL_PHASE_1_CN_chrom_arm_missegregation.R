@@ -38,6 +38,8 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
         } else if (strtoi(event[5]) == -1) {
             i_gain <- 2
         }
+    } else if (length(unique(chromosomes_excluded)) >= N_chromosomes) {
+        return()
     } else {
         while (1) {
             #       Choose which cell to gain/lose the chromosome arm

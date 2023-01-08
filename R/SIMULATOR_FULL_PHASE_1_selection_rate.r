@@ -5,19 +5,21 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
     #--------------------------------or exceeding maximum average ploidy
     vec_CN_all <- c()
     for (chrom in 1:N_chromosomes) {
-        no_strands <- ploidy_chrom[chrom]
-        if (no_strands <= 0) {
-            clone_selection_rate <- 0
-            return(clone_selection_rate)
-        }
         vec_CN <- rep(0, vec_CN_block_no[chrom])
-        for (strand in 1:no_strands) {
-            vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
+        no_strands <- ploidy_chrom[chrom]
+        if (no_strands > 0) {
+            for (strand in 1:no_strands) {
+                vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
+            }
         }
-        if (max(vec_CN) == 0) {
-            clone_selection_rate <- 0
-            return(clone_selection_rate)
-        }
+        # if (no_strands <= 0) {
+        #     clone_selection_rate <- 0
+        #     return(clone_selection_rate)
+        # }
+        # if (max(vec_CN) == 0) {
+        #     clone_selection_rate <- 0
+        #     return(clone_selection_rate)
+        # }
         vec_CN_all <- c(vec_CN_all, vec_CN)
     }
     if (mean(vec_CN_all) > bound_average_ploidy) {
@@ -28,20 +30,24 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         clone_selection_rate <- 0
         return(clone_selection_rate)
     }
-    #-----Cell is not viable if exceeding maximum length of homozygosity
-    L_homozygosity <- 0
-    for (chrom in 1:N_chromosomes) {
-        no_strands <- ploidy_chrom[chrom]
-        vec_CN <- rep(0, vec_CN_block_no[chrom])
-        for (strand in 1:no_strands) {
-            vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
-        }
-        L_homozygosity <- L_homozygosity + length(which(vec_CN == 0))
-        if (L_homozygosity > bound_homozygosity) {
-            clone_selection_rate <- 0
-            return(clone_selection_rate)
-        }
+    if (length(which(vec_CN_all == 0)) > bound_homozygosity) {
+        clone_selection_rate <- 0
+        return(clone_selection_rate)
     }
+    # #-----Cell is not viable if exceeding maximum length of homozygosity
+    # L_homozygosity <- 0
+    # for (chrom in 1:N_chromosomes) {
+    #     no_strands <- ploidy_chrom[chrom]
+    #     vec_CN <- rep(0, vec_CN_block_no[chrom])
+    #     for (strand in 1:no_strands) {
+    #         vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
+    #     }
+    #     L_homozygosity <- L_homozygosity + length(which(vec_CN == 0))
+    #     if (L_homozygosity > bound_homozygosity) {
+    #         clone_selection_rate <- 0
+    #         return(clone_selection_rate)
+    #     }
+    # }
     #---------------Cell is not viable if exceeding maximum driver count
     if (driver_count > 0) {
         driver_count_unique <- unique(driver_map[, 1])

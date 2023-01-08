@@ -101,67 +101,71 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
                     }
                 }
             }
-            # print(chroms_excluded)
             #---Perform the pre-determined events (if any)
             if (elapsed_gen > 1) {
-                if (original_elapsed_genotypes[elapsed_gen] != original_elapsed_genotypes[elapsed_gen - 1]) {
-                    #   Create a new genotype
-                    genotype_parent <- genotype_current
-                    output <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_current, n_daughters = 1)
-                    genotype_current <- output[[1]]
-                    #   Perform driver and CN events
-                    events <- evolution_genotype_changes[[original_elapsed_genotypes[elapsed_gen]]]
-                    for (j in 1:length(events)) {
-                        #   Get information about
-                        event <- events[[j]]
-                        if (event[1] == "new-driver") {
-                            SIMULATOR_FULL_PHASE_1_drivers(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter_1 = genotype_current,
-                                event = event
-                            )
-                        } else if (event[1] == "whole-genome-duplication") {
-                            SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter_1 = genotype_current
-                            )
-                        } else if (event[1] == "missegregation") {
-                            SIMULATOR_FULL_PHASE_1_CN_missegregation(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter_1 = genotype_current,
-                                event = event
-                            )
-                        } else if (event[1] == "chromosome-arm-missegregation") {
-                            SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter_1 = genotype_current,
-                                event = event
-                            )
-                        } else if (event[1] == "focal-amplification") {
-                            SIMULATOR_FULL_PHASE_1_CN_focal_amplification(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter = genotype_current,
-                                event = event
-                            )
-                        } else if (event[1] == "focal-deletion") {
-                            SIMULATOR_FULL_PHASE_1_CN_focal_deletion(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter = genotype_current,
-                                event = event
-                            )
-                        } else if (event[1] == "cnloh-interstitial") {
-                            SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter = genotype_current,
-                                event = event
-                            )
-                        } else if (event[1] == "cnloh-terminal") {
-                            SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(
-                                genotype_to_react = genotype_parent,
-                                genotype_daughter = genotype_current,
-                                event = event
-                            )
-                        }
+                previous_genotype <- original_elapsed_genotypes[elapsed_gen - 1]
+            } else if (branch > 1) {
+                elapsed_gens_mother <- phylogeny_elapsed_genotypes[[neuvar_phylogeny_origin[branch]]]
+                previous_genotype <- elapsed_gens_mother[length(elapsed_gens_mother)]
+            } else {
+                previous_genotype <- original_elapsed_genotypes[elapsed_gen]
+            }
+            if (original_elapsed_genotypes[elapsed_gen] != previous_genotype) {
+                #   Create a new genotype
+                genotype_parent <- genotype_current
+                output <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_current, n_daughters = 1)
+                genotype_current <- output[[1]]
+                #   Perform driver and CN events
+                events <- evolution_genotype_changes[[original_elapsed_genotypes[elapsed_gen]]]
+                for (j in 1:length(events)) {
+                    event <- events[[j]]
+                    if (event[1] == "new-driver") {
+                        SIMULATOR_FULL_PHASE_1_drivers(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter_1 = genotype_current,
+                            event = event
+                        )
+                    } else if (event[1] == "whole-genome-duplication") {
+                        SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter_1 = genotype_current
+                        )
+                    } else if (event[1] == "missegregation") {
+                        SIMULATOR_FULL_PHASE_1_CN_missegregation(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter_1 = genotype_current,
+                            event = event
+                        )
+                    } else if (event[1] == "chromosome-arm-missegregation") {
+                        SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter_1 = genotype_current,
+                            event = event
+                        )
+                    } else if (event[1] == "focal-amplification") {
+                        SIMULATOR_FULL_PHASE_1_CN_focal_amplification(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter = genotype_current,
+                            event = event
+                        )
+                    } else if (event[1] == "focal-deletion") {
+                        SIMULATOR_FULL_PHASE_1_CN_focal_deletion(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter = genotype_current,
+                            event = event
+                        )
+                    } else if (event[1] == "cnloh-interstitial") {
+                        SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter = genotype_current,
+                            event = event
+                        )
+                    } else if (event[1] == "cnloh-terminal") {
+                        SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(
+                            genotype_to_react = genotype_parent,
+                            genotype_daughter = genotype_current,
+                            event = event
+                        )
                     }
                 }
             }

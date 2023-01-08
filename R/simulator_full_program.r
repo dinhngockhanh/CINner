@@ -42,8 +42,11 @@ simulator_full_program <- function(model = "",
                                    compute_parallel = FALSE,
                                    seed = Inf,
                                    output_variables = c(),
-                                   n_cores = NULL) {
+                                   n_cores = NULL,
+                                   R_libPaths = NULL) {
     library(data.table)
+    library(ape)
+    library(ctc)
     if (class(model) == "character") {
         model_parameters <- model
         model_prefix <- model
@@ -72,10 +75,8 @@ simulator_full_program <- function(model = "",
 
     if (neutral_variations == TRUE) stage_final <- max(stage_final, 4)
     # ============PREPARE WORKSPACE DIRECTORY AND IMPORT NECESSARY FILES
-    if (model_readcount == TRUE) {
-        dir.create(model_prefix)
-    }
     if (HMM == TRUE) {
+        dir.create(model_prefix)
         if (HMM_containner == "singularity") {
             if (file.exists("hmmcopy_v0.0.45.sif") == FALSE) {
                 cat("INSTALLING SINGULARITY FOR HMMCOPY-V0.0.45...\n")
@@ -127,8 +128,9 @@ simulator_full_program <- function(model = "",
     } else {
         library(parallel)
         library(ctc)
+        library(ape)
         #---------------------------Run CancerSimulator in parallel mode
-        #   Start parallel cluster
+        #     parallel cluster
         if (is.null(n_cores)) {
             numCores <- detectCores()
         } else {
@@ -138,6 +140,13 @@ simulator_full_program <- function(model = "",
         if (report_progress == TRUE) {
             cat(paste("\nParallel cluster with ", numCores - 1, " cores...\n", sep = ""))
         }
+        if (is.null(R_libPaths) == FALSE) {
+            R_libPaths <<- R_libPaths
+            clusterExport(cl, varlist = c("R_libPaths"))
+            clusterEvalQ(cl = cl, .libPaths(R_libPaths))
+        }
+        clusterEvalQ(cl = cl, library(ape))
+        clusterEvalQ(cl = cl, library(ctc))
         #   Prepare input parameters for CancerSimulator
         model_parameters <<- model_parameters
         model_prefix <<- model_prefix
@@ -186,14 +195,17 @@ simulator_full_program <- function(model = "",
             "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
             "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
             "SIMULATOR_FULL_PHASE_1_genotype_cleaning", "SIMULATOR_FULL_PHASE_1_genotype_comparison", "SIMULATOR_FULL_PHASE_1_genotype_initiation", "SIMULATOR_FULL_PHASE_1_genotype_update", "SIMULATOR_FULL_PHASE_1_selection_rate",
-            "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main",
-            "get_cn_profile", "rbindlist", "p2_cn_profiles_long", "p2_readcount_model"
+            "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main", "SIMULATOR_FULL_PHASE_4_main",
+            "get_cn_profile", "rbindlist",
+            "p0_write_cn_as_wig", "p0_write_gc_map_as_wig", "p0_append_with_hmm",
+            "p2_cn_profiles_long", "p2_cn_profiles_wide", "p2_readcount_model", "p2_readcount_model_wide",
+            "p3_cn_events_table", "p3_cn_profiles_internal", "p3_internal_node_cn_profiles_long", "p3_internal_node_cn_profiles_wide",
+            "p4_cn_profiles_long", "p4_cn_profiles_wide", "p4_readcount_model", "p4_readcount_model_wide"
         ))
-        library(ape)
-        clusterEvalQ(cl = cl, require(ape))
         #   Run CancerSimulator in parallel
         if (report_progress == TRUE) {
             library(pbapply)
+            pbo <- pboptions(type = "txt")
             many_sims <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
                 one_sim <- one_simulation(
                     iteration,
@@ -382,7 +394,7 @@ one_simulation <- function(iteration,
     }
     # ==================================PREPARE DATA FROM VARIOUS PHASES
     #-------------Save noisy CN profiles on base of true profiles in WIG
-    if ((model_readcount == TRUE) & ((model_readcount_base == "truth") | (model_readcount_base == "all"))) {
+    if ((HMM == TRUE) & ((model_readcount_base == "truth") | (model_readcount_base == "all"))) {
         if (report_progress == TRUE) cat("Save noisy CN profiles (base=truth) in WIG format...\n")
         sample_cell_ID <- simulation$sample$sample_cell_ID
         noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
@@ -393,7 +405,7 @@ one_simulation <- function(iteration,
         }
     }
     #-----------Save noisy CN profiles on base of neuvar profiles in WIG
-    if ((model_readcount == TRUE) & ((model_readcount_base == "neuvar") | (model_readcount_base == "all"))) {
+    if ((HMM == TRUE) & (neutral_variations == TRUE) & ((model_readcount_base == "neuvar") | (model_readcount_base == "all"))) {
         if (report_progress == TRUE) cat("Save noisy CN profiles (base=neuvar) in WIG format...\n")
         sample_cell_ID <- simulation$neutral_variations$sample$sample_cell_ID
         noisy_cn_profiles_long <- simulation$neutral_variations$sample$noisy_cn_profiles_long
@@ -498,7 +510,7 @@ one_simulation <- function(iteration,
         }
     }
     #------------------Save noisy CN profiles on base of neuvar profiles
-    if ((save_cn_profile == TRUE) & (model_readcount == TRUE) & ((model_readcount_base == "neuvar") | (model_readcount_base == "all"))) {
+    if ((save_cn_profile == TRUE) & (neutral_variations == TRUE) & (model_readcount == TRUE) & ((model_readcount_base == "neuvar") | (model_readcount_base == "all"))) {
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save noisy CN profiles (base=neuvar) in long format...\n")
             noisy_cn_profiles_long <- simulation$neutral_variations$sample$noisy_cn_profiles_long

@@ -18,6 +18,8 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,
         strand_take <- strtoi(event[4])
         block_start <- strtoi(event[5])
         block_end <- strtoi(event[6])
+    } else if (length(unique(chromosomes_excluded)) >= N_chromosomes) {
+        return()
     } else {
         while (1) {
             #       Choose the chromosome to harbor the interstitial CN-LOH

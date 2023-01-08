@@ -2,7 +2,8 @@
 #' @export
 plot_cn_heatmap <- function(model = "",
                             n_simulations = 0,
-                            folder_workplace,
+                            folder_workplace = "",
+                            folder_plots = "",
                             plotcol = "",
                             CN_data = "TRUTH",
                             phylo = "TRUTH",
@@ -10,7 +11,8 @@ plot_cn_heatmap <- function(model = "",
                             width = 1000,
                             height = 500,
                             compute_parallel = TRUE,
-                            n_cores = NULL) {
+                            n_cores = NULL,
+                            R_libPaths = NULL) {
     library(signals)
     if (compute_parallel == FALSE) {
         #-----------------------------Plot CN heatmap in sequential mode
@@ -19,6 +21,7 @@ plot_cn_heatmap <- function(model = "",
                 model,
                 iteration,
                 folder_workplace,
+                folder_plots,
                 plotcol,
                 CN_data,
                 phylo,
@@ -29,6 +32,7 @@ plot_cn_heatmap <- function(model = "",
         }
     } else {
         #-------------------------------Plot CN heatmap in parallel mode
+        library(parallel)
         library(pbapply)
         #   Start parallel cluster
         if (is.null(n_cores)) {
@@ -37,30 +41,42 @@ plot_cn_heatmap <- function(model = "",
             numCores <- n_cores
         }
         cl <- makePSOCKcluster(numCores - 1)
+        if (is.null(R_libPaths) == FALSE) {
+            R_libPaths <<- R_libPaths
+            clusterExport(cl, varlist = c("R_libPaths"))
+            clusterEvalQ(cl = cl, .libPaths(R_libPaths))
+        }
+        clusterEvalQ(cl = cl, library(signals))
         #   Prepare input parameters for plotting
+        plot_cn_heatmap_one_simulation <<- plot_cn_heatmap_one_simulation
         model <<- model
         folder_workplace <<- folder_workplace
+        folder_plots <<- folder_plots
         plotcol <<- plotcol
         CN_data <<- CN_data
         phylo <<- phylo
         filename_suffix <<- filename_suffix
         width <<- width
         height <<- height
-        plot_cn_heatmap_one_simulation <<- plot_cn_heatmap_one_simulation
         clusterExport(cl, varlist = c(
             "plot_cn_heatmap_one_simulation",
             "model",
             "folder_workplace",
+            "folder_plots",
+            "plotcol",
+            "CN_data",
+            "phylo",
+            "filename_suffix",
             "width",
             "height"
         ))
-        clusterEvalQ(cl = cl, require(signals))
         #   Plot in parallel
         pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
             plot_cn_heatmap_one_simulation(
                 model,
                 iteration,
                 folder_workplace,
+                folder_plots,
                 plotcol,
                 CN_data,
                 phylo,
@@ -77,6 +93,7 @@ plot_cn_heatmap <- function(model = "",
 plot_cn_heatmap_one_simulation <- function(model,
                                            iteration,
                                            folder_workplace,
+                                           folder_plots,
                                            plotcol,
                                            CN_data,
                                            phylo,
@@ -89,16 +106,16 @@ plot_cn_heatmap_one_simulation <- function(model,
     #-----------------------------------------Decide filename suffix
     if (is.null(filename_suffix)) {
         if (CN_data == "TRUTH") {
-            filename_suffix <- "_cnGROUNDTRUTH"
+            filename_suffix <- "_cnTRUTH"
         } else if (CN_data == "NEUTRAL-VARIATIONS") {
             filename_suffix <- "_cnNEUVAR"
         } else if (CN_data == "HMM") {
-            filename_suffix <- "_cnGROUNDTRUTH+HMM"
+            filename_suffix <- "_cnTRUTH+HMM"
         } else if (CN_data == "NEUTRAL-VARIATIONS-HMM") {
             filename_suffix <- "_cnNEUVAR+HMM"
         }
         if (phylo == "TRUTH") {
-            filename_suffix <- paste(filename_suffix, "_phyloGROUNDTRUTH", sep = "")
+            filename_suffix <- paste(filename_suffix, "_phyloTRUTH", sep = "")
         } else if (phylo == "UMAP") {
             filename_suffix <- paste(filename_suffix, "_phyloUMAP", sep = "")
         }
@@ -157,7 +174,7 @@ plot_cn_heatmap_one_simulation <- function(model,
     }
     #-----------------------------------------Plot total CN profiles
     if (plotcol == "total-copy") {
-        filename <- paste(model, "_sim", iteration, "_CN_total", filename_suffix, ".jpeg", sep = "")
+        filename <- paste(folder_plots, model, "_sim", iteration, "_CN_total", filename_suffix, ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
         p <- plotHeatmap(sample_genotype_profiles,
             plotcol = "state",
@@ -173,7 +190,7 @@ plot_cn_heatmap_one_simulation <- function(model,
     }
     #-----------------------------------------Plot minor CN profiles
     if (plotcol == "minor-copy") {
-        filename <- paste(model, "_sim", iteration, "_CN_minor", filename_suffix, ".jpeg", sep = "")
+        filename <- paste(folder_plots, model, "_sim", iteration, "_CN_minor", filename_suffix, ".jpeg", sep = "")
         jpeg(file = filename, width = width, height = height)
         p <- plotHeatmap(sample_genotype_profiles,
             plotcol = "Min",

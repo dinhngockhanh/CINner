@@ -1,0 +1,211 @@
+```{r setup}
+library(signals)
+#-----------------------------------------------------------------------
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
+#-----------------------------------------------------------------------
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
+```
+
+```{r}
+# cn_ov2295 <- read.csv(file = "/Users/dinhngockhanh/My Drive/My Drive/My Drive/RESEARCH AND EVERYTHING/Projects/ST-Cod.Single-cell DNA sequencing/DATA_ov2295/ov2295_cell_cn.csv")
+```
+
+```{r}
+cn_cell_original <- cn_ov2295[which(cn_ov2295$cell_id == unique(cn_ov2295$cell_id)[300]), ]
+cn_cell_original$start<-cn_cell_original$start_point
+cn_cell_original$end<-cn_cell_original$end_point
+cn_cell_original$cell_id<-'Cell'
+jpeg(file = 'cn_cell_original.jpeg', width = 1500, height = 80)
+p <- plotHeatmap(cn_cell_original,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_WGD<-cn_cell_original
+cn_cell_WGD$state<-2*cn_cell_WGD$state
+jpeg(file = 'cn_cell_WGD.jpeg', width = 1500, height = 80)
+p <- plotHeatmap(cn_cell_WGD,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_misseg_1<-cn_cell_original[which(cn_cell_original$chr==1),]
+cn_cell_misseg_1$state[which(cn_cell_misseg_1$chr==1)]<-cn_cell_misseg_1$state[which(cn_cell_misseg_1$chr==1)]+1
+jpeg(file = 'cn_cell_misseg_1.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_misseg_1,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_misseg_2<-cn_cell_original[which(cn_cell_original$chr==1),]
+cn_cell_misseg_2$state[which(cn_cell_misseg_2$chr==1)]<-cn_cell_misseg_2$state[which(cn_cell_misseg_2$chr==1)]-1
+jpeg(file = 'cn_cell_misseg_2.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_misseg_2,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_arm_misseg_1<-cn_cell_original[which(cn_cell_original$chr==5),]
+cn_cell_arm_misseg_1$state[which(cn_cell_arm_misseg_1$chr==5 & cn_cell_arm_misseg_1$start>=97*500000)]<-cn_cell_arm_misseg_1$state[which(cn_cell_arm_misseg_1$chr==5 & cn_cell_arm_misseg_1$start>=97*500000)]+1
+jpeg(file = 'cn_cell_arm_misseg_1.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_arm_misseg_1,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_arm_misseg_2<-cn_cell_original[which(cn_cell_original$chr==5),]
+cn_cell_arm_misseg_2$state[which(cn_cell_arm_misseg_2$chr==5 & cn_cell_arm_misseg_2$start>=97*500000)]<-cn_cell_arm_misseg_2$state[which(cn_cell_arm_misseg_2$chr==5 & cn_cell_arm_misseg_2$start>=97*500000)]-1
+jpeg(file = 'cn_cell_arm_misseg_2.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_arm_misseg_2,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_foc_amp<-cn_cell_original[which(cn_cell_original$chr==3),]
+cn_cell_foc_amp$state[which(cn_cell_foc_amp$chr==3 & cn_cell_foc_amp$start>=50*500000 & cn_cell_foc_amp$end<=100*500000)]<-cn_cell_foc_amp$state[which(cn_cell_foc_amp$chr==3 & cn_cell_foc_amp$start>=50*500000 & cn_cell_foc_amp$end<=100*500000)]+1
+jpeg(file = 'cn_cell_foc_amp.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_foc_amp,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_foc_amp_normal<-cn_cell_original[which(cn_cell_original$chr==3),]
+jpeg(file = 'cn_cell_foc_amp_normal.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_foc_amp_normal,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_foc_del<-cn_cell_original[which(cn_cell_original$chr==3),]
+cn_cell_foc_del$state[which(cn_cell_foc_del$chr==3 & cn_cell_foc_del$start>=50*500000 & cn_cell_foc_del$end<=100*500000)]<-cn_cell_foc_del$state[which(cn_cell_foc_del$chr==3 & cn_cell_foc_del$start>=50*500000 & cn_cell_foc_del$end<=100*500000)]-1
+jpeg(file = 'cn_cell_foc_del.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_foc_del,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_cell_foc_del_normal<-cn_cell_original[which(cn_cell_original$chr==3),]
+jpeg(file = 'cn_cell_foc_del_normal.jpeg', width = 500, height = 80)
+p <- plotHeatmap(cn_cell_foc_del_normal,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_arm_sel_0 <- cn_cell_original[which(cn_cell_original$chr %in% c(1,2,3)),]
+cn_arm_sel_0$state<-2
+jpeg(file = 'cn_arm_sel_0.jpeg', width = 300, height = 80)
+p <- plotHeatmap(cn_arm_sel_0,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_arm_sel_1a<-cn_arm_sel_0
+cn_arm_sel_1a$state[cn_arm_sel_1a$chr==1]<-cn_arm_sel_1a$state[cn_arm_sel_1a$chr==1]-1
+jpeg(file = 'cn_arm_sel_1a.jpeg', width = 300, height = 80)
+p <- plotHeatmap(cn_arm_sel_1a,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_arm_sel_1b<-cn_arm_sel_0
+cn_arm_sel_1b$state[cn_arm_sel_1b$chr==1]<-cn_arm_sel_1b$state[cn_arm_sel_1b$chr==1]+1
+jpeg(file = 'cn_arm_sel_1b.jpeg', width = 300, height = 80)
+p <- plotHeatmap(cn_arm_sel_1b,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_arm_sel_2<-cn_arm_sel_1a
+cn_arm_sel_2$state<-2*cn_arm_sel_2$state
+jpeg(file = 'cn_arm_sel_2.jpeg', width = 300, height = 80)
+p <- plotHeatmap(cn_arm_sel_2,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_arm_sel_3a<-cn_arm_sel_2
+cn_arm_sel_3a$state[which(cn_arm_sel_3a$chr==3 & cn_arm_sel_3a$end<=182*500000)]<-cn_arm_sel_3a$state[which(cn_arm_sel_3a$chr==3 & cn_arm_sel_3a$end<=182*500000)]+1
+jpeg(file = 'cn_arm_sel_3a.jpeg', width = 300, height = 80)
+p <- plotHeatmap(cn_arm_sel_3a,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+```{r}
+cn_arm_sel_3b<-cn_arm_sel_2
+cn_arm_sel_3b$state[which(cn_arm_sel_3b$chr==3 & cn_arm_sel_3b$end<=182*500000)]<-cn_arm_sel_3b$state[which(cn_arm_sel_3b$chr==3 & cn_arm_sel_3b$end<=182*500000)]-1
+jpeg(file = 'cn_arm_sel_3b.jpeg', width = 300, height = 80)
+p <- plotHeatmap(cn_arm_sel_3b,
+    plotcol = "state", plottree = FALSE, clusters = data.frame(cell_id='Cell',clone_id='A'),
+    show_legend=FALSE, show_library_label=FALSE, show_clone_label=FALSE, annofontsize=20, maxCNcol=5
+)
+print(p)
+dev.off()
+```
+
+
+
+```{r}
+```

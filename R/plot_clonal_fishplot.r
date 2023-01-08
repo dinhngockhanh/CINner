@@ -3,12 +3,14 @@
 plot_clonal_fishplot <- function(model = "",
                                  n_simulations = 0,
                                  folder_workplace = "",
+                                 folder_plots = "",
                                  vec_time = NULL,
                                  unit_time = "year",
                                  width = 1000,
                                  height = 500,
                                  compute_parallel = TRUE,
-                                 n_cores = NULL) {
+                                 n_cores = NULL,
+                                 R_libPaths = NULL) {
     library(RColorBrewer)
     library(fishplot)
     library(wesanderson)
@@ -19,6 +21,7 @@ plot_clonal_fishplot <- function(model = "",
                 model,
                 iteration,
                 folder_workplace,
+                folder_plots,
                 vec_time,
                 unit_time,
                 width,
@@ -35,9 +38,20 @@ plot_clonal_fishplot <- function(model = "",
             numCores <- n_cores
         }
         cl <- makePSOCKcluster(numCores - 1)
+        if (is.null(R_libPaths) == FALSE) {
+            R_libPaths <<- R_libPaths
+            clusterExport(cl, varlist = c(
+                "R_libPaths"
+            ))
+            clusterEvalQ(cl = cl, .libPaths(R_libPaths))
+        }
+        clusterEvalQ(cl = cl, library(RColorBrewer))
+        clusterEvalQ(cl = cl, library(fishplot))
+        clusterEvalQ(cl = cl, library(wesanderson))
         #   Prepare input parameters for plotting
         model <<- model
         folder_workplace <<- folder_workplace
+        folder_plots <<- folder_plots
         width <<- width
         height <<- height
         vec_time <<- vec_time
@@ -47,20 +61,19 @@ plot_clonal_fishplot <- function(model = "",
             "plot_clonal_fishplot_one_simulation",
             "model",
             "folder_workplace",
+            "folder_plots",
             "vec_time",
             "unit_time",
             "width",
             "height"
         ))
-        clusterEvalQ(cl = cl, require(RColorBrewer))
-        clusterEvalQ(cl = cl, require(fishplot))
-        clusterEvalQ(cl = cl, require(wesanderson))
         #   Plot in parallel
         pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
             plot_clonal_fishplot_one_simulation(
                 model,
                 iteration,
                 folder_workplace,
+                folder_plots,
                 vec_time,
                 unit_time,
                 width,
@@ -75,6 +88,7 @@ plot_clonal_fishplot <- function(model = "",
 plot_clonal_fishplot_one_simulation <- function(model,
                                                 iteration,
                                                 folder_workplace,
+                                                folder_plots,
                                                 vec_time,
                                                 unit_time,
                                                 width,
@@ -310,7 +324,7 @@ plot_clonal_fishplot_one_simulation <- function(model,
     table_clonal_populations <- table_clonal_populations_new
     vec_clonal_parentage <- vec_clonal_parentage_new
     #------------------------------------------Plot the clonal evolution
-    filename <- paste(model, "_sim", iteration, "_clonal_fishplot", ".jpeg", sep = "")
+    filename <- paste(folder_plots, model, "_sim", iteration, "_clonal_fishplot", ".jpeg", sep = "")
     jpeg(file = filename, width = width, height = height)
     #   Find clonal order of birth times
     vec_clonal_birth_order <- rep(0, length(vec_clonal_labels))

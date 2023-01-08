@@ -28,6 +28,8 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,
         } else if (strtoi(event[4]) == -1) {
             i_gain <- 2
         }
+    } else if (length(unique(chromosomes_excluded)) >= N_chromosomes) {
+        return()
     } else {
         while (1) {
             #   Choose which cell to gain/lose the strand
