@@ -9,6 +9,12 @@ fitting_bulk_arm_CN <- function(model_name,
                                 ABC_simcount = 10000,
                                 n_cores = NULL,
                                 n_samples = NULL) {
+    library(parallel)
+    library(abcrf)
+    library(grid)
+    library(gridExtra)
+    library(ggplot2)
+    library(signals)
     if (is.null(n_cores)) {
         n_cores <- max(detectCores() - 1, 1)
     }
@@ -75,13 +81,6 @@ fitting_bulk_arm_CN <- function(model_name,
         df_dist <- densityPlot_df(model_rf, obs_rf, data_rf)
         best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
     }
-
-
-
-
-
-
-
     #-------------------------------Check list of parameters and targets
     if (type_sample_DATA == "average" & type_cn_DATA == "arm") {
         list_arms_DATA <- copynumber_DATA$Arm
@@ -96,11 +95,6 @@ fitting_bulk_arm_CN <- function(model_name,
     }
     #---------------------------------List of parameter IDs to be fitted
     parameter_IDs <- list_parameters$Variable
-
-
-
-
-
     #---------------------Find arm-level gain/loss map for entire genome
     cn_info <- model_variables$cn_info
     #   Find genome coordinate from one simulation
@@ -262,7 +256,7 @@ fitting_bulk_arm_CN <- function(model_name,
     #   Make simulations using best parameters
     SIMS_chromosome <- simulator_full_program(
         model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
-        save_simulation = FALSE, report_progress = TRUE, compute_parallel = TRUE,
+        save_simulation = FALSE, report_progress = TRUE, compute_parallel = FALSE,
         output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
     )
     #   Plot comparison vs bin-level data
@@ -300,18 +294,20 @@ fitting_bulk_arm_CN <- function(model_name,
         textGrob(
             paste("r=", round(Pearson_r, 3), ", p-value=", formatC(Pearson_p_val, format = "e", digits = 2)),
             x = 0.1, y = 0.9, just = "left",
-            gp = gpar(col = "blue", fontsize = 30, fontface = "bold"),
+            gp = gpar(col = "blue", fontsize = 50, fontface = "bold"),
         )
     )
     plots[[id]] <- ggplot(plot_table, aes(x = Selection_rate, y = Amp_freq_spec)) +
-        geom_point(size = 25, color = "blue") +
+        geom_point(size = 30, color = "blue") +
         geom_smooth(method = lm, color = "blue") +
         annotation_custom(grob1) +
-        geom_text(aes(label = Arm), size = 10, color = "white") +
+        geom_text(aes(label = Arm), size = 12, color = "white") +
         xlab("Selection rates") +
-        ylab(paste("Amplification frequencies (", model_name, ")", sep = "")) +
+        ylab("Amplification frequencies") +
+        # ylab(paste("Amplification frequencies (", model_name, ")", sep = "")) +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-        theme(text = element_text(size = 30))
+        theme(text = element_text(size = 70)) +
+        theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
     gs[[id]] <- plots[[id]]
     #   Plot selection rates vs cancer-specific del frequencies
     id <- id + 1
@@ -323,18 +319,20 @@ fitting_bulk_arm_CN <- function(model_name,
         textGrob(
             paste("r=", round(Pearson_r, 3), ", p-value=", formatC(Pearson_p_val, format = "e", digits = 2)),
             x = 0.9, y = 0.9, just = "right",
-            gp = gpar(col = "blue", fontsize = 30, fontface = "bold")
+            gp = gpar(col = "blue", fontsize = 50, fontface = "bold")
         )
     )
     plots[[id]] <- ggplot(plot_table, aes(x = Selection_rate, y = Del_freq_spec)) +
-        geom_point(size = 25, color = "blue") +
+        geom_point(size = 30, color = "blue") +
         geom_smooth(method = lm, color = "blue") +
         annotation_custom(grob1) +
-        geom_text(aes(label = Arm), size = 10, color = "white") +
+        geom_text(aes(label = Arm), size = 12, color = "white") +
         xlab("Selection rates") +
-        ylab(paste("Deletion frequencies (", model_name, ")", sep = "")) +
+        ylab("Deletion frequencies") +
+        # ylab(paste("Deletion frequencies (", model_name, ")", sep = "")) +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-        theme(text = element_text(size = 30))
+        theme(text = element_text(size = 70)) +
+        theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
     gs[[id]] <- plots[[id]]
     #   Print all plots
     filename <- paste(model_name, "_selection_rate_analysis.jpeg", sep = "")
@@ -353,18 +351,7 @@ fitting_bulk_arm_CN <- function(model_name,
             plot_table$Charm.TSG.OG.score[loc] <- copynumber_DATA$Charm.TSG.OG.score[i]
             plot_table$Charm.TSG.OG.Ess.score[loc] <- copynumber_DATA$Charm.TSG.OG.Ess.score[i]
         }
-
-
-
-        # print(plot_table)
-        # print(plot_table$Charm.TSG.OG.Ess.score)
-        # print(is.na(plot_table$Charm.TSG.OG.Ess.score))
-        # print(length(is.na(plot_table$Charm.TSG.OG.Ess.score)))
         if (any(is.na(plot_table$Charm.TSG.OG.Ess.score))) plot_table <- plot_table[-which(is.na(plot_table$Charm.TSG.OG.Ess.score)), ]
-        # print(plot_table)
-
-
-
         #   Configuration for subplots
         layout <- matrix(NA, nrow = 1, ncol = 2)
         gs <- list()
@@ -380,18 +367,19 @@ fitting_bulk_arm_CN <- function(model_name,
             textGrob(
                 paste("r=", round(Pearson_r, 3), ", p-value=", formatC(Pearson_p_val, format = "e", digits = 2)),
                 x = 0.9, y = 0.9, just = "right",
-                gp = gpar(col = "coral", fontsize = 30, fontface = "bold")
+                gp = gpar(col = "coral", fontsize = 50, fontface = "bold")
             )
         )
         plots[[id]] <- ggplot(plot_table, aes(x = Selection_rate, y = Charm.TSG.OG.score)) +
-            geom_point(size = 25, color = "coral") +
+            geom_point(size = 30, color = "coral") +
             geom_smooth(method = lm, color = "coral") +
             annotation_custom(grob1) +
-            geom_text(aes(label = Arm), size = 10, color = "white") +
+            geom_text(aes(label = Arm), size = 12, color = "white") +
             xlab("Selection rates") +
             ylab("Charm(TSG,OG) score") +
             theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-            theme(text = element_text(size = 30))
+            theme(text = element_text(size = 70)) +
+            theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
         gs[[id]] <- plots[[id]]
         #   Plot selection rates vs Charm.TSG.OG.Ess score
         id <- id + 1
@@ -403,18 +391,19 @@ fitting_bulk_arm_CN <- function(model_name,
             textGrob(
                 paste("r=", round(Pearson_r, 3), ", p-value=", formatC(Pearson_p_val, format = "e", digits = 2)),
                 x = 0.9, y = 0.9, just = "right",
-                gp = gpar(col = "coral", fontsize = 30, fontface = "bold")
+                gp = gpar(col = "coral", fontsize = 50, fontface = "bold")
             )
         )
         plots[[id]] <- ggplot(plot_table, aes(x = Selection_rate, y = Charm.TSG.OG.Ess.score)) +
-            geom_point(size = 25, color = "coral") +
+            geom_point(size = 30, color = "coral") +
             geom_smooth(method = lm, color = "coral") +
             annotation_custom(grob1) +
-            geom_text(aes(label = Arm), size = 10, color = "white") +
+            geom_text(aes(label = Arm), size = 12, color = "white") +
             xlab("Selection rates") +
             ylab("Charm(TSG,OG,Ess) score") +
             theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-            theme(text = element_text(size = 30))
+            theme(text = element_text(size = 70)) +
+            theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
         gs[[id]] <- plots[[id]]
         #   Print all plots
         filename <- paste(model_name, "_selection_rate_vs_Charm_scores.jpeg", sep = "")

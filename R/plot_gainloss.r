@@ -5,7 +5,7 @@ plot_gainloss <- function(copynumber_sims,
                           filename,
                           arm_level = FALSE,
                           pos_centromeres = c(),
-                          height = 1000,
+                          height = 500,
                           width = 2000) {
     plotcol <- "state"
     fillna <- TRUE
@@ -95,10 +95,10 @@ plot_gainloss <- function(copynumber_sims,
         xlab("")
     #---Plot Spearman correlation scores
     p_spearman_gain <- ggplot() +
-        annotate("text", x = 0, y = 0, size = 15, colour = "#E34A33", label = paste("GAIN: rho = ", round(rho_gain, 2), sep = "")) +
+        annotate("text", x = 0, y = 0, size = 12, colour = "#E34A33", label = paste("GAIN: rho = ", round(rho_gain, 2), sep = "")) +
         theme_void()
     p_spearman_loss <- ggplot() +
-        annotate("text", x = 0, y = 0, size = 15, colour = "#3182BD", label = paste("LOSS: rho = ", round(rho_loss, 2), sep = "")) +
+        annotate("text", x = 0, y = 0, size = 12, colour = "#3182BD", label = paste("LOSS: rho = ", round(rho_loss, 2), sep = "")) +
         theme_void()
     #---Plot chromosomes
     #   Find chromosome information
@@ -126,13 +126,15 @@ plot_gainloss <- function(copynumber_sims,
         labels = chr_id,
         limits = c(0, nrow(df_plot)), expand = c(0, 0)
     ) +
-        theme(axis.text.x = element_text(size = 20))
+        theme(axis.text.x = element_text(size = 20)) +
+        theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
     p_data <- p_data + scale_x_continuous(
         breaks = chr_ticks,
         labels = chr_id,
         limits = c(0, nrow(df_plot)), expand = c(0, 0)
     ) +
-        theme(axis.text.x = element_text(size = 20))
+        theme(axis.text.x = element_text(size = 20)) +
+        theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
     #---Print the mini plots
     jpeg(filename, width = width, height = height)
     p <- grid.arrange(p_sims, arrangeGrob(p_spearman_gain, p_spearman_loss, nrow = 1), p_data, heights = c(5, 1, 5), ncol = 1)
@@ -405,7 +407,7 @@ densityPlot_MODIFIED <- function(object,
         ylab("") +
         ggtitle(main) +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-        theme(text = element_text(size = 20)) +
+        theme(text = element_text(size = 50)) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0))
 

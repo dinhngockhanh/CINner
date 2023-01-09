@@ -1,32 +1,5 @@
 ```{r setup}
-library(ggplot2)
-library(ggtree)
-library(signals)
-library(dendextend)
-library(fishplot)
-library(ctc)
-library(adephylo)
-library(data.table)
-library(HMMcopy)
-library(plyr)
-library(matrixStats)
-library(parallel)
-library(RColorBrewer)
-library(ape)
-
-library(grid)
-library(gridExtra)
-
 library(readxl)
-library(phyloTop)
-library(pbapply)
-
-library(abc)
-library(abcrf)
-
-library(reticulate)
-library(fitdistrplus)
-library(ggrepel)
 #-----------------------------------------------------------------------
 setwd("/Users/dinhngockhanh/CancerSimulator/R/")
 files_sources <- list.files(pattern = "*.r$")
@@ -78,6 +51,7 @@ rate_driver <- 0
 #-----------------------------------------------------------------------
 rate_passenger <- 1e-11
 bound_driver <- 3
+bound_maximum_CN <- 8
 bound_average_ploidy <- 4.5
 bound_homozygosity <- 10
 
@@ -116,6 +90,7 @@ model_variables <- BUILD_general_variables(
     rate_passenger = rate_passenger,
     selection_model = selection_model,
     bound_driver = bound_driver,
+    bound_maximum_CN = bound_maximum_CN,
     bound_average_ploidy = bound_average_ploidy,
     bound_homozygosity = bound_homozygosity,
     table_population_dynamics = table_population_dynamics,
