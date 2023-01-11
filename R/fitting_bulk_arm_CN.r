@@ -205,9 +205,12 @@ fitting_bulk_arm_CN <- function(model_name,
     obs_rf <- data.frame(matrix(DATA_target, nrow = 1))
     colnames(obs_rf) <- paste("gainloss_", 1:ncol(obs_rf), sep = "")
     #   Fit each parameter with ABC-rf
+    layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
+    gs <- list()
+    id <- 0
     for (para in 1:length(parameter_IDs)) {
         para_ID <- parameter_IDs[para]
-        cat(paste("ABC for parameter ", para_ID, "\n", sep = ""))
+        cat(paste("ABC for parameter ", para_ID, " [", para, "/", length(parameter_IDs), "]", "\n", sep = ""))
         #   Train the random forest
         data_rf <- cbind(all_paras[para_ID], all_data)
         colnames(data_rf)[1] <- "para"
@@ -228,7 +231,7 @@ fitting_bulk_arm_CN <- function(model_name,
         filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
         save(ABC_output, file = filename)
         #   Plot the prior, posterior and chosen best parameter
-        filename <- paste("ABC_", para_ID, ".jpeg", sep = "")
+        filename <- paste0(model_name, "_ABC_", para_ID, ".jpeg")
         jpeg(filename, width = 2000, height = 1000)
         p <- densityPlot_MODIFIED(
             model_rf, obs_rf, data_rf,
@@ -239,7 +242,27 @@ fitting_bulk_arm_CN <- function(model_name,
         )
         print(p)
         dev.off()
+        #   Plot the prior, posterior and chosen best parameter for all variables
+        id <- id + 1
+        row <- id %% 7
+        if (row == 0) row <- 7
+        col <- ceiling(id / 7)
+        layout[row, col] <- id
+        gs[[id]] <- densityPlot_MODIFIED(
+            model_rf, obs_rf, data_rf,
+            protocol = "arm",
+            fontsize = 20,
+            chosen_para = best_rf,
+            color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
+            main = para_ID
+        )
     }
+    #   Plot the prior, posterior and chosen best parameter for all variables
+    filename <- paste0(model_name, "_ABC_all.jpeg")
+    jpeg(filename, width = 3000, height = 1500)
+    p <- grid.arrange(grobs = gs, layout_matrix = layout)
+    print(p)
+    dev.off()
     # =======================================ANALYSIS OF FITTING RESULTS
     #------------------Choose the best parameter set from all posteriors
     parameters_best <- rep(0, length(parameter_IDs))

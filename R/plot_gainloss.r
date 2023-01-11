@@ -377,6 +377,7 @@ densityPlot_MODIFIED <- function(object,
                                  xlab = NULL,
                                  ylab = NULL,
                                  paral = FALSE,
+                                 fontsize = 50,
                                  ncores = if (paral) max(detectCores() - 1, 1) else 1, ...) {
     df_plot <- densityPlot_df(
         object,
@@ -407,7 +408,7 @@ densityPlot_MODIFIED <- function(object,
         ylab("") +
         ggtitle(main) +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
-        theme(text = element_text(size = 50)) +
+        theme(text = element_text(size = fontsize)) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0))
 
