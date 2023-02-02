@@ -5,6 +5,11 @@ plot_cn_heatmap <- function(model = "",
                             folder_workplace = "",
                             folder_plots = "",
                             plotcol = "",
+                            plottree = TRUE,
+                            plotfrequency = TRUE,
+                            show_legend = TRUE,
+                            show_library_label = TRUE,
+                            show_clone_label = TRUE,
                             CN_data = "TRUTH",
                             phylo = "TRUTH",
                             filename_suffix = NULL,
@@ -23,6 +28,11 @@ plot_cn_heatmap <- function(model = "",
                 folder_workplace,
                 folder_plots,
                 plotcol,
+                plottree,
+                plotfrequency,
+                show_legend,
+                show_library_label,
+                show_clone_label,
                 CN_data,
                 phylo,
                 filename_suffix,
@@ -53,6 +63,11 @@ plot_cn_heatmap <- function(model = "",
         folder_workplace <<- folder_workplace
         folder_plots <<- folder_plots
         plotcol <<- plotcol
+        plottree <<- plottree
+        plotfrequency <<- plotfrequency
+        show_legend <<- show_legend
+        show_library_label <<- show_library_label
+        show_clone_label <<- show_clone_label
         CN_data <<- CN_data
         phylo <<- phylo
         filename_suffix <<- filename_suffix
@@ -64,6 +79,11 @@ plot_cn_heatmap <- function(model = "",
             "folder_workplace",
             "folder_plots",
             "plotcol",
+            "plottree",
+            "plotfrequency",
+            "show_legend",
+            "show_library_label",
+            "show_clone_label",
             "CN_data",
             "phylo",
             "filename_suffix",
@@ -78,6 +98,11 @@ plot_cn_heatmap <- function(model = "",
                 folder_workplace,
                 folder_plots,
                 plotcol,
+                plottree,
+                plotfrequency,
+                show_legend,
+                show_library_label,
+                show_clone_label,
                 CN_data,
                 phylo,
                 filename_suffix,
@@ -89,12 +114,16 @@ plot_cn_heatmap <- function(model = "",
         stopCluster(cl)
     }
 }
-
 plot_cn_heatmap_one_simulation <- function(model,
                                            iteration,
                                            folder_workplace,
                                            folder_plots,
                                            plotcol,
+                                           plottree,
+                                           plotfrequency,
+                                           show_legend,
+                                           show_library_label,
+                                           show_clone_label,
                                            CN_data,
                                            phylo,
                                            filename_suffix,
@@ -181,9 +210,12 @@ plot_cn_heatmap_one_simulation <- function(model,
             clusters = sample_clustering,
             tree = sample_tree,
             reorderclusters = TRUE,
-            plottree = TRUE,
+            plottree = plottree,
+            plotfrequency = plotfrequency,
+            show_legend = show_legend,
+            show_library_label = show_library_label,
+            show_clone_label = show_clone_label,
             normalize_tree = FALSE,
-            plotfrequency = TRUE
         )
         print(p)
         dev.off()
@@ -197,8 +229,12 @@ plot_cn_heatmap_one_simulation <- function(model,
             clusters = sample_clustering,
             tree = sample_tree,
             reorderclusters = TRUE,
-            plottree = TRUE,
-            normalize_tree = FALSE,
+            plottree = plottree,
+            plotfrequency = plotfrequency,
+            show_legend = show_legend,
+            show_library_label = show_library_label,
+            show_clone_label = show_clone_label,
+            normalize_tree = FALSE
         )
         print(p)
         dev.off()

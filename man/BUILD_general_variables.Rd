@@ -44,6 +44,7 @@ BUILD_general_variables(
   selection_model = "",
   bound_driver = 3,
   bound_average_ploidy = 5,
+  bound_maximum_CN = Inf,
   bound_homozygosity = 0,
   SFS_totalsteps = 25,
   prob_coverage = 0.05,

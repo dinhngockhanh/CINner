@@ -21,12 +21,15 @@ simulator_full_program(
   model_readcount = FALSE,
   model_readcount_base = "all",
   pseudo_corrected_readcount = FALSE,
-  apply_HMM = FALSE,
+  HMM = FALSE,
+  HMM_containner = "docker",
+  folder_workplace = NULL,
   report_progress = TRUE,
   compute_parallel = FALSE,
   seed = Inf,
   output_variables = c(),
-  n_cores = NULL
+  n_cores = NULL,
+  R_libPaths = NULL
 )
 }
 \arguments{
@@ -58,7 +61,7 @@ simulator_full_program(
 
 \item{pseudo_corrected_readcount}{...}
 
-\item{apply_HMM}{...}
+\item{HMM}{...}
 
 \item{report_progress}{...}
 
