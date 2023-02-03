@@ -62,7 +62,7 @@ simulator_full_program <- function(model = "",
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
     if (pseudo_corrected_readcount == TRUE) {
         stage_final <- max(stage_final, 2)
-        HMM<-TRUE
+        HMM <- TRUE
     }
     if (HMM == TRUE) {
         stage_final <- max(stage_final, 2)

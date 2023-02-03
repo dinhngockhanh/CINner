@@ -3,10 +3,11 @@
 .RData
 .Ruserdata
 .DS_Store
+.tmp.driveupload
+.tmp.drivedownload
 
 scripts/hmmcopy_v0.0.45.sif
 scripts/ov2295_cell_cn.csv
-
 vignettes/.DS_Store
 vignettes/hmmcopy_v0.0.45.sif
 vignettes/ov2295_cell_cn.csv
