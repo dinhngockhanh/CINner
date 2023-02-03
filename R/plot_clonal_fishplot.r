@@ -57,6 +57,7 @@ plot_clonal_fishplot <- function(model = "",
         height <<- height
         vec_time <<- vec_time
         unit_time <<- unit_time
+        
         # plot_clonal_fishplot_one_simulation <<- plot_clonal_fishplot_one_simulation
         clusterExport(cl, varlist = c(
             "plot_clonal_fishplot_one_simulation",
