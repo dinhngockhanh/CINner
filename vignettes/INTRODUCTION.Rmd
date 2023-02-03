@@ -15,13 +15,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-The library can be installed by running the following line:
+The library can be installed by running the following line: (this only needs to be performed once)
 
 ```{r setup}
 devtools::install_github("dinhngockhanh/CancerSimulator")
 ```
 
-After installing the library once, we can then use the library with:
+We can then use the library:
 
 ```{r}
 library(CancerSimulator)
@@ -52,7 +52,7 @@ Next variables dictate the time points that each sample is taken (same unit as t
 Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80)
 ```
 
-The simulator's efficiency is based partly on its use of the tau-leaping algorithm, which simulates the evolution in fixed steps instead of the exact Gillespie algorithm. As such, it requires a suggested time step. If not specified, the time step is half of the cell lifespan. For statistical accuracy, it should not be higher. However, setting significantly low numbers for time step will lead to increased simulation run time.
+The simulator's efficiency is based partially on its use of the tau-leaping algorithm, which simulates the evolution in fixed steps instead of the exact Gillespie algorithm. As such, it requires a suggested time step. If not specified, the time step is automatically set to be half the cell lifespan. For statistical accuracy, it should not be higher. However, setting significantly low numbers for time step will lead to increased simulation run time.
 
 ```{r}
 T_tau_step <- cell_lifespan / 2
@@ -154,7 +154,7 @@ vec_cell_count <- 10000 / (1 + exp(-0.3 * (vec_time - 20)))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 ```
 
-Parameters for the sequencing noise and bias model:
+If noisy readcounts based on the cells' true CN profiles are requested, we need to also set the parameters for the sequencing noise and bias model:
 
 ```{r}
 gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
@@ -384,7 +384,7 @@ There are several options for conditioning on the simulations or requesting spec
 ```{r}
 tmp <- simulator_full_program(
     model = model_name,
-    n_simulations = 1,
+    n_simulations = 10,
     save_cn_profile = TRUE,
     save_cn_clones = TRUE,
     internal_nodes_cn_info = TRUE,
@@ -397,6 +397,7 @@ A variety of plots from the simulation:
 
 ```{r}
 plot_all(model = model_name,
-    n_simulations = 1
+    n_simulations = 10,
+    compute_parallel = FALSE
 )
 ```
