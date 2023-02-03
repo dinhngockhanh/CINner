@@ -15,10 +15,12 @@ SIMULATOR_FULL_PHASE_1_genotype_comparison <- function(genotype_1, genotype_2) {
     ploidy_block_2 <- genotype_list_ploidy_block[[genotype_2]]
     for (chrom in 1:N_chromosomes) {
         chrom_ploidy <- ploidy_chrom_1[chrom]
-        for (strand in 1:chrom_ploidy) {
-            if (any(ploidy_block_1[[chrom]][[strand]] != ploidy_block_2[[chrom]][[strand]])) {
-                output <- 0
-                return(output)
+        if (chrom_ploidy>0){
+            for (strand in 1:chrom_ploidy) {
+                if (any(ploidy_block_1[[chrom]][[strand]] != ploidy_block_2[[chrom]][[strand]])) {
+                    output <- 0
+                    return(output)
+                }
             }
         }
     }
@@ -27,15 +29,17 @@ SIMULATOR_FULL_PHASE_1_genotype_comparison <- function(genotype_1, genotype_2) {
     ploidy_allele_2 <- genotype_list_ploidy_allele[[genotype_2]]
     for (chrom in 1:N_chromosomes) {
         chrom_ploidy <- ploidy_chrom_1[chrom]
-        for (strand in 1:chrom_ploidy) {
-            if ((nrow(ploidy_allele_1[[chrom]][[strand]]) != nrow(ploidy_allele_2[[chrom]][[strand]])) || (ncol(ploidy_allele_1[[chrom]][[strand]]) != ncol(ploidy_allele_2[[chrom]][[strand]]))) {
-                output <- 0
-                return(output)
-            }
-            if (any(ploidy_allele_1[[chrom]][[strand]] != ploidy_allele_2[[chrom]][[strand]])) {
-                output <- 0
-                return(output)
-            }
+        if (chrom_ploidy>0){
+            for (strand in 1:chrom_ploidy) {
+                if ((nrow(ploidy_allele_1[[chrom]][[strand]]) != nrow(ploidy_allele_2[[chrom]][[strand]])) || (ncol(ploidy_allele_1[[chrom]][[strand]]) != ncol(ploidy_allele_2[[chrom]][[strand]]))) {
+                    output <- 0
+                    return(output)
+                }
+                if (any(ploidy_allele_1[[chrom]][[strand]] != ploidy_allele_2[[chrom]][[strand]])) {
+                    output <- 0
+                    return(output)
+                }
+            }   
         }
     }
     #--------------------------------------------------Compare driver counts

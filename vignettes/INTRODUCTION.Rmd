@@ -15,35 +15,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-The library can be installed and loaded by running:
+The library can be installed by running the following line:
 
 ```{r setup}
-# install.packages("BiocManager")
-# install.packages("devtools")
 devtools::install_github("dinhngockhanh/CancerSimulator")
+```
 
+After installing the library once, we can then use the library with:
 
-
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-########################################################################
-
-
-
+```{r setup}
 library(CancerSimulator)
 ```
 
@@ -315,6 +295,7 @@ On the other hand, for an Oncogene:
 The selective increases or decreases resulting from gain/loss or mutation of a gene (making the cell more advantageous or deleterious) depend on how far its selection rate is from 1.
 
 ```{r}
+library(readxl)
 driver_gene_list <- read_excel("HGSOC_driver_genes.xlsx")
 gene_id <- driver_gene_list$Gene_ID
 gene_role <- driver_gene_list$Gene_role
@@ -379,7 +360,7 @@ There are several options for conditioning on the simulations or requesting spec
 - `n_cores`: Number of computer CPUs to use to produce simulations in parallel (therefore only applied when `compute_parallel`=`TRUE`). If `n_cores` is not specified when `compute_parallel`=`TRUE`, the algorithm uses all available CPU cores except one.
 - `seed`: Seed to produce replicable stochastic simulations. Only applicable when `compute_parallel`=`FALSE`.
 - `report_progress`: The simulator prints updates of the progress if set to `TRUE`.
-- `save_simulation`: All output variables from each simulation are saved in separate `rda` files if set to `TRUE`.
+- `save_simulation`: All output variables from each simulation are saved in separate `rda` files if set to `TRUE`. Default is `TRUE`.
 - `output_variables`: Vector of specific output variables from each simulation to return in the list format in R. Default is `NULL`, in which case no variable is returned.
 - `folder_workplace`: Name of folder in the current directory to store output files from the simulations. If the folder does not exist, it will be created. Default is `NULL`, in which case files are saved within the current directory.
 - `R_libPaths`: Name of folder where required R libraries are stored. Default is `NULL`, in which case the simulator assumes relevent R libraries are automatically usable.
@@ -404,15 +385,9 @@ There are several options for conditioning on the simulations or requesting spec
 tmp <- simulator_full_program(
     model = model_name,
     n_simulations = 1,
-    save_simulation = TRUE,
-    internal_nodes_cn_info = TRUE,
-    save_newick_tree = TRUE,
     save_cn_profile = TRUE,
     save_cn_clones = TRUE,
-    model_readcount = TRUE,
-    format_cn_profile = "both",
-    apply_HMM = FALSE,
-    apply_UMAP_on_HMM = FALSE,
+    internal_nodes_cn_info = TRUE,
     report_progress = TRUE,
     seed = 10
 )
@@ -421,5 +396,7 @@ tmp <- simulator_full_program(
 A variety of plots from the simulation:
 
 ```{r}
-plot_all(model = model_name,n_simulations = n_simulations)
+plot_all(model = model_name,
+    n_simulations = 1
+)
 ```
