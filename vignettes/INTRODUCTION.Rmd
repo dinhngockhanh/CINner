@@ -20,7 +20,7 @@ The library can be installed and loaded by running:
 ```{r setup}
 # install.packages("BiocManager")
 # install.packages("devtools")
-# devtools::install_github("dinhngockhanh/CancerSimulator")
+devtools::install_github("dinhngockhanh/CancerSimulator")
 
 
 
@@ -31,9 +31,9 @@ The library can be installed and loaded by running:
 ########################################################################
 ########################################################################
 ########################################################################
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 ########################################################################
 ########################################################################
 ########################################################################
