@@ -43,7 +43,7 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     cell_lifespan = 4,
                                     T_0 = list(0, "year"),
                                     T_end = list(100, "year"),
-                                    T_tau_step = 3,
+                                    T_tau_step = Inf,
                                     Table_sample = data.frame(),
                                     table_population_dynamics = matrix(0, ncol = 2, nrow = 2),
                                     Population_end = Inf,
@@ -64,15 +64,21 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     prob_neutral_CN_cnloh_interstitial = 0,
                                     prob_neutral_CN_cnloh_terminal = 0,
                                     model_CN_focal_amplification_length = "geom",
-                                    model_CN_focal_deletion_length = "geom",
+                                    prob_CN_focal_amplification_length = 0.1,
                                     prob_CN_focal_amplification_length_shape_1 = 0,
                                     prob_CN_focal_amplification_length_shape_2 = 0,
+                                    model_CN_focal_deletion_length = "geom",
                                     prob_CN_focal_deletion_length_shape_1 = 0,
                                     prob_CN_focal_deletion_length_shape_2 = 0,
-                                    prob_CN_focal_amplification_length = 0.1,
                                     prob_CN_focal_deletion_length = 0.1,
+                                    model_CN_cnloh_interstitial_length = "geom",
                                     prob_CN_cnloh_interstitial_length = 0.1,
+                                    prob_CN_cnloh_interstitial_length_shape_1 = 0,
+                                    prob_CN_cnloh_interstitial_length_shape_2 = 0,
+                                    model_CN_cnloh_terminal_length = "geom",
                                     prob_CN_cnloh_terminal_length = 0.1,
+                                    prob_CN_cnloh_terminal_length_shape_1 = 0,
+                                    prob_CN_cnloh_terminal_length_shape_2 = 0,
                                     rate_driver = 0,
                                     rate_passenger = 0,
                                     selection_model = "",
@@ -145,6 +151,9 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("T_end_time", T_end_time, "day", "Age when simulation stops (for internal use)")
     #   Set up the time step for tau-leaping algorithm
     N_row <- N_row + 1
+    if (T_tau_step == Inf) {
+        T_tau_step <- cell_lifespan / 2
+    }
     TABLE_VARIABLES[N_row, ] <- c("T_tau_step", T_tau_step, "day", "Time step for tau-leaping algorithm for simulation")
     #   Set up condition to end simulation prematurely based on population size or event count
     N_row <- N_row + 1
@@ -211,9 +220,27 @@ BUILD_general_variables <- function(model_name = "MODEL",
         TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion_length_shape_2", prob_CN_focal_deletion_length_shape_2, "", "Beta parameter shape 2 for the block length of a focal deletion event")
     }
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial_length", prob_CN_cnloh_interstitial_length, "", "Geometric parameter for the block length of an interstitial CN-LOH event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_cnloh_interstitial_length", model_CN_cnloh_interstitial_length, "", "Choice of distribution for the block length of an interstitial CN-LOH event")
+    if (model_CN_cnloh_interstitial_length == "geom") {
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial_length", prob_CN_cnloh_interstitial_length, "", "Geometric parameter for the block length of an interstitial CN-LOH event")
+    } else if (model_CN_cnloh_interstitial_length == "beta") {
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial_length_shape_1", prob_CN_cnloh_interstitial_length_shape_1, "", "Beta parameter shape 1 for the block length of an interstitial CN-LOH event")
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial_length_shape_2", prob_CN_cnloh_interstitial_length_shape_2, "", "Beta parameter shape 2 for the block length of an interstitial CN-LOH event")
+    }
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal_length", prob_CN_cnloh_terminal_length, "", "Geometric parameter for the block length of a terminal CN-LOH event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_cnloh_terminal_length", model_CN_cnloh_terminal_length, "", "Choice of distribution for the block length of a terminal CN-LOH event")
+    if (model_CN_cnloh_terminal_length == "geom") {
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal_length", prob_CN_cnloh_terminal_length, "", "Geometric parameter for the block length of a terminal CN-LOH event")
+    } else if (model_CN_cnloh_terminal_length == "beta") {
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal_length_shape_1", prob_CN_cnloh_terminal_length_shape_1, "", "Beta parameter shape 1 for the block length of a terminal CN-LOH event")
+        N_row <- N_row + 1
+        TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal_length_shape_2", prob_CN_cnloh_terminal_length_shape_2, "", "Beta parameter shape 2 for the block length of a terminal CN-LOH event")
+    }
     #   Set up mutation rates
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("rate_driver", rate_driver, "per bp per cell division", "Poisson rate of getting new driver mutations")

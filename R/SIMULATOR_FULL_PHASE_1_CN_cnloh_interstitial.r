@@ -48,10 +48,13 @@ SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial <- function(genotype_to_react,
                 }
             }
             #       Choose the length of the interstitial CN-LOH
-            # cnloh_length <- min(max_length, 1 + rgeom(n = 1, prob_CN_cnloh_interstitial_length))
             cnloh_length <- max_length + 1
-            while (cnloh_length > max_length) {
-                cnloh_length <- 1 + rgeom(n = 1, prob_CN_cnloh_interstitial_length)
+            while ((cnloh_length > max_length) | (cnloh_length <= 0)) {
+                if (model_CN_cnloh_interstitial_length == "geom") {
+                    cnloh_length <- rgeom(n = 1, prob_CN_cnloh_interstitial_length)
+                } else if (model_CN_cnloh_interstitial_length == "beta") {
+                    cnloh_length <- round(rbeta(n = 1, prob_CN_cnloh_interstitial_length_shape_1, prob_CN_cnloh_interstitial_length_shape_2) * max_length)
+                }
             }
             #       Choose the region to harbor the interstitial CN-LOH
             block_start <- (chrom_arm - 1) * centromere + sample.int(max_length - cnloh_length + 1, size = 1)

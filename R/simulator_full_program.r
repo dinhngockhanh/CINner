@@ -23,7 +23,7 @@ simulator_full_program <- function(model = "",
                                    model_prefix = "",
                                    n_simulations = 0,
                                    stage_final = 1,
-                                   n_clones_min = 0,
+                                   n_clones_min = 1,
                                    n_clones_max = Inf,
                                    save_simulation = TRUE,
                                    neutral_variations = FALSE,
@@ -60,15 +60,18 @@ simulator_full_program <- function(model = "",
         folder_workplace <- paste(folder_workplace, "/", sep = "")
     }
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
-    if (HMM == TRUE) {
-        model_readcount <- TRUE
+    if (pseudo_corrected_readcount == TRUE) {
         stage_final <- max(stage_final, 2)
+        HMM<-TRUE
+    }
+    if (HMM == TRUE) {
+        stage_final <- max(stage_final, 2)
+        model_readcount <- TRUE
         save_simulation <- TRUE
     }
     if (save_cn_profile == TRUE) stage_final <- max(stage_final, 2)
     if (save_cn_clones == TRUE) stage_final <- max(stage_final, 2)
     if (model_readcount == TRUE) stage_final <- max(stage_final, 2)
-    if (pseudo_corrected_readcount == TRUE) stage_final <- max(stage_final, 2)
 
     if (internal_nodes_cn_info == TRUE) stage_final <- max(stage_final, 3)
     if (save_newick_tree == TRUE) stage_final <- max(stage_final, 3)
