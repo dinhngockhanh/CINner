@@ -23,7 +23,7 @@ devtools::install_github("dinhngockhanh/CancerSimulator")
 
 After installing the library once, we can then use the library with:
 
-```{r setup}
+```{r}
 library(CancerSimulator)
 ```
 

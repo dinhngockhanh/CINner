@@ -30,6 +30,7 @@ plot_clonal_fishplot <- function(model = "",
         }
     } else {
         #-------------------------Plot clonal evolution in parallel mode
+        library(parallel)
         library(pbapply)
         #   Start parallel cluster
         if (is.null(n_cores)) {

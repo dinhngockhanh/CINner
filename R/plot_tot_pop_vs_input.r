@@ -28,6 +28,7 @@ plot_tot_pop_vs_input <- function(model = "",
         }
     } else {
         #--------------------Plot total population size in parallel mode
+        library(parallel)
         library(pbapply)
         #   Start parallel cluster
         if (is.null(n_cores)) {

@@ -28,6 +28,7 @@ plot_average_ploidy <- function(model = "",
         }
     } else {
         #---------------------------Plot average ploidy in parallel mode
+        library(parallel)
         library(pbapply)
         #   Start parallel cluster
         if (is.null(n_cores)) {
