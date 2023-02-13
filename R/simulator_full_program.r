@@ -1,6 +1,6 @@
 #' Produce simulations and outputs files as requested by user
 #'
-#' @param model ...
+#' @param model_tmp ...
 #' @param n_simulations ...
 #' @param stage_final ...
 #' @param n_clones_min ...
@@ -47,17 +47,22 @@ simulator_full_program <- function(model = "",
     library(data.table)
     library(ape)
     library(ctc)
-    if (class(model) == "character") {
-        model_parameters <- model
-        model_prefix <- model
-    } else if (class(model) == "list") {
-        model_parameters <- model
+
+    model_tmp <- model
+    model_prefix_tmp <- model_prefix
+    folder_workplace_tmp <- folder_workplace
+
+    if (class(model_tmp) == "character") {
+        model_parameters <- model_tmp
+        model_prefix_tmp <- model_tmp
+    } else if (class(model_tmp) == "list") {
+        model_parameters <- model_tmp
     }
-    if (is.null(folder_workplace)) {
-        folder_workplace <- ""
+    if (is.null(folder_workplace_tmp)) {
+        folder_workplace_tmp <- ""
     } else {
-        dir.create(folder_workplace)
-        folder_workplace <- paste(folder_workplace, "/", sep = "")
+        dir.create(folder_workplace_tmp)
+        folder_workplace_tmp <- paste(folder_workplace_tmp, "/", sep = "")
     }
     # ==================================OVERRIDE PARAMETERS IF NECESSARY
     if (pseudo_corrected_readcount == TRUE) {
@@ -79,13 +84,13 @@ simulator_full_program <- function(model = "",
     if (neutral_variations == TRUE) stage_final <- max(stage_final, 4)
     # ============PREPARE WORKSPACE DIRECTORY AND IMPORT NECESSARY FILES
     if (HMM == TRUE) {
-        dir.create(model_prefix)
+        dir.create(model_prefix_tmp)
         if (HMM_containner == "singularity") {
             if (file.exists("hmmcopy_v0.0.45.sif") == FALSE) {
                 cat("INSTALLING SINGULARITY FOR HMMCOPY-V0.0.45...\n")
                 system("singularity pull docker://quay.io/mondrianscwgs/hmmcopy:v0.0.45")
             }
-            file.copy("hmmcopy_v0.0.45.sif", paste(model_prefix, "/hmmcopy_v0.0.45.sif", sep = ""))
+            file.copy("hmmcopy_v0.0.45.sif", paste(model_prefix_tmp, "/hmmcopy_v0.0.45.sif", sep = ""))
         } else if (HMM_containner == "docker") {
             system("docker pull quay.io/mondrianscwgs/hmmcopy:v0.0.45")
         }
@@ -107,7 +112,7 @@ simulator_full_program <- function(model = "",
             many_sims[[iteration]] <- one_simulation(
                 iteration,
                 model_parameters,
-                model_prefix,
+                model_prefix_tmp,
                 stage_final,
                 n_clones_min,
                 n_clones_max,
@@ -123,7 +128,7 @@ simulator_full_program <- function(model = "",
                 pseudo_corrected_readcount,
                 HMM,
                 HMM_containner,
-                folder_workplace,
+                folder_workplace_tmp,
                 report_progress,
                 output_variables
             )
@@ -152,7 +157,7 @@ simulator_full_program <- function(model = "",
         clusterEvalQ(cl = cl, library(ctc))
         #   Prepare input parameters for CancerSimulator
         model_parameters <<- model_parameters
-        model_prefix <<- model_prefix
+        model_prefix_tmp <<- model_prefix_tmp
         stage_final <<- stage_final
         n_clones_min <<- n_clones_min
         n_clones_max <<- n_clones_max
@@ -168,12 +173,12 @@ simulator_full_program <- function(model = "",
         pseudo_corrected_readcount <<- pseudo_corrected_readcount
         HMM <<- HMM
         HMM_containner <<- HMM_containner
-        folder_workplace <<- folder_workplace
+        folder_workplace_tmp <<- folder_workplace_tmp
         report_progress <<- report_progress
         output_variables <<- output_variables
         clusterExport(cl, varlist = c(
             "model_parameters",
-            "model_prefix",
+            "model_prefix_tmp",
             "stage_final",
             "n_clones_min",
             "n_clones_max",
@@ -189,7 +194,7 @@ simulator_full_program <- function(model = "",
             "pseudo_corrected_readcount",
             "HMM",
             "HMM_containner",
-            "folder_workplace",
+            "folder_workplace_tmp",
             "report_progress",
             "one_simulation",
             "output_variables",
@@ -213,7 +218,7 @@ simulator_full_program <- function(model = "",
                 one_sim <- one_simulation(
                     iteration,
                     model_parameters,
-                    model_prefix,
+                    model_prefix_tmp,
                     stage_final,
                     n_clones_min,
                     n_clones_max,
@@ -229,7 +234,7 @@ simulator_full_program <- function(model = "",
                     pseudo_corrected_readcount,
                     HMM,
                     HMM_containner,
-                    folder_workplace,
+                    folder_workplace_tmp,
                     report_progress,
                     output_variables
                 )
@@ -240,7 +245,7 @@ simulator_full_program <- function(model = "",
                 one_sim <- one_simulation(
                     iteration,
                     model_parameters,
-                    model_prefix,
+                    model_prefix_tmp,
                     stage_final,
                     n_clones_min,
                     n_clones_max,
@@ -256,7 +261,7 @@ simulator_full_program <- function(model = "",
                     pseudo_corrected_readcount,
                     HMM,
                     HMM_containner,
-                    folder_workplace,
+                    folder_workplace_tmp,
                     report_progress,
                     output_variables
                 )
@@ -273,7 +278,7 @@ simulator_full_program <- function(model = "",
 #' @export
 one_simulation <- function(iteration,
                            model_parameters,
-                           model_prefix,
+                           model_prefix_tmp,
                            stage_final,
                            n_clones_min,
                            n_clones_max,
@@ -289,7 +294,7 @@ one_simulation <- function(iteration,
                            pseudo_corrected_readcount,
                            HMM,
                            HMM_containner,
-                           folder_workplace,
+                           folder_workplace_tmp,
                            report_progress,
                            output_variables) {
     # =============================================LOAD MODEL PARAMETERS
@@ -403,7 +408,7 @@ one_simulation <- function(iteration,
         noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
         for (cell in 1:length(sample_cell_ID)) {
             cell_ID <- sample_cell_ID[cell]
-            filename <- paste(model_prefix, "/", model_prefix, "_noisy_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
+            filename <- paste(model_prefix_tmp, "/", model_prefix_tmp, "_noisy_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
             p0_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
         }
     }
@@ -414,7 +419,7 @@ one_simulation <- function(iteration,
         noisy_cn_profiles_long <- simulation$neutral_variations$sample$noisy_cn_profiles_long
         for (cell in 1:length(sample_cell_ID)) {
             cell_ID <- sample_cell_ID[cell]
-            filename <- paste(model_prefix, "/", model_prefix, "_noisy_neuvar_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
+            filename <- paste(model_prefix_tmp, "/", model_prefix_tmp, "_noisy_neuvar_cn_profiles_long_", iteration, "_", cell_ID, ".wig", sep = "")
             p0_write_cn_as_wig(filename, noisy_cn_profiles_long, cell_ID)
         }
     }
@@ -422,16 +427,16 @@ one_simulation <- function(iteration,
     if (HMM == TRUE) {
         if (report_progress == TRUE) cat("Run HMMcopy on noisy CN profiles of all bases...\n")
         #   Run HMMcopy for each individual cell
-        p0_write_gc_map_as_wig(filename_gc = paste(model_prefix, "/", model_prefix, "_gc_", iteration, ".wig", sep = ""), filename_map = paste(model_prefix, "/", model_prefix, "_map_", iteration, ".wig", sep = ""))
+        p0_write_gc_map_as_wig(filename_gc = paste(model_prefix_tmp, "/", model_prefix_tmp, "_gc_", iteration, ".wig", sep = ""), filename_map = paste(model_prefix_tmp, "/", model_prefix_tmp, "_map_", iteration, ".wig", sep = ""))
         if (HMM_containner == "singularity") {
-            system(paste("sh hmmcopy_singularity.sh ", model_prefix, " ", iteration, sep = ""))
+            system(paste("sh hmmcopy_singularity.sh ", model_prefix_tmp, " ", iteration, sep = ""))
         } else if (HMM_containner == "docker") {
-            system(paste("sh hmmcopy_docker.sh ", model_prefix, " ", iteration, sep = ""))
+            system(paste("sh hmmcopy_docker.sh ", model_prefix_tmp, " ", iteration, sep = ""))
         }
         #   Update the simulation with HMMcopy inferences
         simulation <- p0_append_with_hmm(
             simulation = simulation,
-            model = model_prefix,
+            model_tmp = model_prefix_tmp,
             iteration = iteration,
             pseudo_corrected_readcount = pseudo_corrected_readcount,
             model_readcount_base = model_readcount_base
@@ -441,30 +446,30 @@ one_simulation <- function(iteration,
     #----------------------------------------Save the simulation package
     if (save_simulation == TRUE) {
         if (report_progress == TRUE) cat("Save simulation package...\n")
-        save(simulation, file = paste(folder_workplace, model_prefix, "_simulation_", iteration, ".rda", sep = ""))
+        save(simulation, file = paste(folder_workplace_tmp, model_prefix_tmp, "_simulation_", iteration, ".rda", sep = ""))
     }
     #---------------------------Save the clonal identities of every cell
     if (save_cn_clones == TRUE) {
         if (report_progress == TRUE) cat("Save table of cell-clone mapping...\n")
         table_cell_clone <- simulation$sample$table_cell_clone
-        filename <- paste(folder_workplace, model_prefix, "_cn_profiles_clonal_mapping_", iteration, ".csv", sep = "")
+        filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_clonal_mapping_", iteration, ".csv", sep = "")
         write.csv(table_cell_clone, filename, row.names = FALSE)
     }
     #----------------------Save the table of CN events in cell phylogeny
     if (internal_nodes_cn_info == TRUE) {
         if (report_progress == TRUE) cat("Save table of CN events in cell phylogeny...\n")
         hclust_CN_events <- simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events
-        filename <- paste(folder_workplace, model_prefix, "_cn_events_", iteration, ".csv", sep = "")
+        filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_events_", iteration, ".csv", sep = "")
         write.csv(hclust_CN_events, filename, row.names = FALSE)
     }
     #-----------------------------Save the sampled cells' phylogeny tree
     if (save_newick_tree == TRUE) {
         if (report_progress == TRUE) cat("Save sampled cells' phylogeny in Newick format...\n")
         cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
-        filename <- paste(folder_workplace, model_prefix, "_cell_phylogeny_", iteration, ".newick", sep = "")
+        filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cell_phylogeny_", iteration, ".newick", sep = "")
         write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
         clone_phylogeny_hclust <- simulation$sample_phylogeny$clone_phylogeny_hclust
-        filename <- paste(folder_workplace, model_prefix, "_clone_phylogeny_", iteration, ".newick", sep = "")
+        filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_clone_phylogeny_", iteration, ".newick", sep = "")
         write(hc2Newick(clone_phylogeny_hclust), file = filename)
     }
     #---------------------------------------Save the sampled CN profiles
@@ -472,13 +477,13 @@ one_simulation <- function(iteration,
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save true CN profiles in long format...\n")
             cn_profiles_long <- simulation$sample$cn_profiles_long
-            filename <- paste(folder_workplace, model_prefix, "_cn_profiles_long_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_long_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_long, filename, row.names = FALSE)
         }
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save true CN profiles in wide format...\n")
             cn_profiles_wide <- simulation$sample$cn_profiles_wide
-            filename <- paste(folder_workplace, model_prefix, "_cn_profiles_wide_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_wide_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_wide, filename, row.names = FALSE)
         }
     }
@@ -487,13 +492,13 @@ one_simulation <- function(iteration,
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save true CN profiles in long format...\n")
             cn_profiles_long <- simulation$neutral_variations$sample$cn_profiles_long
-            filename <- paste(folder_workplace, model_prefix, "_cn_profiles_long_neuvar_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_long_neuvar_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_long, filename, row.names = FALSE)
         }
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save true CN profiles in wide format...\n")
             cn_profiles_wide <- simulation$neutral_variations$sample$cn_profiles_wide
-            filename <- paste(folder_workplace, model_prefix, "_cn_profiles_wide_neuvar_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_wide_neuvar_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_wide, filename, row.names = FALSE)
         }
     }
@@ -502,13 +507,13 @@ one_simulation <- function(iteration,
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save noisy CN profiles (base=truth) in long format...\n")
             noisy_cn_profiles_long <- simulation$sample$noisy_cn_profiles_long
-            filename <- paste(folder_workplace, model_prefix, "_noisy_cn_profiles_long_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_noisy_cn_profiles_long_", iteration, ".csv", sep = "")
             write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
         }
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save noisy CN profiles (base=truth) in wide format...\n")
             noisy_cn_profiles_wide <- simulation$sample$noisy_cn_profiles_wide
-            filename <- paste(folder_workplace, model_prefix, "_noisy_cn_profiles_wide_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_noisy_cn_profiles_wide_", iteration, ".csv", sep = "")
             write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
         }
     }
@@ -517,13 +522,13 @@ one_simulation <- function(iteration,
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save noisy CN profiles (base=neuvar) in long format...\n")
             noisy_cn_profiles_long <- simulation$neutral_variations$sample$noisy_cn_profiles_long
-            filename <- paste(folder_workplace, model_prefix, "_noisy_neuvar_cn_profiles_long_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_noisy_neuvar_cn_profiles_long_", iteration, ".csv", sep = "")
             write.csv(noisy_cn_profiles_long, filename, row.names = FALSE)
         }
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save noisy CN profiles (base=neuvar) in wide format...\n")
             noisy_cn_profiles_wide <- simulation$neutral_variations$sample$noisy_cn_profiles_wide
-            filename <- paste(folder_workplace, model_prefix, "_noisy_neuvar_cn_profiles_wide_", iteration, ".csv", sep = "")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_noisy_neuvar_cn_profiles_wide_", iteration, ".csv", sep = "")
             write.csv(noisy_cn_profiles_wide, filename, row.names = FALSE)
         }
     }

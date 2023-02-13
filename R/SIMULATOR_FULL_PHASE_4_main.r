@@ -1,3 +1,4 @@
+#' @export
 SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample, package_sample_phylogeny, report_progress) {
     #-----------------------------------------------Input CN event rates
     prob_CN_WGD <- prob_neutral_CN_whole_genome_duplication

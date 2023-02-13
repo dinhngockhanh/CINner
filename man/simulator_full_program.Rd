@@ -9,7 +9,7 @@ simulator_full_program(
   model_prefix = "",
   n_simulations = 0,
   stage_final = 1,
-  n_clones_min = 0,
+  n_clones_min = 1,
   n_clones_max = Inf,
   save_simulation = TRUE,
   neutral_variations = FALSE,
@@ -33,8 +33,6 @@ simulator_full_program(
 )
 }
 \arguments{
-\item{model}{...}
-
 \item{n_simulations}{...}
 
 \item{stage_final}{...}
@@ -68,6 +66,8 @@ simulator_full_program(
 \item{compute_parallel}{...}
 
 \item{seed}{...}
+
+\item{model_tmp}{...}
 }
 \description{
 Produce simulations and outputs files as requested by user

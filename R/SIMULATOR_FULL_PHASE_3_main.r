@@ -499,20 +499,29 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     phylogeny_phylo <- ape::as.phylo(phylogeny_hclust, use.labels = TRUE)
     hclust_height <- hclust_height / 2
     #---------Adjust the leaf lengths in phylo according to sample times
-    for (leaf in 1:length(phylogeny_phylo$tip.label)) {
-        #   Find the sample time for this leaf
-        sample_id <- strsplit(phylogeny_phylo$tip.label[leaf], "-")[[1]][1]
-        T_sample <- Table_sampling$Age_sample[which(Table_sampling$Sample_ID == sample_id)]
-        #   Find the location of leaf merging in phylo
-        leaf_row <- 0
-        for (row in 1:nrow(phylogeny_phylo$edge)) {
-            if (phylogeny_phylo$edge[row, 1] == leaf | phylogeny_phylo$edge[row, 2] == leaf) {
-                leaf_row <- row
-            }
-        }
-        #   Substract the duration from length of leaf merging in phylo
-        phylogeny_phylo$edge.length[leaf_row] <- phylogeny_phylo$edge.length[leaf_row] - (T_final - T_sample)
-    }
+    #   Find the sample time for all leaves
+    vec_sample_id <- sub("-.*", "", phylogeny_phylo$tip.label)
+    vec_T_sample <- Table_sampling$Age_sample[match(vec_sample_id, Table_sampling$Sample_ID)]
+    #   Find the location of leaf mergings in phylo
+    vec_leaf_row <- match(1:length(phylogeny_phylo$tip.label), phylogeny_phylo$edge[, 1])
+    vec_leaf_row_2 <- match(1:length(phylogeny_phylo$tip.label), phylogeny_phylo$edge[, 2])
+    vec_leaf_row[which(is.na(vec_leaf_row))] <- vec_leaf_row_2[which(is.na(vec_leaf_row))]
+    #   Substract the duration from length of leaf mergings in phylo
+    phylogeny_phylo$edge.length[vec_leaf_row] <- phylogeny_phylo$edge.length[vec_leaf_row] - (T_final - vec_T_sample)
+    # for (leaf in 1:length(phylogeny_phylo$tip.label)) {
+    #     #   Find the sample time for this leaf
+    #     sample_id <- strsplit(phylogeny_phylo$tip.label[leaf], "-")[[1]][1]
+    #     T_sample <- Table_sampling$Age_sample[which(Table_sampling$Sample_ID == sample_id)]
+    #     #   Find the location of leaf merging in phylo
+    #     leaf_row <- 0
+    #     for (row in 1:nrow(phylogeny_phylo$edge)) {
+    #         if (phylogeny_phylo$edge[row, 1] == leaf | phylogeny_phylo$edge[row, 2] == leaf) {
+    #             leaf_row <- row
+    #         }
+    #     }
+    #     #   Substract the duration from length of leaf merging in phylo
+    #     phylogeny_phylo$edge.length[leaf_row] <- phylogeny_phylo$edge.length[leaf_row] - (T_final - T_sample)
+    # }
     #   Create object containing both phylo-style tree and clustering
     phylogeny_clustering_truth <- list()
     phylogeny_clustering_truth$tree <- phylogeny_phylo
