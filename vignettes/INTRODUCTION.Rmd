@@ -389,7 +389,8 @@ tmp <- simulator_full_program(
     save_cn_clones = TRUE,
     internal_nodes_cn_info = TRUE,
     report_progress = TRUE,
-    seed = 10
+    seed = 10,
+    compute_parallel = TRUE
 )
 ```
 
