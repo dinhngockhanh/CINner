@@ -345,129 +345,129 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         evolution_traj_clonal_ID[[evolution_traj_count]] <- clonal_ID_current
         evolution_traj_population[[evolution_traj_count]] <- clonal_population_current
         evolution_traj_divisions[[evolution_traj_count - 1]] <- mat_divisions
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        # get_ploidy <- function(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
-        #     vec_CN_all <- c()
-        #     for (chrom in 1:N_chromosomes) {
-        #         vec_CN <- rep(0, vec_CN_block_no[chrom])
-        #         no_strands <- ploidy_chrom[chrom]
-        #         if (no_strands > 0) {
-        #             for (strand in 1:no_strands) {
-        #                 vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # # get_ploidy <- function(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
+        # #     vec_CN_all <- c()
+        # #     for (chrom in 1:N_chromosomes) {
+        # #         vec_CN <- rep(0, vec_CN_block_no[chrom])
+        # #         no_strands <- ploidy_chrom[chrom]
+        # #         if (no_strands > 0) {
+        # #             for (strand in 1:no_strands) {
+        # #                 vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
+        # #             }
+        # #         }
+        # #         vec_CN_all <- c(vec_CN_all, vec_CN)
+        # #     }
+        # #     ploidy <- round(mean(vec_CN_all))
+        # #     return(ploidy)
+        # # }
+        # TMP <<- TMP + 1
+        # if ((TMP %% 50) == 0) {
+        #     # clonal_ploidy_current <- rep(0, length(clonal_ID_current))
+        #     clonal_WGD_status <- rep(0, length(clonal_ID_current))
+        #     for (i in 1:length(clonal_ID_current)) {
+        #         # driver_count <- genotype_list_driver_count[clonal_ID_current[i]]
+        #         # driver_map <- genotype_list_driver_map[[clonal_ID_current[i]]]
+        #         # ploidy_chrom <- genotype_list_ploidy_chrom[[clonal_ID_current[i]]]
+        #         # ploidy_block <- genotype_list_ploidy_block[[clonal_ID_current[i]]]
+        #         # ploidy_allele <- genotype_list_ploidy_allele[[clonal_ID_current[i]]]
+        #         # clonal_ploidy_current[i] <- get_ploidy(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
+        #         WGD_status <- 0
+        #         clone <- clonal_ID_current[i]
+        #         while (clone > 0) {
+        #             # print(evolution_genotype_changes[[clone]])
+        #             if (length(evolution_genotype_changes[[clone]]) > 0) {
+        #                 for (j in 1:length(evolution_genotype_changes[[clone]])) {
+        #                     if (evolution_genotype_changes[[clone]][[j]][1] == "whole-genome-duplication") WGD_status <- 1
+        #                 }
         #             }
+        #             clone <- evolution_origin[clone]
         #         }
-        #         vec_CN_all <- c(vec_CN_all, vec_CN)
+        #         clonal_WGD_status[i] <- WGD_status
         #     }
-        #     ploidy <- round(mean(vec_CN_all))
-        #     return(ploidy)
+        #     clonal_fitness_current <- genotype_list_selection_rate[clonal_ID_current] / genotype_list_selection_rate[1]
+        #     # tmp <- sort(clonal_ploidy_current, index.return = TRUE)
+        #     # clonal_ploidy_current <- tmp$x
+        #     # clonal_fitness_current <- clonal_fitness_current[tmp$ix]
+        #     cat("\n\n\n\n\n\n\n")
+        #     # cat("--------------------------------------------------\n")
+        #     # print(clonal_WGD_status)
+        #     # cat("--------------------------------------------------\n")
+        #     # for (i in 1:length(clonal_ID_current)) {
+        #     #     cat(paste0("ploidy = ", clonal_ploidy_current[i], " ---> fitness ratio = ", clonal_fitness_current[i], "\n"))
+        #     # }
+        #     cat("==============================================================================================================\n")
+        #     cat("----------------------------------------------------------------------------   AVERAGES BY WGD STATUS:\n")
+        #     mean_fitness_non_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 0)] * clonal_fitness_current[which(clonal_WGD_status == 0)]) / sum(clonal_population_current[which(clonal_WGD_status == 0)])
+        #     pop_non_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 0)])
+        #     cat(paste0("non-WGD cells ---> mean fitness ratio = ", mean_fitness_non_WGD, " & population = ", pop_non_WGD, "\n"))
+        #     mean_fitness_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 1)] * clonal_fitness_current[which(clonal_WGD_status == 1)]) / sum(clonal_population_current[which(clonal_WGD_status == 1)])
+        #     pop_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 1)])
+        #     cat(paste0("WGD cells ---> mean fitness ratio = ", mean_fitness_WGD, " & population = ", pop_WGD, "\n"))
+        #     # cat("\n")
+        #     # if (mean_fitness_WGD >= mean_fitness_non_WGD) {
+        #     #     cat("WGD IS WINNING\n")
+        #     # } else {
+        #     #     cat("NON-WGD IS WINNING\n")
+        #     # }
+        #     # cat("\n")
+        #     # cat("---------------------------------------------------\n")
+        #     # cat("-----------------------------   AVERAGES BY PLOIDY:\n")
+        #     # ploidy_unique <- unique(clonal_ploidy_current)
+        #     # for (i in 1:length(ploidy_unique)) {
+        #     #     cat(paste0("ploidy = ", ploidy_unique[i], " ---> fitness ratio = ", mean(clonal_fitness_current[which(clonal_ploidy_current == ploidy_unique[i])]), "\n"))
+        #     # }
+        #     cat("------------------------------------------------------------------------------------------------------\n")
+        #     cat("-------------------------------------------------------------------------------   BEST NON-WGD PROFILE:\n")
+        #     tmp <- clonal_ID_current[which(clonal_WGD_status == 0)]
+        #     tmp2 <- clonal_fitness_current[which(clonal_WGD_status == 0)]
+        #     best_clone <- tmp[which(tmp2 == max(tmp2))[1]]
+        #     TMPTMP <<- 1
+        #     driver_count <- genotype_list_driver_count[best_clone]
+        #     driver_map <- genotype_list_driver_map[[best_clone]]
+        #     ploidy_chrom <- genotype_list_ploidy_chrom[[best_clone]]
+        #     ploidy_block <- genotype_list_ploidy_block[[best_clone]]
+        #     ploidy_allele <- genotype_list_ploidy_allele[[best_clone]]
+        #     cat(sum(genotype_list_ploidy_chrom[[best_clone]]), "\n")
+        #     tmp3 <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
+        #     TMPTMP <<- 0
+        #     # print(tmp2[which(tmp == best_clone)] * genotype_list_selection_rate[1])
+        #     cat("------------------------------------------------------------------------------------------------------\n")
+        #     cat("----------------------------------------------------------------------------------   BEST WGD PROFILE:\n")
+        #     tmp <- clonal_ID_current[which(clonal_WGD_status == 1)]
+        #     tmp2 <- clonal_fitness_current[which(clonal_WGD_status == 1)]
+        #     best_clone <- tmp[which(tmp2 == max(tmp2))][1]
+        #     TMPTMP <<- 1
+        #     driver_count <- genotype_list_driver_count[best_clone]
+        #     driver_map <- genotype_list_driver_map[[best_clone]]
+        #     ploidy_chrom <- genotype_list_ploidy_chrom[[best_clone]]
+        #     ploidy_block <- genotype_list_ploidy_block[[best_clone]]
+        #     ploidy_allele <- genotype_list_ploidy_allele[[best_clone]]
+        #     cat(sum(genotype_list_ploidy_chrom[[best_clone]]), "\n")
+        #     tmp3 <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
+        #     TMPTMP <<- 0
+        #     # print(tmp2[which(tmp == best_clone)] * genotype_list_selection_rate[1])
+        #     cat("==============================================================================================================\n")
+        #
+        #     cat("\n\n\n")
         # }
-        TMP <<- TMP + 1
-        if ((TMP %% 50) == 0) {
-            # clonal_ploidy_current <- rep(0, length(clonal_ID_current))
-            clonal_WGD_status <- rep(0, length(clonal_ID_current))
-            for (i in 1:length(clonal_ID_current)) {
-                # driver_count <- genotype_list_driver_count[clonal_ID_current[i]]
-                # driver_map <- genotype_list_driver_map[[clonal_ID_current[i]]]
-                # ploidy_chrom <- genotype_list_ploidy_chrom[[clonal_ID_current[i]]]
-                # ploidy_block <- genotype_list_ploidy_block[[clonal_ID_current[i]]]
-                # ploidy_allele <- genotype_list_ploidy_allele[[clonal_ID_current[i]]]
-                # clonal_ploidy_current[i] <- get_ploidy(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
-                WGD_status <- 0
-                clone <- clonal_ID_current[i]
-                while (clone > 0) {
-                    # print(evolution_genotype_changes[[clone]])
-                    if (length(evolution_genotype_changes[[clone]]) > 0) {
-                        for (j in 1:length(evolution_genotype_changes[[clone]])) {
-                            if (evolution_genotype_changes[[clone]][[j]][1] == "whole-genome-duplication") WGD_status <- 1
-                        }
-                    }
-                    clone <- evolution_origin[clone]
-                }
-                clonal_WGD_status[i] <- WGD_status
-            }
-            clonal_fitness_current <- genotype_list_selection_rate[clonal_ID_current] / genotype_list_selection_rate[1]
-            # tmp <- sort(clonal_ploidy_current, index.return = TRUE)
-            # clonal_ploidy_current <- tmp$x
-            # clonal_fitness_current <- clonal_fitness_current[tmp$ix]
-            cat("\n\n\n\n\n\n\n")
-            # cat("--------------------------------------------------\n")
-            # print(clonal_WGD_status)
-            # cat("--------------------------------------------------\n")
-            # for (i in 1:length(clonal_ID_current)) {
-            #     cat(paste0("ploidy = ", clonal_ploidy_current[i], " ---> fitness ratio = ", clonal_fitness_current[i], "\n"))
-            # }
-            cat("==============================================================================================================\n")
-            cat("----------------------------------------------------------------------------   AVERAGES BY WGD STATUS:\n")
-            mean_fitness_non_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 0)] * clonal_fitness_current[which(clonal_WGD_status == 0)]) / sum(clonal_population_current[which(clonal_WGD_status == 0)])
-            pop_non_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 0)])
-            cat(paste0("non-WGD cells ---> mean fitness ratio = ", mean_fitness_non_WGD, " & population = ", pop_non_WGD, "\n"))
-            mean_fitness_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 1)] * clonal_fitness_current[which(clonal_WGD_status == 1)]) / sum(clonal_population_current[which(clonal_WGD_status == 1)])
-            pop_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 1)])
-            cat(paste0("WGD cells ---> mean fitness ratio = ", mean_fitness_WGD, " & population = ", pop_WGD, "\n"))
-            # cat("\n")
-            # if (mean_fitness_WGD >= mean_fitness_non_WGD) {
-            #     cat("WGD IS WINNING\n")
-            # } else {
-            #     cat("NON-WGD IS WINNING\n")
-            # }
-            # cat("\n")
-            # cat("---------------------------------------------------\n")
-            # cat("-----------------------------   AVERAGES BY PLOIDY:\n")
-            # ploidy_unique <- unique(clonal_ploidy_current)
-            # for (i in 1:length(ploidy_unique)) {
-            #     cat(paste0("ploidy = ", ploidy_unique[i], " ---> fitness ratio = ", mean(clonal_fitness_current[which(clonal_ploidy_current == ploidy_unique[i])]), "\n"))
-            # }
-            cat("------------------------------------------------------------------------------------------------------\n")
-            cat("-------------------------------------------------------------------------------   BEST NON-WGD PROFILE:\n")
-            tmp <- clonal_ID_current[which(clonal_WGD_status == 0)]
-            tmp2 <- clonal_fitness_current[which(clonal_WGD_status == 0)]
-            best_clone <- tmp[which(tmp2 == max(tmp2))[1]]
-            TMPTMP <<- 1
-            driver_count <- genotype_list_driver_count[best_clone]
-            driver_map <- genotype_list_driver_map[[best_clone]]
-            ploidy_chrom <- genotype_list_ploidy_chrom[[best_clone]]
-            ploidy_block <- genotype_list_ploidy_block[[best_clone]]
-            ploidy_allele <- genotype_list_ploidy_allele[[best_clone]]
-            cat(sum(genotype_list_ploidy_chrom[[best_clone]]), "\n")
-            tmp3 <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
-            TMPTMP <<- 0
-            # print(tmp2[which(tmp == best_clone)] * genotype_list_selection_rate[1])
-            cat("------------------------------------------------------------------------------------------------------\n")
-            cat("----------------------------------------------------------------------------------   BEST WGD PROFILE:\n")
-            tmp <- clonal_ID_current[which(clonal_WGD_status == 1)]
-            tmp2 <- clonal_fitness_current[which(clonal_WGD_status == 1)]
-            best_clone <- tmp[which(tmp2 == max(tmp2))][1]
-            TMPTMP <<- 1
-            driver_count <- genotype_list_driver_count[best_clone]
-            driver_map <- genotype_list_driver_map[[best_clone]]
-            ploidy_chrom <- genotype_list_ploidy_chrom[[best_clone]]
-            ploidy_block <- genotype_list_ploidy_block[[best_clone]]
-            ploidy_allele <- genotype_list_ploidy_allele[[best_clone]]
-            cat(sum(genotype_list_ploidy_chrom[[best_clone]]), "\n")
-            tmp3 <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
-            TMPTMP <<- 0
-            # print(tmp2[which(tmp == best_clone)] * genotype_list_selection_rate[1])
-            cat("==============================================================================================================\n")
-
-            cat("\n\n\n")
-        }
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
-        ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
+        # ################################################################
     }
     if (report_progress == TRUE) {
         cat("\n")

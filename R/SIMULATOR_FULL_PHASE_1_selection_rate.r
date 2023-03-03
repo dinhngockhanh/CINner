@@ -23,7 +23,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         clone_selection_rate <- 0
         return(clone_selection_rate)
     }
-    if (max(vec_CN_all / ploidy) > bond_maximum_CN_normalized) {
+    if (max(vec_CN_all / ploidy) > bound_maximum_CN_normalized) {
         clone_selection_rate <- 0
         return(clone_selection_rate)
     }
