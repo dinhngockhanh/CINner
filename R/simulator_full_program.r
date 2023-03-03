@@ -31,6 +31,7 @@ simulator_full_program <- function(model = "",
                                    save_newick_tree = FALSE,
                                    save_cn_profile = FALSE,
                                    save_cn_clones = FALSE,
+                                   build_cn = TRUE,
                                    format_cn_profile = "long",
                                    model_readcount = FALSE,
                                    model_readcount_base = "all",
@@ -117,6 +118,7 @@ simulator_full_program <- function(model = "",
                 n_clones_min,
                 n_clones_max,
                 save_simulation,
+                build_cn,
                 neutral_variations,
                 internal_nodes_cn_info,
                 save_newick_tree,
@@ -138,12 +140,13 @@ simulator_full_program <- function(model = "",
         library(ctc)
         library(ape)
         #---------------------------Run CancerSimulator in parallel mode
-        #     parallel cluster
+        #   Start parallel cluster
         if (is.null(n_cores)) {
             numCores <- detectCores()
         } else {
             numCores <- n_cores
         }
+        #   Configure parallel pool
         cl <- makePSOCKcluster(numCores - 1)
         if (report_progress == TRUE) {
             cat(paste("\nParallel cluster with ", numCores - 1, " cores...\n", sep = ""))
@@ -162,6 +165,7 @@ simulator_full_program <- function(model = "",
         n_clones_min <<- n_clones_min
         n_clones_max <<- n_clones_max
         save_simulation <<- save_simulation
+        build_cn <<- build_cn
         neutral_variations <<- neutral_variations
         internal_nodes_cn_info <<- internal_nodes_cn_info
         save_newick_tree <<- save_newick_tree
@@ -183,6 +187,7 @@ simulator_full_program <- function(model = "",
             "n_clones_min",
             "n_clones_max",
             "save_simulation",
+            "build_cn",
             "neutral_variations",
             "internal_nodes_cn_info",
             "save_newick_tree",
@@ -223,6 +228,7 @@ simulator_full_program <- function(model = "",
                     n_clones_min,
                     n_clones_max,
                     save_simulation,
+                    build_cn,
                     neutral_variations,
                     internal_nodes_cn_info,
                     save_newick_tree,
@@ -250,6 +256,7 @@ simulator_full_program <- function(model = "",
                     n_clones_min,
                     n_clones_max,
                     save_simulation,
+                    build_cn,
                     neutral_variations,
                     internal_nodes_cn_info,
                     save_newick_tree,
@@ -283,6 +290,7 @@ one_simulation <- function(iteration,
                            n_clones_min,
                            n_clones_max,
                            save_simulation,
+                           build_cn,
                            neutral_variations,
                            internal_nodes_cn_info,
                            save_newick_tree,
@@ -343,8 +351,10 @@ one_simulation <- function(iteration,
     if (stage_final >= 2) {
         simulation$sample <- package_sample
         #---Build CN profile tables in long format
-        if (report_progress == TRUE) cat("Extra: build CN profile table in long format...\n")
-        simulation <- p2_cn_profiles_long(simulation)
+        if (build_cn == TRUE) {
+            if (report_progress == TRUE) cat("Extra: build CN profile table in long format...\n")
+            simulation <- p2_cn_profiles_long(simulation)
+        }
         #---Build CN profile tables in wide format
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Extra: build CN profile table in wide format...\n")
@@ -541,6 +551,7 @@ one_simulation <- function(iteration,
         if ("sample_cell_ID" %in% output_variables) simulation_output$sample$sample_cell_ID <- simulation$sample$sample_cell_ID
         if ("sample_genotype_unique" %in% output_variables) simulation_output$sample$sample_genotype_unique <- simulation$sample$sample_genotype_unique
         if ("sample_genotype_unique_profile" %in% output_variables) simulation_output$sample$sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+        if ("sample_genotype_unique_drivers" %in% output_variables) simulation_output$sample$sample_genotype_unique_drivers <- simulation$sample$sample_genotype_unique_drivers
         if ("cell_phylogeny_hclust" %in% output_variables) simulation_output$sample_phylogeny$cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
         if ("cn_profiles_long" %in% output_variables) {
             sample <- simulation$sample

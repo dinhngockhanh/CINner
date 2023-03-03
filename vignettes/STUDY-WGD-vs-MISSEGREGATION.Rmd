@@ -12,11 +12,10 @@ sapply(files_sources, source)
 
 
 ```{r,fig.height=5,fig.width=10}
-#====================================================   FIXED PARAMETERS
 cell_lifespan <- 1
 T_0 <- list(0, "day")
 T_end <- list(300, "day")
-Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(100), Age_sample = c(T_end[[1]]))
+Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
 
 T_tau_step <- cell_lifespan / 2
 CN_bin_length <- 500000
@@ -42,7 +41,7 @@ rate_driver <- 0
 rate_passenger <- 1e-11
 
 bound_driver <- 3
-bound_average_ploidy <- 4.5
+bound_average_ploidy <- 6
 bound_maximum_CN <- 8
 bound_homozygosity <- 0
 
@@ -98,14 +97,60 @@ arm_chromosome <- rep(model_variables_base$cn_info$Chromosome, 2)
 arm_start <- c(rep(1, length(model_variables_base$cn_info$Chromosome)), model_variables_base$cn_info$Centromere_location + 1)
 arm_end <- c(model_variables_base$cn_info$Centromere_location, model_variables_base$cn_info$Bin_count)
 arm_s <- rep(1, length(arm_id))
+arm_s[which(arm_id == "1p")] <- 0.886307781235821
+arm_s[which(arm_id == "2p")] <- 1.01825968094413
+arm_s[which(arm_id == "3p")] <- 0.920530554894643
+arm_s[which(arm_id == "4p")] <- 0.976827677204689
+arm_s[which(arm_id == "5p")] <- 1.15969179661142
+arm_s[which(arm_id == "6p")] <- 1.04997702081472
+arm_s[which(arm_id == "7p")] <- 1.13777132552215
+arm_s[which(arm_id == "8p")] <- 0.884012569028591
+arm_s[which(arm_id == "9p")] <- 0.935174629285682
+arm_s[which(arm_id == "10p")] <- 1.02799999379291
+arm_s[which(arm_id == "11p")] <- 0.967134549774896
+arm_s[which(arm_id == "12p")] <- 1.06959509411319
+arm_s[which(arm_id == "13p")] <- 1
+arm_s[which(arm_id == "14p")] <- 1
+arm_s[which(arm_id == "15p")] <- 1
+arm_s[which(arm_id == "16p")] <- 1.04513229635198
+arm_s[which(arm_id == "17p")] <- 0.864520777388622
+arm_s[which(arm_id == "18p")] <- 1.01592152467124
+arm_s[which(arm_id == "19p")] <- 1.02814969243796
+arm_s[which(arm_id == "20p")] <- 1.00368324400257
+arm_s[which(arm_id == "21p")] <- 1
+arm_s[which(arm_id == "22p")] <- 1
+arm_s[which(arm_id == "Xp")] <- 1
+arm_s[which(arm_id == "Yp")] <- 1
 
-delta_selection <- c(0.25, 0.5)
-delta_sel_gain_per_arm <- sqrt(1 + delta_selection[1]) - 1
-delta_sel_loss_per_arm <- sqrt(1 + delta_selection[2]) - 1
-chrom_gains <- sample(model_variables_base$cn_info$Chromosome, round(length(model_variables_base$cn_info$Chromosome) / 2), replace = FALSE)
-chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
-arm_s[which(arm_chromosome %in% chrom_gains)] <- 1 + delta_sel_gain_per_arm
-arm_s[which(arm_chromosome %in% chrom_losses)] <- 1 / (1 + delta_sel_loss_per_arm)
+arm_s[which(arm_id == "1q")] <- 1.18666462081686
+arm_s[which(arm_id == "2q")] <- 0.962046964747096
+arm_s[which(arm_id == "3q")] <- 1.11600788103894
+arm_s[which(arm_id == "4q")] <- 0.937701536089568
+arm_s[which(arm_id == "5q")] <- 0.896394926675205
+arm_s[which(arm_id == "6q")] <- 0.886499991701187
+arm_s[which(arm_id == "7q")] <- 1.05243171270735
+arm_s[which(arm_id == "8q")] <- 1.22076350654396
+arm_s[which(arm_id == "9q")] <- 0.964639963793044
+arm_s[which(arm_id == "10q")] <- 0.90108395332905
+arm_s[which(arm_id == "11q")] <- 0.967049029726524
+arm_s[which(arm_id == "12q")] <- 1.03537911097717
+arm_s[which(arm_id == "13p")] <- 0.969546453082048
+arm_s[which(arm_id == "14p")] <- 0.971985635416426
+arm_s[which(arm_id == "15p")] <- 0.998823078653965
+arm_s[which(arm_id == "16q")] <- 0.935335591311341
+arm_s[which(arm_id == "17q")] <- 1.05238889818635
+arm_s[which(arm_id == "18q")] <- 0.935292135865439
+arm_s[which(arm_id == "19q")] <- 1.03037910158697
+arm_s[which(arm_id == "20q")] <- 1.20848277950342
+arm_s[which(arm_id == "21q")] <- 0.96470320220417
+arm_s[which(arm_id == "22q")] <- 0.959601745948745
+arm_s[which(arm_id == "Xq")] <- 1
+arm_s[which(arm_id == "Yq")] <- 1
+
+s_rate_scale <- 1
+
+arm_s[which(arm_s > 1)] <- 1 + s_rate_scale * (arm_s[which(arm_s > 1)] - 1)
+arm_s[which(arm_s < 1)] <- 1 / (1 + s_rate_scale * (1 / arm_s[which(arm_s < 1)] - 1))
 
 model_variables_base <- BUILD_driver_library(
     model_variables = model_variables_base,
@@ -123,7 +168,7 @@ model_variables_base <- BUILD_initial_population(
 )
 
 model_prefix <- "WGD-vs-MISSEGREGATION"
-folder_workplace <- model_prefix
+folder_workplace <- "WGD-vs-MISSEGREGATION"
 ```
 
 
@@ -139,35 +184,55 @@ var2_vals <- seq(1e-3, 1e-2, by = 1e-3)
 ```
 
 ```{r}
-# simulator_multivar(
-#     model_prefix = model_prefix, folder_workplace = folder_workplace,
-#     model_variables_base = model_variables_base,
-#     var1_name = var1_name, var1_vals = var1_vals,
-#     var2_name = var2_name, var2_vals = var2_vals,
-#     n_simulations_per_batch = n_simulations_per_batch,
-#     stage_final = 3, compute_parallel = TRUE,
-#     R_libPaths = "/burg/iicd/users/knd2127/rpackages"
-# )
-```
-
-```{r}
-# statistics_multivar(
-#     model_prefix = model_prefix, folder_workplace = folder_workplace,
-#     var1_name = var1_name, var1_vals = var1_vals,
-#     var2_name = var2_name, var2_vals = var2_vals,
-#     n_simulations = n_simulations_per_batch,
-#     compute_parallel = TRUE
-# )
-```
-
-```{r}
-simulation_statistics_multivar(
+simulator_multivar(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
-    var1_name = var1_name, var1_vals = var1_vals[c(10,10,1,1)],
-    var2_name = var2_name, var2_vals = var2_vals[c(10,1,10,1)],
+    model_variables_base = model_variables_base,
+    var1_name = var1_name, var1_vals = var1_vals,
+    var2_name = var2_name, var2_vals = var2_vals,
     n_simulations = n_simulations_per_batch,
-    compute_parallel = TRUE,
-    example_simulation = TRUE
+    stage_final = 3,
+    compute_parallel = TRUE
+)
+```
+
+```{r}
+statistics_multivar_matrix(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    var1_name = var1_name, var1_vals = var1_vals,
+    var2_name = var2_name, var2_vals = var2_vals,
+    n_simulations = n_simulations_per_batch,
+    plot_WGD = TRUE,
+    compute_parallel = TRUE
+)
+```
+
+
+
+```{r}
+var2_fixed <- var2_vals[1]
+statistics_multivar_vector(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    var1_name = var1_name, var1_vals = var1_vals,
+    var2_name = var2_name, var2_vals = rep(var2_fixed, length(var1_vals)),
+    var_labs = scientific(var1_vals), name_lab = "Probability of missegregation",
+    plot_WGD = TRUE,
+    n_simulations = n_simulations_per_batch,
+    plotname = paste0(model_prefix, "_prob_CN_missegregation_varies_and_prob_CN_whole_genome_duplication=", var2_fixed),
+    example_simulation = FALSE
+)
+```
+
+```{r}
+var1_fixed <- var1_vals[length(var1_vals)]
+statistics_multivar_vector(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    var1_name = var1_name, var1_vals = rep(var1_fixed, length(var2_vals)),
+    var2_name = var2_name, var2_vals = var2_vals,
+    var_labs = scientific(var2_vals), name_lab = "Probability of WGD",
+    plot_WGD = TRUE,
+    n_simulations = n_simulations_per_batch,
+    plotname = paste0(model_prefix, "_prob_CN_whole_genome_duplication_varies_and_prob_CN_missegregation=", var1_fixed),
+    example_simulation = FALSE
 )
 ```
 

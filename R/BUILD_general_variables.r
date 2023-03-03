@@ -49,6 +49,13 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     Population_end = Inf,
                                     Max_events = Inf,
                                     CN_bin_length = 500000,
+                                    model_CN_whole_genome_duplication = "per_division",
+                                    model_CN_missegregation = "per_division",
+                                    model_CN_chrom_arm_missegregation = "per_division",
+                                    model_CN_focal_amplification = "per_division",
+                                    model_CN_focal_deletion = "per_division",
+                                    model_CN_cnloh_interstitial = "per_division",
+                                    model_CN_cnloh_terminal = "per_division",
                                     prob_CN_whole_genome_duplication = 0,
                                     prob_CN_missegregation = 0,
                                     prob_CN_chrom_arm_missegregation = 0,
@@ -168,19 +175,33 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("size_CN_block_DNA", CN_bin_length, "bp", "CN bin width")
     #   Set up CN event probabilities
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_whole_genome_duplication", prob_CN_whole_genome_duplication, "per cell division", "Probability for a cell division to harbor a WGD event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_whole_genome_duplication", model_CN_whole_genome_duplication, "", "Model of probability for a cell division to harbor a WGD event")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_missegregation", prob_CN_missegregation, "per cell division", "Probability for a cell division to harbor a chromosome mis-segregation event")
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_whole_genome_duplication", prob_CN_whole_genome_duplication, "", "Probability for a cell division to harbor a WGD event")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_chrom_arm_missegregation", prob_CN_chrom_arm_missegregation, "per cell division", "Probability for a cell division to harbor a chromosome-arm mis-segregation event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_missegregation", model_CN_missegregation, "", "Model of probability for a cell division to harbor a chromosome mis-segregation event")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_amplification", prob_CN_focal_amplification, "per cell division", "Probability for a cell division to harbor a focal amplification event")
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_missegregation", prob_CN_missegregation, "", "Probability for a cell division to harbor a chromosome mis-segregation event")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion", prob_CN_focal_deletion, "per cell division", "Probability for a cell division to harbor a focal deletion event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_chrom_arm_missegregation", model_CN_chrom_arm_missegregation, "", "Model of probability for a cell division to harbor a chromosome-arm mis-segregation event")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial", prob_CN_cnloh_interstitial, "per cell division", "Probability for a cell division to harbor an interstitial CN-LOH event")
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_chrom_arm_missegregation", prob_CN_chrom_arm_missegregation, "", "Probability for a cell division to harbor a chromosome-arm mis-segregation event")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal", prob_CN_cnloh_terminal, "per cell division", "Probability for a cell division to harbor a terminal CN-LOH event")
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_focal_amplification", model_CN_focal_amplification, "", "Model of probability for a cell division to harbor a focal amplification event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_amplification", prob_CN_focal_amplification, "", "Probability for a cell division to harbor a focal amplification event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_focal_deletion", model_CN_focal_deletion, "", "Model of probability for a cell division to harbor a focal deletion event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_focal_deletion", prob_CN_focal_deletion, "", "Probability for a cell division to harbor a focal deletion event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_cnloh_interstitial", model_CN_cnloh_interstitial, "", "Model of probability for a cell division to harbor an interstitial CN-LOH event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_interstitial", prob_CN_cnloh_interstitial, "", "Probability for a cell division to harbor an interstitial CN-LOH event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("model_CN_cnloh_terminal", model_CN_cnloh_terminal, "", "Model of probability for a cell division to harbor a terminal CN-LOH event")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("prob_CN_cnloh_terminal", prob_CN_cnloh_terminal, "", "Probability for a cell division to harbor a terminal CN-LOH event")
     #   Set up neutral CN event probabilities
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("prob_neutral_CN_whole_genome_duplication", prob_neutral_CN_whole_genome_duplication, "per cell division", "Probability for a cell division to harbor a neutral WGD event")

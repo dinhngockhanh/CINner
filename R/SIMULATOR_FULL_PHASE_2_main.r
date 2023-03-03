@@ -11,11 +11,14 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     evolution_traj_population <- package_clonal_evolution$evolution_traj_population
 
     for (row in 1:nrow(Table_sampling)) {
-        if (Table_sampling$Cell_count[row] == Inf) {
-            loc <- which.min(abs(evolution_traj_time - Table_sampling$T_sample[row]))
-            N_cells_total <- sum(evolution_traj_population[[loc]])
-            Table_sampling$Cell_count[row] <- N_cells_total
-        }
+        loc <- which.min(abs(evolution_traj_time - Table_sampling$T_sample[row]))
+        N_cells_total <- sum(evolution_traj_population[[loc]])
+        Table_sampling$Cell_count[row] <- min(Table_sampling$Cell_count[row], N_cells_total)
+        # if (Table_sampling$Cell_count[row] == Inf) {
+        #     loc <- which.min(abs(evolution_traj_time - Table_sampling$T_sample[row]))
+        #     N_cells_total <- sum(evolution_traj_population[[loc]])
+        #     Table_sampling$Cell_count[row] <- N_cells_total
+        # }
     }
     #---------------------------Find a random sample of final population
     Table_sampling$T_sample_real <- Table_sampling$T_sample
@@ -60,11 +63,14 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique <- unique(all_sample_genotype)
     sample_genotype_unique_profile <- list()
+    sample_genotype_unique_drivers <- list()
     for (i_clone in 1:length(sample_genotype_unique)) {
         #   Extract CN information for the clone
         clone_ID <- sample_genotype_unique[i_clone]
         genotype_unique_profile <- get_cn_profile(package_clonal_evolution, clone_ID)
         sample_genotype_unique_profile[[i_clone]] <- genotype_unique_profile
+        #   Extract driver information for the clone
+        sample_genotype_unique_drivers[[i_clone]] <- genotype_list_driver_map[[clone_ID]]
     }
     #---Find the CN profiles for each cell in the sample
     sample_cell_ID <- c()
@@ -119,6 +125,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     output$all_sample_ID <- all_sample_ID
     output$sample_genotype_unique <- sample_genotype_unique
     output$sample_genotype_unique_profile <- sample_genotype_unique_profile
+    output$sample_genotype_unique_drivers <- sample_genotype_unique_drivers
 
     output$Table_sampling <- Table_sampling
 

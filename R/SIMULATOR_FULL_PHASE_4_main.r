@@ -105,7 +105,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
             #---Perform the pre-determined events (if any)
             if (elapsed_gen > 1) {
                 previous_genotype <- original_elapsed_genotypes[elapsed_gen - 1]
-            } else if (branch > 1) {
+            } else if ((branch > 1) & (neuvar_phylogeny_origin[branch] > 0)) {
                 elapsed_gens_mother <- phylogeny_elapsed_genotypes[[neuvar_phylogeny_origin[branch]]]
                 previous_genotype <- elapsed_gens_mother[length(elapsed_gens_mother)]
             } else {

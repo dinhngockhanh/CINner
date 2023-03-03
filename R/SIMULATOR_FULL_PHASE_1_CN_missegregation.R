@@ -32,26 +32,49 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,
         return()
     } else {
         while (1) {
-            #   Choose which cell to gain/lose the strand
-            i_gain <- sample.int(2, size = 1)
-            #   Choose the chromosome to be mis-segregated
-            chrom <- sample.int(N_chromosomes, size = 1)
-            if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
-                next
+            if (model_CN_missegregation == "per_division") {
+                #   Choose which cell to gain/lose the strand
+                i_gain <- sample.int(2, size = 1)
+                #   Choose the chromosome to be mis-segregated
+                chrom <- sample.int(N_chromosomes, size = 1)
+                if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
+                    next
+                }
+                if (i_gain == 1 & !is.null(genotype_daughter_2)) {
+                    no_strands <- ploidy_chrom_2[chrom]
+                } else if (i_gain == 1 & is.null(genotype_daughter_2)) {
+                    no_strands <- ploidy_chrom_1[chrom]
+                } else if (i_gain == 2) {
+                    no_strands <- ploidy_chrom_1[chrom]
+                }
+                if (no_strands <= 0) {
+                    next
+                }
+                #   Choose the strand to be mis-segregated
+                strand <- sample.int(no_strands, size = 1)
+                break
+            } else if (model_CN_missegregation == "per_homolog") {
+                #   Choose which cell to gain/lose the strand
+                i_gain <- sample.int(2, size = 1)
+                #   Choose the chromosome to be mis-segregated
+                chrom <- sample.int(N_chromosomes, size = 1, prob = ploidy_chrom_1 / sum(ploidy_chrom_1))
+                if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
+                    next
+                }
+                if (i_gain == 1 & !is.null(genotype_daughter_2)) {
+                    no_strands <- ploidy_chrom_2[chrom]
+                } else if (i_gain == 1 & is.null(genotype_daughter_2)) {
+                    no_strands <- ploidy_chrom_1[chrom]
+                } else if (i_gain == 2) {
+                    no_strands <- ploidy_chrom_1[chrom]
+                }
+                if (no_strands <= 0) {
+                    next
+                }
+                #   Choose the strand to be mis-segregated
+                strand <- sample.int(no_strands, size = 1)
+                break
             }
-            if (i_gain == 1 & !is.null(genotype_daughter_2)) {
-                no_strands <- ploidy_chrom_2[chrom]
-            } else if (i_gain == 1 & is.null(genotype_daughter_2)) {
-                no_strands <- ploidy_chrom_1[chrom]
-            } else if (i_gain == 2) {
-                no_strands <- ploidy_chrom_1[chrom]
-            }
-            if (no_strands <= 0) {
-                next
-            }
-            #   Choose the strand to be mis-segregated
-            strand <- sample.int(no_strands, size = 1)
-            break
         }
     }
     #   Find all drivers located on this strand in the losing cell
@@ -192,25 +215,6 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,
         driver_unique_2 <- driver_unique_2[driver_unique_2 != 0]
         driver_count_2 <- length(driver_unique_2)
     }
-    # print("----------------------------")
-    # ploidy_chrom <- genotype_list_ploidy_chrom[[genotype_to_react]]
-    # ploidy_allele <- genotype_list_ploidy_allele[[genotype_to_react]]
-    # ploidy_block <- genotype_list_ploidy_block[[genotype_to_react]]
-    # driver_count <- genotype_list_driver_count[genotype_to_react]
-    # driver_map <- genotype_list_driver_map[[genotype_to_react]]
-    # print("")
-    # print(SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele))
-    # print("")
-    #
-    # if (i_gain == 2) {
-    #     print("")
-    #     print(SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_1, driver_map_1, ploidy_chrom_1, ploidy_block_1, ploidy_allele_1))
-    #     print("")
-    # } else {
-    #     print("")
-    #     print(SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_2, driver_map_2, ploidy_chrom_2, ploidy_block_2, ploidy_allele_2))
-    #     print("")
-    # }
     #-----------------------------------------------Output the new genotypes
     genotype_list_ploidy_chrom[[genotype_daughter_1]] <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]] <<- ploidy_allele_1

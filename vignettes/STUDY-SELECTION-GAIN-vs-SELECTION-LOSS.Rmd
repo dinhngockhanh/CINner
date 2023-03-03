@@ -166,14 +166,14 @@ folder_workplace <- "GAIN-vs-LOSS"
 ```
 
 ```{r}
-n_simulations_per_batch <- 100
+n_simulations_per_batch <- 1000
 
 var1_name <- "scale_selection_loss"
-var1_vals <- seq(1,10)
+var1_vals <- seq(1, 10)
 var1_labs <- paste0("x", var1_vals)
 
 var2_name <- "scale_selection_gain"
-var2_vals <- seq(1,10)
+var2_vals <- seq(1, 10)
 var2_labs <- paste0("x", var2_vals)
 ```
 
@@ -190,45 +190,40 @@ simulator_multivar(
 ```
 
 ```{r}
-statistics_multivar(
+statistics_multivar_matrix(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
     var1_name = var1_name, var1_vals = var1_vals, var1_labs = var1_labs,
     var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
     n_simulations = n_simulations_per_batch,
-    plot_WGD = TRUE,
+    plot_WGD = TRUE, plot_misseg = TRUE,
     compute_parallel = TRUE
 )
 ```
 
-
-
-
-
-
-
-
 ```{r}
-simulation_statistics_multivar(
+var2_fixed <- var2_labs[1]
+statistics_multivar_vector(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
-    var1_name = var1_name, var1_vals = var1_vals,
-    var2_name = var2_name, var2_vals = rep(var2_vals[1], length(var1_vals)),
-    var_labs = var1_labs, name_lab = "Scale of selection rates for losses",
+    var1_name = var1_name, var1_labs = var1_labs,
+    var2_name = var2_name, var2_labs = rep(var2_fixed, length(var1_labs)),
+    var_labs = var1_labs, name_lab = "Scale of selection rates for TSG arms",
     plot_WGD = FALSE,
     n_simulations = n_simulations_per_batch,
-    plotname = paste0(model_prefix, "_scale_selection_loss"),
+    plotname = paste0(model_prefix, "_scale_selection_loss_varies_and_scale_selection_gain=", var2_fixed),
     example_simulation = FALSE
 )
 ```
 
 ```{r}
-simulation_statistics_multivar(
+var1_fixed <- var1_labs[1]
+statistics_multivar_vector(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
-    var1_name = var1_name, var1_vals = rep(var1_vals[1], length(var2_vals)),
-    var2_name = var2_name, var2_vals = var2_vals,
-    var_labs = var1_labs, name_lab = "Scale of selection rates for gains",
+    var1_name = var1_name, var1_labs = rep(var1_fixed, length(var2_labs)),
+    var2_name = var2_name, var2_labs = var2_labs,
+    var_labs = var1_labs, name_lab = "Scale of selection rates for ONCOGENE arms",
     plot_WGD = FALSE,
     n_simulations = n_simulations_per_batch,
-    plotname = paste0(model_prefix, "_scale_selection_gain"),
+    plotname = paste0(model_prefix, "_scale_selection_gain_varies_and_scale_selection_loss=", var1_fixed),
     example_simulation = FALSE
 )
 ```

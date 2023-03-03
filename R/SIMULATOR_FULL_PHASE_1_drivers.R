@@ -43,6 +43,9 @@ SIMULATOR_FULL_PHASE_1_drivers <- function(genotype_to_react,
         if (all(is.na(driver_library_eligible))) {
             return()
         }
+        if (nrow(driver_library_eligible) == 0) {
+            return()
+        }
         #   Find copy number of each eligible driver gene
         for (driver in 1:nrow(driver_library_eligible)) {
             chrom <- driver_library_eligible$Chromosome[driver]

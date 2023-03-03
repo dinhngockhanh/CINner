@@ -17,6 +17,7 @@ simulator_full_program(
   save_newick_tree = FALSE,
   save_cn_profile = FALSE,
   save_cn_clones = FALSE,
+  build_cn = TRUE,
   format_cn_profile = "long",
   model_readcount = FALSE,
   model_readcount_base = "all",

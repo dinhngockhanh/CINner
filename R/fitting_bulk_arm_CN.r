@@ -200,10 +200,10 @@ fitting_bulk_arm_CN <- function(model_name,
     colnames(all_paras) <- parameter_IDs
     #   Dataframe for corresponding statistics for reference
     all_data <- data.frame(sim_stat)
-    colnames(all_data) <- paste("gainloss_", 1:ncol(all_data), sep = "")
+    colnames(all_data) <- paste0("gainloss_", 1:ncol(all_data))
     #   Dataframe for data observation
     obs_rf <- data.frame(matrix(DATA_target, nrow = 1))
-    colnames(obs_rf) <- paste("gainloss_", 1:ncol(obs_rf), sep = "")
+    colnames(obs_rf) <- paste0("gainloss_", 1:ncol(obs_rf))
     #   Fit each parameter with ABC-rf
     layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
     gs <- list()

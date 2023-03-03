@@ -17,7 +17,7 @@ sapply(files_sources, source)
 cell_lifespan <- 1
 T_0 <- list(0, "day")
 T_end <- list(300, "day")
-Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(1000), Age_sample = c(T_end[[1]]))
 
 T_tau_step <- cell_lifespan / 2
 CN_bin_length <- 500000
@@ -170,7 +170,7 @@ folder_workplace <- "GROWTHMODE-vs-SIZE"
 
 
 ```{r}
-n_simulations_per_batch <- 5
+n_simulations_per_batch <- 1000
 
 var1_name <- "vec_cell_count"
 P0_vals <- seq(10, 1, by = -1) / 10
@@ -210,15 +210,16 @@ for (i in 1:length(P0_vals)) {
 }
 df_all$mode <- factor(df_all$mode, levels = var1_labs)
 filename <- paste0(model_prefix, "_0_growth_mode.jpeg")
-jpeg(file = filename, width = 2000, height = 1000)
+jpeg(file = filename, width = 1000, height = 1100)
 p <- ggplot(data = df_all, aes(x = t, y = value)) +
     geom_line(aes(colour = mode), size = 2) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(limits = c(0, NA), expand = c(0, 0)) +
     xlab("Time") +
     ylab("Total cell count") +
-    theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
-    guides(colour = guide_legend(nrow = 1))
+    labs(color = "Growth mode") +
+    theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "right", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"), axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+    guides(colour = guide_legend(nrow = 2))
 print(p)
 dev.off()
 ```
@@ -236,12 +237,12 @@ simulator_multivar(
 ```
 
 ```{r}
-statistics_multivar(
+statistics_multivar_matrix(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
     var1_name = var1_name, var1_vals = var1_vals, var1_labs = var1_labs,
     var2_name = var2_name, var2_vals = var2_vals,
     n_simulations = n_simulations_per_batch,
-    plot_WGD = TRUE,
+    plot_WGD = TRUE, plot_misseg = TRUE,
     compute_parallel = TRUE
 )
 ```
@@ -249,4 +250,32 @@ statistics_multivar(
 
 
 ```{r}
+var2_fixed <- var2_vals[length(var2_vals)]
+statistics_multivar_vector(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    var1_name = var1_name, var1_labs = var1_labs,
+    var2_name = var2_name, var2_vals = rep(var2_fixed, length(var1_vals)),
+    var_labs = var1_labs, name_lab = "Growth mode",
+    plot_WGD = TRUE,
+    n_simulations = n_simulations_per_batch,
+    plotname = paste0(model_prefix, "_growth_mode_varies_and_average_cell_count=", var2_fixed),
+    example_simulation = FALSE,
+    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+)
+```
+
+
+
+```{r}
+var1_fixed <- var1_labs[length(var1_labs)]
+statistics_multivar_vector(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    var1_name = var1_name, var1_labs = rep(var1_fixed, length(var2_vals)),
+    var2_name = var2_name, var2_vals = var2_vals,
+    var_labs = scientific(var2_vals), name_lab = "Average cell count",
+    plot_WGD = TRUE,
+    n_simulations = n_simulations_per_batch,
+    plotname = paste0(model_prefix, "_average_cell_count_varies_and_growth_mode=", var1_fixed),
+    example_simulation = FALSE
+)
 ```

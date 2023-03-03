@@ -136,11 +136,6 @@ simulator_multivar <- function(model_variables_base = list(),
             } else {
                 stop("VARIABLE 2 IS NOT RECOGNIZED")
             }
-
-
-
-
-
             #   Fix additional variables if necessary
             if (!is.null(extra_var)) {
                 for (i in 1:ceiling(length(extra_var) / 2)) {
@@ -150,11 +145,7 @@ simulator_multivar <- function(model_variables_base = list(),
                     }
                 }
             }
-
-
-
-
-
+            model_variables <- CHECK_model_variables(model_variables)
             #   Save model variables
             model_name <- paste0(model_prefix, "_")
             if (!is.null(var1_labs)) {
@@ -276,19 +267,20 @@ simulator_multivar <- function(model_variables_base = list(),
 }
 
 #' @export
-statistics_multivar <- function(model_prefix = "",
-                                folder_workplace = "",
-                                var1_name = "",
-                                var1_vals = c(),
-                                var1_labs = NULL,
-                                var2_name = "",
-                                var2_vals = c(),
-                                var2_labs = NULL,
-                                n_simulations = 0,
-                                plot_WGD = FALSE,
-                                compute_parallel = TRUE,
-                                n_cores = NULL,
-                                R_libPaths = NULL) {
+statistics_multivar_matrix <- function(model_prefix = "",
+                                       folder_workplace = "",
+                                       var1_name = "",
+                                       var1_vals = c(),
+                                       var1_labs = NULL,
+                                       var2_name = "",
+                                       var2_vals = c(),
+                                       var2_labs = NULL,
+                                       n_simulations = 0,
+                                       plot_WGD = FALSE,
+                                       plot_misseg = FALSE,
+                                       compute_parallel = TRUE,
+                                       n_cores = NULL,
+                                       R_libPaths = NULL) {
     library(data.table)
     library(scales)
     library(vegan)
@@ -301,9 +293,9 @@ statistics_multivar <- function(model_prefix = "",
     } else if (var1_name == "scale_selection") {
         var1_lab <- "Scale of selection rates"
     } else if (var1_name == "scale_selection_gain") {
-        var1_lab <- "Scale of selection rates for gains"
+        var1_lab <- "Scale of selection rates for ONCOGENE arms"
     } else if (var1_name == "scale_selection_loss") {
-        var1_lab <- "Scale of selection rates for losses"
+        var1_lab <- "Scale of selection rates for TSG arms"
     } else if (var1_name == "delta_selection") {
         var1_lab <- "Selection rate"
     } else if (var1_name == "prob_CN_missegregation") {
@@ -320,9 +312,9 @@ statistics_multivar <- function(model_prefix = "",
     } else if (var2_name == "scale_selection") {
         var2_lab <- "Scale of selection rates"
     } else if (var2_name == "scale_selection_gain") {
-        var2_lab <- "Scale of selection rates for gains"
+        var2_lab <- "Scale of selection rates for ONCOGENE arms"
     } else if (var2_name == "scale_selection_loss") {
-        var2_lab <- "Scale of selection rates for losses"
+        var2_lab <- "Scale of selection rates for TSG arms"
     } else if (var2_name == "delta_selection") {
         var2_lab <- "Selection rate"
     } else if (var2_name == "prob_CN_missegregation") {
@@ -344,9 +336,6 @@ statistics_multivar <- function(model_prefix = "",
     } else if (is.matrix(var2_vals)) {
         cols <- ncol(var2_vals):1
     }
-    #------------Create dataframe for all statistics for all simulations
-    df_stats_simulations <- data.frame(matrix(ncol = 5, nrow = 0))
-    colnames(df_stats_simulations) <- c("var1", "var2", "sim", "stat", "val")
     #------------------------------------Get statistics from simulations
     df_stat_sims_all_list <- vector("list", length = length(rows) * length(cols))
     ind <- 0
@@ -381,7 +370,7 @@ statistics_multivar <- function(model_prefix = "",
                 df_stat_sims_list <- vector("list", n_simulations)
                 for (sim in 1:n_simulations) {
                     filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                    df_stat_sim <- statistics_multivar_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
+                    df_stat_sim <- statistics_multivar_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg)
                     df_stat_sims_list[[sim]] <- df_stat_sim
                 }
             } else {
@@ -412,6 +401,7 @@ statistics_multivar <- function(model_prefix = "",
                 var2 <<- var2
                 statistics_multivar_one_simulation <<- statistics_multivar_one_simulation
                 plot_WGD <<- plot_WGD
+                plot_misseg <<- plot_misseg
                 clusterExport(cl, varlist = c(
                     "filename_prefix",
                     "var1_name",
@@ -425,7 +415,7 @@ statistics_multivar <- function(model_prefix = "",
                 pbo <- pboptions(type = "txt")
                 df_stat_sims_list <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(sim) {
                     filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                    df_stat_sim <- statistics_multivar_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
+                    df_stat_sim <- statistics_multivar_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg)
                     return(df_stat_sim)
                 })
                 #   Stop parallel cluster
@@ -440,17 +430,13 @@ statistics_multivar <- function(model_prefix = "",
     print(end_time - start_time)
     df_stat_sims_all <- rbindlist(df_stat_sims_all_list)
     save(df_stat_sims_all, file = paste0(folder_workplace, "/", model_prefix, "_", "simulation_stats.rda"))
-
-
-
-    load(paste0(folder_workplace, "/", model_prefix, "_", "simulation_stats.rda"))
-
-
-
     #-----------------------------------------Compute average statistics
+    load(paste0(folder_workplace, "/", model_prefix, "_", "simulation_stats.rda"))
     df_ploidy_dist <- data.frame(matrix(ncol = 7, nrow = 0))
     colnames(df_ploidy_dist) <- c("var1", "var2", "haploid", "diploid", "triploid", "tetraploid", "other")
-    if ((var1_name == "prob_CN_missegregation") | (var2_name == "prob_CN_missegregation")) {
+    df_nonviability <- data.frame(matrix(ncol = 5, nrow = 0))
+    colnames(df_nonviability) <- c("var1", "var2", "diploid", "tetraploid", "other")
+    if (plot_misseg == TRUE) {
         df_missegregation <- data.frame(matrix(ncol = 4, nrow = 0))
         colnames(df_missegregation) <- c("var1", "var2", "clonal_count_missegregation", "subclonal_count_missegregation")
     }
@@ -492,8 +478,19 @@ statistics_multivar <- function(model_prefix = "",
             #---Statistics: Shannon diversity index
             mean_Shannon_index <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "Shannon_index")]))
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "Shannon_index", mean_Shannon_index)
+            #---Statistics: count of nonviable cells in diploid & tetraploid cells
+            mean_nonviability_diploid <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=no_ploidy=2_cell_count")]))
+            mean_nonviability_tetraploid <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=no_ploidy=4_cell_count")]))
+            mean_nonviability_other <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=no_cell_count")])) - mean_nonviability_diploid - mean_nonviability_tetraploid
+            if (is.nan(mean_nonviability_diploid)) mean_nonviability_diploid <- 0
+            if (is.nan(mean_nonviability_tetraploid)) mean_nonviability_tetraploid <- 0
+            if (is.nan(mean_nonviability_other)) mean_nonviability_other <- 0
+            mean_nonviability_diploid <- 100 * mean_nonviability_diploid / mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=all_cell_count")]))
+            mean_nonviability_tetraploid <- 100 * mean_nonviability_tetraploid / mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=all_cell_count")]))
+            mean_nonviability_other <- max(0, 100 * mean_nonviability_other / mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=all_cell_count")])))
+            df_nonviability[nrow(df_nonviability) + 1, ] <- c(var1, var2, mean_nonviability_diploid, mean_nonviability_tetraploid, mean_nonviability_other)
             #---Statistics: count of clonal & subclonal events
-            if ((var1_name == "prob_CN_missegregation") | (var2_name == "prob_CN_missegregation")) {
+            if (plot_misseg == TRUE) {
                 mean_clonal_count_missegregation <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "clonal_count_missegregation")]))
                 mean_subclonal_count_missegregation <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "subclonal_count_missegregation")]))
                 df_missegregation[nrow(df_missegregation) + 1, ] <- c(var1, var2, mean_clonal_count_missegregation, mean_subclonal_count_missegregation)
@@ -540,19 +537,17 @@ statistics_multivar <- function(model_prefix = "",
             }
         }
     }
-    save(df_stat_average, file = paste0(folder_workplace, "/", model_prefix, "_", "average_stats.rda"))
-    save(df_ploidy_dist, file = paste0(folder_workplace, "/", model_prefix, "_", "ploidy_distribution.rda"))
-    if (plot_WGD == TRUE) save(df_WGD_clonality_dist, file = paste0(folder_workplace, "/", model_prefix, "_", "WGD_clonality_distribution.rda"))
-
-
-
-    load(paste0(folder_workplace, "/", model_prefix, "_", "average_stats.rda"))
-    load(paste0(folder_workplace, "/", model_prefix, "_", "ploidy_distribution.rda"))
-    if (plot_WGD == TRUE) load(paste0(folder_workplace, "/", model_prefix, "_", "ploidy_distribution.rda"))
-
-
-
+    save(df_stat_average, file = paste0(folder_workplace, "/", model_prefix, "_average_stats.rda"))
+    save(df_ploidy_dist, file = paste0(folder_workplace, "/", model_prefix, "_ploidy_distribution.rda"))
+    save(df_nonviability, file = paste0(folder_workplace, "/", model_prefix, "_nonviability.rda"))
+    if (plot_WGD == TRUE) save(df_WGD_clonality_dist, file = paste0(folder_workplace, "/", model_prefix, "_WGD_clonality_distribution.rda"))
+    if (plot_misseg == TRUE) save(df_missegregation, file = paste0(folder_workplace, "/", model_prefix, "_missegregation.rda"))
     #-----------------------------Prepare dataframe for average heatmaps
+    load(paste0(folder_workplace, "/", model_prefix, "_average_stats.rda"))
+    load(paste0(folder_workplace, "/", model_prefix, "_ploidy_distribution.rda"))
+    load(paste0(folder_workplace, "/", model_prefix, "_nonviability.rda"))
+    if (plot_WGD == TRUE) load(paste0(folder_workplace, "/", model_prefix, "_WGD_clonality_distribution.rda"))
+    if (plot_misseg == TRUE) load(paste0(folder_workplace, "/", model_prefix, "_missegregation.rda"))
     df_stat_average$val <- as.numeric(df_stat_average$val)
     #   Sort dataframe according to increasing variables
     if (!is.null(var1_labs)) {
@@ -578,13 +573,6 @@ statistics_multivar <- function(model_prefix = "",
     df_ploidy_dist$triploid <- as.numeric(df_ploidy_dist$triploid)
     df_ploidy_dist$tetraploid <- as.numeric(df_ploidy_dist$tetraploid)
     df_ploidy_dist$other <- as.numeric(df_ploidy_dist$other)
-    if (plot_WGD == TRUE) {
-        df_WGD_clonality_dist$var1 <- as.numeric(df_WGD_clonality_dist$var1)
-        df_WGD_clonality_dist$var2 <- as.numeric(df_WGD_clonality_dist$var2)
-        df_WGD_clonality_dist$clonal_WGD <- as.numeric(df_WGD_clonality_dist$clonal_WGD)
-        df_WGD_clonality_dist$subclonal_WGD <- as.numeric(df_WGD_clonality_dist$subclonal_WGD)
-        df_WGD_clonality_dist$other <- as.numeric(df_WGD_clonality_dist$other)
-    }
     #   Force identical scale for distribution maps
     if (!is.null(var1_labs)) {
         x_ticks_breaks <- var1_labs
@@ -598,16 +586,42 @@ statistics_multivar <- function(model_prefix = "",
     }
     for (ind in 1:length(x_ticks_breaks)) {
         df_ploidy_dist$var1[which(df_ploidy_dist$var1 == x_ticks_breaks[ind])] <- ind
-        if (plot_WGD == TRUE) df_WGD_clonality_dist$var1[which(df_WGD_clonality_dist$var1 == x_ticks_breaks[ind])] <- ind
     }
     for (ind in 1:length(y_ticks_breaks)) {
         df_ploidy_dist$var2[which(df_ploidy_dist$var2 == y_ticks_breaks[ind])] <- ind
-        if (plot_WGD == TRUE) df_WGD_clonality_dist$var2[which(df_WGD_clonality_dist$var2 == y_ticks_breaks[ind])] <- ind
     }
     df_ploidy_dist$var1 <- as.numeric(df_ploidy_dist$var1)
     df_ploidy_dist$var2 <- as.numeric(df_ploidy_dist$var2)
+    if (plot_WGD == TRUE) {
+        if (is.null(var1_labs)) df_WGD_clonality_dist$var1 <- as.numeric(df_WGD_clonality_dist$var1)
+        if (is.null(var2_labs)) df_WGD_clonality_dist$var2 <- as.numeric(df_WGD_clonality_dist$var2)
+        df_WGD_clonality_dist$var1_real <- df_WGD_clonality_dist$var1
+        df_WGD_clonality_dist$var2_real <- df_WGD_clonality_dist$var2
+        df_WGD_clonality_dist$clonal_WGD <- as.numeric(df_WGD_clonality_dist$clonal_WGD)
+        df_WGD_clonality_dist$subclonal_WGD <- as.numeric(df_WGD_clonality_dist$subclonal_WGD)
+        df_WGD_clonality_dist$other <- as.numeric(df_WGD_clonality_dist$other)
+        #   Force identical scale for distribution maps
+        for (ind in 1:length(x_ticks_breaks)) df_WGD_clonality_dist$var1[which(df_WGD_clonality_dist$var1 == x_ticks_breaks[ind])] <- ind
+        for (ind in 1:length(y_ticks_breaks)) df_WGD_clonality_dist$var2[which(df_WGD_clonality_dist$var2 == y_ticks_breaks[ind])] <- ind
+        df_WGD_clonality_dist$var1 <- as.numeric(df_WGD_clonality_dist$var1)
+        df_WGD_clonality_dist$var2 <- as.numeric(df_WGD_clonality_dist$var2)
+    }
+    #-------------------------Prepare dataframe for nonviable cell count
+    if (is.null(var1_labs)) df_nonviability$var1 <- as.numeric(df_nonviability$var1)
+    if (is.null(var2_labs)) df_nonviability$var2 <- as.numeric(df_nonviability$var2)
+    df_nonviability$var1_real <- df_nonviability$var1
+    df_nonviability$var2_real <- df_nonviability$var2
+    df_nonviability$diploid <- as.numeric(df_nonviability$diploid)
+    df_nonviability$tetraploid <- as.numeric(df_nonviability$tetraploid)
+    df_nonviability$other <- as.numeric(df_nonviability$other)
+    df_nonviability$total <- df_nonviability$diploid + df_nonviability$tetraploid + df_nonviability$other
+    #   Force identical scale for distribution maps
+    for (ind in 1:length(x_ticks_breaks)) df_nonviability$var1[which(df_nonviability$var1 == x_ticks_breaks[ind])] <- ind
+    for (ind in 1:length(y_ticks_breaks)) df_nonviability$var2[which(df_nonviability$var2 == y_ticks_breaks[ind])] <- ind
+    df_nonviability$var1 <- as.numeric(df_nonviability$var1)
+    df_nonviability$var2 <- as.numeric(df_nonviability$var2)
     #---------------------------------Prepare dataframe for event counts
-    if ((var1_name == "prob_CN_missegregation") | (var2_name == "prob_CN_missegregation")) {
+    if (plot_misseg == TRUE) {
         if (is.null(var1_labs)) df_missegregation$var1 <- as.numeric(df_missegregation$var1)
         if (is.null(var2_labs)) df_missegregation$var2 <- as.numeric(df_missegregation$var2)
         df_missegregation$var1_real <- df_missegregation$var1
@@ -646,7 +660,7 @@ statistics_multivar <- function(model_prefix = "",
         coord_equal() +
         xlab(var1_lab) +
         ylab(var2_lab) +
-        scale_fill_viridis(discrete = FALSE, name = "Clone count") +
+        scale_fill_distiller(palette = "RdPu", name = "Clone count") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
@@ -677,7 +691,7 @@ statistics_multivar <- function(model_prefix = "",
         coord_equal() +
         xlab(var1_lab) +
         ylab(var2_lab) +
-        scale_fill_distiller(palette = "RdPu", name = "Log(Fitness)") +
+        scale_fill_distiller(palette = "YlOrBr", name = "Log(fitness)") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
@@ -693,11 +707,11 @@ statistics_multivar <- function(model_prefix = "",
         xlab(var1_lab) +
         ylab(var2_lab) +
         scale_fill_gradientn(
-            colours = c("azure4", "cadetblue1", "ivory2", "palegreen2", "lightsalmon", "azure4"),
+            colours = c("azure4", "royalblue3", "ghostwhite", "seagreen2", "tomato1", "azure4"),
             breaks = c(0, 1, 2, 3, 4, 5),
             labels = c(0, 1, 2, 3, 4, 5),
             limits = c(0, 5),
-            name = "Ploidy"
+            name = "Average ploidy"
         ) +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
@@ -718,10 +732,10 @@ statistics_multivar <- function(model_prefix = "",
         scale_y_continuous(breaks = 1:length(y_ticks_breaks), labels = y_ticks_breaks) +
         scale_fill_manual(
             values = c(
-                "haploid" = "cadetblue1",
-                "diploid" = "ivory2",
-                "triploid" = "palegreen2",
-                "tetraploid" = "lightsalmon",
+                "haploid" = "royalblue3",
+                "diploid" = "ghostwhite",
+                "triploid" = "seagreen2",
+                "tetraploid" = "tomato1",
                 "other" = "azure4"
             ),
             breaks = c("haploid", "diploid", "triploid", "tetraploid", "other"),
@@ -765,7 +779,7 @@ statistics_multivar <- function(model_prefix = "",
             )
         )
     }
-    if ((var1_name == "prob_CN_missegregation") | (var2_name == "prob_CN_missegregation")) {
+    if (plot_misseg == TRUE) {
         filename <- paste0(model_prefix, "_5_count_missegregations.jpeg")
         jpeg(file = filename, width = 1000, height = 1100)
         max_total_count_missegregation <- max(df_missegregation$total_count_missegregation)
@@ -780,7 +794,7 @@ statistics_multivar <- function(model_prefix = "",
             scale_x_continuous(limits = c(0, 1 + max(df_missegregation$var1)), expand = c(0, 0), breaks = 1:length(x_ticks_breaks), labels = x_ticks_breaks) +
             ylab(var2_lab) +
             scale_y_continuous(limits = c(0, 1 + max(df_missegregation$var2)), expand = c(0, 0), breaks = 1:length(y_ticks_breaks), labels = y_ticks_breaks) +
-            scale_fill_manual(values = c("tomato1", "gray")) +
+            scale_fill_manual(values = c("orchid4", "moccasin")) +
             theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
         for (i in seq(1, length(y_ticks_breaks), by = 1)) {
             var1_all <- df_missegregation$var1_real
@@ -804,12 +818,20 @@ statistics_multivar <- function(model_prefix = "",
                 cols = c("clonal_WGD", "subclonal_WGD", "other")
             ) +
             coord_equal() +
-            labs(fill = "Percentage") +
+            labs(fill = "WGD") +
             xlab(var1_lab) +
             scale_x_continuous(breaks = 1:length(x_ticks_breaks), labels = x_ticks_breaks) +
             ylab(var2_lab) +
             scale_y_continuous(breaks = 1:length(y_ticks_breaks), labels = y_ticks_breaks) +
-            scale_fill_manual(values = c("sienna", "wheat", "gray")) +
+            scale_fill_manual(
+                values = c(
+                    "clonal_WGD" = "sienna",
+                    "subclonal_WGD" = "wheat",
+                    "other" = "gray"
+                ),
+                breaks = c("clonal_WGD", "subclonal_WGD", "other"),
+                labels = c("Clonal", "Subclonal", "Other")
+            ) +
             theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
         print(p)
         dev.off()
@@ -831,19 +853,57 @@ statistics_multivar <- function(model_prefix = "",
                 na.value = "black",
                 name = "Event count before clonal WGD"
             ) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+            theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(1.5, "cm"))
         print(p)
         dev.off()
     }
+    #-----------------Plot statistics: nonviability percentage by ploidy
+    filename <- paste0(model_prefix, "_8_count_nonviability.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    max_total <- max(df_nonviability$total)
+    p <- ggplot() +
+        geom_scatterpie(aes(x = var1, y = var2, r = 0.45 * total / max_total),
+            data = df_nonviability,
+            cols = c("diploid", "tetraploid", "other")
+        ) +
+        coord_equal() +
+        labs(fill = "Nonviability") +
+        xlab(var1_lab) +
+        scale_x_continuous(limits = c(0, 1 + max(df_nonviability$var1)), expand = c(0, 0), breaks = 1:length(x_ticks_breaks), labels = x_ticks_breaks) +
+        ylab(var2_lab) +
+        scale_y_continuous(limits = c(0, 1 + max(df_nonviability$var2)), expand = c(0, 0), breaks = 1:length(y_ticks_breaks), labels = y_ticks_breaks) +
+        # scale_fill_manual(values = c("orchid4", "moccasin")) +
+        scale_fill_manual(
+            values = c(
+                "diploid" = "ghostwhite",
+                "tetraploid" = "tomato1",
+                "other" = "azure4"
+            ),
+            breaks = c("diploid", "tetraploid", "other"),
+            labels = c("Diploid", "Tetraploid", "Other")
+        ) +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    for (i in seq(1, length(y_ticks_breaks), by = 1)) {
+        var1_all <- df_nonviability$var1_real
+        if (is.null(var1_labs)) var1_all <- scientific(df_nonviability$var1_real)
+        var2_all <- df_nonviability$var2_real
+        if (is.null(var2_labs)) var2_all <- scientific(df_nonviability$var2_real)
+        tmp <- df_nonviability$total[which(df_nonviability$var1_real == x_ticks_breaks_val[length(x_ticks_breaks_val)] & df_nonviability$var2_real == y_ticks_breaks_val[i])]
+        if (tmp <= 0) next
+        p <- p + custom_geom_scatterpie_legend(0.45 * tmp / max_total, x = length(x_ticks_breaks_val), y = i, labeller = function(x) paste0(round(x * max_total / 0.45), "%"), textsize = 7)
+    }
+    print(p)
+    dev.off()
 }
 
-statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD) {
+statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg) {
     load(filename)
     #--------------------------------Create dataframe for all statistics
     df_stat_sim <- data.frame(matrix(ncol = 5, nrow = 0))
     colnames(df_stat_sim) <- c("var1", "var2", "sim", "stat", "val")
     #---------------------------Input required variables from simulation
     genotype_list_selection_rate <- simulation$clonal_evolution$genotype_list_selection_rate
+    evolution_origin <- simulation$clonal_evolution$evolution_origin
     genotype_list_ploidy_chrom <- simulation$clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- simulation$clonal_evolution$genotype_list_ploidy_block
     evolution_origin <- simulation$clonal_evolution$evolution_origin
@@ -928,12 +988,20 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     for (chrom in 1:N_chromosomes) {
         vec_CN_block_no[chrom] <- length(genotype_list_ploidy_block[[1]][[chrom]][[1]])
     }
-    #   Compute ploidy for each unique clone
+    #   Find ploidy and selection rate for each unique clone and its mother clone
     table_clone$ploidy <- 0
+    table_clone$mother_ploidy <- 0
     for (i in 1:nrow(table_clone)) {
         table_clone$ploidy[i] <- compute_ploidy(vec_CN_block_no, genotype_list_ploidy_chrom[[Clone_ID[i]]], genotype_list_ploidy_block[[Clone_ID[i]]])
+        if (evolution_origin[Clone_ID[i]] <= 0) {
+            mother_clone <- Clone_ID[i]
+        } else {
+            mother_clone <- evolution_origin[Clone_ID[i]]
+        }
+        table_clone$mother_ploidy[i] <- compute_ploidy(vec_CN_block_no, genotype_list_ploidy_chrom[[mother_clone]], genotype_list_ploidy_block[[mother_clone]])
     }
     table_clone$rounded_ploidy <- round(table_clone$ploidy)
+    table_clone$rounded_mother_ploidy <- round(table_clone$mother_ploidy)
     ploidy_unique <- unique(table_clone$rounded_ploidy)
     #   Compute mean ploidy for simulation
     ploidy <- sum((table_clone$ploidy) * (table_clone$Freq)) / sum(table_clone$Freq)
@@ -951,6 +1019,16 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     table_clone$fitness <- genotype_list_selection_rate[Clone_ID] / genotype_list_selection_rate[1]
     fitness <- sum((table_clone$fitness) * (table_clone$Freq)) / sum(table_clone$Freq)
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "fitness", fitness)
+    #-------------------Statistics: cell count for each viability status
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viability=all_cell_count", sum(table_clone$Freq))
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viability=yes_cell_count", sum(table_clone$Freq[which(table_clone$fitness > 0)]))
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viability=no_cell_count", sum(table_clone$Freq[which(table_clone$fitness <= 0)]))
+    #------------Statistics: cell count for nonviability for each ploidy
+    mother_ploidy_unique <- c(2, 4)
+    for (i in 1:length(mother_ploidy_unique)) {
+        ploidy <- mother_ploidy_unique[i]
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viability=no_ploidy=", ploidy, "_cell_count"), sum(table_clone$Freq[which((table_clone$fitness <= 0) & (table_clone$rounded_mother_ploidy == ploidy))]))
+    }
     #--------------------------------Statistics: Shannon diversity index
     Shannon_index <- diversity(table_clone_unique$Freq)
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "Shannon_index", Shannon_index)
@@ -1005,10 +1083,7 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
         }
         return(event_count)
     }
-
-
-
-    if ((var1_name == "prob_CN_missegregation") | (var2_name == "prob_CN_missegregation")) {
+    if (plot_misseg == TRUE) {
         #   Find count of clonal missegs
         clonal_ancestry <- find_clonal_ancestry(subclonal_ancestry)
         clonal_count_missegregation <- find_event_count(clonal_ancestry, "missegregation")
@@ -1023,25 +1098,16 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     #-----------------------------------------for clones based on ploidy
     for (i in 1:length(ploidy_unique)) {
         ploidy <- ploidy_unique[i]
-        ploidy_table_clone <- table_clone[which(table_clone$rounded_ploidy == ploidy), ]
-        ploidy_subclonal_ancestry <- subclonal_ancestry[which(table_clone$rounded_ploidy == ploidy)]
-        if ((var1_name == "prob_CN_missegregation") | (var2_name == "prob_CN_missegregation")) {
-            #   Find count of clonal missegs
-            clonal_ancestry <- find_clonal_ancestry(ploidy_subclonal_ancestry)
-            clonal_count_missegregation <- find_event_count(clonal_ancestry, "missegregation")
-            df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_clonal_count_missegregation"), clonal_count_missegregation)
-            #   Find average count of subclonal missegs
-            subclonal_count_missegregation <- sum((ploidy_table_clone$count_missegregation) * (ploidy_table_clone$Freq)) / sum(ploidy_table_clone$Freq) - clonal_count_missegregation
-            df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_subclonal_count_missegregation"), subclonal_count_missegregation)
-        }
+        mini_table_clone <- table_clone[which(table_clone$rounded_ploidy == ploidy), ]
+        mini_subclonal_ancestry <- subclonal_ancestry[which(table_clone$rounded_ploidy == ploidy)]
+        #   Find count of clonal missegs
+        clonal_ancestry <- find_clonal_ancestry(mini_subclonal_ancestry)
+        clonal_count_missegregation <- find_event_count(clonal_ancestry, "missegregation")
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_clonal_count_missegregation"), clonal_count_missegregation)
+        #   Find average count of subclonal missegs
+        subclonal_count_missegregation <- sum((mini_table_clone$count_missegregation) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_subclonal_count_missegregation"), subclonal_count_missegregation)
     }
-
-
-
-
-
-
-
     #--------------------------Statistics: event count before clonal WGD
     if (plot_WGD == TRUE) {
         if (clonal_WGD == 1) {
@@ -1087,25 +1153,25 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
 }
 
 #' @export
-simulation_statistics_multivar <- function(model_prefix = "",
-                                           folder_workplace = NULL,
-                                           folder_plots = NULL,
-                                           model_variables_base,
-                                           var1_name = "",
-                                           var1_vals = c(),
-                                           var1_labs = NULL,
-                                           var2_name = "",
-                                           var2_vals = c(),
-                                           var2_labs = NULL,
-                                           var_labs = NULL,
-                                           name_lab = "",
-                                           plotname = "",
-                                           plot_WGD = FALSE,
-                                           n_simulations = 0,
-                                           compute_parallel = TRUE,
-                                           example_simulation = FALSE,
-                                           n_cores = NULL,
-                                           R_libPaths = NULL) {
+statistics_multivar_vector <- function(model_prefix = "",
+                                       folder_workplace = NULL,
+                                       folder_plots = NULL,
+                                       model_variables_base,
+                                       var1_name = "",
+                                       var1_vals = c(),
+                                       var1_labs = NULL,
+                                       var2_name = "",
+                                       var2_vals = c(),
+                                       var2_labs = NULL,
+                                       var_labs = NULL,
+                                       name_lab = "",
+                                       plotname = "",
+                                       plot_WGD = FALSE,
+                                       n_simulations = 0,
+                                       compute_parallel = TRUE,
+                                       example_simulation = FALSE,
+                                       n_cores = NULL,
+                                       R_libPaths = NULL) {
     library(scales)
     library(data.table)
     library(grid)
@@ -1119,14 +1185,6 @@ simulation_statistics_multivar <- function(model_prefix = "",
     } else if (is.matrix(var1_vals)) {
         inds <- 1:ncol(var1_vals)
     }
-
-
-
-
-
-
-
-
     #------------------------------------Get statistics from simulations
     df_stat_sims_all_list <- vector("list", length(inds))
     for (ind in inds) {
@@ -1246,14 +1304,8 @@ simulation_statistics_multivar <- function(model_prefix = "",
     }
     df_stat_sims_all <- rbindlist(df_stat_sims_all_list)
     save(df_stat_sims_all, file = paste0(folder_workplace, "/", plotname, ".rda"))
-
-
-
-    load(paste0(folder_workplace, "/", plotname, ".rda"))
-
-
-
     #---------------------------------------------Functions for plotting
+    load(paste0(folder_workplace, "/", plotname, ".rda"))
     #   Function to make splitted violin plots
     GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin,
         draw_group = function(self, data, ..., draw_quantiles = NULL) {
@@ -1287,227 +1339,254 @@ simulation_statistics_multivar <- function(model_prefix = "",
         )
     }
     #   Function to plot MRCA age
-    plot_MRCA_age <- function(df_plot) {
+    plot_MRCA_age <- function(df_plot, lab) {
         p_MRCA <- ggplot(df_plot, aes(x = lab, y = -val)) +
-            geom_violin(fill = "azure4", alpha = 0.2) +
+            geom_violin(fill = "azure4", width = 1, alpha = 0.2) +
+            geom_boxplot(fill = "azure4", width = 0.1) +
             coord_flip() +
             xlab(name_lab) +
-            ylab("Age of MRCA") +
+            ylab(lab) +
             scale_y_continuous(breaks = c(-1, -0.5, 0), labels = c("-1", "-0.5", "0"), limits = c(-1, 0)) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 50), legend.position = "top")
+            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top")
         return(p_MRCA)
     }
-    #   Function to plot clonal events
-    plot_events <- function(df_plot, lab, pos_legend) {
+    #   Function to plot clonal or subclonal events
+    plot_events <- function(df_plot, lab, pos_legend, limits = NULL) {
         p_events <- ggplot(df_plot, aes(x = lab, y = val, fill = stat)) +
-            geom_split_violin() +
+            geom_split_violin(width = 1, alpha = 0.2) +
+            geom_boxplot(width = 0.1) +
             coord_flip() +
             labs(fill = "") +
             ylab(lab) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 50), legend.position = pos_legend, axis.title.y = element_text(size = 0), axis.text.y = element_text(size = 0))
+            scale_fill_manual(
+                values = c(
+                    "gain" = "indianred3",
+                    "loss" = "dodgerblue3"
+                ),
+                breaks = c("gain", "loss"),
+                labels = c("Gain", "Loss")
+            ) +
+            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = pos_legend, axis.title.y = element_text(size = 0), axis.text.y = element_text(size = 0))
+        if (!is.null(limits)) {
+            p_events <- p_events + ylim(limits)
+        }
         return(p_events)
     }
-
-
-    #----------------------------------------Plot the clonal development
-    df_stat_sims_all$lab <- factor(df_stat_sims_all$lab, levels = var_labs)
-    filename <- paste0(plotname, ".jpeg")
-    jpeg(filename, width = 2000, height = 2000)
-    if (plot_WGD == FALSE) {
-        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat == "MRCA_age"), ]
-        p_MRCA <- plot_MRCA_age(df_plot)
-
-        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("clonal_misseg_gain", "clonal_misseg_loss")), ]
-        df_plot$stat[which(df_plot$stat == "clonal_misseg_gain")] <- "gain"
-        df_plot$stat[which(df_plot$stat == "clonal_misseg_loss")] <- "loss"
-        p_clonal_events <- plot_events(df_plot, lab = "Clonal events", pos_legend = c(0.8, 0.1))
-
-        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("subclonal_misseg_gain", "subclonal_misseg_loss")), ]
-        df_plot$stat[which(df_plot$stat == "subclonal_misseg_gain")] <- "gain"
-        df_plot$stat[which(df_plot$stat == "subclonal_misseg_loss")] <- "loss"
-        p_subclonal_events <- plot_events(df_plot, lab = "Sublonal events", pos_legend = c(0.8, 0.1))
-
-        p <- grid.arrange(p_MRCA, p_clonal_events, p_subclonal_events, widths = c(1.5, 1, 1), nrow = 1)
+    #   Function to plot both clonal and subclonal events
+    plot_clonal_and_subclonal_events <- function(df_plot, lab, var_labs, pos_legend, limits = NULL) {
+        p_events <- ggplot(df_plot, aes(x = lab, y = val, fill = stat)) +
+            geom_boxplot(width = 0.4) +
+            coord_flip() +
+            labs(fill = "") +
+            ylab(lab) +
+            scale_fill_manual(
+                values = c(
+                    "clonal_gain" = "#ff0000",
+                    "clonal_loss" = "#0072B2",
+                    "subclonal_gain" = "olivedrab",
+                    "subclonal_loss" = "gold2"
+                ),
+                breaks = c("clonal_gain", "clonal_loss", "subclonal_gain", "subclonal_loss"),
+                labels = c("Clonal gain", "Clonal loss", "Subclonal gain", "Subclonal loss")
+            ) +
+            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = pos_legend, legend.title = element_text(size = 0), legend.text = element_text(size = 20), axis.title.y = element_text(size = 0), axis.text.y = element_text(size = 0)) +
+            guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+        if (!is.null(limits)) {
+            p_events <- p_events + ylim(limits)
+        }
+        return(p_events)
     }
+    #   Function to plot fitness for both diploid and tetraploid cells
+    plot_fitness_by_ploidy <- function(df_plot, lab, var_labs, pos_legend, limits = NULL) {
+        p_events <- ggplot(df_plot, aes(x = lab, y = val, fill = stat)) +
+            # geom_violin(width = 1, alpha = 0.2) +
+            geom_split_violin(width = 1.5, alpha = 0.2) +
+            geom_boxplot(width = 0.2) +
+            coord_flip() +
+            labs(fill = "") +
+            ylab(lab) +
+            scale_fill_manual(
+                values = c(
+                    "ploidy=2" = "magenta4",
+                    "ploidy=4" = "darkorange"
+                ),
+                breaks = c("ploidy=2", "ploidy=4"),
+                labels = c("ploidy=2", "ploidy=4")
+            ) +
+            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = pos_legend, legend.title = element_text(size = 0), legend.text = element_text(size = 20), axis.title.y = element_text(size = 0), axis.text.y = element_text(size = 0)) +
+            guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+        if (!is.null(limits)) {
+            p_events <- p_events + ylim(limits)
+        }
+        return(p_events)
+    }
+    #   Function to plot fitness for both WGD and non-WGD cells
+    plot_fitness_by_WGD_status <- function(df_plot, lab, var_labs, pos_legend, limits = NULL) {
+        p_events <- ggplot(df_plot, aes(x = lab, y = val, fill = stat)) +
+            # geom_violin(width = 1, alpha = 0.2) +
+            geom_split_violin(width = 1.5, alpha = 0.2) +
+            geom_boxplot(width = 0.2) +
+            coord_flip() +
+            labs(fill = "") +
+            ylab(lab) +
+            scale_fill_manual(
+                values = c(
+                    "WGD=0" = "magenta4",
+                    "WGD=1" = "darkorange"
+                ),
+                breaks = c("WGD=0", "WGD=1"),
+                labels = c("non-WGD cells", "WGD cells")
+            ) +
+            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = pos_legend, legend.title = element_text(size = 0), legend.text = element_text(size = 20), axis.title.y = element_text(size = 0), axis.text.y = element_text(size = 0)) +
+            guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+        if (!is.null(limits)) {
+            p_events <- p_events + ylim(limits)
+        }
+        return(p_events)
+    }
+    #--------------------Plot the clonal development for all simulations
+    filename <- paste0(plotname, ".jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    df_stat_sims_all$lab <- factor(df_stat_sims_all$lab, levels = var_labs)
+    #   Plot age of MRCA
+    df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat == "MRCA_age"), ]
+    p_MRCA <- plot_MRCA_age(df_plot, lab = "Age of MRCA")
+    #   Plot count of events
+    df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("clonal_misseg_loss", "clonal_misseg_gain", "subclonal_misseg_loss", "subclonal_misseg_gain")), ]
+    df_plot$stat[which(df_plot$stat == "clonal_misseg_gain")] <- "clonal_gain"
+    df_plot$stat[which(df_plot$stat == "clonal_misseg_loss")] <- "clonal_loss"
+    df_plot$stat[which(df_plot$stat == "subclonal_misseg_gain")] <- "subclonal_gain"
+    df_plot$stat[which(df_plot$stat == "subclonal_misseg_loss")] <- "subclonal_loss"
+    p_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts", var_labs = var_labs, pos_legend = c(0.5, 0.11))
+    #   Group subplots into a single plot
+    p <- grid.arrange(p_MRCA, p_events, widths = c(1.5, 1), nrow = 1)
+    #   Print plot
     print(p)
     dev.off()
-    return()
-
-
-
-
-
-
-
-
-
-
-    #----------------------------Plot the clonal CCF and development
-    filename <- paste0(plotname_prefix, "_1_clonal_CCF_and_development.jpeg")
-    #---Plot the clonal CCF
-    df_plot <- df_stat_sims_all_list[which(startsWith(df_stat_sims_all_list$stat, "CCF_")), ]
-    df_plot$stat <- gsub("^.*?CCF_", "", df_plot$stat)
-    #   Order the simulation based on clonal CCF score
-    vec_sim_score <- rep(0, length(unique(df_plot$sim)))
-    for (sim in 1:length(vec_sim_score)) {
-        for (group in 1:5) {
-            vec_sim_score[sim] <- vec_sim_score[sim] + 10^(3 * (5 - group)) * df_plot$val[which(df_plot$sim == sim & df_plot$stat == as.character(group))]
-        }
-    }
-    df_plot$sim <- factor(df_plot$sim, levels = order(vec_sim_score, decreasing = TRUE))
-    #   Plot the clonal CCF
-    p_CCF <- ggplot(df_plot, aes(fill = stat, y = val, x = sim)) +
-        geom_bar(width = 1, stat = "identity", position = position_stack(reverse = TRUE)) +
-        scale_x_discrete(expand = c(0, 0)) +
-        scale_y_discrete(expand = c(0, 0)) +
-        labs(fill = "Clonal CCF") +
-        xlab("") +
-        ylab("%") +
-        scale_fill_manual(values = c("dodgerblue3", "cyan3", "palegreen1", "khaki", "salmon2", "gray")) +
-        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 80), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"), axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
-        guides(fill = guide_legend(nrow = 1))
-    #---Plot the average clonal development
-    #   Define necessary functions for plotting
-    plot_MRCA_age <- function(df) {
-        df_plot <- df[which(df$stat == "MRCA_age"), ]
-        p_MRCA <- ggplot(df_plot, aes(x = stat, y = -val)) +
-            geom_violin(fill = "azure4", alpha = 0.2) +
-            geom_boxplot(fill = "azure4") +
-            coord_flip() +
-            xlab("") +
-            ylab("Age") +
-            scale_y_continuous(breaks = c(-1, -0.5, 0), labels = c("-1", "-0.5", "0"), limits = c(-1, 0)) +
-            scale_x_discrete(labels = c("MRCA_age" = "MRCA")) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 0), legend.position = "none", axis.title.x = element_text(size = 50), axis.text.x = element_text(size = 50), axis.text.y = element_text(size = 50, hjust = 0.5))
-        return(p_MRCA)
-    }
-    plot_MRCA_and_WGD_age <- function(df) {
-        df_plot <- df[which(df$stat %in% c("MRCA_age", "WGD_age")), ]
-        df_plot$stat <- factor(df_plot$stat, levels = c("MRCA_age", "WGD_age"))
-        p_before <- ggplot(df_plot, aes(x = stat, y = -val, fill = stat)) +
-            geom_violin(alpha = 0.2) +
-            geom_boxplot() +
-            coord_flip() +
-            xlab("") +
-            ylab("Age") +
-            scale_y_continuous(breaks = c(-1, -0.5, 0), labels = c("-1", "-0.5", "0"), limits = c(-1, 0)) +
-            scale_fill_manual(values = c("azure4", "olivedrab")) +
-            scale_x_discrete(labels = c("MRCA_age" = "MRCA", "WGD_age" = "WGD")) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 0), legend.position = "none", axis.title.x = element_text(size = 50), axis.text.x = element_text(size = 50), axis.text.y = element_text(size = 50, hjust = 0.5))
-    }
-    plot_clonal_events <- function(df, events_max = NULL) {
-        df_plot <- df[which(df$stat %in% c("clonal_misseg_gain", "clonal_misseg_loss")), ]
-        df_plot$stat <- factor(df_plot$stat, levels = c("clonal_misseg_loss", "clonal_misseg_gain"))
-        p_before <- ggplot(df_plot, aes(x = stat, y = val, fill = stat)) +
-            # geom_violin(alpha = 0.2) +
-            geom_boxplot(alpha = 0.5) +
-            coord_flip() +
-            xlab("") +
-            ylab("Clonal events") +
-            scale_y_continuous(breaks = function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
-            scale_fill_manual(values = c("blue3", "firebrick2")) +
-            scale_x_discrete(labels = c("clonal_misseg_gain" = "gain", "clonal_misseg_loss" = "loss")) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 0), legend.position = "none", axis.title.x = element_text(size = 50), axis.text.x = element_text(size = 50), axis.text.y = element_text(size = 50, hjust = 0.5))
-        if (!is.null(events_max)) {
-            p_before <- p_before + scale_y_continuous(limits = c(0, events_max))
-        }
-        return(p_before)
-    }
-    plot_subclonal_events <- function(df, events_max = NULL) {
-        df_plot <- df[which(df$stat %in% c("subclonal_misseg_gain", "subclonal_misseg_loss")), ]
-        df_plot$stat <- factor(df_plot$stat, levels = c("subclonal_misseg_loss", "subclonal_misseg_gain"))
-        p_after <- ggplot(df_plot, aes(x = stat, y = val, fill = stat)) +
-            # geom_violin(alpha = 0.2) +
-            geom_boxplot(alpha = 0.5) +
-            coord_flip() +
-            xlab("") +
-            ylab("Subclonal events") +
-            scale_y_continuous(breaks = function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
-            scale_fill_manual(values = c("blue3", "firebrick2")) +
-            scale_x_discrete(labels = c("subclonal_misseg_gain" = "gain", "subclonal_misseg_loss" = "loss")) +
-            theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 0), legend.position = "none", axis.title.x = element_text(size = 50), axis.text.x = element_text(size = 50), axis.text.y = element_text(size = 50, hjust = 0.5))
-        if (!is.null(events_max)) {
-            p_after <- p_after + scale_y_continuous(limits = c(0, events_max))
-        }
-        return(p_after)
-    }
-    #   Plot the average clonal development
-    if (plot_WGD == FALSE) {
-        jpeg(filename, width = 2000, height = 650)
-        p_MRCA <- plot_MRCA_age(df_stat_sims_all_list)
-        p_before <- plot_clonal_events(df_stat_sims_all_list)
-        p_after <- plot_subclonal_events(df_stat_sims_all_list)
-        p <- grid.arrange(p_CCF, grid.arrange(p_before, p_MRCA, p_after, widths = c(1, 1, 1), nrow = 1), heights = c(4, 2.5), ncol = 1)
+    #------------------Plot the clonal development for only viable cells
+    #-------------------------------------------------in all simulations
+    filename <- paste0(plotname, "_VIABLE.jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    df_stat_sims_all$lab <- factor(df_stat_sims_all$lab, levels = var_labs)
+    #   Plot age of MRCA
+    df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat == "MRCA_age"), ]
+    p_MRCA <- plot_MRCA_age(df_plot, lab = "Age of MRCA")
+    #   Plot count of events
+    df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_clonal_misseg_loss", "viable_cells_clonal_misseg_gain", "viable_cells_subclonal_misseg_loss", "viable_cells_subclonal_misseg_gain")), ]
+    df_plot$stat[which(df_plot$stat == "viable_cells_clonal_misseg_gain")] <- "clonal_gain"
+    df_plot$stat[which(df_plot$stat == "viable_cells_clonal_misseg_loss")] <- "clonal_loss"
+    df_plot$stat[which(df_plot$stat == "viable_cells_subclonal_misseg_gain")] <- "subclonal_gain"
+    df_plot$stat[which(df_plot$stat == "viable_cells_subclonal_misseg_loss")] <- "subclonal_loss"
+    p_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts", var_labs = var_labs, pos_legend = c(0.5, 0.11))
+    #   Group subplots into a single plot
+    p <- grid.arrange(p_MRCA, p_events, widths = c(1.5, 1), nrow = 1)
+    #   Print plot
+    print(p)
+    dev.off()
+    #---------------Plot the clonal development classified by WGD status
+    if (plot_WGD == TRUE) {
+        filename <- paste0(plotname, "_by_WGD_status_VIABLE.jpeg")
+        jpeg(filename, width = 2000, height = 1100)
+        clonal_limits <- c(min(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_clonal_misseg_gain", "viable_cells_clonal_misseg_loss"))]), max(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_clonal_misseg_gain", "viable_cells_clonal_misseg_loss"))]))
+        subclonal_limits <- c(min(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_subclonal_misseg_gain", "viable_cells_subclonal_misseg_loss"))]), max(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_subclonal_misseg_gain", "viable_cells_subclonal_misseg_loss"))]))
+        #   Plot age of MRCA
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat == "MRCA_age"), ]
+        p_MRCA <- plot_MRCA_age(df_plot, lab = "Age of MRCA")
+        #   Plot fitness
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_WGD=0_fitness", "viable_cells_WGD=1_fitness")), ]
+        if (length(which(is.nan(df_plot$val))) > 0) df_plot <- df_plot[-which(is.nan(df_plot$val)), ]
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=0_fitness")] <- "WGD=0"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=1_fitness")] <- "WGD=1"
+        p_fitness <- plot_fitness_by_WGD_status(df_plot, lab = "Fitness", pos_legend = c(0.25, 0.11))
+        #   Plot count of events in non-WGD cells
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_WGD=0_clonal_misseg_loss", "viable_cells_WGD=0_clonal_misseg_gain", "viable_cells_WGD=0_subclonal_misseg_loss", "viable_cells_WGD=0_subclonal_misseg_gain")), ]
+        if (length(which(is.nan(df_plot$val))) > 0) df_plot <- df_plot[-which(is.nan(df_plot$val)), ]
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=0_clonal_misseg_loss")] <- "clonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=0_clonal_misseg_gain")] <- "clonal_gain"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=0_subclonal_misseg_loss")] <- "subclonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=0_subclonal_misseg_gain")] <- "subclonal_gain"
+        p_diploid_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts (non-WGD)", pos_legend = c(0.5, 0.11), limits = clonal_limits)
+        #   Plot count of events in tetraploid cells
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_WGD=1_clonal_misseg_loss", "viable_cells_WGD=1_clonal_misseg_gain", "viable_cells_WGD=1_subclonal_misseg_loss", "viable_cells_WGD=1_subclonal_misseg_gain")), ]
+        if (length(which(is.nan(df_plot$val))) > 0) df_plot <- df_plot[-which(is.nan(df_plot$val)), ]
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=1_clonal_misseg_loss")] <- "clonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=1_clonal_misseg_gain")] <- "clonal_gain"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=1_subclonal_misseg_loss")] <- "subclonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_WGD=1_subclonal_misseg_gain")] <- "subclonal_gain"
+        p_tetraploid_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts (WGD)", pos_legend = "none", limits = clonal_limits)
+        #   Group subplots into a single plot
+        p <- grid.arrange(p_MRCA, p_fitness, p_diploid_events, p_tetraploid_events, widths = c(1.5, 1, 1, 1), nrow = 1)
+        #   Print plot
         print(p)
         dev.off()
-    } else {
-        jpeg(filename, width = 2000, height = 1600)
-        list_sim_all <- unique(df_stat_sims_all_list$sim)
-        list_sim_clonal_WGD <- df_stat_sims_all_list$sim[which((df_stat_sims_all_list$stat == "flag_clonal_WGD") & df_stat_sims_all_list$val == 1)]
-        list_sim_subclonal_WGD <- df_stat_sims_all_list$sim[which((df_stat_sims_all_list$stat == "flag_subclonal_WGD") & df_stat_sims_all_list$val == 1)]
-        list_sim_no_WGD <- setdiff(setdiff(list_sim_all, list_sim_clonal_WGD), list_sim_subclonal_WGD)
-        clonal_events_max <- max(df_stat_sims_all_list$val[which(df_stat_sims_all_list$stat %in% c("clonal_misseg_gain", "clonal_misseg_loss"))])
-        subclonal_events_max <- max(df_stat_sims_all_list$val[which(df_stat_sims_all_list$stat %in% c("subclonal_misseg_gain", "subclonal_misseg_loss"))])
-        if (length(list_sim_clonal_WGD) >= 100) {
-            p_clonal_WGD_title <- ggplot() +
-                geom_label(aes(x = 0, y = 0, label = paste0(round(100 * length(list_sim_clonal_WGD) / length(list_sim_all)), "% simulations with clonal WGD:")), size = 30, label.size = 4, label.padding = unit(1, "lines")) +
-                theme(panel.background = element_rect(fill = "white", colour = "white"), text = element_text(size = 60), axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
-            p_clonal_WGD_MRCA <- plot_MRCA_and_WGD_age(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_clonal_WGD), ])
-            p_clonal_WGD_before <- plot_clonal_events(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_clonal_WGD), ], clonal_events_max)
-            p_clonal_WGD_after <- plot_subclonal_events(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_clonal_WGD), ], subclonal_events_max)
-        } else {
-            p_clonal_WGD_title <- ggplot() +
-                geom_label(aes(x = 0, y = 0, label = paste0(round(100 * length(list_sim_clonal_WGD) / length(list_sim_all)), "% simulations with clonal WGD")), size = 30, label.size = 4, label.padding = unit(1, "lines")) +
-                theme(panel.background = element_rect(fill = "white", colour = "white"), text = element_text(size = 60), axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
-            p_clonal_WGD_MRCA <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-            p_clonal_WGD_before <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-            p_clonal_WGD_after <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-        }
-        if (length(list_sim_subclonal_WGD) >= 100) {
-            p_subclonal_WGD_title <- ggplot() +
-                geom_label(aes(x = 0, y = 0, label = paste0(round(100 * length(list_sim_subclonal_WGD) / length(list_sim_all)), "% simulations with subclonal WGD:")), size = 30, label.size = 4, label.padding = unit(1, "lines")) +
-                theme(panel.background = element_rect(fill = "white", colour = "white"), text = element_text(size = 60), axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
-            p_subclonal_WGD_MRCA <- plot_MRCA_age(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_subclonal_WGD), ])
-            p_subclonal_WGD_before <- plot_clonal_events(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_subclonal_WGD), ], clonal_events_max)
-            p_subclonal_WGD_after <- plot_subclonal_events(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_subclonal_WGD), ], subclonal_events_max)
-        } else {
-            p_subclonal_WGD_title <- ggplot() +
-                geom_label(aes(x = 0, y = 0, label = paste0(round(100 * length(list_sim_subclonal_WGD) / length(list_sim_all)), "% simulations with subclonal WGD")), size = 30, label.size = 4, label.padding = unit(1, "lines")) +
-                theme(panel.background = element_rect(fill = "white", colour = "white"), text = element_text(size = 60), axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
-            p_subclonal_WGD_MRCA <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-            p_subclonal_WGD_before <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-            p_subclonal_WGD_after <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-        }
-        if (length(list_sim_no_WGD) >= 100) {
-            p_no_WGD_title <- ggplot() +
-                geom_label(aes(x = 0, y = 0, label = paste0(round(100 * length(list_sim_no_WGD) / length(list_sim_all)), "% simulations with no WGD:")), size = 30, label.size = 4, label.padding = unit(1, "lines")) +
-                theme(panel.background = element_rect(fill = "white", colour = "white"), text = element_text(size = 60), axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
-            p_no_WGD_MRCA <- plot_MRCA_age(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_no_WGD), ])
-            p_no_WGD_before <- plot_clonal_events(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_no_WGD), ], clonal_events_max)
-            p_no_WGD_after <- plot_subclonal_events(df_stat_sims_all_list[which(df_stat_sims_all_list$sim %in% list_sim_no_WGD), ], subclonal_events_max)
-        } else {
-            p_no_WGD_title <- ggplot() +
-                geom_label(aes(x = 0, y = 0, label = paste0(round(100 * length(list_sim_no_WGD) / length(list_sim_all)), "% simulations with no WGD")), size = 30, label.size = 4, label.padding = unit(1, "lines")) +
-                theme(panel.background = element_rect(fill = "white", colour = "white"), text = element_text(size = 60), axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank())
-            p_no_WGD_MRCA <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-            p_no_WGD_before <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-            p_no_WGD_after <- ggplot() +
-                theme(panel.background = element_rect(fill = "white", colour = "white"))
-        }
-        p <- grid.arrange(p_CCF,
-            p_clonal_WGD_title, grid.arrange(p_clonal_WGD_before, p_clonal_WGD_MRCA, p_clonal_WGD_after, widths = c(1, 1, 1), nrow = 1),
-            p_subclonal_WGD_title, grid.arrange(p_subclonal_WGD_before, p_subclonal_WGD_MRCA, p_subclonal_WGD_after, widths = c(1, 1, 1), nrow = 1),
-            p_no_WGD_title, grid.arrange(p_no_WGD_before, p_no_WGD_MRCA, p_no_WGD_after, widths = c(1, 1, 1), nrow = 1),
-            heights = c(4, 1.5, 2.5, 1.5, 2.5, 1.5, 2.5), ncol = 1
-        )
+    }
+    #-------------------Plot the clonal development classified by ploidy
+    if (plot_WGD == TRUE) {
+        #---------------------------------------------Plot for all cells
+        filename <- paste0(plotname, "_by_ploidy.jpeg")
+        jpeg(filename, width = 2000, height = 1100)
+        clonal_limits <- c(min(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("clonal_misseg_gain", "clonal_misseg_loss"))]), max(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("clonal_misseg_gain", "clonal_misseg_loss"))]))
+        subclonal_limits <- c(min(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("subclonal_misseg_gain", "subclonal_misseg_loss"))]), max(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("subclonal_misseg_gain", "subclonal_misseg_loss"))]))
+        #   Plot age of MRCA
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat == "MRCA_age"), ]
+        p_MRCA <- plot_MRCA_age(df_plot, lab = "Age of MRCA")
+        #   Plot fitness
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("ploidy=2_fitness", "ploidy=4_fitness")), ]
+        df_plot$stat[which(df_plot$stat == "ploidy=2_fitness")] <- "ploidy=2"
+        df_plot$stat[which(df_plot$stat == "ploidy=4_fitness")] <- "ploidy=4"
+        p_fitness <- plot_fitness_by_ploidy(df_plot, lab = "Fitness", pos_legend = c(0.25, 0.11))
+        #   Plot count of events in diploid cells
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("ploidy=2_clonal_misseg_loss", "ploidy=2_clonal_misseg_gain", "ploidy=2_subclonal_misseg_loss", "ploidy=2_subclonal_misseg_gain")), ]
+        df_plot$stat[which(df_plot$stat == "ploidy=2_clonal_misseg_loss")] <- "clonal_loss"
+        df_plot$stat[which(df_plot$stat == "ploidy=2_clonal_misseg_gain")] <- "clonal_gain"
+        df_plot$stat[which(df_plot$stat == "ploidy=2_subclonal_misseg_loss")] <- "subclonal_loss"
+        df_plot$stat[which(df_plot$stat == "ploidy=2_subclonal_misseg_gain")] <- "subclonal_gain"
+        p_diploid_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts (ploidy=2)", pos_legend = c(0.5, 0.11), limits = clonal_limits)
+        #   Plot count of events in tetraploid cells
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("ploidy=4_clonal_misseg_loss", "ploidy=4_clonal_misseg_gain", "ploidy=4_subclonal_misseg_loss", "ploidy=4_subclonal_misseg_gain")), ]
+        df_plot$stat[which(df_plot$stat == "ploidy=4_clonal_misseg_loss")] <- "clonal_loss"
+        df_plot$stat[which(df_plot$stat == "ploidy=4_clonal_misseg_gain")] <- "clonal_gain"
+        df_plot$stat[which(df_plot$stat == "ploidy=4_subclonal_misseg_loss")] <- "subclonal_loss"
+        df_plot$stat[which(df_plot$stat == "ploidy=4_subclonal_misseg_gain")] <- "subclonal_gain"
+        p_tetraploid_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts (ploidy=4)", pos_legend = "none", limits = clonal_limits)
+        #   Group subplots into a single plot
+        p <- grid.arrange(p_MRCA, p_fitness, p_diploid_events, p_tetraploid_events, widths = c(1.5, 1, 1, 1), nrow = 1)
+        #   Print plot
+        print(p)
+        dev.off()
+        #-------------------------------------Plot for only viable cells
+        filename <- paste0(plotname, "_by_ploidy_VIABLE.jpeg")
+        jpeg(filename, width = 2000, height = 1100)
+        clonal_limits <- c(min(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_clonal_misseg_gain", "viable_cells_clonal_misseg_loss"))]), max(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_clonal_misseg_gain", "viable_cells_clonal_misseg_loss"))]))
+        subclonal_limits <- c(min(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_subclonal_misseg_gain", "viable_cells_subclonal_misseg_loss"))]), max(df_stat_sims_all$val[which(df_stat_sims_all$stat %in% c("viable_cells_subclonal_misseg_gain", "viable_cells_subclonal_misseg_loss"))]))
+        #   Plot age of MRCA
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat == "MRCA_age"), ]
+        p_MRCA <- plot_MRCA_age(df_plot, lab = "Age of MRCA")
+        #   Plot fitness
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_ploidy=2_fitness", "viable_cells_ploidy=4_fitness")), ]
+        if (length(which(is.nan(df_plot$val))) > 0) df_plot <- df_plot[-which(is.nan(df_plot$val)), ]
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=2_fitness")] <- "ploidy=2"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=4_fitness")] <- "ploidy=4"
+        p_fitness <- plot_fitness_by_ploidy(df_plot, lab = "Fitness", pos_legend = c(0.25, 0.11))
+        #   Plot count of events in diploid cells
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_ploidy=2_clonal_misseg_loss", "viable_cells_ploidy=2_clonal_misseg_gain", "viable_cells_ploidy=2_subclonal_misseg_loss", "viable_cells_ploidy=2_subclonal_misseg_gain")), ]
+        if (length(which(is.nan(df_plot$val))) > 0) df_plot <- df_plot[-which(is.nan(df_plot$val)), ]
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=2_clonal_misseg_loss")] <- "clonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=2_clonal_misseg_gain")] <- "clonal_gain"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=2_subclonal_misseg_loss")] <- "subclonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=2_subclonal_misseg_gain")] <- "subclonal_gain"
+        p_diploid_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts (ploidy=2)", pos_legend = c(0.5, 0.11), limits = clonal_limits)
+        #   Plot count of events in tetraploid cells
+        df_plot <- df_stat_sims_all[which(df_stat_sims_all$stat %in% c("viable_cells_ploidy=4_clonal_misseg_loss", "viable_cells_ploidy=4_clonal_misseg_gain", "viable_cells_ploidy=4_subclonal_misseg_loss", "viable_cells_ploidy=4_subclonal_misseg_gain")), ]
+        if (length(which(is.nan(df_plot$val))) > 0) df_plot <- df_plot[-which(is.nan(df_plot$val)), ]
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=4_clonal_misseg_loss")] <- "clonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=4_clonal_misseg_gain")] <- "clonal_gain"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=4_subclonal_misseg_loss")] <- "subclonal_loss"
+        df_plot$stat[which(df_plot$stat == "viable_cells_ploidy=4_subclonal_misseg_gain")] <- "subclonal_gain"
+        p_tetraploid_events <- plot_clonal_and_subclonal_events(df_plot, lab = "Event counts (ploidy=4)", pos_legend = "none", limits = clonal_limits)
+        #   Group subplots into a single plot
+        p <- grid.arrange(p_MRCA, p_fitness, p_diploid_events, p_tetraploid_events, widths = c(1.5, 1, 1, 1), nrow = 1)
+        #   Print plot
         print(p)
         dev.off()
     }
@@ -1530,6 +1609,20 @@ simulation_statistics_one_simulation <- function(filename, var1_name, var2_name,
 
     phylogeny_origin <- simulation$sample_phylogeny$package_cell_phylogeny$phylogeny_origin
     phylogeny_deathtime <- simulation$sample_phylogeny$package_cell_phylogeny$phylogeny_deathtime
+    #-------------------Function to find clonal ancestry of given clones
+    find_clonal_ancestry <- function(list_subclonal_ancestry) {
+        if (length(list_subclonal_ancestry) == 0) {
+            clonal_ancestry <- c()
+        } else if (length(list_subclonal_ancestry) == 1) {
+            clonal_ancestry <- list_subclonal_ancestry[[1]]
+        } else {
+            clonal_ancestry <- list_subclonal_ancestry[[1]]
+            for (i in 2:length(list_subclonal_ancestry)) {
+                clonal_ancestry <- intersect(clonal_ancestry, list_subclonal_ancestry[[i]])
+            }
+        }
+        return(clonal_ancestry)
+    }
     #-------------------------------------------------Find unique clones
     table_clone <- as.data.frame(table(ID = simulation$sample$sample_clone_ID))
     table_clone$ID_unique <- 0
@@ -1574,16 +1667,109 @@ simulation_statistics_one_simulation <- function(filename, var1_name, var2_name,
         while (ancestry[1] != 0) ancestry <- c(evolution_origin[ancestry[1]], ancestry)
         subclonal_ancestry[[i]] <- ancestry
     }
-    #------------------Find clonal ancestry (shared by all alive clones)
-    clonal_ancestry <- subclonal_ancestry[[1]]
-    if (length(Clone_ID) > 1) {
-        for (i in 2:length(Clone_ID)) {
-            clonal_ancestry <- intersect(clonal_ancestry, subclonal_ancestry[[i]])
+    #-----------------------------------------Find ploidy for each clone
+    compute_ploidy <- function(vec_CN_block_no, ploidy_chrom, ploidy_block) {
+        N_chromosomes <- length(vec_CN_block_no)
+        vec_CN_all <- c()
+        for (chrom in 1:N_chromosomes) {
+            vec_CN <- rep(0, vec_CN_block_no[chrom])
+            no_strands <- ploidy_chrom[chrom]
+            if (no_strands > 0) {
+                for (strand in 1:no_strands) {
+                    vec_CN <- vec_CN + ploidy_block[[chrom]][[strand]]
+                }
+            }
+            vec_CN_all <- c(vec_CN_all, vec_CN)
         }
+        ploidy <- mean(vec_CN_all)
+        return(ploidy)
     }
-    #----------------Find subclonal ancestry (excluding clonal ancestry)
-    for (i in 1:length(Clone_ID)) {
-        subclonal_ancestry[[i]] <- setdiff(subclonal_ancestry[[i]], clonal_ancestry)
+    N_chromosomes <- length(genotype_list_ploidy_chrom[[1]])
+    vec_CN_block_no <- rep(0, N_chromosomes)
+    for (chrom in 1:N_chromosomes) {
+        vec_CN_block_no[chrom] <- length(genotype_list_ploidy_block[[1]][[chrom]][[1]])
+    }
+    #   Find ploidy and selection rate for each unique clone and its mother clone
+    table_clone$ploidy <- 0
+    table_clone$mother_ploidy <- 0
+    for (i in 1:nrow(table_clone)) {
+        table_clone$ploidy[i] <- compute_ploidy(vec_CN_block_no, genotype_list_ploidy_chrom[[Clone_ID[i]]], genotype_list_ploidy_block[[Clone_ID[i]]])
+        if (evolution_origin[Clone_ID[i]] <= 0) {
+            mother_clone <- Clone_ID[i]
+        } else {
+            mother_clone <- evolution_origin[Clone_ID[i]]
+        }
+        table_clone$mother_ploidy[i] <- compute_ploidy(vec_CN_block_no, genotype_list_ploidy_chrom[[mother_clone]], genotype_list_ploidy_block[[mother_clone]])
+    }
+    table_clone$rounded_ploidy <- round(table_clone$ploidy)
+    table_clone$rounded_mother_ploidy <- round(table_clone$mother_ploidy)
+    ploidy_unique <- unique(table_clone$rounded_ploidy)
+    # #-------------------------------------Find WGD status for each clone
+    # table_clone$WGD_status <- 0
+    # for (i in 1:nrow(table_clone)) {
+    #     WGD_status <- 0
+    #     clone <- Clone_ID[i]
+    #     while (clone > 0) {
+    #         if (length(evolution_genotype_changes[[clone]]) > 0) {
+    #             for (j in 1:length(evolution_genotype_changes[[clone]])) {
+    #                 if (evolution_genotype_changes[[clone]][[j]][1] == "whole-genome-duplication") WGD_status <- 1
+    #             }
+    #         }
+    #         clone <- evolution_origin[clone]
+    #     }
+    #     table_clone$WGD_status[i] <- WGD_status
+    # }
+    #-------------------------------------Find WGD status for each clone
+    find_WGD_status <- function(subclone_ancestry) {
+        WGD_status <- 0
+        j <- 0
+        while ((WGD_status == 0) & (j < length(subclone_ancestry))) {
+            j <- j + 1
+            clone_node <- subclone_ancestry[j]
+            if (clone_node <= 0) next
+            events <- evolution_genotype_changes[[clone_node]]
+            if (length(events) > 0) {
+                for (event in 1:length(events)) {
+                    if (events[[event]][1] == "whole-genome-duplication") {
+                        WGD_status <- 1
+                    }
+                }
+            }
+        }
+        return(WGD_status)
+    }
+    #   Compute WGD status for each unique clone
+    table_clone$WGD_status <- 0
+    for (i in 1:nrow(table_clone)) {
+        subclone_ancestry <- subclonal_ancestry[[i]]
+        table_clone$WGD_status[i] <- find_WGD_status(subclone_ancestry)
+    }
+    #--------------------------------Statistics: status of WGD clonality
+    if (plot_WGD == TRUE) {
+        if (max(table_clone$WGD_status == 1) & min(table_clone$WGD_status) == 1) {
+            flag_clonal_WGD <- 1
+            flag_subclonal_WGD <- 0
+        } else if ((max(table_clone$WGD_status == 1) == 1) & (min(table_clone$WGD_status == 1) == 0)) {
+            flag_clonal_WGD <- 0
+            flag_subclonal_WGD <- 1
+        } else {
+            flag_clonal_WGD <- 0
+            flag_subclonal_WGD <- 0
+        }
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "flag_clonal_WGD", flag_clonal_WGD)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "flag_subclonal_WGD", flag_subclonal_WGD)
+    }
+    #---------------------------------------Statistics: total cell count
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "all_cell_count", sum(table_clone$Freq))
+    #-----------------------------Statistics: cell count for each ploidy
+    for (i in 1:length(ploidy_unique)) {
+        ploidy <- ploidy_unique[i]
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_cell_count"), sum(table_clone$Freq[which(table_clone$rounded_ploidy == ploidy)]))
+    }
+    #-------------------------Statistics: cell count for each WGD status
+    if (plot_WGD == TRUE) {
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "WGD=0_cell_count", sum(table_clone$Freq[which(table_clone$WGD_status == 0)]))
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "WGD=1_cell_count", sum(table_clone$Freq[which(table_clone$WGD_status == 1)]))
     }
     #-----------------------Statistics: CCF of 5 biggest clones + others
     vec_CCF_unique <- 100 * table_clone_unique$Freq / sum(table_clone_unique$Freq)
@@ -1600,102 +1786,142 @@ simulation_statistics_one_simulation <- function(filename, var1_name, var2_name,
     #--------------------------------------------Statistics: Age of MRCA
     MRCA_age <- 1 - mean(phylogeny_deathtime[which(phylogeny_origin == 0)]) / T_current
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "MRCA_age", MRCA_age)
-    #-------------------------------------Statistics: clonal development
-    #   Find count of clonal missegregation gains and losses
-    clonal_count_missegregation_gain <- 0
-    clonal_count_missegregation_loss <- 0
-    if (length(clonal_ancestry) > 0) {
-        for (i in 1:length(clonal_ancestry)) {
-            if (clonal_ancestry[i] == 0) next
-            if (length(evolution_genotype_changes[[clonal_ancestry[i]]]) == 0) next
-            for (j in 1:length(evolution_genotype_changes[[clonal_ancestry[i]]])) {
-                if (evolution_genotype_changes[[clonal_ancestry[i]]][[j]][1] == "missegregation") {
-                    if (evolution_genotype_changes[[clonal_ancestry[i]]][[j]][4] == 1) {
-                        clonal_count_missegregation_gain <- clonal_count_missegregation_gain + 1
-                    } else {
-                        clonal_count_missegregation_loss <- clonal_count_missegregation_loss + 1
-                    }
-                }
-            }
-        }
-    }
-    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "clonal_misseg_gain", clonal_count_missegregation_gain)
-    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "clonal_misseg_loss", clonal_count_missegregation_loss)
-    #   Find count of subclonal missegregation gains and losses
-    table_clone$subclonal_count_missegregation_gain <- 0
-    table_clone$subclonal_count_missegregation_loss <- 0
-    for (k in 1:nrow(table_clone)) {
-        if (length(subclonal_ancestry[[k]]) > 0) {
-            for (i in 1:length(subclonal_ancestry[[k]])) {
-                if (subclonal_ancestry[[k]][i] == 0) next
-                if (length(evolution_genotype_changes[[subclonal_ancestry[[k]][i]]]) == 0) next
-                for (j in 1:length(evolution_genotype_changes[[subclonal_ancestry[[k]][i]]])) {
-                    if (evolution_genotype_changes[[subclonal_ancestry[[k]][i]]][[j]][1] == "missegregation") {
-                        if (evolution_genotype_changes[[subclonal_ancestry[[k]][i]]][[j]][4] == 1) {
-                            table_clone$subclonal_count_missegregation_gain[k] <- table_clone$subclonal_count_missegregation_gain[k] + 1
-                        } else {
-                            table_clone$subclonal_count_missegregation_loss[k] <- table_clone$subclonal_count_missegregation_loss[k] + 1
-                        }
-                    }
-                }
-            }
-        }
-    }
-    subclonal_count_missegregation_gain <- sum((table_clone$subclonal_count_missegregation_gain) * (table_clone$Freq)) / sum(table_clone$Freq)
-    subclonal_count_missegregation_loss <- sum((table_clone$subclonal_count_missegregation_loss) * (table_clone$Freq)) / sum(table_clone$Freq)
-    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "subclonal_misseg_gain", subclonal_count_missegregation_gain)
-    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "subclonal_misseg_loss", subclonal_count_missegregation_loss)
-    #--------------------------------Statistics: status of WGD clonality
-    if (plot_WGD == TRUE) {
-        #   Find status of clonal/subclonal WGD
-        flag_clonal_WGD <- 0
-        if (length(clonal_ancestry) > 0) {
-            for (i in 1:length(clonal_ancestry)) {
-                if (clonal_ancestry[i] == 0) next
-                if (length(evolution_genotype_changes[[clonal_ancestry[i]]]) == 0) next
-                for (j in 1:length(evolution_genotype_changes[[clonal_ancestry[i]]])) {
-                    if (evolution_genotype_changes[[clonal_ancestry[i]]][[j]][1] == "whole-genome-duplication") {
-                        if (flag_clonal_WGD == 0) {
-                            clone_WGD <- clonal_ancestry[i]
-                            flag_clonal_WGD <- 1
-                        }
-                    }
-                }
-            }
-        }
-        flag_subclonal_WGD <- 0
-        if (flag_clonal_WGD == 0) {
-            for (k in 1:nrow(table_clone)) {
-                if (length(subclonal_ancestry[[k]]) > 0) {
-                    for (i in 1:length(subclonal_ancestry[[k]])) {
-                        if (subclonal_ancestry[[k]][i] == 0) next
-                        if (length(evolution_genotype_changes[[subclonal_ancestry[[k]][i]]]) == 0) next
-                        for (j in 1:length(evolution_genotype_changes[[subclonal_ancestry[[k]][i]]])) {
-                            if (evolution_genotype_changes[[subclonal_ancestry[[k]][i]]][[j]][1] == "whole-genome-duplication") {
-                                flag_subclonal_WGD <- 1
+    #------------------Statistics: fitness with respect to diploid clone
+    #-----------------------------------------------for all alive clones
+    table_clone$fitness <- genotype_list_selection_rate[Clone_ID] / genotype_list_selection_rate[1]
+    fitness <- sum((table_clone$fitness) * (table_clone$Freq)) / sum(table_clone$Freq)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "fitness", fitness)
+    #-----------------------Statistics: count of clonal/subclonal events
+    #-----------------------------------------------for all alive clones
+    find_event_count <- function(ancestry, event_type, event_subtype = NULL) {
+        event_count <- 0
+        if (length(ancestry) > 0) {
+            for (i in 1:length(ancestry)) {
+                if (ancestry[i] == 0) next
+                if (length(evolution_genotype_changes[[ancestry[i]]]) == 0) next
+                for (j in 1:length(evolution_genotype_changes[[ancestry[i]]])) {
+                    if (evolution_genotype_changes[[ancestry[i]]][[j]][1] == event_type) {
+                        if (!is.null(event_subtype)) {
+                            if (strtoi(evolution_genotype_changes[[ancestry[i]]][[j]][4]) == event_subtype) {
+                                event_count <- event_count + 1
                             }
+                        } else {
+                            event_count <- event_count + 1
                         }
                     }
                 }
             }
         }
-        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "flag_clonal_WGD", flag_clonal_WGD)
-        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "flag_subclonal_WGD", flag_subclonal_WGD)
+        return(event_count)
     }
-    #--------------------------------------Statistics: age of clonal WGD
-    if (plot_WGD == TRUE) {
-        if (flag_clonal_WGD == 1) {
-            T_WGD <- 0
-            tmp <- 0
-            while (T_WGD == 0) {
-                tmp <- tmp + 1
-                if (clone_WGD %in% evolution_traj_clonal_ID[[tmp]]) T_WGD <- evolution_traj_time[tmp]
-            }
-            WGD_age <- 1 - T_WGD / T_current
-        } else {
-            WGD_age <- 0
-        }
-        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "WGD_age", WGD_age)
+    #   Find count of clonal misseg gains and losses
+    clonal_ancestry <- find_clonal_ancestry(subclonal_ancestry)
+    clonal_count_missegregation_gain <- find_event_count(clonal_ancestry, "missegregation", 1)
+    clonal_count_missegregation_loss <- find_event_count(clonal_ancestry, "missegregation", -1)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "clonal_misseg_loss", clonal_count_missegregation_loss)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "clonal_misseg_gain", clonal_count_missegregation_gain)
+    #   Find average count of subclonal misseg gains and losses
+    table_clone$count_missegregation_gain <- 0
+    table_clone$count_missegregation_loss <- 0
+    for (k in 1:nrow(table_clone)) {
+        table_clone$count_missegregation_gain[k] <- find_event_count(subclonal_ancestry[[k]], "missegregation", 1)
+        table_clone$count_missegregation_loss[k] <- find_event_count(subclonal_ancestry[[k]], "missegregation", -1)
+    }
+    subclonal_count_missegregation_gain <- sum((table_clone$count_missegregation_gain) * (table_clone$Freq)) / sum(table_clone$Freq) - clonal_count_missegregation_gain
+    subclonal_count_missegregation_loss <- sum((table_clone$count_missegregation_loss) * (table_clone$Freq)) / sum(table_clone$Freq) - clonal_count_missegregation_loss
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "subclonal_misseg_loss", subclonal_count_missegregation_loss)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "subclonal_misseg_gain", subclonal_count_missegregation_gain)
+    #   Find count of clonal misseg gains and losses for only viable cells
+    mini_table_clone <- table_clone[which(table_clone$fitness > 0), ]
+    mini_subclonal_ancestry <- subclonal_ancestry[which(table_clone$fitness > 0)]
+    mini_clonal_ancestry <- find_clonal_ancestry(mini_subclonal_ancestry)
+    viable_cells_clonal_count_missegregation_gain <- find_event_count(mini_clonal_ancestry, "missegregation", 1)
+    viable_cells_clonal_count_missegregation_loss <- find_event_count(mini_clonal_ancestry, "missegregation", -1)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viable_cells_clonal_misseg_loss", viable_cells_clonal_count_missegregation_loss)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viable_cells_clonal_misseg_gain", viable_cells_clonal_count_missegregation_gain)
+    #   Find average count of subclonal misseg gains and losses for only viable cells
+    viable_cells_subclonal_count_missegregation_gain <- sum((mini_table_clone$count_missegregation_gain) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - viable_cells_clonal_count_missegregation_gain
+    viable_cells_subclonal_count_missegregation_loss <- sum((mini_table_clone$count_missegregation_loss) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - viable_cells_clonal_count_missegregation_loss
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viable_cells_subclonal_misseg_loss", viable_cells_subclonal_count_missegregation_loss)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "viable_cells_subclonal_misseg_gain", viable_cells_subclonal_count_missegregation_gain)
+    #-----------------------Statistics: count of clonal/subclonal events
+    #-----------------------------------------for clones based on ploidy
+    for (i in 1:length(ploidy_unique)) {
+        ploidy <- ploidy_unique[i]
+        mini_table_clone <- table_clone[which(table_clone$rounded_ploidy == ploidy), ]
+        mini_subclonal_ancestry <- subclonal_ancestry[which(table_clone$rounded_ploidy == ploidy)]
+        #   Find count of clonal misseg gains and losses
+        clonal_ancestry <- find_clonal_ancestry(mini_subclonal_ancestry)
+        clonal_count_missegregation_gain <- find_event_count(clonal_ancestry, "missegregation", 1)
+        clonal_count_missegregation_loss <- find_event_count(clonal_ancestry, "missegregation", -1)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_clonal_misseg_loss"), clonal_count_missegregation_loss)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_clonal_misseg_gain"), clonal_count_missegregation_gain)
+        #   Find average count of subclonal misseg gains and losses
+        subclonal_count_missegregation_gain <- sum((mini_table_clone$count_missegregation_gain) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation_gain
+        subclonal_count_missegregation_loss <- sum((mini_table_clone$count_missegregation_loss) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation_loss
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_subclonal_misseg_loss"), subclonal_count_missegregation_loss)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_subclonal_misseg_gain"), subclonal_count_missegregation_gain)
+    }
+    #-----------------------Statistics: count of clonal/subclonal events
+    #-----------------------------for only viable clones based on ploidy
+    for (i in 1:length(ploidy_unique)) {
+        ploidy <- ploidy_unique[i]
+        mini_table_clone <- table_clone[which(table_clone$rounded_ploidy == ploidy & table_clone$fitness > 0), ]
+        mini_subclonal_ancestry <- subclonal_ancestry[which(table_clone$rounded_ploidy == ploidy & table_clone$fitness > 0)]
+        #   Find count of clonal misseg gains and losses
+        clonal_ancestry <- find_clonal_ancestry(mini_subclonal_ancestry)
+        clonal_count_missegregation_gain <- find_event_count(clonal_ancestry, "missegregation", 1)
+        clonal_count_missegregation_loss <- find_event_count(clonal_ancestry, "missegregation", -1)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_ploidy=", ploidy, "_clonal_misseg_loss"), clonal_count_missegregation_loss)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_ploidy=", ploidy, "_clonal_misseg_gain"), clonal_count_missegregation_gain)
+        #   Find average count of subclonal misseg gains and losses
+        subclonal_count_missegregation_gain <- sum((mini_table_clone$count_missegregation_gain) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation_gain
+        subclonal_count_missegregation_loss <- sum((mini_table_clone$count_missegregation_loss) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation_loss
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_ploidy=", ploidy, "_subclonal_misseg_loss"), subclonal_count_missegregation_loss)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_ploidy=", ploidy, "_subclonal_misseg_gain"), subclonal_count_missegregation_gain)
+    }
+    #-----------------------Statistics: count of clonal/subclonal events
+    #-------------------------for only viable clones based on WGD status
+    WGD_status_unique <- c(0, 1)
+    for (i in 1:length(WGD_status_unique)) {
+        WGD_status <- WGD_status_unique[i]
+        mini_table_clone <- table_clone[which(table_clone$WGD_status == WGD_status & table_clone$fitness > 0), ]
+        mini_subclonal_ancestry <- subclonal_ancestry[which(table_clone$WGD_status == WGD_status & table_clone$fitness > 0)]
+        #   Find count of clonal misseg gains and losses
+        clonal_ancestry <- find_clonal_ancestry(mini_subclonal_ancestry)
+        clonal_count_missegregation_gain <- find_event_count(clonal_ancestry, "missegregation", 1)
+        clonal_count_missegregation_loss <- find_event_count(clonal_ancestry, "missegregation", -1)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_WGD=", WGD_status, "_clonal_misseg_loss"), clonal_count_missegregation_loss)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_WGD=", WGD_status, "_clonal_misseg_gain"), clonal_count_missegregation_gain)
+        #   Find average count of subclonal misseg gains and losses
+        subclonal_count_missegregation_gain <- sum((mini_table_clone$count_missegregation_gain) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation_gain
+        subclonal_count_missegregation_loss <- sum((mini_table_clone$count_missegregation_loss) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq) - clonal_count_missegregation_loss
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_WGD=", WGD_status, "_subclonal_misseg_loss"), subclonal_count_missegregation_loss)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_WGD=", WGD_status, "_subclonal_misseg_gain"), subclonal_count_missegregation_gain)
+    }
+    #------------------Statistics: fitness with respect to diploid clone
+    #-----------------------------------------for clones based on ploidy
+    for (i in 1:length(ploidy_unique)) {
+        ploidy <- ploidy_unique[i]
+        mini_table_clone <- table_clone[which(table_clone$rounded_ploidy == ploidy), ]
+        fitness <- sum((mini_table_clone$fitness) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("ploidy=", ploidy, "_fitness"), fitness)
+    }
+    #------------------Statistics: fitness with respect to diploid clone
+    #-----------------------------for only viable clones based on ploidy
+    for (i in 1:length(ploidy_unique)) {
+        ploidy <- ploidy_unique[i]
+        mini_table_clone <- table_clone[which(table_clone$rounded_ploidy == ploidy & table_clone$fitness > 0), ]
+        fitness <- sum((mini_table_clone$fitness) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_ploidy=", ploidy, "_fitness"), fitness)
+    }
+    #------------------Statistics: fitness with respect to diploid clone
+    #-------------------------for only viable clones based on WGD status
+    for (i in 1:length(WGD_status_unique)) {
+        WGD_status <- WGD_status_unique[i]
+        mini_table_clone <- table_clone[which(table_clone$WGD_status == WGD_status & table_clone$fitness > 0), ]
+        fitness <- sum((mini_table_clone$fitness) * (mini_table_clone$Freq)) / sum(mini_table_clone$Freq)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, paste0("viable_cells_WGD=", WGD_status, "_fitness"), fitness)
     }
     #--------------------------Return the statistics for this simulation
     return(df_stat_sim)
