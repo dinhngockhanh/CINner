@@ -1,3 +1,60 @@
+#----------------------Function to assign parameters to proper positions
+assign_paras <- function(model_variables, parameter_IDs, parameters) {
+    for (i in 1:length(parameter_IDs)) {
+        parameter_ID <- parameter_IDs[i]
+        if (parameter_ID %in% model_variables$general_variables$Variable) {
+            model_variables$general_variables$Value[which(model_variables$general_variables$Variable == parameter_ID)] <- parameters[i]
+        } else if (parameter_ID %in% model_variables$chromosome_arm_library$Arm_ID) {
+            model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Arm_ID == parameter_ID)] <- parameters[i]
+        }
+    }
+    return(model_variables)
+}
+#--------------------------Function to extract arm-level gain/loss delta
+get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, list_targets) {
+    arm_gain <- rep(0, length(list_targets))
+    arm_loss <- rep(0, length(list_targets))
+    for (i in 1:length(list_targets)) {
+        chrom <- substr(list_targets[i], 1, nchar(list_targets[i]) - 1)
+        arm <- substr(list_targets[i], nchar(list_targets[i]), nchar(list_targets[i]))
+        vec_loc <- which(copynumber_coordinates$chr == chrom)
+        delta_gain <- bin_gainloss$delta_gain[vec_loc]
+        delta_loss <- bin_gainloss$delta_loss[vec_loc]
+        if (arm == "p") {
+            arm_gain[i] <- delta_gain[1]
+            arm_loss[i] <- delta_loss[1]
+        } else if (arm == "q") {
+            arm_gain[i] <- delta_gain[length(delta_gain)]
+            arm_loss[i] <- delta_loss[length(delta_loss)]
+        }
+    }
+    arm_gainloss <- list()
+    arm_gainloss$delta_gain <- arm_gain
+    arm_gainloss$delta_loss <- arm_loss
+    return(arm_gainloss)
+}
+#-------------------------------------Objective function for ABC fitting
+func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets) {
+    #   Assign parameters in model variables
+    model_variables <- assign_paras(model_variables, parameter_IDs, parameters)
+    #   Make simulations
+    SIMS_chromosome <- simulator_full_program(
+        model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
+        save_simulation = FALSE, report_progress = TRUE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile"),
+        R_libPaths = R_libPaths
+    )
+    #   Statistics = arm-level gain/loss delta
+    SIMS_delta_genome_arms <- gainloss_SIMS(SIMS_chromosome, ploidy_normalization = FALSE)
+    SIMS_arm_gainloss <- get_arm_gainloss(SIMS_delta_genome_arms, copynumber_coordinates, list_targets)
+    stat <- c(SIMS_arm_gainloss$delta_gain, SIMS_arm_gainloss$delta_loss)
+}
+#-----------------Function to choose one best parameter from a posterior
+get_best_para <- function(data_rf, model_rf, obs_rf, post_rf) {
+    df_dist <- densityPlot_df(model_rf, obs_rf, data_rf)
+    best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
+}
+
 #' @export
 library_bulk_arm_CN <- function(library_name,
                                 model_variables,
@@ -5,8 +62,10 @@ library_bulk_arm_CN <- function(library_name,
                                 list_targets,
                                 ABC_simcount = 10000,
                                 n_cores = NULL,
-                                n_samples = 100) {
+                                n_samples = 100,
+                                R_libPaths = NULL) {
     library(parallel)
+    library(pbapply)
     library(abcrf)
     library(grid)
     library(gridExtra)
@@ -14,57 +73,6 @@ library_bulk_arm_CN <- function(library_name,
     library(signals)
     if (is.null(n_cores)) {
         n_cores <- max(detectCores() - 1, 1)
-    }
-    #---------------------------Define functions for the fitting routine
-    #---Function to assign parameters to proper positions
-    assign_paras <- function(model_variables, parameter_IDs, parameters) {
-        for (i in 1:length(parameter_IDs)) {
-            parameter_ID <- parameter_IDs[i]
-            if (parameter_ID %in% model_variables$general_variables$Variable) {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == parameter_ID)] <- parameters[i]
-            } else if (parameter_ID %in% model_variables$chromosome_arm_library$Arm_ID) {
-                model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Arm_ID == parameter_ID)] <- parameters[i]
-            }
-        }
-        return(model_variables)
-    }
-    #---Function to extract arm-level gain/loss delta
-    get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, list_targets) {
-        arm_gain <- rep(0, length(list_targets))
-        arm_loss <- rep(0, length(list_targets))
-        for (i in 1:length(list_targets)) {
-            chrom <- substr(list_targets[i], 1, nchar(list_targets[i]) - 1)
-            arm <- substr(list_targets[i], nchar(list_targets[i]), nchar(list_targets[i]))
-            vec_loc <- which(copynumber_coordinates$chr == chrom)
-            delta_gain <- bin_gainloss$delta_gain[vec_loc]
-            delta_loss <- bin_gainloss$delta_loss[vec_loc]
-            if (arm == "p") {
-                arm_gain[i] <- delta_gain[1]
-                arm_loss[i] <- delta_loss[1]
-            } else if (arm == "q") {
-                arm_gain[i] <- delta_gain[length(delta_gain)]
-                arm_loss[i] <- delta_loss[length(delta_loss)]
-            }
-        }
-        arm_gainloss <- list()
-        arm_gainloss$delta_gain <- arm_gain
-        arm_gainloss$delta_loss <- arm_loss
-        return(arm_gainloss)
-    }
-    #---Objective function for ABC fitting
-    func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets) {
-        #   Assign parameters in model variables
-        model_variables <- assign_paras(model_variables, parameter_IDs, parameters)
-        #   Make simulations
-        SIMS_chromosome <- simulator_full_program(
-            model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
-            save_simulation = FALSE, report_progress = TRUE,
-            output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
-        )
-        #   Statistics = arm-level gain/loss delta
-        SIMS_delta_genome_arms <- gainloss_SIMS(SIMS_chromosome, ploidy_normalization = FALSE)
-        SIMS_arm_gainloss <- get_arm_gainloss(SIMS_delta_genome_arms, copynumber_coordinates, list_targets)
-        stat <- c(SIMS_arm_gainloss$delta_gain, SIMS_arm_gainloss$delta_loss)
     }
     #---------------------------------List of parameter IDs to be fitted
     parameter_IDs <- list_parameters$Variable
@@ -96,6 +104,7 @@ library_bulk_arm_CN <- function(library_name,
     #   Configure parallel pool
     cl <- makePSOCKcluster(n_cores)
     cat("Creating reference table for ABC...\n")
+    n_samples <<- n_samples
     list_targets <<- list_targets
     sim_param <<- sim_param
     parameter_IDs <<- parameter_IDs
@@ -103,8 +112,10 @@ library_bulk_arm_CN <- function(library_name,
     gainloss_SIMS <<- gainloss_SIMS
     func_ABC <<- func_ABC
     assign_paras <<- assign_paras
+    get_arm_gainloss <<- get_arm_gainloss
+    R_libPaths <<- R_libPaths
     clusterExport(cl, varlist = c(
-        "list_targets", "sim_param", "parameter_IDs", "model_variables", "gainloss_SIMS", "func_ABC", "assign_paras",
+        "n_samples", "list_targets", "sim_param", "parameter_IDs", "model_variables", "gainloss_SIMS", "func_ABC", "assign_paras", "get_arm_gainloss", "R_libPaths",
         "BUILD_driver_library", "simulator_full_program", "one_simulation",
         "SIMULATOR_VARIABLES_for_simulation",
         "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
@@ -147,12 +158,25 @@ library_bulk_arm_CN <- function(library_name,
 
 #' @export
 fitting_bulk_arm_CN <- function(library_name,
+                                model_name,
                                 copynumber_DATA,
                                 type_sample_DATA = "individual",
                                 type_cn_DATA = "bin",
                                 list_parameters,
                                 list_targets,
-                                n_cores = NULL) {
+                                n_cores = NULL,
+                                R_libPaths = NULL) {
+    library(parallel)
+    library(pbapply)
+    library(abcrf)
+    library(grid)
+    library(gridExtra)
+    library(ggplot2)
+    library(signals)
+    if (is.null(n_cores)) {
+        n_cores <- max(detectCores() - 1, 1)
+    }
+    #-----------------------------------------Input simulated CN library
     filename <- paste0(library_name, "_ABC_input.rda")
     load(filename)
     model_variables <- ABC_input$model_variables
@@ -160,24 +184,75 @@ fitting_bulk_arm_CN <- function(library_name,
     parameter_IDs <- ABC_input$parameter_IDs
     sim_param <- ABC_input$sim_param
     sim_stat <- ABC_input$sim_stat
+    #---------------------Find arm-level gain/loss map for entire genome
+    cn_info <- model_variables$cn_info
+    #   Find genome coordinate from one simulation
+    copynumber_sims <- simulator_full_program(
+        model = model_variables,
+        model_prefix = "TEST",
+        n_simulations = 1,
+        stage_final = 2,
+        save_simulation = FALSE,
+        report_progress = FALSE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+    )
+    simulation <- copynumber_sims[[1]]
+    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+    CNbins_iteration <- sample_genotype_unique_profile[[1]]
+    copynumber_coordinates <- CNbins_iteration[, 1:3]
+    copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
+    #   Get the target statistics (= gain/loss on each chromosome arm)
+    if (type_sample_DATA == "individual") {
+        #   Get gain/loss map for this chromosome at arm level
+        DATA_delta_genome_arms <- gainloss_DATA(
+            copynumber_DATA, copynumber_coordinates,
+            ploidy_normalization = TRUE,
+            use_rbindlist = TRUE,
+            arm_level = TRUE, pos_centromeres = cn_info
+        )
+        #   Get the target statistics (= gain/loss on each chromosome arm)
+        DATA_arm_gainloss <- get_arm_gainloss(DATA_delta_genome_arms, copynumber_coordinates, list_targets)
+        DATA_target <- c(DATA_arm_gainloss$delta_gain, DATA_arm_gainloss$delta_loss)
+    } else if (type_sample_DATA == "average") {
+        DATA_target <- rep(0, 2 * length(list_targets))
+        for (i in 1:length(list_targets)) {
+            arm <- list_targets[i]
+            loc <- which(copynumber_DATA$Arm == arm)
+            if (length(loc) > 0) {
+                DATA_target[i] <- copynumber_DATA$Amp_freq_all[loc]
+                DATA_target[i + length(list_targets)] <- -copynumber_DATA$Del_freq_all[loc]
+            }
+        }
+    }
     # ====================================FITTING WITH ABC RANDOM FOREST
     #--------------------------------------------Fit parameters with ABC
-    #   Dataframe for parameters for reference
-    all_paras <- data.frame(sim_param)
-    colnames(all_paras) <- parameter_IDs
-    #   Dataframe for corresponding statistics for reference
-    all_data <- data.frame(sim_stat)
-    colnames(all_data) <- paste0("gainloss_", 1:ncol(all_data))
-    #   Dataframe for data observation
+    #---Dataframe for data observation
     obs_rf <- data.frame(matrix(DATA_target, nrow = 1))
     colnames(obs_rf) <- paste0("gainloss_", 1:ncol(obs_rf))
-    #   Fit each parameter with ABC-rf
+    #---Dataframe for parameters for reference
+    all_paras <- data.frame(sim_param[, which(parameter_IDs %in% list_parameters$Variable)])
+    colnames(all_paras) <- parameter_IDs[which(parameter_IDs %in% list_parameters$Variable)]
+    # all_paras <- data.frame(sim_param)
+    # colnames(all_paras) <- parameter_IDs
+    #---Dataframe for corresponding statistics for reference
+    all_data <- data.frame(sim_stat[
+        , c(
+            which(model_variables$chromosome_arm_library$Arm_ID %in% list_targets),
+            which(model_variables$chromosome_arm_library$Arm_ID %in% list_targets) + length(model_variables$chromosome_arm_library$Arm_ID)
+        )
+    ])
+    colnames(all_data) <- paste0("gainloss_", 1:ncol(all_data))
+    # all_data <- data.frame(sim_stat)
+    # colnames(all_data) <- paste0("gainloss_", 1:ncol(all_data))
+    #---Fit each parameter with ABC-rf
     layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
     gs <- list()
     id <- 0
-    for (para in 1:length(parameter_IDs)) {
-        para_ID <- parameter_IDs[para]
-        cat(paste("ABC for parameter ", para_ID, " [", para, "/", length(parameter_IDs), "]", "\n", sep = ""))
+    # for (para in 1:length(parameter_IDs)) {
+    for (para in 1:nrow(list_parameters)) {
+        para_ID <- list_parameters$Variable[para]
+        # para_ID <- parameter_IDs[para]
+        cat(paste("ABC for parameter ", para_ID, " [", para, "/", nrow(list_parameters), "]", "\n", sep = ""))
         #   Train the random forest
         data_rf <- cbind(all_paras[para_ID], all_data)
         colnames(data_rf)[1] <- "para"
@@ -197,18 +272,18 @@ fitting_bulk_arm_CN <- function(library_name,
         ABC_output$best_rf <- best_rf
         filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
         save(ABC_output, file = filename)
-        #   Plot the prior, posterior and chosen best parameter
-        filename <- paste0(model_name, "_ABC_", para_ID, ".jpeg")
-        jpeg(filename, width = 2000, height = 1000)
-        p <- densityPlot_MODIFIED(
-            model_rf, obs_rf, data_rf,
-            protocol = "arm",
-            chosen_para = best_rf,
-            color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
-            main = para_ID
-        )
-        print(p)
-        dev.off()
+        # #   Plot the prior, posterior and chosen best parameter
+        # filename <- paste0(model_name, "_ABC_", para_ID, ".jpeg")
+        # jpeg(filename, width = 2000, height = 1000)
+        # p <- densityPlot_MODIFIED(
+        #     model_rf, obs_rf, data_rf,
+        #     protocol = "arm",
+        #     chosen_para = best_rf,
+        #     color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
+        #     main = para_ID
+        # )
+        # print(p)
+        # dev.off()
         #   Plot the prior, posterior and chosen best parameter for all variables
         id <- id + 1
         row <- id %% 7
@@ -233,30 +308,64 @@ fitting_bulk_arm_CN <- function(library_name,
     # =======================================ANALYSIS OF FITTING RESULTS
     #------------------Choose the best parameter set from all posteriors
     parameters_best <- rep(0, length(parameter_IDs))
-    for (para in 1:length(parameter_IDs)) {
-        para_ID <- parameter_IDs[para]
+    # for (para in 1:length(parameter_IDs)) {
+    for (para in 1:nrow(list_parameters)) {
+        para_ID <- list_parameters$Variable[para]
+        # para_ID <- parameter_IDs[para]
         filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
         load(filename)
         best_rf <- ABC_output$best_rf
         parameters_best[para] <- best_rf
     }
+
+
+    list_parameters$Best_value <- 0
+    # for (para in 1:nrow(list_parameters)) {
+    for (para in 1:nrow(list_parameters)) {
+        para_ID <- list_parameters$Variable[para]
+        filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
+        load(filename)
+        best_rf <- ABC_output$best_rf
+        list_parameters$Best_value[para] <- best_rf
+    }
+    filename <- paste0(model_name, "_fitted_parameters.csv")
+    write.csv(list_parameters, filename)
+
+
+
+
+
+
+
     #------------------------Analysis of fitted CN profiles against data
     #   Assign parameters in model variables
-    model_variables <- assign_paras(model_variables, parameter_IDs, parameters_best)
+    model_variables <- assign_paras(model_variables, list_parameters$Variable, parameters_best)
+    # model_variables <- assign_paras(model_variables, parameter_IDs, parameters_best)
     #   Make simulations using best parameters
     SIMS_chromosome <- simulator_full_program(
         model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
-        save_simulation = FALSE, report_progress = TRUE, compute_parallel = FALSE,
-        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+        save_simulation = FALSE, report_progress = TRUE, compute_parallel = TRUE, n_cores = n_cores,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile"),
+        R_libPaths = R_libPaths
     )
     #   Plot comparison vs bin-level data
     if (type_cn_DATA == "bin") {
         filename <- paste(model_name, "_against_bin_data.jpeg", sep = "")
-        plot_gainloss(SIMS_chromosome, copynumber_DATA, type_sample_DATA, filename, arm_level = FALSE, pos_centromeres = cn_info)
+        plot_gainloss(
+            copynumber_sims = SIMS_chromosome, copynumber_DATA = copynumber_DATA,
+            title = model_name, filename = filename,
+            type_sample_DATA = type_sample_DATA,
+            arm_level = FALSE, pos_centromeres = cn_info
+        )
     }
     #   Plot comparison vs arm-level data
     filename <- paste(model_name, "_against_arm_data.jpeg", sep = "")
-    plot_gainloss(SIMS_chromosome, copynumber_DATA, type_sample_DATA, filename, arm_level = TRUE, pos_centromeres = cn_info)
+    plot_gainloss(
+        copynumber_sims = SIMS_chromosome, copynumber_DATA = copynumber_DATA,
+        title = model_name, filename = filename,
+        type_sample_DATA = type_sample_DATA,
+        arm_level = TRUE, pos_centromeres = cn_info
+    )
     #----------------Analysis of fitted parameters against amp/del freqs
     #   Prepare plot dataframe with fitted selection rates and amp/del freqs
     plot_table <- data.frame(Arm = list_targets)

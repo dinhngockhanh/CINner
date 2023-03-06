@@ -2,6 +2,7 @@
 plot_gainloss <- function(copynumber_sims,
                           copynumber_DATA,
                           type_sample_DATA = "individual",
+                          title = NULL,
                           filename,
                           arm_level = FALSE,
                           pos_centromeres = c(),
@@ -71,6 +72,11 @@ plot_gainloss <- function(copynumber_sims,
         gain_data = f1_data,
         loss_data = f2_data
     )
+    if (!is.null(title)) {
+        p_title <- ggplot() +
+            annotate("text", x = 0, y = 0, size = 12, colour = "black", label = title) +
+            theme_void()
+    }
     #---Plot gain_sims/loss_sims map for simulations
     p_sims <- ggplot(data = df_plot) +
         geom_bar(aes(x = x, y = gain_sims), stat = "identity", colour = "#E34A33", fill = "#E34A33") +
@@ -91,7 +97,7 @@ plot_gainloss <- function(copynumber_sims,
         theme(text = element_text(size = 30)) +
         scale_x_continuous(limits = c(0, nrow(df_plot)), expand = c(0, 0)) +
         scale_y_continuous(limits = c(-1, 1), expand = c(0, 0)) +
-        ylab("PCAWG") +
+        ylab("Data") +
         xlab("")
     #---Plot Spearman correlation scores
     p_spearman_gain <- ggplot() +
@@ -137,7 +143,11 @@ plot_gainloss <- function(copynumber_sims,
         theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
     #---Print the mini plots
     jpeg(filename, width = width, height = height)
-    p <- grid.arrange(p_sims, arrangeGrob(p_spearman_gain, p_spearman_loss, nrow = 1), p_data, heights = c(5, 1, 5), ncol = 1)
+    if (!is.null(title)) {
+        p <- grid.arrange(p_title, p_sims, arrangeGrob(p_spearman_gain, p_spearman_loss, nrow = 1), p_data, heights = c(1, 5, 1, 5), ncol = 1)
+    } else {
+        p <- grid.arrange(p_sims, arrangeGrob(p_spearman_gain, p_spearman_loss, nrow = 1), p_data, heights = c(5, 1, 5), ncol = 1)
+    }
     print(p)
     dev.off()
 }

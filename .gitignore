@@ -14,7 +14,8 @@ vignettes/ov2295_cell_cn.csv
 vignettes/__pycache__
 vignettes/WCND.py
 vignettes/Plan\ for\ vignettes.gdoc
-specific_functions/
+functions_ginsburg/
+functions_old/
 
 vignettes/batch_GAINvsLOSS.sh
 vignettes/program_GAINvsLOSS.r
