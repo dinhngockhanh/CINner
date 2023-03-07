@@ -165,7 +165,8 @@ fitting_bulk_arm_CN <- function(library_name,
                                 list_parameters,
                                 list_targets,
                                 n_cores = NULL,
-                                R_libPaths = NULL) {
+                                R_libPaths = NULL,
+                                folder_workplace = NULL) {
     library(parallel)
     library(pbapply)
     library(abcrf)
@@ -175,6 +176,13 @@ fitting_bulk_arm_CN <- function(library_name,
     library(signals)
     if (is.null(n_cores)) {
         n_cores <- max(detectCores() - 1, 1)
+    }
+    folder_workplace_tmp <- folder_workplace
+    if (is.null(folder_workplace_tmp)) {
+        folder_workplace_tmp <- ""
+    } else {
+        dir.create(folder_workplace_tmp)
+        folder_workplace_tmp <- paste(folder_workplace_tmp, "/", sep = "")
     }
     #-----------------------------------------Input simulated CN library
     filename <- paste0(library_name, "_ABC_input.rda")
@@ -224,122 +232,93 @@ fitting_bulk_arm_CN <- function(library_name,
             }
         }
     }
-    # ====================================FITTING WITH ABC RANDOM FOREST
-    #--------------------------------------------Fit parameters with ABC
-    #---Dataframe for data observation
-    obs_rf <- data.frame(matrix(DATA_target, nrow = 1))
-    colnames(obs_rf) <- paste0("gainloss_", 1:ncol(obs_rf))
-    #---Dataframe for parameters for reference
-    all_paras <- data.frame(sim_param[, which(parameter_IDs %in% list_parameters$Variable)])
-    colnames(all_paras) <- parameter_IDs[which(parameter_IDs %in% list_parameters$Variable)]
-    # all_paras <- data.frame(sim_param)
-    # colnames(all_paras) <- parameter_IDs
-    #---Dataframe for corresponding statistics for reference
-    all_data <- data.frame(sim_stat[
-        , c(
-            which(model_variables$chromosome_arm_library$Arm_ID %in% list_targets),
-            which(model_variables$chromosome_arm_library$Arm_ID %in% list_targets) + length(model_variables$chromosome_arm_library$Arm_ID)
-        )
-    ])
-    colnames(all_data) <- paste0("gainloss_", 1:ncol(all_data))
-    # all_data <- data.frame(sim_stat)
+    # # ====================================FITTING WITH ABC RANDOM FOREST
+    # #--------------------------------------------Fit parameters with ABC
+    # #---Dataframe for data observation
+    # obs_rf <- data.frame(matrix(DATA_target, nrow = 1))
+    # colnames(obs_rf) <- paste0("gainloss_", 1:ncol(obs_rf))
+    # #---Dataframe for parameters for reference
+    # all_paras <- data.frame(sim_param[, which(parameter_IDs %in% list_parameters$Variable)])
+    # colnames(all_paras) <- parameter_IDs[which(parameter_IDs %in% list_parameters$Variable)]
+    # #---Dataframe for corresponding statistics for reference
+    # all_data <- data.frame(sim_stat[
+    #     , c(
+    #         which(model_variables$chromosome_arm_library$Arm_ID %in% list_targets),
+    #         which(model_variables$chromosome_arm_library$Arm_ID %in% list_targets) + length(model_variables$chromosome_arm_library$Arm_ID)
+    #     )
+    # ])
     # colnames(all_data) <- paste0("gainloss_", 1:ncol(all_data))
-    #---Fit each parameter with ABC-rf
-    layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
-    gs <- list()
-    id <- 0
-    # for (para in 1:length(parameter_IDs)) {
-    for (para in 1:nrow(list_parameters)) {
-        para_ID <- list_parameters$Variable[para]
-        # para_ID <- parameter_IDs[para]
-        cat(paste("ABC for parameter ", para_ID, " [", para, "/", nrow(list_parameters), "]", "\n", sep = ""))
-        #   Train the random forest
-        data_rf <- cbind(all_paras[para_ID], all_data)
-        colnames(data_rf)[1] <- "para"
-        f <- as.formula("para ~.")
-        model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
-        #   Predict posterior distribution based on found random forest
-        post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
-        #   Choose best value from posterior distribution
-        best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
-        #   Save results for fitting this parameter
-        ABC_output <- list()
-        ABC_output$para_ID <- para_ID
-        ABC_output$data_rf <- data_rf
-        ABC_output$model_rf <- model_rf
-        ABC_output$obs_rf <- obs_rf
-        ABC_output$post_rf <- post_rf
-        ABC_output$best_rf <- best_rf
-        filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
-        save(ABC_output, file = filename)
-        # #   Plot the prior, posterior and chosen best parameter
-        # filename <- paste0(model_name, "_ABC_", para_ID, ".jpeg")
-        # jpeg(filename, width = 2000, height = 1000)
-        # p <- densityPlot_MODIFIED(
-        #     model_rf, obs_rf, data_rf,
-        #     protocol = "arm",
-        #     chosen_para = best_rf,
-        #     color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
-        #     main = para_ID
-        # )
-        # print(p)
-        # dev.off()
-        #   Plot the prior, posterior and chosen best parameter for all variables
-        id <- id + 1
-        row <- id %% 7
-        if (row == 0) row <- 7
-        col <- ceiling(id / 7)
-        layout[row, col] <- id
-        gs[[id]] <- densityPlot_MODIFIED(
-            model_rf, obs_rf, data_rf,
-            protocol = "arm",
-            fontsize = 20,
-            chosen_para = best_rf,
-            color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
-            main = para_ID
-        )
-    }
-    #   Plot the prior, posterior and chosen best parameter for all variables
-    filename <- paste0(model_name, "_ABC_all.jpeg")
-    jpeg(filename, width = 3000, height = 1500)
-    p <- grid.arrange(grobs = gs, layout_matrix = layout)
-    print(p)
-    dev.off()
+    # #---Fit each parameter with ABC-rf
+    # layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
+    # gs <- list()
+    # id <- 0
+    # # for (para in 1:length(parameter_IDs)) {
+    # for (para in 1:nrow(list_parameters)) {
+    #     para_ID <- list_parameters$Variable[para]
+    #     # para_ID <- parameter_IDs[para]
+    #     cat(paste("ABC for parameter ", para_ID, " [", para, "/", nrow(list_parameters), "]", "\n", sep = ""))
+    #     #   Train the random forest
+    #     data_rf <- cbind(all_paras[para_ID], all_data)
+    #     colnames(data_rf)[1] <- "para"
+    #     f <- as.formula("para ~.")
+    #     model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
+    #     #   Predict posterior distribution based on found random forest
+    #     post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
+    #     #   Choose best value from posterior distribution
+    #     best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
+    #     #   Save results for fitting this parameter
+    #     ABC_output <- list()
+    #     ABC_output$para_ID <- para_ID
+    #     ABC_output$data_rf <- data_rf
+    #     ABC_output$model_rf <- model_rf
+    #     ABC_output$obs_rf <- obs_rf
+    #     ABC_output$post_rf <- post_rf
+    #     ABC_output$best_rf <- best_rf
+    #     filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
+    #     save(ABC_output, file = filename)
+    #     #   Plot the prior, posterior and chosen best parameter for all variables
+    #     id <- id + 1
+    #     row <- id %% 7
+    #     if (row == 0) row <- 7
+    #     col <- ceiling(id / 7)
+    #     layout[row, col] <- id
+    #     gs[[id]] <- densityPlot_MODIFIED(
+    #         model_rf, obs_rf, data_rf,
+    #         protocol = "arm",
+    #         fontsize = 20,
+    #         chosen_para = best_rf,
+    #         color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
+    #         main = para_ID
+    #     )
+    # }
+    # #   Plot the prior, posterior and chosen best parameter for all variables
+    # filename <- paste0(model_name, "_ABC_all.jpeg")
+    # jpeg(filename, width = 3000, height = 1500)
+    # p <- grid.arrange(grobs = gs, layout_matrix = layout)
+    # print(p)
+    # dev.off()
     # =======================================ANALYSIS OF FITTING RESULTS
     #------------------Choose the best parameter set from all posteriors
     parameters_best <- rep(0, length(parameter_IDs))
-    # for (para in 1:length(parameter_IDs)) {
+    list_parameters$Best_value <- 0
     for (para in 1:nrow(list_parameters)) {
         para_ID <- list_parameters$Variable[para]
-        # para_ID <- parameter_IDs[para]
-        filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
+        filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
         load(filename)
         best_rf <- ABC_output$best_rf
         parameters_best[para] <- best_rf
-    }
-
-
-    list_parameters$Best_value <- 0
-    # for (para in 1:nrow(list_parameters)) {
-    for (para in 1:nrow(list_parameters)) {
-        para_ID <- list_parameters$Variable[para]
-        filename <- paste(model_name, "_ABC_output_", para_ID, ".rda", sep = "")
-        load(filename)
-        best_rf <- ABC_output$best_rf
         list_parameters$Best_value[para] <- best_rf
+        cat(paste0(para_ID, "===", best_rf, "\n"))
     }
     filename <- paste0(model_name, "_fitted_parameters.csv")
     write.csv(list_parameters, filename)
 
 
 
-
-
-
-
     #------------------------Analysis of fitted CN profiles against data
     #   Assign parameters in model variables
     model_variables <- assign_paras(model_variables, list_parameters$Variable, parameters_best)
+    print(model_variables$chromosome_arm_library)
     # model_variables <- assign_paras(model_variables, parameter_IDs, parameters_best)
     #   Make simulations using best parameters
     SIMS_chromosome <- simulator_full_program(
@@ -511,4 +490,75 @@ fitting_bulk_arm_CN <- function(library_name,
         print(p)
         dev.off()
     }
+}
+
+#' @export
+statistics_bulk_arm_WGD_against_losses <- function(plotname,
+                                                   DATA_cancer_types,
+                                                   DATA_cancer_type_sample_ids,
+                                                   DATA_wgd) {
+    library(ggplot2)
+    library(ggrepel)
+
+    #---------------------------Find WGD proportions in each cancer type
+    DATA_wgd_proportion <- rep(0, length(DATA_cancer_types))
+    for (i in 1:length(DATA_cancer_types)) {
+        mini_DATA_wgd <- DATA_wgd[which(DATA_wgd$samplename %in% DATA_cancer_type_sample_ids[[i]] & DATA_wgd$wgd_uncertain == FALSE), ]
+        DATA_wgd_proportion[i] <- length(which(mini_DATA_wgd$wgd_status == "wgd")) / length(mini_DATA_wgd$wgd_status)
+    }
+    #------------Find count and strength of TSG arms in each cancer type
+    FIT_tsg_count <- rep(0, length(DATA_cancer_types))
+    FIT_tsg_strength <- rep(0, length(DATA_cancer_types))
+    for (i in 1:length(DATA_cancer_types)) {
+        cancer_types_fit <- read.csv(paste0(DATA_cancer_types[i], "_fitted_parameters.csv"), header = TRUE)
+        cancer_types_fit_selection_rates <- cancer_types_fit$Best_value[which(cancer_types_fit$Type == "Arm_selection_rate")]
+        FIT_tsg_count[i] <- length(which(cancer_types_fit_selection_rates < 1))
+        if (FIT_tsg_count[i] == 0) {
+            FIT_tsg_strength[i] <- 1
+        } else {
+            FIT_tsg_strength[i] <- 1 / mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
+        }
+    }
+    #-------------------Plot relationship between fitted selection rates
+    #---------------------------------------and observed WGD proportions
+    filename <- paste0(plotname, "_WGD_vs_fitted_TSG.jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    df_plot <- data.frame(
+        cancer_types = DATA_cancer_types,
+        WGD = DATA_wgd_proportion,
+        TSG_count = FIT_tsg_count,
+        TSG_strength = FIT_tsg_strength
+    )
+    p <- ggplot(df_plot, aes(x = TSG_count, y = TSG_strength, color = WGD)) +
+        geom_point(size = 10) +
+        geom_text_repel(aes(label = cancer_types), size = 10, point.padding = 0.4) +
+        xlab("Count of TSG arms") +
+        ylab("Mean selection rate of TSG arms") +
+        labs(fill = "WGD proportion") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+
+
+    tmp <- cor.test(FIT_tsg_count, DATA_wgd_proportion, method = "spearman", exact = FALSE)
+    print("COUNT:")
+    print(tmp$estimate)
+    print(tmp$p.value)
+
+    tmp <- cor.test(FIT_tsg_strength, DATA_wgd_proportion, method = "spearman", exact = FALSE)
+    print("STRENGTH:")
+    print(tmp$estimate)
+    print(tmp$p.value)
+
+
+    # print(DATA_cancer_type_sample_ids)
+    # print(DATA_wgd)
+    print("-----------------------------------------------------------")
+    print(DATA_cancer_types)
+    print("-----------------------------------------------------------")
+    print(DATA_wgd_proportion)
+    print("-----------------------------------------------------------")
+    print(FIT_tsg_count)
+    print("-----------------------------------------------------------")
+    print(FIT_tsg_strength)
 }

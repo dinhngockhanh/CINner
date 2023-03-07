@@ -1,0 +1,33 @@
+```{r setup}
+library(readxl)
+#-----------------------------------------------------------------------
+setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
+#-----------------------------------------------------------------------
+# devtools::install_github("dinhngockhanh/CancerSimulator")
+# library(CancerSimulator)
+```
+
+#   Fit the lengths of focal events
+.....
+.....
+.....
+.....
+.....
+.....
+.....
+
+#   Get the Driver Gene data
+```{r}
+
+
+
+```
+
+
+
+
+
+```{r}
+```
