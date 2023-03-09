@@ -83,6 +83,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         all_prob_division <- func_expected_population(T_current) / (func_expected_population(T_current) + N_cells_current) * sum(clonal_population_current) * clonal_portion / sum(clonal_portion * clonal_population_current)
 
         all_prob_division[which(all_prob_division > 1)] <- 1
+
         #       Find next time step and initiate next clonal population vector
         T_next <- T_current + T_tau_step
         clonal_population_next <<- clonal_population_current

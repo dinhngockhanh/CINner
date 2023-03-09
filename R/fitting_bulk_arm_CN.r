@@ -1,5 +1,5 @@
 #----------------------Function to assign parameters to proper positions
-assign_paras <- function(model_variables, parameter_IDs, parameters) {
+bulk_arm_CN_assign_paras <- function(model_variables, parameter_IDs, parameters) {
     for (i in 1:length(parameter_IDs)) {
         parameter_ID <- parameter_IDs[i]
         if (parameter_ID %in% model_variables$general_variables$Variable) {
@@ -11,7 +11,7 @@ assign_paras <- function(model_variables, parameter_IDs, parameters) {
     return(model_variables)
 }
 #--------------------------Function to extract arm-level gain/loss delta
-get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, list_targets) {
+bulk_arm_CN_get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, list_targets) {
     arm_gain <- rep(0, length(list_targets))
     arm_loss <- rep(0, length(list_targets))
     for (i in 1:length(list_targets)) {
@@ -34,9 +34,9 @@ get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, list_targets)
     return(arm_gainloss)
 }
 #-------------------------------------Objective function for ABC fitting
-func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets) {
+bulk_arm_CN_func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets) {
     #   Assign parameters in model variables
-    model_variables <- assign_paras(model_variables, parameter_IDs, parameters)
+    model_variables <- bulk_arm_CN_assign_paras(model_variables, parameter_IDs, parameters)
     #   Make simulations
     SIMS_chromosome <- simulator_full_program(
         model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
@@ -46,11 +46,11 @@ func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coor
     )
     #   Statistics = arm-level gain/loss delta
     SIMS_delta_genome_arms <- gainloss_SIMS(SIMS_chromosome, ploidy_normalization = FALSE)
-    SIMS_arm_gainloss <- get_arm_gainloss(SIMS_delta_genome_arms, copynumber_coordinates, list_targets)
+    SIMS_arm_gainloss <- bulk_arm_CN_get_arm_gainloss(SIMS_delta_genome_arms, copynumber_coordinates, list_targets)
     stat <- c(SIMS_arm_gainloss$delta_gain, SIMS_arm_gainloss$delta_loss)
 }
 #-----------------Function to choose one best parameter from a posterior
-get_best_para <- function(data_rf, model_rf, obs_rf, post_rf) {
+bulk_arm_CN_get_best_para <- function(data_rf, model_rf, obs_rf, post_rf) {
     df_dist <- densityPlot_df(model_rf, obs_rf, data_rf)
     best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
 }
@@ -110,12 +110,12 @@ library_bulk_arm_CN <- function(library_name,
     parameter_IDs <<- parameter_IDs
     model_variables <<- model_variables
     gainloss_SIMS <<- gainloss_SIMS
-    func_ABC <<- func_ABC
-    assign_paras <<- assign_paras
-    get_arm_gainloss <<- get_arm_gainloss
+    bulk_arm_CN_func_ABC <<- bulk_arm_CN_func_ABC
+    bulk_arm_CN_assign_paras <<- bulk_arm_CN_assign_paras
+    bulk_arm_CN_get_arm_gainloss <<- bulk_arm_CN_get_arm_gainloss
     R_libPaths <<- R_libPaths
     clusterExport(cl, varlist = c(
-        "n_samples", "list_targets", "sim_param", "parameter_IDs", "model_variables", "gainloss_SIMS", "func_ABC", "assign_paras", "get_arm_gainloss", "R_libPaths",
+        "n_samples", "list_targets", "sim_param", "parameter_IDs", "model_variables", "gainloss_SIMS", "bulk_arm_CN_func_ABC", "bulk_arm_CN_assign_paras", "bulk_arm_CN_get_arm_gainloss", "R_libPaths",
         "BUILD_driver_library", "simulator_full_program", "one_simulation",
         "SIMULATOR_VARIABLES_for_simulation",
         "SIMULATOR_FULL_PHASE_1_main", "SIMULATOR_FULL_PHASE_1_clonal_population_cleaning",
@@ -133,7 +133,7 @@ library_bulk_arm_CN <- function(library_name,
     pbo <- pboptions(type = "txt")
     sim_results_list <- pblapply(cl = cl, X = 1:ABC_simcount, FUN = function(iteration) {
         parameters <- sim_param[iteration, ]
-        stat <- func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets)
+        stat <- bulk_arm_CN_func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets)
         return(stat)
     })
     stopCluster(cl)
@@ -163,7 +163,10 @@ fitting_bulk_arm_CN <- function(library_name,
                                 type_sample_DATA = "individual",
                                 type_cn_DATA = "bin",
                                 list_parameters,
+                                list_parameters_library,
                                 list_targets,
+                                list_targets_library,
+                                N_shuffle = 21,
                                 n_cores = NULL,
                                 R_libPaths = NULL,
                                 folder_workplace = NULL) {
@@ -174,6 +177,7 @@ fitting_bulk_arm_CN <- function(library_name,
     library(gridExtra)
     library(ggplot2)
     library(signals)
+    library(data.table)
     if (is.null(n_cores)) {
         n_cores <- max(detectCores() - 1, 1)
     }
@@ -219,7 +223,7 @@ fitting_bulk_arm_CN <- function(library_name,
             arm_level = TRUE, pos_centromeres = cn_info
         )
         #   Get the target statistics (= gain/loss on each chromosome arm)
-        DATA_arm_gainloss <- get_arm_gainloss(DATA_delta_genome_arms, copynumber_coordinates, list_targets)
+        DATA_arm_gainloss <- bulk_arm_CN_get_arm_gainloss(DATA_delta_genome_arms, copynumber_coordinates, list_targets)
         DATA_target <- c(DATA_arm_gainloss$delta_gain, DATA_arm_gainloss$delta_loss)
     } else if (type_sample_DATA == "average") {
         DATA_target <- rep(0, 2 * length(list_targets))
@@ -232,6 +236,13 @@ fitting_bulk_arm_CN <- function(library_name,
             }
         }
     }
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    #######################   ORIGINAL FITTING   #######################
+    ####################################################################
+    ####################################################################
+    ####################################################################
     # # ====================================FITTING WITH ABC RANDOM FOREST
     # #--------------------------------------------Fit parameters with ABC
     # #---Dataframe for data observation
@@ -265,14 +276,10 @@ fitting_bulk_arm_CN <- function(library_name,
     #     #   Predict posterior distribution based on found random forest
     #     post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
     #     #   Choose best value from posterior distribution
-    #     best_rf <- get_best_para(data_rf, model_rf, obs_rf, post_rf)
+    #     best_rf <- bulk_arm_CN_get_best_para(data_rf, model_rf, obs_rf, post_rf)
     #     #   Save results for fitting this parameter
     #     ABC_output <- list()
     #     ABC_output$para_ID <- para_ID
-    #     ABC_output$data_rf <- data_rf
-    #     ABC_output$model_rf <- model_rf
-    #     ABC_output$obs_rf <- obs_rf
-    #     ABC_output$post_rf <- post_rf
     #     ABC_output$best_rf <- best_rf
     #     filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
     #     save(ABC_output, file = filename)
@@ -297,9 +304,289 @@ fitting_bulk_arm_CN <- function(library_name,
     # p <- grid.arrange(grobs = gs, layout_matrix = layout)
     # print(p)
     # dev.off()
+    # # =======================================ANALYSIS OF FITTING RESULTS
+    # #------------------Choose the best parameter set from all posteriors
+    # parameter_IDs_best <- list_parameters$Variable
+    # parameters_best <- rep(0, nrow(list_parameters))
+    # # parameters_best <- model_variables$chromosome_arm_library$s_rate
+    # list_parameters$Best_value <- 0
+    # for (para in 1:nrow(list_parameters)) {
+    #     para_ID <- list_parameters$Variable[para]
+    #     filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
+    #     load(filename)
+    #     best_rf <- ABC_output$best_rf
+    #     parameters_best[para] <- best_rf
+    #     # parameters_best[which(list_parameters_library$Variable == para_ID)] <- best_rf
+    #     list_parameters$Best_value[para] <- best_rf
+    #     cat(paste0(para_ID, "===", best_rf, "\n"))
+    # }
+    # filename <- paste0(model_name, "_fitted_parameters.csv")
+    # write.csv(list_parameters, filename)
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    #######################   ABC-RF FOR CHROM   #######################
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    # # ====================================FITTING WITH ABC RANDOM FOREST
+    # #--------------------------------------------Fit parameters with ABC
+    # #---Dataframe for prepared library of parameters
+    # all_paras <- data.frame(sim_param)
+    # colnames(all_paras) <- list_parameters_library$Variable
+    # #---Dataframe for prepared library of statistics
+    # all_data <- data.frame(sim_stat)
+    # colnames(all_data) <- c(paste0("gain_", list_targets_library), paste0("loss_", list_targets_library))
+    # #---Dataframe for data observation
+    # all_obs <- data.frame(matrix(DATA_target, nrow = 1))
+    # colnames(all_obs) <- c(paste0("gain_", list_targets), paste0("loss_", list_targets))
+    # #---Fit each parameter with ABC-rf
+    # layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
+    # gs <- list()
+    # id <- 0
+    # for (para in 1:nrow(list_parameters)) {
+    #     para_ID <- list_parameters$Variable[para]
+    #     para_type <- list_parameters$Type[para]
+    #     cat(paste("ABC for parameter ", para_ID, " [", para, "/", nrow(list_parameters), "]", "\n", sep = ""))
+    #     #   Prepare observations for this parameter
+    #     if (para_type == "CNA_probability") {
+    #         mini_obs <- all_obs
+    #     } else if (para_type == "Arm_selection_rate") {
+    #         para_chrom <- substr(para_ID, 1, nchar(para_ID) - 1)
+    #         mini_obs <- NULL
+    #         for (stat in colnames(all_obs)) {
+    #             stat_arm <- sub(".*_", "", stat)
+    #             stat_chrom <- substr(stat_arm, 1, nchar(stat_arm) - 1)
+    #             if (stat_chrom != para_chrom) next
+    #             if (is.null(mini_obs)) {
+    #                 mini_obs <- all_obs[stat]
+    #             } else {
+    #                 mini_obs <- cbind(mini_obs, all_obs[stat])
+    #             }
+    #         }
+    #     }
+    #     #   Prepare library of statistics for this parameter
+    #     mini_data <- NULL
+    #     for (stat in colnames(mini_obs)) {
+    #         next_data <- all_data[stat]
+    #         if (is.null(mini_data)) {
+    #             mini_data <- next_data
+    #         } else {
+    #             mini_data <- cbind(mini_data, next_data)
+    #         }
+    #     }
+    #     #   Train the random forest
+    #     data_rf <- cbind(all_paras[para_ID], mini_data)
+    #     colnames(data_rf)[1] <- "para"
+    #     f <- as.formula("para ~.")
+    #     model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
+    #     #   Predict posterior distribution based on found random forest
+    #     post_rf <- predict(model_rf, mini_obs, data_rf, paral = TRUE, ncores = n_cores)
+    #     #   Choose best value from posterior distribution
+    #     best_rf <- bulk_arm_CN_get_best_para(data_rf, model_rf, all_obs, post_rf)
+    #     #   Save results for fitting this parameter
+    #     ABC_output <- list()
+    #     ABC_output$para_ID <- para_ID
+    #     ABC_output$best_rf <- best_rf
+    #     filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
+    #     save(ABC_output, file = filename)
+    #     #   Plot the prior, posterior and chosen best parameter for all variables
+    #     id <- id + 1
+    #     row <- id %% 7
+    #     if (row == 0) row <- 7
+    #     col <- ceiling(id / 7)
+    #     layout[row, col] <- id
+    #     gs[[id]] <- densityPlot_MODIFIED(
+    #         model_rf, all_obs, data_rf,
+    #         protocol = "arm",
+    #         fontsize = 20,
+    #         chosen_para = best_rf,
+    #         color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
+    #         main = para_ID
+    #     )
+    # }
+    # #   Plot the prior, posterior and chosen best parameter for all variables
+    # filename <- paste0(model_name, "_ABC_all.jpeg")
+    # jpeg(filename, width = 3000, height = 1500)
+    # p <- grid.arrange(grobs = gs, layout_matrix = layout)
+    # print(p)
+    # dev.off()
+    # # =======================================ANALYSIS OF FITTING RESULTS
+    # #------------------Choose the best parameter set from all posteriors
+    # parameter_IDs_best <- list_parameters$Variable
+    # parameters_best <- rep(0, nrow(list_parameters))
+    # # parameters_best <- model_variables$chromosome_arm_library$s_rate
+    # list_parameters$Best_value <- 0
+    # for (para in 1:nrow(list_parameters)) {
+    #     para_ID <- list_parameters$Variable[para]
+    #     filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
+    #     load(filename)
+    #     best_rf <- ABC_output$best_rf
+    #     parameters_best[para] <- best_rf
+    #     # parameters_best[which(list_parameters_library$Variable == para_ID)] <- best_rf
+    #     list_parameters$Best_value[para] <- best_rf
+    #     cat(paste0(para_ID, "===", best_rf, "\n"))
+    # }
+    # filename <- paste0(model_name, "_fitted_parameters.csv")
+    # write.csv(list_parameters, filename)
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    #######################   ABC-RF FOR CHROM   #######################
+    #######################    PLUS BOOTSTRAP    #######################
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    # ==========================INCREASE SIMULATED LIBRARY VIA BOOTSTRAP
+    #   Find ID for each parameter in the prepared library
+    sim_param_ID <- list_parameters_library$Variable
+    sim_param_type <- list_parameters_library$Type
+    sim_stat_ID <- c(paste0("gain_", list_targets_library), paste0("loss_", list_targets_library))
+    #   Find unique chromosomes in the library
+    sim_stat_chroms <- sim_stat_ID
+    for (i in 1:length(sim_stat_chroms)) {
+        sim_stat_chroms[i] <- sub(".*_", "", substr(sim_stat_chroms[i], 1, nchar(sim_stat_chroms[i]) - 1))
+    }
+    unique_chroms <- unique(sim_stat_chroms)
+    #   Prepare the original prepared library
+    df_sim_param <- data.frame(sim_param)
+    colnames(df_sim_param) <- sim_param_ID
+    df_sim_stat <- data.frame(sim_stat)
+    colnames(df_sim_stat) <- sim_stat_ID
+    #   Bootstrap each simulation in the prepared library
+    ls_sim_param_bootstrap <- vector("list", 1)
+    ls_sim_param_bootstrap[[1]] <- df_sim_param
+    ls_sim_stat_bootstrap <- vector("list", 1)
+    ls_sim_stat_bootstrap[[1]] <- df_sim_stat
+    tmp <- 0
+    if (N_shuffle > 0) {
+        for (i in 1:N_shuffle) {
+            # for (i in 1:(length(unique_chroms) - 1)) {
+            df_sim_param_next <- df_sim_param
+            df_sim_stat_next <- df_sim_stat
+            #   Shuffle the chromosome indices
+            shuffle_chroms <- c(unique_chroms[(i + 1):length(unique_chroms)], unique_chroms[1:i])
+            # shuffle_chroms <- sample(unique_chroms, length(unique_chroms), replace = FALSE)
+            #   Shuffle the library of parameters accordingly
+            for (j in 1:ncol(df_sim_param)) {
+                if (sim_param_type[j] != "Arm_selection_rate") next
+                param_ID_old <- sim_param_ID[j]
+                param_chrom_old <- substr(param_ID_old, 1, nchar(param_ID_old) - 1)
+                param_chrom_new <- shuffle_chroms[which(unique_chroms == param_chrom_old)]
+                param_ID_new <- paste0(param_chrom_new, substr(param_ID_old, nchar(param_ID_old), nchar(param_ID_old)))
+                df_sim_param_next[param_ID_new] <- df_sim_param[param_ID_old]
+            }
+            #   Shuffle the library of statistics accordingly
+            for (j in 1:ncol(df_sim_stat)) {
+                param_ID_old <- sim_stat_ID[j]
+                param_chrom_old <- sub(".*_", "", substr(param_ID_old, 1, nchar(param_ID_old) - 1))
+                param_chrom_new <- shuffle_chroms[which(unique_chroms == param_chrom_old)]
+                param_ID_new <- paste0(sub("\\_.*", "_", param_ID_old), param_chrom_new, substr(param_ID_old, nchar(param_ID_old), nchar(param_ID_old)))
+                df_sim_stat_next[param_ID_new] <- df_sim_stat[param_ID_old]
+            }
+            #   Record the shuffled library
+            ls_sim_param_bootstrap[[i + 1]] <- df_sim_param_next
+            ls_sim_stat_bootstrap[[i + 1]] <- df_sim_stat_next
+        }
+    }
+    #   Combine all shuffled libraries into one dataframe
+    sim_param_bootstrap <- as.data.frame(rbindlist(ls_sim_param_bootstrap))
+    sim_stat_bootstrap <- as.data.frame(rbindlist(ls_sim_stat_bootstrap))
+    # ====================================FITTING WITH ABC RANDOM FOREST
+    #--------------------------------------------Fit parameters with ABC
+    #---Dataframe for prepared library of parameters
+    all_paras_original <- df_sim_param
+    all_paras_bootstrap <- sim_param_bootstrap
+    #---Dataframe for prepared library of statistics
+    all_data_original <- df_sim_stat
+    all_data_bootstrap <- sim_stat_bootstrap
+    #---Dataframe for data observation
+    all_obs <- data.frame(matrix(DATA_target, nrow = 1))
+    colnames(all_obs) <- c(paste0("gain_", list_targets), paste0("loss_", list_targets))
+    #---Fit each parameter with ABC-rf
+    layout <- matrix(NA, nrow = 7, ncol = ceiling(length(parameter_IDs) / 7))
+    gs <- list()
+    id <- 0
+    for (para in 1:nrow(list_parameters)) {
+        para_ID <- list_parameters$Variable[para]
+        para_type <- list_parameters$Type[para]
+        cat(paste("ABC for parameter ", para_ID, " [", para, "/", nrow(list_parameters), "]", "\n", sep = ""))
+        #   Prepare observations for this parameter
+        if (para_type == "CNA_probability") {
+            mini_obs <- all_obs
+        } else if (para_type == "Arm_selection_rate") {
+            para_chrom <- substr(para_ID, 1, nchar(para_ID) - 1)
+            mini_obs <- NULL
+            for (stat in colnames(all_obs)) {
+                stat_arm <- sub(".*_", "", stat)
+                stat_chrom <- substr(stat_arm, 1, nchar(stat_arm) - 1)
+                if (stat_chrom != para_chrom) next
+                if (is.null(mini_obs)) {
+                    mini_obs <- all_obs[stat]
+                } else {
+                    mini_obs <- cbind(mini_obs, all_obs[stat])
+                }
+            }
+        }
+        #   Prepare library of statistics for this parameter
+        mini_data <- NULL
+        for (stat in colnames(mini_obs)) {
+            if (para_type == "CNA_probability") {
+                next_data <- all_data_original[stat]
+            } else if (para_type == "Arm_selection_rate") {
+                next_data <- all_data_bootstrap[stat]
+            }
+            if (is.null(mini_data)) {
+                mini_data <- next_data
+            } else {
+                mini_data <- cbind(mini_data, next_data)
+            }
+        }
+        #   Train the random forest
+        if (para_type == "CNA_probability") {
+            data_rf <- cbind(all_paras_original[para_ID], mini_data)
+        } else if (para_type == "Arm_selection_rate") {
+            data_rf <- cbind(all_paras_bootstrap[para_ID], mini_data)
+        }
+        colnames(data_rf)[1] <- "para"
+        f <- as.formula("para ~.")
+        model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
+        #   Predict posterior distribution based on found random forest
+        post_rf <- predict(model_rf, mini_obs, data_rf, paral = TRUE, ncores = n_cores)
+        #   Choose best value from posterior distribution
+        best_rf <- bulk_arm_CN_get_best_para(data_rf, model_rf, all_obs, post_rf)
+        #   Save results for fitting this parameter
+        ABC_output <- list()
+        ABC_output$para_ID <- para_ID
+        ABC_output$best_rf <- best_rf
+        filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
+        save(ABC_output, file = filename)
+        #   Plot the prior, posterior and chosen best parameter for all variables
+        id <- id + 1
+        row <- id %% 7
+        if (row == 0) row <- 7
+        col <- ceiling(id / 7)
+        layout[row, col] <- id
+        gs[[id]] <- densityPlot_MODIFIED(
+            model_rf, all_obs, data_rf,
+            protocol = "arm",
+            fontsize = 20,
+            chosen_para = best_rf,
+            color_prior = "lightblue", color_posterior = "darkblue", color_vline = "blue",
+            main = para_ID
+        )
+    }
+    #   Plot the prior, posterior and chosen best parameter for all variables
+    filename <- paste0(model_name, "_ABC_all.jpeg")
+    jpeg(filename, width = 3000, height = 1500)
+    p <- grid.arrange(grobs = gs, layout_matrix = layout)
+    print(p)
+    dev.off()
     # =======================================ANALYSIS OF FITTING RESULTS
     #------------------Choose the best parameter set from all posteriors
-    parameters_best <- rep(0, length(parameter_IDs))
+    parameter_IDs_best <- list_parameters$Variable
+    parameters_best <- rep(0, nrow(list_parameters))
+    # parameters_best <- model_variables$chromosome_arm_library$s_rate
     list_parameters$Best_value <- 0
     for (para in 1:nrow(list_parameters)) {
         para_ID <- list_parameters$Variable[para]
@@ -307,19 +594,24 @@ fitting_bulk_arm_CN <- function(library_name,
         load(filename)
         best_rf <- ABC_output$best_rf
         parameters_best[para] <- best_rf
+        # parameters_best[which(list_parameters_library$Variable == para_ID)] <- best_rf
         list_parameters$Best_value[para] <- best_rf
         cat(paste0(para_ID, "===", best_rf, "\n"))
     }
     filename <- paste0(model_name, "_fitted_parameters.csv")
     write.csv(list_parameters, filename)
-
-
-
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    ####################################################################
     #------------------------Analysis of fitted CN profiles against data
     #   Assign parameters in model variables
-    model_variables <- assign_paras(model_variables, list_parameters$Variable, parameters_best)
+    model_variables <- bulk_arm_CN_assign_paras(model_variables, parameter_IDs_best, parameters_best)
     print(model_variables$chromosome_arm_library)
-    # model_variables <- assign_paras(model_variables, parameter_IDs, parameters_best)
+    # model_variables <- bulk_arm_CN_assign_paras(model_variables, parameter_IDs, parameters_best)
     #   Make simulations using best parameters
     SIMS_chromosome <- simulator_full_program(
         model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
@@ -355,7 +647,7 @@ fitting_bulk_arm_CN <- function(library_name,
         arm <- plot_table$Arm[row]
         plot_table$Amp_freq_spec[row] <- DATA_target[which(list_targets == arm)]
         plot_table$Del_freq_spec[row] <- -DATA_target[which(list_targets == arm) + length(list_targets)]
-        plot_table$Selection_rate[row] <- parameters_best[which(list_parameters$Variable == arm)]
+        plot_table$Selection_rate[row] <- parameters_best[which(parameter_IDs_best == arm)]
     }
     #   Configuration for subplots
     layout <- matrix(NA, nrow = 1, ncol = 2)
@@ -499,7 +791,6 @@ statistics_bulk_arm_WGD_against_losses <- function(plotname,
                                                    DATA_wgd) {
     library(ggplot2)
     library(ggrepel)
-
     #---------------------------Find WGD proportions in each cancer type
     DATA_wgd_proportion <- rep(0, length(DATA_cancer_types))
     for (i in 1:length(DATA_cancer_types)) {

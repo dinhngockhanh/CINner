@@ -131,7 +131,7 @@ for (i in 1:length(model_variables$chromosome_arm_library$Arm_ID)) {
 We create a list for the statistics targets. This would be the list of chromosome arms. The CN gain/loss frequencies on each arm form the statistics for ABC.
 
 ```{r}
-list_targets <- model_variables$chromosome_arm_library$Arm_ID
+list_targets_library <- model_variables$chromosome_arm_library$Arm_ID
 ```
 
 We then create a simulated arm-level library with CancerSimulator:
@@ -141,8 +141,8 @@ We then create a simulated arm-level library with CancerSimulator:
 # library_bulk_arm_CN(
 #     library_name = library_name,
 #     model_variables = model_variables,
-#     list_parameters_library = list_parameters_library,
-#     list_targets = list_targets,
+#     list_parameters = list_parameters_library,
+#     list_targets = list_targets_library,
 #     ABC_simcount = 1000,
 #     n_samples = 100
 # )
@@ -155,35 +155,38 @@ We then create a simulated arm-level library with CancerSimulator:
 We first load the pan-cancer arm-level gain/loss data from TCGA:
 
 ```{r}
-# copynumber_DATA <- read.csv(file = system.file("extdata", "Davoli_Charm_score.csv", package = "CancerSimulator"))
-# copynumber_DATA <- copynumber_DATA[, c(1, 2, 3, 14, 15)]
-# colnames(copynumber_DATA) <- c("Arm", "Del_freq_all", "Amp_freq_all", "Charm.TSG.OG.score", "Charm.TSG.OG.Ess.score")
+copynumber_DATA <- read.csv(file = system.file("extdata", "Davoli_Charm_score.csv", package = "CancerSimulator"))
+copynumber_DATA <- copynumber_DATA[, c(1, 2, 3, 14, 15)]
+colnames(copynumber_DATA) <- c("Arm", "Del_freq_all", "Amp_freq_all", "Charm.TSG.OG.score", "Charm.TSG.OG.Ess.score")
 ```
 
 Limit the list of parameters to chromosome arms with available data:
 
 ```{r}
-# list_targets <- copynumber_DATA$Arm
-# list_parameters <- list_parameters[c(
-#     which(list_parameters$Type == "CNA_probability"),
-#     which(list_parameters$Type == "Arm_selection_rate" & list_parameters$Variable %in% copynumber_DATA$Arm)
-# ), ]
+list_targets <- copynumber_DATA$Arm
+list_parameters <- list_parameters_library[c(
+    which(list_parameters_library$Type == "CNA_probability"),
+    which(list_parameters_library$Type == "Arm_selection_rate" & list_parameters_library$Variable %in% copynumber_DATA$Arm)
+), ]
 ```
 
 We then run the fitting routine:
 
 ```{r}
-# cat(paste0("\n\n\nFITTING FOR PAN-CANCER\n"))
-# fitting_bulk_arm_CN(
-#     library_name = library_name,
-#     model_name = "PAN-CANCER",
-#     copynumber_DATA = copynumber_DATA,
-#     list_parameters = list_parameters,
-#     list_targets = list_targets,
-#     type_sample_DATA = "average",
-#     type_cn_DATA = "arm",
-#     folder_workplace = library_name
-# )
+cat(paste0("\n\n\nFITTING FOR PAN-CANCER\n"))
+fitting_bulk_arm_CN(
+    library_name = library_name,
+    model_name = "PAN-CANCER",
+    copynumber_DATA = copynumber_DATA,
+    list_parameters = list_parameters,
+    list_parameters_library = list_parameters_library,
+    list_targets = list_targets,
+    list_targets_library = list_targets_library,
+    N_shuffle = 21,
+    type_sample_DATA = "average",
+    type_cn_DATA = "arm",
+    folder_workplace = library_name
+)
 ```
 
 #   Fit the Copy Number data for each cancer type from PCAWG
@@ -191,63 +194,63 @@ We then run the fitting routine:
 We first load the list of samples for all cancer types in PCAWG:
 
 ```{r}
-# copynumber_PCAWG <- read_excel(system.file("pcawg_sample_sheet.xlsx", package = "CancerSimulator"))
+copynumber_PCAWG <- read_excel(system.file("pcawg_sample_sheet.xlsx", package = "CancerSimulator"))
 ```
 
 List of cancer type-specific datasets in PCAWG:
 
 ```{r}
-# PCAWG_cancer_types <- unique(copynumber_PCAWG$dcc_project_code)
+PCAWG_cancer_types <- unique(copynumber_PCAWG$dcc_project_code)
 ```
 
-List of available CN profiles per PCAWG cancer type:
+List of available samples per PCAWG cancer type:
 
 ```{r}
-# PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
-# for (i in 1:length(PCAWG_cancer_types)) {
-#     sample_ids <- copynumber_PCAWG$aliquot_id[which(copynumber_PCAWG$dcc_project_code == PCAWG_cancer_types[i])]
-#     for (j in 1:length(sample_ids)) {
-#         sample_id <- sample_ids[j]
-#         if (file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) {
-#             tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
-#             if (max(tmp$star, na.rm = TRUE) < 2) next
-#             PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
-#         }
-#     }
-# }
+PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    sample_ids <- copynumber_PCAWG$aliquot_id[which(copynumber_PCAWG$dcc_project_code == PCAWG_cancer_types[i])]
+    for (j in 1:length(sample_ids)) {
+        sample_id <- sample_ids[j]
+        if (file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) {
+            tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+            if (max(tmp$star, na.rm = TRUE) < 2) next
+            PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
+        }
+    }
+}
 ```
 
 Remove PCAWG cancer types with too few samples:
 
 ```{r}
-# sample_sizes <- sapply(PCAWG_cancer_type_sample_ids, length)
-# PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 30)]
-# PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 30)]
+sample_sizes <- sapply(PCAWG_cancer_type_sample_ids, length)
+PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 30)]
+PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 30)]
 ```
 
 Combine CN profiles for all samples of each PCAWG cancer type into one:
 
 ```{r}
-# copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
-# for (i in 1:length(PCAWG_cancer_types)) {
-#     cancer_type <- PCAWG_cancer_types[i]
-#     cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
-#     copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
-#     for (j in 1:length(cancer_type_sample_ids)) {
-#         sample_id <- cancer_type_sample_ids[j]
-#         tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
-#         if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
-#         tmp <- tmp[which(tmp$star >= 2), ]
-#         tmp$donor_unique_id <- sample_id
-#         copynumber_DATA_ls[[j]] <- tmp
-#     }
-#     copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
-# }
+copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    cancer_type <- PCAWG_cancer_types[i]
+    cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
+    copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
+    for (j in 1:length(cancer_type_sample_ids)) {
+        sample_id <- cancer_type_sample_ids[j]
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
+        tmp <- tmp[which(tmp$star >= 2), ]
+        tmp$donor_unique_id <- sample_id
+        copynumber_DATA_ls[[j]] <- tmp
+    }
+    copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+}
 ```
 
 ```{r}
-# list_targets <- model_variables$chromosome_arm_library$Arm_ID
-# list_parameters <- list_parameters_library
+list_targets <- model_variables$chromosome_arm_library$Arm_ID
+list_parameters <- list_parameters_library
 ```
 
 Fit the chromosome-arm-level gain/loss frequencies with ABC random forest:
@@ -256,7 +259,10 @@ Fit the chromosome-arm-level gain/loss frequencies with ABC random forest:
 for (i in 1:length(PCAWG_cancer_types)) {
 
 
-    if (PCAWG_cancer_types[i] != "CLLE-ES") next
+    if (i>1) next
+
+
+    # if (PCAWG_cancer_types[i] != "CLLE-ES") next
 
 
     cancer_type <- PCAWG_cancer_types[i]
@@ -267,7 +273,10 @@ for (i in 1:length(PCAWG_cancer_types)) {
         model_name = cancer_type,
         copynumber_DATA = copynumber_DATA,
         list_parameters = list_parameters,
+        list_parameters_library = list_parameters_library,
         list_targets = list_targets,
+        list_targets_library = list_targets_library,
+        N_shuffle = 21,
         folder_workplace = library_name
     )
 }

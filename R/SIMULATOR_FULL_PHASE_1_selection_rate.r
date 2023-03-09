@@ -160,7 +160,8 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         # }
     } else if (selection_model == "driver-gene-selection") {
         #--------------------------------------------Find average ploidy
-        ploidy <- max(1, round(mean(vec_CN_all)))
+        ploidy <- mean(vec_CN_all)
+        # ploidy <- max(1, round(mean(vec_CN_all)))
         #--If driver library is empty, then viable cells have sel rate 1
         if (nrow(driver_library) == 0) {
             clone_selection_rate <- 1
@@ -173,12 +174,13 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         driver_library_copy$Copy_MUT <- 0
         for (i_driver in 1:nrow(driver_library_copy)) {
             chrom <- driver_library_copy$Chromosome[i_driver]
+            chrom_loc <- which(vec_chromosome_id == chrom)
             block <- driver_library_copy$Bin[i_driver]
-            no_strands <- ploidy_chrom[chrom]
+            no_strands <- ploidy_chrom[chrom_loc]
             driver_copy <- 0
             if (no_strands > 0) {
                 for (strand in 1:no_strands) {
-                    driver_copy <- driver_copy + ploidy_block[[chrom]][[strand]][block]
+                    driver_copy <- driver_copy + ploidy_block[[chrom_loc]][[strand]][block]
                 }
             }
             driver_library_copy$Copy_WT[i_driver] <- driver_copy
