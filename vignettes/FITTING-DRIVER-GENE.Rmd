@@ -182,7 +182,7 @@ prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
 prob_CN_cnloh_interstitial_length <- 0.005
 prob_CN_cnloh_terminal_length <- 0.005
 #--------------------------------------------DRIVER MUTATION PROBABILITY
-rate_driver <- 1e-16
+rate_driver <- 5e-16
 rate_passenger <- 1e-11
 #---------------------------------------------------VIABILITY THRESHOLDS
 # bound_driver <- Inf
@@ -262,15 +262,33 @@ model_variables <- CHECK_model_variables(model_variables)
 We create a list of all parameters to be fitted, their types (CNA probabilities or driver-gene selection rates), and the bounds for their respective uniform prior distributions:
 
 ```{r}
+# list_parameters <- data.frame(matrix(ncol = 4, nrow = 0))
+# colnames(list_parameters) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
+# # list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_amplification", "CNA_probability", 1e-6, 1e-5)
+# list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_deletion", "CNA_probability", 1e-6, 1e-5)
+# for (i in 1:length(model_variables$driver_library$Gene_ID)) {
+#     list_parameters[nrow(list_parameters) + 1, ] <- c(
+#         model_variables$driver_library$Gene_ID[i],
+#         "Gene_selection_rate",
+#         1, 1.5
+#     )
+# }
+
+
+
+cancer_type_gene_mut_freq <- rep(0, length(cancer_type_gene_id))
+for (i in 1:length(cancer_type_gene_id)) {
+    cancer_type_gene_mut_freq[i] <- length(unique(cancer_type_driver_events$sample_id[which(cancer_type_driver_events$gene == cancer_type_gene_id[i] & cancer_type_driver_events$top_category == "mutational")]))
+}
 list_parameters <- data.frame(matrix(ncol = 4, nrow = 0))
 colnames(list_parameters) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
-list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_amplification", "CNA_probability", 1e-6, 1e-4)
-list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_deletion", "CNA_probability", 1e-6, 1e-4)
-for (i in 1:length(model_variables$driver_library$Gene_ID)) {
+# list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_amplification", "CNA_probability", 1e-6, 1e-5)
+`list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_deletion", "CNA_probability", 1e-6, 1e-5)
+`for (i in 1:length(model_variables$driver_library$Gene_ID)) {
     list_parameters[nrow(list_parameters) + 1, ] <- c(
         model_variables$driver_library$Gene_ID[i],
         "Gene_selection_rate",
-        1, 1.5
+        1, 1+0.5*cancer_type_gene_mut_freq[which(cancer_type_gene_id==model_variables$driver_library$Gene_ID[i])]/max(cancer_type_gene_mut_freq)
     )
 }
 ```
@@ -284,17 +302,17 @@ list_targets <- model_variables$driver_library$Gene_ID
 We then create a simulated gene-level library with CancerSimulator:
 
 ```{r}
-start_time <- Sys.time()
-library_bulk_gene(
-    library_name = library_name,
-    model_variables = model_variables,
-    list_parameters = list_parameters,
-    list_targets = list_targets,
-    ABC_simcount = 1000,
-    n_samples = 100
-)
-end_time <- Sys.time()
-print(end_time - start_time)
+# start_time <- Sys.time()
+# library_bulk_gene(
+#     library_name = library_name,
+#     model_variables = model_variables,
+#     list_parameters = list_parameters,
+#     list_targets = list_targets,
+#     ABC_simcount = 1000,
+#     n_samples = 200
+# )
+# end_time <- Sys.time()
+# print(end_time - start_time)
 ```
 
 #   Fit the Driver Gene data for a cancer type from PCAWG
@@ -311,6 +329,20 @@ fitting_bulk_gene(
 )
 ```
 
+#   Statistics for Driver Gene data for a cancer type from PCAWG
+
+```{r}
+# statistics_bulk_gene_cooccurrence(
+#     plotname = paste0(cancer_type,'_cooccurence'),
+#     library_name = library_name,
+#     model_name = cancer_type,
+#     sample_ids_DATA = cancer_type_sample_ids,
+#     driver_events_DATA = cancer_type_driver_events,
+#     list_parameters = list_parameters,
+#     list_targets = list_targets,
+#     folder_workplace = library_name
+# )
+```
 
 
 

@@ -1,6 +1,8 @@
 #' @export
 plot_gainloss <- function(copynumber_sims,
                           copynumber_DATA,
+                          ploidy_normalization_sims = FALSE,
+                          ploidy_normalization_DATA = TRUE,
                           type_sample_DATA = "individual",
                           title = NULL,
                           filename,
@@ -14,7 +16,7 @@ plot_gainloss <- function(copynumber_sims,
     #---------------------------Get gain/loss consensus from simulations
     delta_sims <- gainloss_SIMS(
         copynumber_sims,
-        ploidy_normalization = TRUE,
+        ploidy_normalization = ploidy_normalization_sims,
         use_rbindlist = TRUE,
         get_coordinates = TRUE
     )
@@ -26,7 +28,7 @@ plot_gainloss <- function(copynumber_sims,
         delta_PCAWG <- gainloss_DATA(
             copynumber_DATA,
             copynumber_coordinates,
-            ploidy_normalization = TRUE,
+            ploidy_normalization = ploidy_normalization_DATA,
             use_rbindlist = TRUE,
             arm_level = arm_level, pos_centromeres = pos_centromeres
         )

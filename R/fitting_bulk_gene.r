@@ -93,8 +93,8 @@ bulk_gene_func_ABC <- function(parameters, parameter_IDs, model_variables, list_
     stat <- SIMS_gene_freqs
 }
 #-----------------Function to choose one best parameter from a posterior
-bulk_gene_get_best_para <- function(data_rf, model_rf, obs_rf, post_rf) {
-    df_dist <- densityPlot_df(model_rf, obs_rf, data_rf)
+bulk_gene_get_best_para <- function(data_rf, model_rf, all_obs, post_rf) {
+    df_dist <- densityPlot_df(model_rf, all_obs, data_rf)
     best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
 }
 
@@ -200,6 +200,7 @@ fitting_bulk_gene <- function(library_name,
     library(gridExtra)
     library(ggplot2)
     library(dplyr)
+    library(ggrepel)
     if (is.null(n_cores)) {
         n_cores <- max(detectCores() - 1, 1)
     }
@@ -251,8 +252,8 @@ fitting_bulk_gene <- function(library_name,
     # ====================================FITTING WITH ABC RANDOM FOREST
     #--------------------------------------------Fit parameters with ABC
     #---Dataframe for data observation
-    obs_rf <- data.frame(matrix(DATA_target, nrow = 1))
-    colnames(obs_rf) <- paste0("freqs_", 1:ncol(obs_rf))
+    all_obs <- data.frame(matrix(DATA_target, nrow = 1))
+    colnames(all_obs) <- paste0("freqs_", 1:ncol(all_obs))
     #---Dataframe for parameters for reference
     all_paras <- data.frame(sim_param)
     colnames(all_paras) <- parameter_IDs
@@ -270,18 +271,19 @@ fitting_bulk_gene <- function(library_name,
         data_rf <- cbind(all_paras[para_ID], all_data)
         colnames(data_rf)[1] <- "para"
         f <- as.formula("para ~.")
-        model_rf <- regAbcrf(formula = f, data_rf, paral = TRUE, ncores = n_cores)
+        model_rf <- regAbcrf(
+            formula = f, data_rf,
+            paral = TRUE, ncores = n_cores,
+            sampsize = nrow(data_rf),
+            save.memory = TRUE
+        )
         #   Predict posterior distribution based on found random forest
-        post_rf <- predict(model_rf, obs_rf, data_rf, paral = TRUE, ncores = n_cores)
+        post_rf <- predict(model_rf, all_obs, data_rf, paral = TRUE, ncores = n_cores)
         #   Choose best value from posterior distribution
-        best_rf <- bulk_gene_get_best_para(data_rf, model_rf, obs_rf, post_rf)
+        best_rf <- bulk_gene_get_best_para(data_rf, model_rf, all_obs, post_rf)
         #   Save results for fitting this parameter
         ABC_output <- list()
         ABC_output$para_ID <- para_ID
-        ABC_output$data_rf <- data_rf
-        ABC_output$model_rf <- model_rf
-        ABC_output$obs_rf <- obs_rf
-        ABC_output$post_rf <- post_rf
         ABC_output$best_rf <- best_rf
         filename <- paste0(folder_workplace_tmp, model_name, "_ABC_output_", para_ID, ".rda")
         save(ABC_output, file = filename)
@@ -292,7 +294,7 @@ fitting_bulk_gene <- function(library_name,
         col <- ceiling(id / 7)
         layout[row, col] <- id
         gs[[id]] <- densityPlot_MODIFIED(
-            model_rf, obs_rf, data_rf,
+            model_rf, all_obs, data_rf,
             protocol = "arm",
             fontsize = 20,
             chosen_para = best_rf,
@@ -368,16 +370,19 @@ fitting_bulk_gene <- function(library_name,
         Source = c(rep("Data", length(DATA_mean_freqs)), rep("Simulation", length(SIMS_mean_freqs))),
         SD = c(DATA_sd_freqs, SIMS_sd_freqs)
     )
+    #   Sort dataframe according to decreasing mutation frequencies
+    levels <- list_targets[sort(DATA_mean_freqs[1:length(list_targets)], decreasing = TRUE, index.return = TRUE)$ix]
+    df_freq$Gene_ID <- factor(df_freq$Gene_ID, levels = levels)
     #   Plot comparison vs data
     filename <- paste0(model_name, "_against_data.jpeg")
     jpeg(file = filename, width = 2000, height = 1100)
     p <- ggplot(df_freq, aes(x = Gene_ID, y = Freq, fill = Type, color = Type, Source = Source)) +
-        geom_bar(stat = "identity", width = 0.5, position = position_dodge(width = 0.5), data = df_freq %>% filter(Source == "Simulation"), alpha = 0.6) +
+        geom_bar(stat = "identity", width = 0.5, position = position_dodge(width = 0.5), data = df_freq %>% filter(Source == "Simulation"), alpha = 0.4) +
         geom_errorbar(aes(ymin = Freq - SD, ymax = Freq + SD), width = 0.5, position = position_dodge(width = 0.5), data = df_freq %>% filter(Source == "Simulation")) +
         geom_point(size = 5, shape = 21, position = position_dodge(width = 0.5), data = df_freq %>% filter(Source == "Data")) +
         geom_errorbar(aes(ymin = Freq - SD, ymax = Freq + SD), width = 0.5, position = position_dodge(width = 0.5), data = df_freq %>% filter(Source == "Data")) +
         xlab("Gene") +
-        ylab("Frequency") +
+        ylab("Frequency (%)") +
         scale_fill_manual(
             values = c(
                 "Mutation" = "olivedrab",
@@ -416,15 +421,150 @@ fitting_bulk_gene <- function(library_name,
         )
     )
     p <- ggplot(plot_table, aes(x = Selection_rate, y = Mut_freq_spec)) +
-        geom_point(size = 30, color = "blue") +
+        geom_point(size = 10, color = "blue") +
         geom_smooth(method = lm, color = "blue") +
+        geom_text_repel(aes(label = Gene), size = 10, point.padding = 0.4) +
         annotation_custom(grob1) +
-        geom_text(aes(label = Gene), size = 10, color = "white") +
         xlab("Selection rates") +
         ylab("Mutation frequencies") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50")) +
         theme(text = element_text(size = 40)) +
         theme(plot.margin = unit(c(1, 0.5, 0, 0.5), "cm"))
+    print(p)
+    dev.off()
+}
+
+statistics_bulk_gene_cooccurrence <- function(plotname,
+                                              library_name,
+                                              model_name,
+                                              sample_ids_DATA,
+                                              driver_events_DATA,
+                                              list_parameters,
+                                              list_targets,
+                                              folder_workplace,
+                                              n_cores = NULL,
+                                              R_libPaths = NULL) {
+    library(ggplot2)
+    if (is.null(n_cores)) {
+        n_cores <- max(detectCores() - 1, 1)
+    }
+    #-----------------------------------------Input simulated CN library
+    filename <- paste0(library_name, "_ABC_input.rda")
+    load(filename)
+    model_variables <- ABC_input$model_variables
+    n_samples <- ABC_input$n_samples
+
+    n_samples <- 1000
+    #---------------------------------Find co-occurence matrix from data
+    DATA_cooccurence <- data.frame(matrix(0, nrow = 0, ncol = 2))
+    colnames(DATA_cooccurence) <- c("var1", "var2")
+    for (gene1 in list_targets) {
+        for (gene2 in list_targets) {
+            DATA_cooccurence[nrow(DATA_cooccurence) + 1, ] <- c(gene1, gene2)
+        }
+    }
+    DATA_cooccurence$val <- 0
+    for (i in 1:length(sample_ids_DATA)) {
+        sample_id <- sample_ids_DATA[i]
+        sample_driver_events_DATA <- driver_events_DATA[which(driver_events_DATA$sample_id == sample_id), ]
+        if (nrow(sample_driver_events_DATA) == 0) next
+        sample_gene_drivers <- unique(sample_driver_events_DATA$gene)
+        for (gene1 in sample_gene_drivers) {
+            for (gene2 in sample_gene_drivers) {
+                row <- which(DATA_cooccurence$var1 == gene1 & DATA_cooccurence$var2 == gene2)
+                DATA_cooccurence$val[row] <- DATA_cooccurence$val[row] + 1
+            }
+        }
+    }
+    DATA_cooccurence$val <- 100 * DATA_cooccurence$val / length(sample_ids_DATA)
+    #--------------------------Find co-occurence matrix from simulations
+    #   Load best parameters from fitting
+    list_parameters_best <- read.csv(paste0(model_name, "_fitted_parameters.csv"))
+    #   Assign best parameters in model variables
+    model_variables <- bulk_gene_assign_paras(model_variables, list_parameters_best$Variable, list_parameters_best$Best_value)
+    #   Make simulations using best parameters
+    SIMS_chromosome <- simulator_full_program(
+        model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
+        save_simulation = FALSE, report_progress = TRUE, build_cn = FALSE, compute_parallel = TRUE, n_cores = n_cores,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile", "sample_genotype_unique_drivers"),
+        R_libPaths = R_libPaths
+    )
+    driver_library <- model_variables$driver_library
+    SIMS_best <- bulk_gene_get_gene_counts(SIMS_chromosome, list_targets, driver_library)
+    SIMS_count_mut <- SIMS_best$count_mut
+    SIMS_count_gain <- SIMS_best$count_gain
+    SIMS_count_loss <- SIMS_best$count_loss
+    SIMS_count <- SIMS_count_mut + SIMS_count_gain + SIMS_count_loss
+    #   Find co-occurence matrix from simulations
+    SIMS_cooccurence <- data.frame(matrix(0, nrow = 0, ncol = 2))
+    colnames(SIMS_cooccurence) <- c("var1", "var2")
+    for (gene1 in list_targets) {
+        for (gene2 in list_targets) {
+            SIMS_cooccurence[nrow(SIMS_cooccurence) + 1, ] <- c(gene1, gene2)
+        }
+    }
+    SIMS_cooccurence$val <- 0
+    for (i in 1:nrow(SIMS_count)) {
+        if (length(which(SIMS_count[i, ] > 0)) == 0) next
+        sample_driver_events_SIMS <- list_targets[which(SIMS_count[i, ] > 0)]
+        sample_gene_drivers <- unique(sample_driver_events_SIMS)
+        for (gene1 in sample_gene_drivers) {
+            for (gene2 in sample_gene_drivers) {
+                row <- which(SIMS_cooccurence$var1 == gene1 & SIMS_cooccurence$var2 == gene2)
+                SIMS_cooccurence$val[row] <- SIMS_cooccurence$val[row] + 1
+            }
+        }
+    }
+    SIMS_cooccurence$val <- 100 * SIMS_cooccurence$val / nrow(SIMS_count)
+
+
+
+
+
+
+    #------------------------Find gene order according to frequency sums
+    list_targets_freq_sum <- rep(0, length(list_targets))
+    for (i in 1:length(list_targets)) {
+        list_targets_freq_sum[i] <- sum(DATA_cooccurence$val[which(DATA_cooccurence$var1 == list_targets[i])])
+    }
+    list_targets_ordered <- list_targets[sort(list_targets_freq_sum, index.return = TRUE)$ix]
+    DATA_cooccurence$var1 <- factor(DATA_cooccurence$var1, levels = list_targets_ordered)
+    DATA_cooccurence$var2 <- factor(DATA_cooccurence$var2, levels = list_targets_ordered)
+
+
+    SIMS_cooccurence$var1 <- factor(SIMS_cooccurence$var1, levels = list_targets_ordered)
+    SIMS_cooccurence$var2 <- factor(SIMS_cooccurence$var2, levels = list_targets_ordered)
+
+
+
+    #-----------------------------------------Plot co-occurence matrices
+    filename <- paste0(plotname, ".jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    p <- ggplot(DATA_cooccurence, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        coord_equal() +
+        xlab("") +
+        ylab("") +
+        scale_fill_distiller(palette = "RdPu", name = "Data") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+
+
+
+
+
+
+    #-----------------------------------------Plot co-occurence matrices
+    filename <- paste0(plotname, "_SIMS.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    p <- ggplot(SIMS_cooccurence, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        coord_equal() +
+        xlab("") +
+        ylab("") +
+        scale_fill_distiller(palette = "RdPu", name = "Data") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
 }

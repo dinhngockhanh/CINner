@@ -82,7 +82,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
     } else if (selection_model == "chrom-arm-selection") {
         #--------------------------------------------Find average ploidy
-        ploidy <- mean(vec_CN_all)
+        ploidy <- round(mean(vec_CN_all))
         #-----------------------------------------Compute selection rate
         #   Find average CN per chromosome arm
         chrom_arm_library_copy <- chrom_arm_library
