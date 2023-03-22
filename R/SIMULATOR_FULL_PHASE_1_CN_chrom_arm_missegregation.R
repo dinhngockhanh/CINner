@@ -1,4 +1,5 @@
 # =================================SIMULATE CHROMOSOME ARM MISSEGREGATION
+#' @export
 SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react,
                                                                genotype_daughter_1,
                                                                genotype_daughter_2 = NULL,
