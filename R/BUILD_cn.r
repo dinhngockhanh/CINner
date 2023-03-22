@@ -1,7 +1,7 @@
 #' @export
 BUILD_cn_normal_autosomes <- function(TABLE_CHROMOSOME_CN_INFO) {
-    #----------------------------------------------------Remove chromosome Y
-    TABLE_CHROMOSOME_CN_INFO <- TABLE_CHROMOSOME_CN_INFO[-which(TABLE_CHROMOSOME_CN_INFO$Chromosome %in% c("X", "Y")), ]
+    #---------------------------------------------Remove sex chromosomes
+    if (length(which(TABLE_CHROMOSOME_CN_INFO$Chromosome %in% c("X", "Y"))) > 0) TABLE_CHROMOSOME_CN_INFO <- TABLE_CHROMOSOME_CN_INFO[-which(TABLE_CHROMOSOME_CN_INFO$Chromosome %in% c("X", "Y")), ]
     #--------------------------------------------------------Build CN matrix
     vec_chrom <- c()
     vec_bin_start <- c()
@@ -29,8 +29,8 @@ BUILD_cn_normal_autosomes <- function(TABLE_CHROMOSOME_CN_INFO) {
 
 #' @export
 BUILD_cn_normal_XX <- function(TABLE_CHROMOSOME_CN_INFO) {
-    #----------------------------------------------------Remove chromosome Y
-    TABLE_CHROMOSOME_CN_INFO <- TABLE_CHROMOSOME_CN_INFO[-which(TABLE_CHROMOSOME_CN_INFO$Chromosome == "Y"), ]
+    #---------------------------------------------Remove sex chromosomes
+    if (length(which(TABLE_CHROMOSOME_CN_INFO$Chromosome %in% c("X", "Y"))) > 0) TABLE_CHROMOSOME_CN_INFO <- TABLE_CHROMOSOME_CN_INFO[-which(TABLE_CHROMOSOME_CN_INFO$Chromosome %in% c("X", "Y")), ]
     #--------------------------------------------------------Build CN matrix
     vec_chrom <- c()
     vec_bin_start <- c()

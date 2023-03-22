@@ -95,7 +95,7 @@ bulk_gene_func_ABC <- function(parameters, parameter_IDs, model_variables, list_
 #-----------------Function to choose one best parameter from a posterior
 bulk_gene_get_best_para <- function(data_rf, model_rf, all_obs, post_rf) {
     df_dist <- densityPlot_df(model_rf, all_obs, data_rf)
-    best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
+    best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))][1]
 }
 
 #' @export
@@ -181,6 +181,67 @@ library_bulk_gene <- function(library_name,
     ABC_input$sim_stat <- sim_stat
     filename <- paste0(library_name, "_ABC_input.rda")
     save(ABC_input, file = filename)
+}
+
+#' @export
+fitting_bulk_focal_length <- function(cnv_DATA,
+                                      type,
+                                      model = "beta",
+                                      table_chromosome_info,
+                                      plotname) {
+    library(fitdistrplus)
+    library(ggplot2)
+    if (type == "loss") {
+        cnv_DATA <- cnv_DATA[which(cnv_DATA$Seg.CN < 0), ]
+        color <- "#3182BD"
+        xlab <- "Focal del length / Chromosome arm length"
+    } else if (type == "gain") {
+        cnv_DATA <- cnv_DATA[which(cnv_DATA$Seg.CN > 0), ]
+        color <- "#E34A33"
+        xlab <- "Focal amp length / Chromosome arm length"
+    }
+    #------------------------------Add chromosome arm length to each CNV
+    cnv_DATA$Arm.bp <- 0
+    for (i in 1:nrow(cnv_DATA)) {
+        chrom <- cnv_DATA$Chromosome[i]
+        start <- cnv_DATA$Start.bp[i]
+        centromere <- table_chromosome_info$centromere[which(table_chromosome_info$chrom == chrom)]
+        if (start < centromere) {
+            cnv_DATA$Arm.bp[i] <- table_chromosome_info$centromere[which(table_chromosome_info$chrom == chrom)]
+        } else {
+            cnv_DATA$Arm.bp[i] <- table_chromosome_info$length[which(table_chromosome_info$chrom == chrom)] - table_chromosome_info$centromere[which(table_chromosome_info$chrom == chrom)]
+        }
+    }
+    #---------------------------------Compute ratio of CNV to arm length
+    cnv_DATA$Length.bp <- cnv_DATA$End.bp - cnv_DATA$Start.bp + 1
+    cnv_DATA$Ratio <- cnv_DATA$Length.bp / cnv_DATA$Arm.bp
+    #-------------------------Fit the CNV length with given distribution
+    binwidth <- 0.01
+    binwidth_fit <- 0.001
+    #   Fit the CNV length with given distribution
+    fit <- fitdist(cnv_DATA$Ratio, distr = model)
+    df_fit_x <- seq(binwidth_fit, max(cnv_DATA$Ratio), by = binwidth_fit)
+    if (model == "beta") {
+        df_fit_y <- dbeta(df_fit_x, shape1 = fit$estimate[1], shape2 = fit$estimate[2])
+    }
+    #   Normalize and prepare the fitted distribution for plotting
+    df_fit_y <- df_fit_y * (binwidth * length(which(cnv_DATA$Ratio > binwidth))) / (binwidth_fit * sum(df_fit_y[which(df_fit_x > binwidth)]))
+    df_fit <- data.frame(Ratio = df_fit_x, y = df_fit_y)
+    #---------------Plot the fitted CNV length distribution against data
+    filename <- paste0(plotname, ".jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    p <- ggplot(cnv_DATA, aes(x = Ratio)) +
+        geom_histogram(color = color, fill = color, binwidth = binwidth, alpha = 0.5) +
+        list(
+            geom_line(data = df_fit, aes(x = Ratio, y = y), size = 3, color = color)
+        ) +
+        xlab(xlab) +
+        ylab("") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #-------------------------------------------Return fitted parameters
+    return(fit$estimate)
 }
 
 #' @export

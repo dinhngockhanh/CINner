@@ -168,8 +168,7 @@ fitting_bulk_arm_CN <- function(library_name,
                                 list_targets_library,
                                 bound_freq = 0.1,
                                 ntree = 200,
-                                # ntree = 200,
-                                N_shuffle = 21,
+                                library_shuffle = FALSE,
                                 n_cores = NULL,
                                 R_libPaths = NULL,
                                 folder_workplace = NULL) {
@@ -261,7 +260,8 @@ fitting_bulk_arm_CN <- function(library_name,
     ls_sim_stat_bootstrap <- vector("list", 1)
     ls_sim_stat_bootstrap[[1]] <- df_sim_stat
     tmp <- 0
-    if (N_shuffle > 0) {
+    if (library_shuffle) {
+        N_shuffle <- length(unique_chroms) - 1
         for (i in 1:N_shuffle) {
             df_sim_param_next <- df_sim_param
             df_sim_stat_next <- df_sim_stat
@@ -682,19 +682,88 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         ONC_mean_selection_rate = FIT_onc_mean_selection_rate,
         ONC_max_selection_rate = FIT_onc_max_selection_rate
     )
-    #---Plot relationship between WGD status and count/mean selection rate of TSG arms
-    #   Find p-values for correlation between WGD status and either count of mean selection rate of TSG/ONC arms
+    #---Find p-values for correlation between WGD status and either count or mean selection rate of TSG/ONC arms
     tmp <- cor.test(FIT_tsg_count, DATA_wgd_proportion, method = "spearman", exact = FALSE)
     p_val_TSG_count <- tmp$p.value
     tmp <- cor.test(FIT_tsg_mean_selection_rate, DATA_wgd_proportion, method = "spearman", exact = FALSE)
     p_val_TSG_mean_selection_rate <- tmp$p.value
-
     tmp <- cor.test(FIT_onc_count, DATA_wgd_proportion, method = "spearman", exact = FALSE)
     p_val_ONC_count <- tmp$p.value
     tmp <- cor.test(FIT_onc_mean_selection_rate, DATA_wgd_proportion, method = "spearman", exact = FALSE)
     p_val_ONC_mean_selection_rate <- tmp$p.value
-
-    #   Plot
+    #---Plot relationship between WGD status and count of TSG/ONCOGENE arms
+    filename <- paste0(plotname, "_WGD_vs_counts_TSG_ONC.jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    p <- ggplot(df_plot, aes(x = TSG_count, y = ONC_count, color = WGD)) +
+        geom_point(size = 10) +
+        geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
+        annotate("segment",
+            x = min(df_plot$TSG_count) + 0.7 * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            xend = min(df_plot$TSG_count) + 0.75 * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            y = min(df_plot$ONC_count) + 0.0 * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            yend = min(df_plot$ONC_count) + 0.0 * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            colour = "black", size = 2, alpha = 1, arrow = arrow()
+        ) +
+        annotate("text",
+            x = min(df_plot$TSG_count) + 0.77 * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            y = min(df_plot$ONC_count) + 0.0 * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            label = paste0("p.val=", scientific(p_val_TSG_count)), colour = "black", size = 8, hjust = 0
+        ) +
+        annotate("segment",
+            x = min(df_plot$TSG_count) + 0.7 * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            xend = min(df_plot$TSG_count) + 0.7 * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            y = min(df_plot$ONC_count) + 0.0 * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            yend = min(df_plot$ONC_count) + 0.05 * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            colour = "black", size = 2, alpha = 1, arrow = arrow()
+        ) +
+        annotate("text",
+            x = min(df_plot$TSG_count) + 0.7 * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            y = min(df_plot$ONC_count) + 0.07 * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            label = paste0("p.val=", scientific(p_val_ONC_count)), colour = "black", size = 8, hjust = 0
+        ) +
+        xlab("Count of TSG arms") +
+        ylab("Count of ONC arms") +
+        labs(fill = "WGD proportion") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #---Plot relationship between WGD status and selection rates of TSG/ONCOGENE arms
+    filename <- paste0(plotname, "_WGD_vs_selection_rates_TSG_ONC.jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    p <- ggplot(df_plot, aes(x = TSG_mean_selection_rate, y = ONC_mean_selection_rate, color = WGD)) +
+        geom_point(size = 10) +
+        geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
+        annotate("segment",
+            x = min(df_plot$TSG_mean_selection_rate) + 0.7 * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            xend = min(df_plot$TSG_mean_selection_rate) + 0.75 * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            y = min(df_plot$ONC_mean_selection_rate) + 0.0 * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            yend = min(df_plot$ONC_mean_selection_rate) + 0.0 * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            colour = "black", size = 2, alpha = 1, arrow = arrow()
+        ) +
+        annotate("text",
+            x = min(df_plot$TSG_mean_selection_rate) + 0.77 * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            y = min(df_plot$ONC_mean_selection_rate) + 0.0 * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate)), colour = "black", size = 8, hjust = 0
+        ) +
+        annotate("segment",
+            x = min(df_plot$TSG_mean_selection_rate) + 0.7 * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            xend = min(df_plot$TSG_mean_selection_rate) + 0.7 * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            y = min(df_plot$ONC_mean_selection_rate) + 0.0 * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            yend = min(df_plot$ONC_mean_selection_rate) + 0.05 * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            colour = "black", size = 2, alpha = 1, arrow = arrow()
+        ) +
+        annotate("text",
+            x = min(df_plot$TSG_mean_selection_rate) + 0.7 * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            y = min(df_plot$ONC_mean_selection_rate) + 0.07 * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate)), colour = "black", size = 8, hjust = 0
+        ) +
+        xlab("Selection rates of TSG arms") +
+        ylab("Selection rates of ONC arms") +
+        labs(fill = "WGD proportion") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #---Plot relationship between WGD status and count/mean selection rate of TSG arms
     filename <- paste0(plotname, "_WGD_vs_fitted_TSG.jpeg")
     jpeg(filename, width = 1000, height = 1100)
     p <- ggplot(df_plot, aes(x = TSG_count, y = TSG_mean_selection_rate, color = WGD)) +

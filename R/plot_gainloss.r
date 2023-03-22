@@ -422,11 +422,7 @@ densityPlot_MODIFIED <- function(object,
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0))
 
-    # if (protocol == "arm") {
-    #     p_plot <- p_plot +
-    #         geom_vline(aes(xintercept = 1), color = color_vline, size = 1)
-    # }
-
+    print(chosen_para)
     if (is.null(chosen_para) == FALSE) {
         p_plot <- p_plot +
             geom_vline(aes(xintercept = chosen_para), color = color_vline, size = 1, linetype = "dotted")

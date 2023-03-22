@@ -3,6 +3,8 @@ CHECK_model_variables <- function(model_variables) {
     TABLE_INITIAL_CN <- model_variables$initial_cn
     #---------------------------------Clean up library of CN information
     TABLE_CHROMOSOME_CN_INFO <- model_variables$cn_info
+    # print(TABLE_INITIAL_CN)
+    # print(TABLE_CHROMOSOME_CN_INFO)
     vec_delete <- c()
     for (i in 1:nrow(TABLE_CHROMOSOME_CN_INFO)) {
         chrom <- TABLE_CHROMOSOME_CN_INFO$Chromosome[i]

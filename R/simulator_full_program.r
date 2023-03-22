@@ -545,6 +545,8 @@ one_simulation <- function(iteration,
     #---------------------------------------Return the simulation result
     if (length(output_variables) == 0) {
         return()
+    } else if (output_variables == "all") {
+        return(simulation)
     } else {
         simulation_output <- list()
         if ("all_sample_genotype" %in% output_variables) simulation_output$sample$all_sample_genotype <- simulation$sample$all_sample_genotype
