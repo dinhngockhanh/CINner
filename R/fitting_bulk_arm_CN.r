@@ -1,4 +1,5 @@
 #----------------------Function to assign parameters to proper positions
+#' @export
 bulk_arm_CN_assign_paras <- function(model_variables, parameter_IDs, parameters) {
     for (i in 1:length(parameter_IDs)) {
         parameter_ID <- parameter_IDs[i]
@@ -293,11 +294,9 @@ fitting_bulk_arm_CN <- function(library_name,
     sim_param_bootstrap <- as.data.frame(rbindlist(ls_sim_param_bootstrap))
     sim_stat_bootstrap <- as.data.frame(rbindlist(ls_sim_stat_bootstrap))
     # ====================================FITTING WITH ABC RANDOM FOREST
-    #--------------------------------------------Fit parameters with ABC
     #---Dataframe for prepared library of parameters
     all_paras_original <- df_sim_param
     all_paras_bootstrap <- sim_param_bootstrap
-    # print(nrow(all_paras_bootstrap))
     #---Dataframe for prepared library of statistics
     all_data_original <- df_sim_stat
     all_data_bootstrap <- sim_stat_bootstrap
@@ -835,4 +834,42 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
+}
+
+#' @export
+fitting_bulk_arm_WGD <- function(library_name,
+                                 model_name,
+                                 copynumber_DATA,
+                                 wgd_DATA,
+                                 list_parameters,
+                                 list_parameters_library,
+                                 # bound_freq = 0.1,
+                                 # ntree = 200,
+                                 # library_shuffle = FALSE,
+                                 n_cores = NULL,
+                                 R_libPaths = NULL,
+                                 folder_workplace = NULL) {
+    library(parallel)
+    library(pbapply)
+    library(abcrf)
+    library(grid)
+    library(gridExtra)
+    library(ggplot2)
+    library(signals)
+    library(data.table)
+    if (is.null(n_cores)) {
+        n_cores <- max(detectCores() - 1, 1)
+    }
+    print("KHANH")
+    print(wgd_DATA)
+
+    # tmp <- simulator_full_program(
+    #     model = model_variables,
+    #     n_simulations = 10,
+    #     stage_final = 3,
+    #     save_simulation = FALSE,
+    #     report_progress = TRUE,
+    #     seed = 11,
+    #     compute_parallel = FALSE
+    # )
 }

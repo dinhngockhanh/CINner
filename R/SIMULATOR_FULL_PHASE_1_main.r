@@ -1,14 +1,6 @@
 #' @export
 SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
-    #---------------------------------------------------Input CN event rates
-    base_prob_CN_WGD <- prob_CN_whole_genome_duplication
-    base_prob_CN_misseg <- prob_CN_missegregation
-    base_prob_CN_arm_misseg <- prob_CN_chrom_arm_missegregation
-    base_prob_CN_foc_amp <- prob_CN_focal_amplification
-    base_prob_CN_foc_del <- prob_CN_focal_deletion
-    base_prob_CN_cnloh_i <- prob_CN_cnloh_interstitial
-    base_prob_CN_cnloh_t <- prob_CN_cnloh_terminal
-    #------------------------------------Set up the initial clonal genotypes
+    #--------------------------------Set up the initial clonal genotypes
     #   Set up the strand count for each chromosome for each clone
     genotype_list_ploidy_chrom <<- initial_ploidy_chrom
     assign("genotype_list_ploidy_chrom", genotype_list_ploidy_chrom, envir = .GlobalEnv)
@@ -33,7 +25,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     #   Set up the probability of new drivers per division for each clone
     genotype_list_prob_new_drivers <<- initial_prob_new_drivers
     assign("genotype_list_prob_new_drivers", genotype_list_prob_new_drivers, envir = .GlobalEnv)
-    #-------------------------------------Set up the clonal evolution record
+    #---------------------------------Set up the clonal evolution record
     N_clones <<- initial_N_clones
     assign("N_clones", N_clones, envir = .GlobalEnv)
     #   Set up the record for current clonal populations
@@ -53,7 +45,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     evolution_traj_divisions <- list()
     assign("evolution_origin", evolution_origin, envir = .GlobalEnv)
     assign("evolution_genotype_changes", evolution_genotype_changes, envir = .GlobalEnv)
-    #--------------------------------------Set up counts for the simulations
+    #----------------------------------Set up counts for the simulations
     #   Current time
     T_current <- T_start_time
     T_goal <- T_end_time
@@ -63,7 +55,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     #   Count of events
     N_events_current <- 0
     N_events_goal <- Max_events
-    #-----------------------------------------------------Simulation process
+    #-------------------------------------------------Simulation process
     if (report_progress == TRUE) {
         pb <- txtProgressBar(
             min = T_start_time, max = T_goal,
@@ -74,17 +66,14 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         if (report_progress == TRUE) {
             setTxtProgressBar(pb, T_current)
         }
-        #       Find the Poisson propensities of event count for all clones
+        #   Find the Poisson propensities of event count for all clones
         rate_base_lifetime <- func_event_rate(T_current)
         all_propensity <- T_tau_step * rate_base_lifetime * clonal_population_current
-        #       Find the probability of division for all clones
+        #   Find the probability of division for all clones
         clonal_portion <- genotype_list_selection_rate[clonal_ID_current]
-
         all_prob_division <- func_expected_population(T_current) / (func_expected_population(T_current) + N_cells_current) * sum(clonal_population_current) * clonal_portion / sum(clonal_portion * clonal_population_current)
-
         all_prob_division[which(all_prob_division > 1)] <- 1
-
-        #       Find next time step and initiate next clonal population vector
+        #   Find next time step and initiate next clonal population vector
         T_next <- T_current + T_tau_step
         clonal_population_next <<- clonal_population_current
         if ((N_cells_current <= 0) || (is.null(N_cells_current))) {
@@ -95,11 +84,11 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
             T_current <- T_end_time
             break
         }
-        #       Initialize the matrix of divisions for this step
+        #   Initialize the matrix of divisions for this step
         mat_divisions <- c()
-        #       Find all existing clones
+        #   Find all existing clones
         all_existing_clones <- clonal_ID_current
-        #       For every existing clones...
+        #   For every existing clones...
         if (length(all_existing_clones) >= 1) {
             for (i in 1:length(all_existing_clones)) {
                 #   Find clone ID
@@ -108,52 +97,20 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                 genotype_to_react <- clone_to_react
                 #   Find current clonal population
                 clone_population <- clonal_population_current[i]
+                #   Find ingredients to compute probabilities of CNA/driver mutation
+                chrom_ploidy <- genotype_list_ploidy_chrom[[clone_to_react]]
+                DNA_length <- genotype_list_DNA_length[[clone_to_react]]
                 #   Find probability of division
                 prob_division <- all_prob_division[i]
                 #   Find probability of new genotype
-                DNA_length <- genotype_list_DNA_length[[clone_to_react]]
                 prob_new_drivers <- genotype_list_prob_new_drivers[clone_to_react]
-                if (model_CN_whole_genome_duplication == "per_division") {
-                    prob_CN_WGD <- base_prob_CN_WGD
-                }
-                if (model_CN_missegregation == "per_division") {
-                    prob_CN_misseg <- base_prob_CN_misseg
-                } else if (model_CN_missegregation == "per_homolog") {
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    prob_CN_misseg <- base_prob_CN_misseg * sum(genotype_list_ploidy_chrom[[clone_to_react]])
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                    ################################################################
-                }
-                if (model_CN_chrom_arm_missegregation == "per_division") {
-                    prob_CN_arm_misseg <- base_prob_CN_arm_misseg
-                }
-                if (model_CN_focal_amplification == "per_division") {
-                    prob_CN_foc_amp <- base_prob_CN_foc_amp
-                }
-                if (model_CN_focal_deletion == "per_division") {
-                    prob_CN_foc_del <- base_prob_CN_foc_del
-                }
-                if (model_CN_cnloh_interstitial == "per_division") {
-                    prob_CN_cnloh_i <- base_prob_CN_cnloh_i
-                }
-                if (model_CN_cnloh_terminal == "per_division") {
-                    prob_CN_cnloh_t <- base_prob_CN_cnloh_t
-                }
+                prob_CN_WGD <- eval(parse(text = formula_CN_whole_genome_duplication))
+                prob_CN_misseg <- eval(parse(text = formula_CN_missegregation))
+                prob_CN_arm_misseg <- eval(parse(text = formula_CN_chrom_arm_missegregation))
+                prob_CN_foc_amp <- eval(parse(text = formula_CN_focal_amplification))
+                prob_CN_foc_del <- eval(parse(text = formula_CN_focal_deletion))
+                prob_CN_cnloh_i <- eval(parse(text = formula_CN_cnloh_interstitial))
+                prob_CN_cnloh_t <- eval(parse(text = formula_CN_cnloh_terminal))
                 prob_new_genotype <- 1 - (1 - prob_new_drivers) * (1 - prob_CN_WGD) * (1 - prob_CN_misseg) * (1 - prob_CN_arm_misseg) * (1 - prob_CN_foc_amp) * (1 - prob_CN_foc_del) * (1 - prob_CN_cnloh_i) * (1 - prob_CN_cnloh_t)
                 #   Find number of events
                 prop <- all_propensity[i]
@@ -171,11 +128,11 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                 count_div_old <- count_event_types[2]
                 count_div_new_tmp <- count_event_types[3]
                 count_div_new <- count_div_new_tmp
-                #-----------Perform death events
+                #---Perform death events
                 clonal_population_next[i] <<- clonal_population_next[i] - count_deaths
-                #-----------Perform division events with no new genotype
+                #---Perform division events with no new genotype
                 clonal_population_next[i] <<- clonal_population_next[i] + count_div_old
-                #-----------Perform division events with new genotype
+                #---Perform division events with new genotype
                 if (count_div_new_tmp >= 1) {
                     for (j in 1:count_div_new_tmp) {
                         #   Find what events lead to the new genotype
@@ -199,51 +156,46 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                             flag_cnloh_terminal <- as.numeric(runif(1) < (prob_CN_cnloh_t / prob_new_genotype))
                             vec_flag <- c(flag_drivers, flag_whole_genome_duplication, flag_missegregation, flag_chrom_arm_missegregation, flag_amplification, flag_deletion, flag_cnloh_interstitial, flag_cnloh_terminal)
                         }
-                        #               Initiate the two new genotypes
+                        #   Initiate the two new genotypes
                         output <- SIMULATOR_FULL_PHASE_1_genotype_initiation(genotype_to_react)
                         genotype_daughter_1 <- output[[1]]
                         position_daughter_1 <- output[[2]]
                         genotype_daughter_2 <- output[[3]]
                         position_daughter_2 <- output[[4]]
-                        #               Simulate new driver event
+                        #   Simulate new driver event
                         if (flag_drivers == 1) {
-                            # print('=========================================================DRIVER')
                             SIMULATOR_FULL_PHASE_1_drivers(
                                 genotype_to_react = genotype_to_react,
                                 genotype_daughter_1 = genotype_daughter_1,
                                 genotype_daughter_2 = genotype_daughter_2
                             )
                         }
-                        #               Simulate whole genome duplication event
+                        #   Simulate whole genome duplication event
                         if (flag_whole_genome_duplication == 1) {
-                            # print('=======================================WHOLE-GENOME DUPLICATION')
                             SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication(
                                 genotype_to_react = genotype_to_react,
                                 genotype_daughter_1 = genotype_daughter_1,
                                 genotype_daughter_2 = genotype_daughter_2
                             )
                         }
-                        #               Simulate missegregation event
+                        #   Simulate missegregation event
                         if (flag_missegregation == 1) {
-                            # print("=================================================MISSEGREGATION")
                             SIMULATOR_FULL_PHASE_1_CN_missegregation(
                                 genotype_to_react = genotype_to_react,
                                 genotype_daughter_1 = genotype_daughter_1,
                                 genotype_daughter_2 = genotype_daughter_2
                             )
                         }
-                        #               Simulate chromosome-arm missegregation event
+                        #   Simulate chromosome-arm missegregation event
                         if (flag_chrom_arm_missegregation == 1) {
-                            # print('=============================================ARM-MISSEGREGATION')
                             SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(
                                 genotype_to_react = genotype_to_react,
                                 genotype_daughter_1 = genotype_daughter_1,
                                 genotype_daughter_2 = genotype_daughter_2
                             )
                         }
-                        #               Simulate focal amplification event
+                        #   Simulate focal amplification event
                         if (flag_amplification == 1) {
-                            # print('==================================================AMPLIFICATION')
                             if (sample.int(2, size = 1) == 1) {
                                 SIMULATOR_FULL_PHASE_1_CN_focal_amplification(
                                     genotype_to_react = genotype_to_react,
@@ -256,9 +208,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                                 )
                             }
                         }
-                        #               Simulate focal deletion event
+                        #   Simulate focal deletion event
                         if (flag_deletion == 1) {
-                            # print('=======================================================DELETION')
                             if (sample.int(2, size = 1) == 1) {
                                 SIMULATOR_FULL_PHASE_1_CN_focal_deletion(
                                     genotype_to_react = genotype_to_react,
@@ -271,9 +222,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                                 )
                             }
                         }
-                        #               Simulate interstitial CN-LOH event
+                        #   Simulate interstitial CN-LOH event
                         if (flag_cnloh_interstitial == 1) {
-                            # print('============================================INTERSTITIAL CN-LOH')
                             if (sample.int(2, size = 1) == 1) {
                                 SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial(
                                     genotype_to_react = genotype_to_react,
@@ -286,9 +236,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                                 )
                             }
                         }
-                        #               Simulate terminal CN-LOH event
+                        #   Simulate terminal CN-LOH event
                         if (flag_cnloh_terminal == 1) {
-                            # print('================================================TERMINAL CN-LOH')
                             if (sample.int(2, size = 1) == 1) {
                                 SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal(
                                     genotype_to_react = genotype_to_react,
@@ -301,9 +250,9 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                                 )
                             }
                         }
-                        #               Update DNA length and selection rates of daughter cells
+                        #   Update DNA length and selection rates of daughter cells
                         SIMULATOR_FULL_PHASE_1_genotype_update(genotype_daughter_1, genotype_daughter_2)
-                        #               Check if either daughter cell did not create a new clone
+                        #   Check if either daughter cell did not create a new clone
                         output <- SIMULATOR_FULL_PHASE_1_genotype_cleaning(genotype_to_react, genotype_daughter_1, genotype_daughter_2, position_to_react, position_daughter_1, position_daughter_2)
                         genotype_to_react <- output[[1]]
                         genotype_daughter_1 <- output[[2]]
@@ -311,35 +260,35 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                         position_to_react <- output[[4]]
                         position_daughter_1 <- output[[5]]
                         position_daughter_2 <- output[[6]]
-                        #               Adjust the event count accordingly, and add event to
-                        #               matrix of divisions
+                        #   Adjust the event count accordingly, and add event to
+                        #   matrix of divisions
                         if ((genotype_daughter_1 == genotype_to_react) && (genotype_daughter_2 == genotype_to_react)) {
                             count_div_new <- count_div_new - 1
                             count_div_old <- count_div_old + 1
                         } else {
                             mat_divisions <- rbind(mat_divisions, c(1, genotype_to_react, genotype_daughter_1, genotype_daughter_2))
                         }
-                        #               Update the clonal population according to what happens
+                        #   Update the clonal population according to what happens
                         clonal_population_next[position_to_react] <<- clonal_population_next[position_to_react] - 1
                         clonal_population_next[position_daughter_1] <<- clonal_population_next[position_daughter_1] + 1
                         clonal_population_next[position_daughter_2] <<- clonal_population_next[position_daughter_2] + 1
                     }
                 }
-                #           Add the divisions with old genotype to the matrix of divisions
+                #   Add the divisions with old genotype to the matrix of divisions
                 if (count_div_old > 0) {
                     mat_divisions <- rbind(mat_divisions, c(count_div_old, genotype_to_react, genotype_to_react, genotype_to_react))
                 }
             }
         }
-        #       Clean clonal populations
+        #   Clean clonal populations
         SIMULATOR_FULL_PHASE_1_clonal_population_cleaning()
-        #       Update clonal populations
+        #   Update clonal populations
         clonal_population_current <<- clonal_population_next
-        #       Update time
+        #   Update time
         T_current <- T_next
-        #       Update count of cells
+        #   Update count of cells
         N_cells_current <- sum(clonal_population_current)
-        #       Update record of clonal evolution over time
+        #   Update record of clonal evolution over time
         evolution_traj_count <- evolution_traj_count + 1
 
         evolution_traj_time[evolution_traj_count] <- T_current
@@ -481,7 +430,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         evolution_traj_population[[evolution_traj_count]] <- evolution_traj_population[[evolution_traj_count - 1]]
         evolution_traj_divisions[[evolution_traj_count - 1]] <- c()
     }
-    #---------------------------------Output package of data from simulation
+    #-----------------------------Output package of data from simulation
     if (is.null(N_cells_current)) {
         flag_success <- 0
     }

@@ -32,49 +32,27 @@ SIMULATOR_FULL_PHASE_1_CN_missegregation <- function(genotype_to_react,
         return()
     } else {
         while (1) {
-            if (model_CN_missegregation == "per_division") {
-                #   Choose which cell to gain/lose the strand
-                i_gain <- sample.int(2, size = 1)
-                #   Choose the chromosome to be mis-segregated
-                chrom <- sample.int(N_chromosomes, size = 1)
-                if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
-                    next
-                }
-                if (i_gain == 1 & !is.null(genotype_daughter_2)) {
-                    no_strands <- ploidy_chrom_2[chrom]
-                } else if (i_gain == 1 & is.null(genotype_daughter_2)) {
-                    no_strands <- ploidy_chrom_1[chrom]
-                } else if (i_gain == 2) {
-                    no_strands <- ploidy_chrom_1[chrom]
-                }
-                if (no_strands <= 0) {
-                    next
-                }
-                #   Choose the strand to be mis-segregated
-                strand <- sample.int(no_strands, size = 1)
-                break
-            } else if (model_CN_missegregation == "per_homolog") {
-                #   Choose which cell to gain/lose the strand
-                i_gain <- sample.int(2, size = 1)
-                #   Choose the chromosome to be mis-segregated
-                chrom <- sample.int(N_chromosomes, size = 1, prob = ploidy_chrom_1 / sum(ploidy_chrom_1))
-                if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
-                    next
-                }
-                if (i_gain == 1 & !is.null(genotype_daughter_2)) {
-                    no_strands <- ploidy_chrom_2[chrom]
-                } else if (i_gain == 1 & is.null(genotype_daughter_2)) {
-                    no_strands <- ploidy_chrom_1[chrom]
-                } else if (i_gain == 2) {
-                    no_strands <- ploidy_chrom_1[chrom]
-                }
-                if (no_strands <= 0) {
-                    next
-                }
-                #   Choose the strand to be mis-segregated
-                strand <- sample.int(no_strands, size = 1)
-                break
+            #   Choose which cell to gain/lose the strand
+            i_gain <- sample.int(2, size = 1)
+            #   Choose the chromosome to be mis-segregated
+            chrom <- sample.int(N_chromosomes, size = 1)
+            # chrom <- sample.int(N_chromosomes, size = 1, prob = ploidy_chrom_1 / sum(ploidy_chrom_1))
+            if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
+                next
             }
+            if (i_gain == 1 & !is.null(genotype_daughter_2)) {
+                no_strands <- ploidy_chrom_2[chrom]
+            } else if (i_gain == 1 & is.null(genotype_daughter_2)) {
+                no_strands <- ploidy_chrom_1[chrom]
+            } else if (i_gain == 2) {
+                no_strands <- ploidy_chrom_1[chrom]
+            }
+            if (no_strands <= 0) {
+                next
+            }
+            #   Choose the strand to be mis-segregated
+            strand <- sample.int(no_strands, size = 1)
+            break
         }
     }
     #   Find all drivers located on this strand in the losing cell

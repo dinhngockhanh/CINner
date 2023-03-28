@@ -548,23 +548,35 @@ one_simulation <- function(iteration,
     } else if (output_variables == "all") {
         return(simulation)
     } else {
-        simulation_output <- list()
-        if ("all_sample_genotype" %in% output_variables) simulation_output$sample$all_sample_genotype <- simulation$sample$all_sample_genotype
-        if ("sample_cell_ID" %in% output_variables) simulation_output$sample$sample_cell_ID <- simulation$sample$sample_cell_ID
-        if ("sample_genotype_unique" %in% output_variables) simulation_output$sample$sample_genotype_unique <- simulation$sample$sample_genotype_unique
-        if ("sample_genotype_unique_profile" %in% output_variables) simulation_output$sample$sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
-        if ("sample_genotype_unique_drivers" %in% output_variables) simulation_output$sample$sample_genotype_unique_drivers <- simulation$sample$sample_genotype_unique_drivers
-        if ("cell_phylogeny_hclust" %in% output_variables) simulation_output$sample_phylogeny$cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
-        if ("cn_profiles_long" %in% output_variables) {
-            sample <- simulation$sample
-            if (is.null(sample[["cn_profiles_long"]])) simulation <- p2_cn_profiles_long(simulation)
-            simulation_output$sample$cn_profiles_long <- simulation$sample$cn_profiles_long
-        }
-        if ("cn_profiles_wide" %in% output_variables) {
-            sample <- simulation$sample
-            if (is.null(sample[["cn_profiles_wide"]])) simulation <- p2_cn_profiles_wide(simulation)
-            simulation_output$sample$cn_profiles_wide <- simulation$sample$cn_profiles_wide
+        simulation_output <- vector("list", length(names(simulation)))
+        names(simulation_output) <- names(simulation)
+        for (i in 1:length(names(simulation))) {
+            phase <- names(simulation)[i]
+            vec_variables <- names(simulation[[phase]])
+            locs <- which(vec_variables %in% output_variables)
+            simulation_output[[phase]] <- simulation[[phase]][locs]
         }
         return(simulation_output)
+
+
+
+        # simulation_output <- list()
+        # if ("all_sample_genotype" %in% output_variables) simulation_output$sample$all_sample_genotype <- simulation$sample$all_sample_genotype
+        # if ("sample_cell_ID" %in% output_variables) simulation_output$sample$sample_cell_ID <- simulation$sample$sample_cell_ID
+        # if ("sample_genotype_unique" %in% output_variables) simulation_output$sample$sample_genotype_unique <- simulation$sample$sample_genotype_unique
+        # if ("sample_genotype_unique_profile" %in% output_variables) simulation_output$sample$sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+        # if ("sample_genotype_unique_drivers" %in% output_variables) simulation_output$sample$sample_genotype_unique_drivers <- simulation$sample$sample_genotype_unique_drivers
+        # if ("cell_phylogeny_hclust" %in% output_variables) simulation_output$sample_phylogeny$cell_phylogeny_hclust <- simulation$sample_phylogeny$cell_phylogeny_hclust
+        # if ("cn_profiles_long" %in% output_variables) {
+        #     sample <- simulation$sample
+        #     if (is.null(sample[["cn_profiles_long"]])) simulation <- p2_cn_profiles_long(simulation)
+        #     simulation_output$sample$cn_profiles_long <- simulation$sample$cn_profiles_long
+        # }
+        # if ("cn_profiles_wide" %in% output_variables) {
+        #     sample <- simulation$sample
+        #     if (is.null(sample[["cn_profiles_wide"]])) simulation <- p2_cn_profiles_wide(simulation)
+        #     simulation_output$sample$cn_profiles_wide <- simulation$sample$cn_profiles_wide
+        # }
+        # return(simulation_output)
     }
 }
