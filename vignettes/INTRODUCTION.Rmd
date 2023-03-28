@@ -382,29 +382,29 @@ There are several options for conditioning on the simulations or requesting spec
 - `pseudo_corrected_readcount`: if `TRUE`, the pseudo-corrected readcounts (= cell's HMM-inferred mean readcount X bin GC level) are computed and saved in a csv file. The specific data used depends on `model_readcount_base`. Default is `FALSE`.
 
 ```{r}
-# tmp <- simulator_full_program(
-#     model = model_name,
-#     n_simulations = 1,
-#     save_cn_profile = TRUE,
-#     save_cn_clones = TRUE,
-#     internal_nodes_cn_info = TRUE,
-#     report_progress = TRUE,
-#     seed = 10,
-#     output_variables = c('genotype_list_selection_rate','sample_clone_ID','evolution_origin'),
-#     compute_parallel = FALSE
-# )
-
-
 tmp <- simulator_full_program(
     model = model_name,
-    n_simulations = 10,
+    n_simulations = 1,
     save_cn_profile = TRUE,
     save_cn_clones = TRUE,
     internal_nodes_cn_info = TRUE,
     report_progress = TRUE,
     seed = 10,
-    compute_parallel = TRUE
+    output_variables = c('genotype_list_selection_rate','sample_clone_ID','evolution_origin'),
+    compute_parallel = FALSE
 )
+
+
+# tmp <- simulator_full_program(
+#     model = model_name,
+#     n_simulations = 10,
+#     save_cn_profile = TRUE,
+#     save_cn_clones = TRUE,
+#     internal_nodes_cn_info = TRUE,
+#     report_progress = TRUE,
+#     seed = 10,
+#     compute_parallel = TRUE
+# )
 ```
 
 A variety of plots from the simulation:
