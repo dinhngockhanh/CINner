@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 The library can be installed by running the following line: (this only needs to be performed once)
 
 ```{r setup}
-devtools::install_github("dinhngockhanh/CancerSimulator")
+# devtools::install_github("dinhngockhanh/CancerSimulator")
 ```
 
 We can then use the library:
@@ -384,27 +384,14 @@ There are several options for conditioning on the simulations or requesting spec
 ```{r}
 tmp <- simulator_full_program(
     model = model_name,
-    n_simulations = 1,
+    n_simulations = 10,
     save_cn_profile = TRUE,
     save_cn_clones = TRUE,
     internal_nodes_cn_info = TRUE,
     report_progress = TRUE,
     seed = 10,
-    output_variables = c('genotype_list_selection_rate','sample_clone_ID','evolution_origin'),
-    compute_parallel = FALSE
+    compute_parallel = TRUE
 )
-
-
-# tmp <- simulator_full_program(
-#     model = model_name,
-#     n_simulations = 10,
-#     save_cn_profile = TRUE,
-#     save_cn_clones = TRUE,
-#     internal_nodes_cn_info = TRUE,
-#     report_progress = TRUE,
-#     seed = 10,
-#     compute_parallel = TRUE
-# )
 ```
 
 A variety of plots from the simulation:
