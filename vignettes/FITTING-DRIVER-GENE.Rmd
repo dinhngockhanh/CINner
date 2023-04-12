@@ -340,17 +340,17 @@ list_targets <- model_variables$driver_library$Gene_ID
 We then create a simulated gene-level library with CancerSimulator:
 
 ```{r}
-# start_time <- Sys.time()
-# library_bulk_gene(
-#     library_name = library_name,
-#     model_variables = model_variables,
-#     list_parameters = list_parameters,
-#     list_targets = list_targets,
-#     ABC_simcount = 1000,
-#     n_samples = 200
-# )
-# end_time <- Sys.time()
-# print(end_time - start_time)
+start_time <- Sys.time()
+library_bulk_gene(
+    library_name = library_name,
+    model_variables = model_variables,
+    list_parameters = list_parameters,
+    list_targets = list_targets,
+    ABC_simcount = 1000,
+    n_samples = 200
+)
+end_time <- Sys.time()
+print(end_time - start_time)
 ```
 
 #   Fit the Driver Gene data for a cancer type from PCAWG
