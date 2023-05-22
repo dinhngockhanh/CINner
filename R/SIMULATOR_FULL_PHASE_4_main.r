@@ -171,6 +171,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
                 }
             }
             selection_rate <- SIMULATOR_FULL_PHASE_1_selection_rate(
+                genotype_list_WGD_count[genotype_current],
                 genotype_list_driver_count[genotype_current],
                 genotype_list_driver_map[[genotype_current]],
                 genotype_list_ploidy_chrom[[genotype_current]],
@@ -249,6 +250,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
                 }
                 #   Compute the selection rate for the new genotype
                 selection_rate <- SIMULATOR_FULL_PHASE_1_selection_rate(
+                    genotype_list_WGD_count[genotype_current],
                     genotype_list_driver_count[genotype_current],
                     genotype_list_driver_map[[genotype_current]],
                     genotype_list_ploidy_chrom[[genotype_current]],
@@ -304,6 +306,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
     sample$sample_genotype_unique_profile <- neuvar_sample_genotype_unique_profile
 
     output <- list()
+    output$clonal_evolution <- package_clonal_evolution
     output$cell_phylogeny <- cell_phylogeny
     output$sample <- sample
 

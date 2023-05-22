@@ -34,7 +34,7 @@ bulk_arm_CN_get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, l
     arm_gainloss$delta_loss <- arm_loss
     return(arm_gainloss)
 }
-#-------------------------------------Objective function for ABC fitting
+#-----Objective function for ABC fitting for CNA rates & selection rates
 bulk_arm_CN_func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coordinates, list_targets) {
     #   Assign parameters in model variables
     model_variables <- bulk_arm_CN_assign_paras(model_variables, parameter_IDs, parameters)
@@ -49,6 +49,147 @@ bulk_arm_CN_func_ABC <- function(parameters, parameter_IDs, model_variables, cop
     SIMS_delta_genome_arms <- gainloss_SIMS(SIMS_chromosome, ploidy_normalization = FALSE)
     SIMS_arm_gainloss <- bulk_arm_CN_get_arm_gainloss(SIMS_delta_genome_arms, copynumber_coordinates, list_targets)
     stat <- c(SIMS_arm_gainloss$delta_gain, SIMS_arm_gainloss$delta_loss)
+}
+#------------Function to extract WGD proportion and aneuploidy-WGD score
+
+#-----Objective function for ABC fitting for WGD rate & aneuploidy score
+bulk_arm_WGD_func_ABC <- function(parameters, parameter_IDs, model_variables, copynumber_coordinates, cn_info, CNbin_length, list_targets) {
+    #   Assign parameters in model variables
+    model_variables <- bulk_arm_CN_assign_paras(model_variables, parameter_IDs, parameters)
+    #   Make simulations
+    #####
+    #####
+    #####
+    n_samples <- 8
+    # n_samples <- 100
+    #####
+    #####
+    #####
+    SIMS_chromosome <- simulator_full_program(
+        model = model_variables, model_prefix = "", n_simulations = n_samples, stage_final = 2,
+        save_simulation = FALSE, report_progress = TRUE,
+        #####
+        #####
+        #####
+        compute_parallel = TRUE,
+        #####
+        #####
+        #####
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile", "evolution_genotype_changes", "evolution_origin"),
+        #####
+        #####
+        #####
+        # R_libPaths = R_libPaths
+        #####
+        #####
+        #####
+    )
+    SIMS_gainloss <- gainloss_SIMS(
+        SIMS_chromosome,
+        ploidy_normalization = FALSE,
+        # ploidy_normalization = TRUE,
+        get_CN = TRUE,
+        get_WGD_status = TRUE
+    )
+    #   Statistics 1 = WGD proportion
+    SIMS_wgd_status <- SIMS_gainloss$wgd_status_sims
+    WGD_proportion <- length(which(SIMS_wgd_status == "wgd")) / length(SIMS_wgd_status)
+    #   Statistics 2 = ratio of arm missegs between no-WGD and WGD samples
+    if (WGD_proportion == 0) {
+        WGD_arm_misseg_ratio <- 0
+    } else if (WGD_proportion == 1) {
+        WGD_arm_misseg_ratio <- Inf
+    } else {
+        SIMS_arm_cn_bin_level <- SIMS_gainloss$copynumber_sims
+        list_samples <- colnames(SIMS_arm_cn_bin_level)
+        list_samples <- list_samples[-c(1:4)]
+        #   Get arm-level CN profiles
+        SIMS_arm_cn <- data.frame(matrix(0, nrow = length(list_targets), ncol = (length(list_samples) + 1)))
+        colnames(SIMS_arm_cn) <- c("arm", list_samples)
+        SIMS_arm_cn$arm <- list_targets
+        for (i in 1:length(list_targets)) {
+            arm_ID <- list_targets[i]
+            chr <- substr(arm_ID, 1, nchar(arm_ID) - 1)
+            centromere <- cn_info$Centromere_location[which(cn_info$Chromosome == chr)]
+            length <- cn_info$Bin_count[which(cn_info$Chromosome == chr)]
+            arm <- substr(arm_ID, nchar(arm_ID), nchar(arm_ID))
+            if (arm == "p") {
+                vec_rows <- which((SIMS_arm_cn_bin_level$chr == chr) & (SIMS_arm_cn_bin_level$end <= centromere * CNbin_length))
+            } else if (arm == "q") {
+                vec_rows <- which((SIMS_arm_cn_bin_level$chr == chr) & (SIMS_arm_cn_bin_level$start > centromere * CNbin_length))
+            }
+            for (sample in list_samples) {
+                SIMS_arm_cn[[sample]][i] <- mean(SIMS_arm_cn_bin_level[[sample]][vec_rows])
+            }
+        }
+        #   Find ratio of arm missegs between no-WGD and WGD samples
+        cn_no_wgd <- c()
+        cn_wgd <- c()
+        for (i in 1:length(SIMS_wgd_status)) {
+            sample <- list_samples[i]
+            if (SIMS_wgd_status[i] == "wgd") {
+                cn_wgd <- c(cn_wgd, sum(abs(SIMS_arm_cn[[sample]] - 4)))
+            } else {
+                cn_no_wgd <- c(cn_no_wgd, sum(abs(SIMS_arm_cn[[sample]] - 2)))
+            }
+            print("---------------------------------------------------")
+            print(SIMS_wgd_status[i])
+            print("")
+            print(SIMS_arm_cn[[sample]])
+            if (SIMS_wgd_status[i] == "wgd") {
+                print("")
+                print(abs(SIMS_arm_cn[[sample]] - 4))
+                print("")
+                print(sum(abs(SIMS_arm_cn[[sample]] - 4)))
+            } else {
+                print("")
+                print(abs(SIMS_arm_cn[[sample]] - 2))
+                print("")
+                print(sum(abs(SIMS_arm_cn[[sample]] - 2)))
+            }
+            print("---------------------------------------------------")
+        }
+        WGD_arm_misseg_ratio <- mean(cn_wgd) / mean(cn_no_wgd)
+    }
+
+
+
+
+
+    WGD_proportion_bootstrap <- c()
+    for (i_bootstrap in 1:1000) {
+        SIMS_wgd_status_bootstrap <- sample(SIMS_wgd_status, length(SIMS_wgd_status), replace = TRUE)
+        WGD_proportion_bootstrap <- c(WGD_proportion_bootstrap, length(which(SIMS_wgd_status_bootstrap == "wgd")) / length(SIMS_wgd_status_bootstrap))
+    }
+    WGD_arm_misseg_ratio_bootstrap <- c()
+    for (i_bootstrap in 1:1000) {
+        cn_wgd_bootstrap <- sample(cn_wgd, length(cn_wgd), replace = TRUE)
+        cn_no_wgd_bootstrap <- sample(cn_no_wgd, length(cn_wgd), replace = TRUE)
+        WGD_arm_misseg_ratio_bootstrap <- c(WGD_arm_misseg_ratio_bootstrap, mean(cn_wgd_bootstrap) / mean(cn_no_wgd_bootstrap))
+    }
+    cat("WGD proportion      = ", mean(WGD_proportion_bootstrap), "+/-", sd(WGD_proportion_bootstrap), "\n")
+    cat("WGD-aneuploidy rate = ", mean(WGD_arm_misseg_ratio_bootstrap), "+/-", sd(WGD_arm_misseg_ratio_bootstrap), "\n")
+    # print(cn_wgd)
+    # print(cn_no_wgd)
+    # print(SIMS_wgd_status)
+    # print(SIMS_arm_cn)
+
+
+
+
+    # print(model_variables$general_variables)
+    # print(SIMS_arm_cn_bin_level)
+    # print(SIMS_wgd_status)
+    # print(WGD_proportion)
+    #####
+    #####
+    #####
+    #####
+    #####
+    #####
+    #####
+    stat <- c(WGD_proportion, WGD_arm_misseg_ratio)
+    return(stat)
 }
 #-----------------Function to choose one best parameter from a posterior
 bulk_arm_CN_get_best_para <- function(data_rf, model_rf, obs_rf, post_rf) {
@@ -631,7 +772,9 @@ fitting_bulk_arm_CN <- function(library_name,
 statistics_bulk_arm_WGD_status <- function(plotname,
                                            DATA_cancer_types,
                                            DATA_cancer_type_sample_ids,
-                                           DATA_wgd) {
+                                           DATA_cancer_type_cn,
+                                           DATA_wgd,
+                                           model_variables) {
     library(ggplot2)
     library(ggrepel)
     library(scales)
@@ -668,6 +811,57 @@ statistics_bulk_arm_WGD_status <- function(plotname,
             FIT_onc_max_selection_rate[i] <- max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
         }
     }
+    #-------------------------Find genome coordinate from one simulation
+    cn_info <- model_variables$cn_info
+    copynumber_sims <- simulator_full_program(
+        model = model_variables,
+        model_prefix = "TEST",
+        n_simulations = 1,
+        stage_final = 2,
+        save_simulation = FALSE,
+        report_progress = FALSE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+    )
+    simulation <- copynumber_sims[[1]]
+    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+    CNbins_iteration <- sample_genotype_unique_profile[[1]]
+    copynumber_coordinates <- CNbins_iteration[, 1:3]
+    copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
+    CNbin_length <- copynumber_coordinates$end[1] - copynumber_coordinates$start[1] + 1
+    #--------------Find WGD rate & aneuploidy score for each cancer type
+    df_WGD_FGA <- data.frame(matrix(0, nrow = length(DATA_cancer_types), ncol = 3))
+    colnames(df_WGD_FGA) <- c("cancer_type", "WGD", "WGD_increased_FGA")
+    pb <- txtProgressBar(min = 0, max = length(DATA_cancer_types), style = 3, width = 50, char = "=")
+    for (i in 1:length(DATA_cancer_types)) {
+        setTxtProgressBar(pb, i)
+        cancer_type <- DATA_cancer_types[i]
+        copynumber_DATA <- DATA_cancer_type_cn[[i]]
+        DATA_statistics <- DATA_WGD(copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info)
+        WGD_proportion <- DATA_statistics$WGD_proportion
+        WGD_increased_FGA <- DATA_statistics$WGD_increased_FGA
+        df_WGD_FGA[i, ] <- c(cancer_type, WGD_proportion, WGD_increased_FGA)
+    }
+    cat("\n")
+    df_WGD_FGA$WGD <- as.numeric(df_WGD_FGA$WGD)
+    df_WGD_FGA$WGD_increased_FGA <- as.numeric(df_WGD_FGA$WGD_increased_FGA)
+    write.csv(df_WGD_FGA, file = paste0(plotname, ".csv"))
+    if (length(which(df_WGD_FGA$WGD == 0)) > 0) {
+        df_WGD_FGA <- df_WGD_FGA[-which(df_WGD_FGA$WGD == 0), ]
+    }
+    #---------------------------Plot relationship between WGD proportion
+    #-----------------------------------------------and aneuploidy score
+    filename <- paste0(plotname, "_WGD_vs_FGA_from_data.jpeg")
+    jpeg(filename, width = 2000, height = 1100)
+    p <- ggplot(df_WGD_FGA, aes(x = WGD, y = WGD_increased_FGA)) +
+        geom_point(size = 10) +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1) +
+        # geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+        # ylim(0, NA) +
+        xlab("WGD proportion") +
+        ylab("FGA difference") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
     #-------------------Plot relationship between fitted selection rates
     #---------------------------------------and observed WGD proportions
     #---Prepare the dataframe for plotting
@@ -834,6 +1028,139 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
+    return(df_WGD_FGA)
+}
+
+#---------------------Function for WGD rate & aneuploidy score from data
+DATA_WGD <- function(copynumber_DATA,
+                     DATA_wgd,
+                     copynumber_coordinates,
+                     cn_info) {
+    CNbin_length <- copynumber_coordinates$end[1] - copynumber_coordinates$start[1] + 1
+    #   Get CN profile for each sample (normalized and calibrated for arm level)
+    DATA_gainloss <- gainloss_DATA(
+        copynumber_DATA, copynumber_coordinates,
+        ploidy_normalization = TRUE,
+        use_rbindlist = TRUE,
+        arm_level = TRUE,
+        round = FALSE,
+        pos_centromeres = cn_info
+    )
+    copynumber_data <- DATA_gainloss$copynumber_data
+    list_samples <- colnames(copynumber_data)
+    list_samples <- list_samples[-c(1:4)]
+    df_sample_stats <- data.frame(sample = list_samples)
+    #   Get sample WGD status
+    df_sample_stats$WGD <- 0
+    list_delete <- c()
+    for (i in 1:nrow(df_sample_stats)) {
+        sample <- df_sample_stats$sample[i]
+        wgd_uncertain <- DATA_wgd$wgd_uncertain[which(DATA_wgd$samplename == sample)]
+        wgd_status <- DATA_wgd$wgd_status[which(DATA_wgd$samplename == sample)]
+        if (wgd_uncertain == TRUE) list_delete <- c(list_delete, i)
+        if (wgd_status == "wgd") df_sample_stats$WGD[i] <- 1
+    }
+    if (length(list_delete) > 0) df_sample_stats <- df_sample_stats[-list_delete, ]
+    #   Get sample FGA (= fraction of genome altered)
+    df_sample_stats$FGA <- 0
+    for (i in 1:nrow(df_sample_stats)) {
+        sample <- df_sample_stats$sample[i]
+        sample_CN <- copynumber_data[[sample]]
+        df_sample_stats$FGA[i] <- length(which(sample_CN != 2)) / length(sample_CN)
+    }
+    #   Statistics: mean proportion of WGD
+    WGD_proportion <- length(which(df_sample_stats$WGD == 1)) / length(df_sample_stats$WGD)
+    #   Statistics: mean difference in FGA between WGD and no-WGD samples
+    if (WGD_proportion == 0) {
+        WGD_increased_FGA <- 0
+    } else if (WGD_proportion == 1) {
+        WGD_increased_FGA <- 0
+    } else {
+        WGD_increased_FGA <- mean(df_sample_stats$FGA[which(df_sample_stats$WGD == 1)]) - mean(df_sample_stats$FGA[which(df_sample_stats$WGD == 0)])
+    }
+    stat <- list()
+    stat$WGD_proportion <- WGD_proportion
+    stat$WGD_increased_FGA <- WGD_increased_FGA
+
+    return(stat)
+}
+
+#' @export
+library_bulk_arm_WGD <- function(library_name,
+                                 model_variables,
+                                 list_parameters,
+                                 list_targets,
+                                 ABC_simcount = 10000,
+                                 n_cores = NULL,
+                                 n_samples = 100,
+                                 R_libPaths = NULL) {
+    library(parallel)
+    library(pbapply)
+    library(abcrf)
+    library(grid)
+    library(gridExtra)
+    library(ggplot2)
+    library(signals)
+    if (is.null(n_cores)) {
+        n_cores <- max(detectCores() - 1, 1)
+    }
+    cn_info <- model_variables$cn_info
+    #---------------------------------List of parameter IDs to be fitted
+    parameter_IDs <- list_parameters$Variable
+    #   Find genome coordinate from one simulation
+    copynumber_sims <- simulator_full_program(
+        model = model_variables,
+        model_prefix = "TEST",
+        n_simulations = 1,
+        stage_final = 2,
+        save_simulation = FALSE,
+        report_progress = FALSE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+    )
+    simulation <- copynumber_sims[[1]]
+    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+    CNbins_iteration <- sample_genotype_unique_profile[[1]]
+    copynumber_coordinates <- CNbins_iteration[, 1:3]
+    copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
+    CNbin_length <- copynumber_coordinates$end[1] - copynumber_coordinates$start[1] + 1
+    # =============================================CREATE REFERENCE DATA
+    #---------------------------------------Simulate table of parameters
+    sim_param <- matrix(0, nrow = ABC_simcount, ncol = nrow(list_parameters))
+    for (col in 1:ncol(sim_param)) {
+        sim_param[, col] <- runif(ABC_simcount, min = as.numeric(list_parameters$Lower_bound[col]), max = as.numeric(list_parameters$Upper_bound[col]))
+    }
+
+    parameters <- c(5e-5, 1)
+    cat(paste0("\n\n\n\n\nWGD rate = ", parameters[1], "\n"))
+    cat(paste0("power    = ", parameters[2], "\n"))
+    bulk_arm_WGD_func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, cn_info, CNbin_length, list_targets)
+    bulk_arm_WGD_func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, cn_info, CNbin_length, list_targets)
+    bulk_arm_WGD_func_ABC(parameters, parameter_IDs, model_variables, copynumber_coordinates, cn_info, CNbin_length, list_targets)
+
+
+
+
+    # tmp <- simulator_full_program(
+    #     model = model_variables,
+    #     n_simulations = 10,
+    #     stage_final = 3,
+    #     save_simulation = FALSE,
+    #     report_progress = TRUE,
+    #     seed = 11,
+    #     compute_parallel = FALSE
+    # )
+    ####################################################################
+    ####################################################################
+    ####################################################################
+    #---------------------------Save the parameters and their statistics
+    ABC_input <- list()
+    ABC_input$model_variables <- model_variables
+    ABC_input$n_samples <- n_samples
+    # ABC_input$parameter_IDs <- parameter_IDs
+    # ABC_input$sim_param <- sim_param
+    # ABC_input$sim_stat <- sim_stat
+    filename <- paste0(library_name, "_ABC_input.rda")
+    save(ABC_input, file = filename)
 }
 
 #' @export
@@ -843,6 +1170,7 @@ fitting_bulk_arm_WGD <- function(library_name,
                                  wgd_DATA,
                                  list_parameters,
                                  list_parameters_library,
+                                 list_targets,
                                  # bound_freq = 0.1,
                                  # ntree = 200,
                                  # library_shuffle = FALSE,
@@ -860,16 +1188,107 @@ fitting_bulk_arm_WGD <- function(library_name,
     if (is.null(n_cores)) {
         n_cores <- max(detectCores() - 1, 1)
     }
-    print("KHANH")
-    print(wgd_DATA)
-
-    # tmp <- simulator_full_program(
-    #     model = model_variables,
-    #     n_simulations = 10,
-    #     stage_final = 3,
-    #     save_simulation = FALSE,
-    #     report_progress = TRUE,
-    #     seed = 11,
-    #     compute_parallel = FALSE
+    folder_workplace_tmp <- folder_workplace
+    if (is.null(folder_workplace_tmp)) {
+        folder_workplace_tmp <- ""
+    } else {
+        dir.create(folder_workplace_tmp)
+        folder_workplace_tmp <- paste(folder_workplace_tmp, "/", sep = "")
+    }
+    #-----------------------------------------Input simulated CN library
+    filename <- paste0(library_name, "_ABC_input.rda")
+    load(filename)
+    model_variables <- ABC_input$model_variables
+    n_samples <- ABC_input$n_samples
+    # parameter_IDs <- ABC_input$parameter_IDs
+    # sim_param <- ABC_input$sim_param
+    # sim_stat <- ABC_input$sim_stat
+    #---------------------Find arm-level gain/loss map for entire genome
+    cn_info <- model_variables$cn_info
+    #   Find genome coordinate from one simulation
+    copynumber_sims <- simulator_full_program(
+        model = model_variables,
+        model_prefix = "TEST",
+        n_simulations = 1,
+        stage_final = 2,
+        save_simulation = FALSE,
+        report_progress = FALSE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+    )
+    simulation <- copynumber_sims[[1]]
+    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+    CNbins_iteration <- sample_genotype_unique_profile[[1]]
+    copynumber_coordinates <- CNbins_iteration[, 1:3]
+    copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
+    CNbin_length <- copynumber_coordinates$end[1] - copynumber_coordinates$start[1] + 1
+    #------------------------------------------Get the target statistics
+    # #   Get CN profile for each sample (normalized and calibrated for arm level)
+    # DATA_gainloss <- gainloss_DATA(
+    #     copynumber_DATA, copynumber_coordinates,
+    #     ploidy_normalization = FALSE,
+    #     # ploidy_normalization = TRUE,
+    #     use_rbindlist = TRUE,
+    #     arm_level = TRUE,
+    #     pos_centromeres = cn_info
     # )
+    # DATA_arm_cn_bin_level <- DATA_gainloss$copynumber_data
+    # list_samples <- colnames(DATA_arm_cn_bin_level)
+    # list_samples <- list_samples[-c(1:4)]
+    # #   Get arm-level CN profiles
+    # DATA_arm_cn <- data.frame(matrix(0, nrow = length(list_targets), ncol = (length(list_samples) + 1)))
+    # colnames(DATA_arm_cn) <- c("arm", list_samples)
+    # DATA_arm_cn$arm <- list_targets
+    # for (i in 1:length(list_targets)) {
+    #     arm_ID <- list_targets[i]
+    #     chr <- substr(arm_ID, 1, nchar(arm_ID) - 1)
+    #     centromere <- cn_info$Centromere_location[which(cn_info$Chromosome == chr)]
+    #     length <- cn_info$Bin_count[which(cn_info$Chromosome == chr)]
+    #     arm <- substr(arm_ID, nchar(arm_ID), nchar(arm_ID))
+    #     if (arm == "p") {
+    #         vec_rows <- which((DATA_arm_cn_bin_level$chr == chr) & (DATA_arm_cn_bin_level$end <= centromere * CNbin_length))
+    #     } else if (arm == "q") {
+    #         vec_rows <- which((DATA_arm_cn_bin_level$chr == chr) & (DATA_arm_cn_bin_level$start > centromere * CNbin_length))
+    #     }
+    #     for (sample in list_samples) {
+    #         DATA_arm_cn[[sample]][i] <- mean(DATA_arm_cn_bin_level[[sample]][vec_rows])
+    #     }
+    # }
+    # #   Statistics: proportion of WGD
+    # wgd_uncertain <- wgd_DATA$wgd_uncertain[which(wgd_DATA$samplename %in% list_samples)]
+    # wgd_status <- wgd_DATA$wgd_status[which(wgd_DATA$samplename %in% list_samples)]
+    # n_no_wgd <- length(which(wgd_uncertain == FALSE & wgd_status == "no_wgd"))
+    # n_wgd <- length(which(wgd_uncertain == FALSE & wgd_status == "wgd"))
+    # WGD_proportion <- n_wgd / (n_wgd + n_no_wgd)
+    # #   Statistics: ratio of arm missegs between no-WGD and WGD samples
+    # cn_no_wgd <- c()
+    # cn_wgd <- c()
+    # for (sample in list_samples) {
+    #     if (wgd_DATA$wgd_uncertain[which(wgd_DATA$samplename == sample)] == "FALSE") {
+    #         if (wgd_DATA$wgd_status[which(wgd_DATA$samplename == sample)] == "wgd") {
+    #             cn_wgd <- c(cn_wgd, sum(abs(DATA_arm_cn[[sample]] - 4)))
+    #         } else {
+    #             cn_no_wgd <- c(cn_no_wgd, sum(abs(DATA_arm_cn[[sample]] - 2)))
+    #         }
+    #     }
+    # }
+    # WGD_arm_misseg_ratio <- mean(cn_wgd) / mean(cn_no_wgd)
+    DATA_statistics <- DATA_WGD(copynumber_DATA, wgd_DATA, list_targets, copynumber_coordinates, cn_info)
+    WGD_proportion <- DATA_statistics[1]
+    WGD_arm_misseg_ratio <- DATA_statistics[2]
+
+
+
+
+
+
+    print(WGD_proportion)
+    print(WGD_arm_misseg_ratio)
+    # print("---")
+    # print(cn_no_wgd)
+    # print(mean(cn_no_wgd))
+    # print(median(cn_no_wgd))
+    # print("---")
+    # print(cn_wgd)
+    # print(mean(cn_wgd))
+    # print(median(cn_wgd))
 }

@@ -7,7 +7,7 @@
 #' @param T_tau_step ...
 #' @param Table_sample ...
 #' @param table_population_dynamics ...
-#' @param Population_end ...
+#' @param Max_cell_count ...
 #' @param Max_events ...
 #' @param CN_bin_length ...
 #' @param prob_CN_whole_genome_duplication ...
@@ -41,12 +41,14 @@
 #' @export
 BUILD_general_variables <- function(model_name = "MODEL",
                                     cell_lifespan = 4,
+                                    cell_prob_division = NA,
                                     T_0 = list(0, "year"),
                                     T_end = list(100, "year"),
                                     T_tau_step = Inf,
                                     Table_sample = data.frame(),
                                     table_population_dynamics = matrix(0, ncol = 2, nrow = 2),
-                                    Population_end = Inf,
+                                    Max_cell_count = Inf,
+                                    Min_cell_count = 0,
                                     Max_events = Inf,
                                     CN_bin_length = 500000,
                                     # model_CN_whole_genome_duplication = "per_division",
@@ -96,11 +98,12 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     rate_driver = 0,
                                     rate_passenger = 0,
                                     selection_model = "",
-                                    bound_driver = 3,
-                                    bound_average_ploidy = 5,
+                                    bound_driver = Inf,
+                                    bound_average_ploidy = Inf,
                                     bound_homozygosity = 0,
                                     bound_maximum_CN = Inf,
                                     bound_maximum_CN_normalized = Inf,
+                                    bound_WGD = Inf,
                                     SFS_totalsteps = 25,
                                     prob_coverage = 0.05,
                                     alpha_coverage = 0.7,
@@ -172,12 +175,17 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_VARIABLES[N_row, ] <- c("T_tau_step", T_tau_step, "day", "Time step for tau-leaping algorithm for simulation")
     #   Set up condition to end simulation prematurely based on population size or event count
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("Population_end", Population_end, "cell count", "Condition for ending simulation (Inf if no condition)")
+    TABLE_VARIABLES[N_row, ] <- c("Max_cell_count", Max_cell_count, "cell count", "Maximum cell count, simulation is ended if violated (Inf if no condition)")
     N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("Max_events", Max_events, "event count", "Condition for ending simulation (Inf if no condition)")
-    #   Set up cell lifespan
+    TABLE_VARIABLES[N_row, ] <- c("Min_cell_count", Min_cell_count, "cell count", "Minimum cell count, simulation is rejected if violated (0 if no condition)")
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("Max_events", Max_events, "event count", "Maximum event count, simulation is ended if violated (Inf if no condition)")
+    #   Set up constant cell lifespan
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("cell_lifespan", cell_lifespan, "day", "Lifespan of one cell")
+    #   Set up constant cell division probability
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("cell_prob_division", cell_prob_division, "", "Division probability of one cell (if NA: overrides the selection model, population follows neutral exponential growth)")
     #   Set up CN bin width
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("size_CN_block_DNA", CN_bin_length, "bp", "CN bin width")
@@ -322,6 +330,8 @@ BUILD_general_variables <- function(model_name = "MODEL",
     TABLE_SELECTION[N_row, ] <- c("bound_maximum_CN", bound_maximum_CN, "", "Maximum CN at any bin (cells exceeding this will die)")
     N_row <- N_row + 1
     TABLE_SELECTION[N_row, ] <- c("bound_maximum_CN_normalized", bound_maximum_CN_normalized, "", "Maximum CN normalized by average ploidy at any bin (cells exceeding this will die)")
+    N_row <- N_row + 1
+    TABLE_SELECTION[N_row, ] <- c("bound_WGD", bound_WGD, "", "Maximum WGD allowed for a cell (cells are not allowed to exceed this)")
     N_row <- N_row + 1
     TABLE_SELECTION[N_row, ] <- c("bound_homozygosity", bound_homozygosity, "", "Maximum number of bins under homozygosity (cells exceeding this will die)")
     ##########################

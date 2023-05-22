@@ -5,12 +5,14 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype_1, genotype_2) {
     ploidy_chrom_1 <- genotype_list_ploidy_chrom[[genotype_1]]
     ploidy_allele_1 <- genotype_list_ploidy_allele[[genotype_1]]
     ploidy_block_1 <- genotype_list_ploidy_block[[genotype_1]]
+    WGD_count_1 <- genotype_list_WGD_count[genotype_1]
     driver_count_1 <- genotype_list_driver_count[genotype_1]
     driver_map_1 <- genotype_list_driver_map[[genotype_1]]
 
     ploidy_chrom_2 <- genotype_list_ploidy_chrom[[genotype_2]]
     ploidy_allele_2 <- genotype_list_ploidy_allele[[genotype_2]]
     ploidy_block_2 <- genotype_list_ploidy_block[[genotype_2]]
+    WGD_count_2 <- genotype_list_WGD_count[genotype_2]
     driver_count_2 <- genotype_list_driver_count[genotype_2]
     driver_map_2 <- genotype_list_driver_map[[genotype_2]]
     #---------------------------Compute the DNA length for the new genotypes
@@ -42,8 +44,8 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype_1, genotype_2) {
     genotype_list_DNA_length[[genotype_1]] <<- DNA_length_1
     genotype_list_DNA_length[[genotype_2]] <<- DNA_length_2
     #-----------------------Compute the selection rate for the new genotypes
-    selection_rate_1 <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_1, driver_map_1, ploidy_chrom_1, ploidy_block_1, ploidy_allele_1)
-    selection_rate_2 <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count_2, driver_map_2, ploidy_chrom_2, ploidy_block_2, ploidy_allele_2)
+    selection_rate_1 <- SIMULATOR_FULL_PHASE_1_selection_rate(WGD_count_1, driver_count_1, driver_map_1, ploidy_chrom_1, ploidy_block_1, ploidy_allele_1)
+    selection_rate_2 <- SIMULATOR_FULL_PHASE_1_selection_rate(WGD_count_2, driver_count_2, driver_map_2, ploidy_chrom_2, ploidy_block_2, ploidy_allele_2)
     #----------------------------Update the DNA length for the new genotypes
     genotype_list_selection_rate[genotype_1] <<- selection_rate_1
     genotype_list_selection_rate[genotype_2] <<- selection_rate_2

@@ -17,6 +17,7 @@ SIMULATOR_FULL_PHASE_1_genotype_initiation <- function(genotype_to_react,
     genotype_list_ploidy_chrom[[N_clones]] <<- genotype_list_ploidy_chrom[[genotype_to_react]]
     genotype_list_ploidy_allele[[N_clones]] <<- genotype_list_ploidy_allele[[genotype_to_react]]
     genotype_list_ploidy_block[[N_clones]] <<- genotype_list_ploidy_block[[genotype_to_react]]
+    genotype_list_WGD_count[N_clones] <<- genotype_list_WGD_count[genotype_to_react]
     genotype_list_driver_count[N_clones] <<- genotype_list_driver_count[genotype_to_react]
     genotype_list_driver_map[[N_clones]] <<- genotype_list_driver_map[[genotype_to_react]]
     genotype_list_DNA_length[[N_clones]] <<- 0
@@ -38,6 +39,7 @@ SIMULATOR_FULL_PHASE_1_genotype_initiation <- function(genotype_to_react,
         genotype_list_ploidy_chrom[[N_clones]] <<- genotype_list_ploidy_chrom[[genotype_to_react]]
         genotype_list_ploidy_allele[[N_clones]] <<- genotype_list_ploidy_allele[[genotype_to_react]]
         genotype_list_ploidy_block[[N_clones]] <<- genotype_list_ploidy_block[[genotype_to_react]]
+        genotype_list_WGD_count[N_clones] <<- genotype_list_WGD_count[genotype_to_react]
         genotype_list_driver_count[N_clones] <<- genotype_list_driver_count[genotype_to_react]
         genotype_list_driver_map[[N_clones]] <<- genotype_list_driver_map[[genotype_to_react]]
         genotype_list_DNA_length[[N_clones]] <<- 0

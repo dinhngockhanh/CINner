@@ -136,6 +136,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     initial_ploidy_chrom <<- vector("list", length = initial_N_clones)
     initial_ploidy_allele <<- vector("list", length = initial_N_clones)
     initial_ploidy_block <<- vector("list", length = initial_N_clones)
+    initial_WGD_count <<- rep(0, initial_N_clones)
     initial_driver_count <<- rep(0, initial_N_clones)
     initial_driver_map <<- vector("list", length = initial_N_clones)
     initial_DNA_length <<- vector("list", length = initial_N_clones)
@@ -145,6 +146,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     assign("initial_ploidy_chrom", initial_ploidy_chrom, envir = .GlobalEnv)
     assign("initial_ploidy_allele", initial_ploidy_allele, envir = .GlobalEnv)
     assign("initial_ploidy_block", initial_ploidy_block, envir = .GlobalEnv)
+    assign("initial_WGD_count", initial_WGD_count, envir = .GlobalEnv)
     assign("initial_driver_count", initial_driver_count, envir = .GlobalEnv)
     assign("initial_driver_map", initial_driver_map, envir = .GlobalEnv)
     assign("initial_DNA_length", initial_DNA_length, envir = .GlobalEnv)
@@ -263,9 +265,10 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         ploidy_chrom <- initial_ploidy_chrom[[clone]]
         ploidy_allele <- initial_ploidy_allele[[clone]]
         ploidy_block <- initial_ploidy_block[[clone]]
+        WGD_count <- initial_WGD_count[clone]
         driver_count <- initial_driver_count[clone]
         driver_map <- initial_driver_map[[clone]]
-        selection_rate <- SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
+        selection_rate <- SIMULATOR_FULL_PHASE_1_selection_rate(WGD_count, driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
         initial_selection_rate[clone] <<- selection_rate
     }
     #-----------------------------------Set up total population dynamics
@@ -275,7 +278,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     }
     vec_age_in_days <- Age_in_day
     vec_total_cell_count <- Total_cell_count
-    linear_app_fun <<- approxfun(c(T_start_time - 300, vec_age_in_days, T_end_time + 300), c(vec_total_cell_count[1], vec_total_cell_count, tail(vec_total_cell_count, 1)), method = "linear")
+    linear_app_fun <<- approxfun(c(T_start_time - 1e6, vec_age_in_days, T_end_time + 1e6), c(vec_total_cell_count[1], vec_total_cell_count, tail(vec_total_cell_count, 1)), method = "linear")
     func_expected_population <<- function(time) linear_app_fun(time)
     #--------------------------------------------------Set up event rate
     #--------------------------------------as function of time (in days)

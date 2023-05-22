@@ -740,6 +740,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     package_cell_phylogeny_hclust_extra <- list()
     package_cell_phylogeny_hclust_extra$hclust_internal_genotypes <- hclust_internal_genotypes
     package_cell_phylogeny_hclust_extra$hclust_CN_events <- hclust_CN_events
+    package_cell_phylogeny_hclust_extra$hclust_nodes <- hclust_nodes
 
     package_cell_phylogeny <- list()
     package_cell_phylogeny$phylogeny_origin <- phylogeny_origin

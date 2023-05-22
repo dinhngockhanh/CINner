@@ -45,7 +45,8 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
             #       Choose which cell to gain/lose the chromosome arm
             i_gain <- sample.int(2, size = 1)
             #       Choose the chromosome to be mis-segregated
-            chrom <- sample.int(N_chromosomes, size = 1)
+            # chrom <- sample.int(N_chromosomes, size = 1)
+            chrom <- sample.int(N_chromosomes, size = 1, prob = ploidy_chrom_1 / sum(ploidy_chrom_1))
             if (!is.null(chromosomes_excluded) & (chrom %in% chromosomes_excluded)) {
                 next
             }

@@ -160,7 +160,10 @@ gainloss_DATA <- function(copynumber_DATA,
                           ploidy_normalization = FALSE,
                           use_rbindlist = FALSE,
                           arm_level = FALSE,
+                          state_mode = NULL,
+                          round = TRUE,
                           pos_centromeres) {
+    library(signals)
     plotcol <- "state"
     fillna <- TRUE
     cutoff <- 2
@@ -242,7 +245,7 @@ gainloss_DATA <- function(copynumber_DATA,
     }
     #---Normalize ploidy of each sample to 2
     if (ploidy_normalization == TRUE) {
-        copynumber_data <- normalize_cell_ploidy(copynumber_data)
+        copynumber_data <- normalize_cell_ploidy(copynumber_data, state_mode, round)
     }
     #---Replace previously NA in each sample with ploidy 2
     if (arm_level != TRUE) {
@@ -275,30 +278,58 @@ gainloss_DATA <- function(copynumber_DATA,
 gainloss_SIMS <- function(copynumber_sims,
                           ploidy_normalization = FALSE,
                           use_rbindlist = FALSE,
-                          get_coordinates = FALSE) {
+                          get_coordinates = FALSE,
+                          state_mode = NULL,
+                          get_CN = FALSE,
+                          round = TRUE,
+                          get_WGD_status = FALSE) {
     plotcol <- "state"
     fillna <- TRUE
     cutoff <- 2
     #---------------------------Get gain/loss consensus from simulations
     CNbins_list_sims <- vector("list", length = length(copynumber_sims))
+    if (get_WGD_status) {
+        wgd_status_sims <- rep("", length(copynumber_sims))
+    }
     for (iteration in 1:length(copynumber_sims)) {
         simulation <- copynumber_sims[[iteration]]
         all_sample_genotype <- simulation$sample$all_sample_genotype
+        sample_genotype_unique <- simulation$sample$sample_genotype_unique
         sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
         #   Get the genotype with the highest clonal percentage in sample
-        tmp <- as.data.frame(table(all_sample_genotype))
-        max_freq <- max(tmp$Freq)
-        vec_loc <- which(tmp$Freq == max_freq)
-        if (length(vec_loc) > 1) {
-            loc <- sample(vec_loc, 1)
-        } else {
-            loc <- vec_loc
+        freqs <- rep(0, length(sample_genotype_unique))
+        for (i in 1:length(sample_genotype_unique)) {
+            freqs[i] <- length(which(all_sample_genotype == sample_genotype_unique[i]))
         }
-        max_genotype <- tmp$all_sample_genotype[loc]
+        max_freq <- max(freqs)
+        vec_loc <- which(freqs == max_freq)
+        if (length(vec_loc) > 1) {
+            max_loc <- sample(vec_loc, 1)
+        } else {
+            max_loc <- vec_loc
+        }
+        max_genotype <- sample_genotype_unique[max_loc]
         #   Add record for this cell to list
-        CNbins_iteration <- sample_genotype_unique_profile[[max_genotype]]
+        CNbins_iteration <- sample_genotype_unique_profile[[max_loc]]
         CNbins_iteration$cell_id <- paste("SIMULATION", iteration, "-Library-1-1", sep = "")
         CNbins_list_sims[[iteration]] <- CNbins_iteration
+        #   Find WGD status if inquired
+        if (get_WGD_status) {
+            evolution_genotype_changes <- simulation$clonal_evolution$evolution_genotype_changes
+            evolution_origin <- simulation$clonal_evolution$evolution_origin
+            WGD_status <- "no_wgd"
+            genotype <- max_genotype
+            while (genotype > 0) {
+                genotype_changes <- evolution_genotype_changes[[genotype]]
+                for (genotype_change in genotype_changes) {
+                    if (genotype_change[1] == "whole-genome-duplication") {
+                        WGD_status <- "wgd"
+                    }
+                }
+                genotype <- evolution_origin[genotype]
+            }
+            wgd_status_sims[iteration] <- WGD_status
+        }
     }
     if (use_rbindlist == TRUE) {
         CNbins_sims <- rbindlist(CNbins_list_sims, use.names = FALSE, fill = FALSE, idcol = NULL)
@@ -322,7 +353,7 @@ gainloss_SIMS <- function(copynumber_sims,
     }
     #---Normalize ploidy of each sample to 2
     if (ploidy_normalization == TRUE) {
-        copynumber_sims <- normalize_cell_ploidy(copynumber_sims)
+        copynumber_sims <- normalize_cell_ploidy(copynumber_sims, state_mode, round)
     }
     #---Get genome coordinates
     if (get_coordinates == TRUE) {
@@ -341,6 +372,12 @@ gainloss_SIMS <- function(copynumber_sims,
     if (get_coordinates == TRUE) {
         output$copynumber_coordinates <- copynumber_coordinates
     }
+    if (get_CN == TRUE) {
+        output$copynumber_sims <- copynumber_sims
+    }
+    if (get_WGD_status == TRUE) {
+        output$wgd_status_sims <- wgd_status_sims
+    }
     return(output)
 }
 
@@ -358,17 +395,20 @@ calc_state_mode <- function(states) {
     return(state_mode)
 }
 
-normalize_cell_ploidy <- function(copynumber_sims) {
-    cell_ids <- colnames(copynumber_sims)
+normalize_cell_ploidy <- function(copynumber, state_mode, round = TRUE) {
+    cell_ids <- colnames(copynumber)
     cell_ids <- cell_ids[!(cell_ids %in% c("chr", "start", "end", "width"))]
     for (cell_id in cell_ids) {
-        state_mode <- calc_state_mode(copynumber_sims[[cell_id]])
-        copynumber_sims[[cell_id]] <- as.integer(ceiling(
-            copynumber_sims[[cell_id]] / (state_mode / 2)
-        ))
-        copynumber_sims[[cell_id]][copynumber_sims[[cell_id]] > 11] <- 11
+        if (is.null(state_mode)) {
+            state_mode_cell <- calc_state_mode(copynumber[[cell_id]])
+        }
+        copynumber[[cell_id]] <- copynumber[[cell_id]] / (state_mode_cell / 2)
+        if (round == TRUE) {
+            copynumber[[cell_id]] <- as.integer(ceiling(copynumber[[cell_id]]))
+        }
+        copynumber[[cell_id]][copynumber[[cell_id]] > 11] <- 11
     }
-    return(copynumber_sims)
+    return(copynumber)
 }
 
 densityPlot_MODIFIED <- function(object,

@@ -16,7 +16,7 @@ BUILD_driver_library <- function(model_variables = list(),
     selection_model <- TABLE_SELECTION$Value[which(TABLE_SELECTION$Variable == "selection_model")]
     #---------------------Compute selection rates for each driver allele
     #-----------------------------according to choice of selection model
-    if (selection_model == "chrom-arm-selection") {
+    if ((selection_model == "chrom-arm-selection") | (selection_model == "WGD-chrom-arm-selection")) {
         #---Build the arm driver library
         TABLE_CANCER_ARMS <- table_arm_selection_rates
         #--------------------------------Output the model variable files

@@ -1,6 +1,13 @@
 # ==================================COMPUTE THE SELECTION RATE OF A CLONE
 #' @export
-SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
+SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
+    # print("***")
+    # print(WGD_count)
+    # print(driver_count)
+    # print(driver_map)
+    # print(ploidy_chrom)
+    # print(ploidy_block)
+    # print(ploidy_allele)
     #---------------------Cell is not viable if losing whole chromosomes
     #--------------------------------or exceeding maximum average ploidy
     vec_CN_all <- c()
@@ -14,7 +21,11 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         }
         vec_CN_all <- c(vec_CN_all, vec_CN)
     }
-    ploidy <- mean(vec_CN_all)
+    if (selection_model == "WGD-chrom-arm-selection") {
+        ploidy <- 2^(WGD_count + 1)
+    } else {
+        ploidy <- mean(vec_CN_all)
+    }
     if (mean(vec_CN_all) > bound_average_ploidy) {
         clone_selection_rate <- 0
         return(clone_selection_rate)
@@ -80,6 +91,33 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
             chrom_arm_library_copy$cn[i_arm] <- cn
         }
         clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
+    } else if (selection_model == "WGD-chrom-arm-selection") {
+        #--------------------------------------------Find average ploidy
+        ploidy <- 2^(WGD_count + 1)
+        # ploidy <- round(mean(vec_CN_all))
+        #-----------------------------------------Compute selection rate
+        #   Find average CN per chromosome arm
+        chrom_arm_library_copy <- chrom_arm_library
+        chrom_arm_library_copy$cn <- 0
+        for (i_arm in 1:nrow(chrom_arm_library_copy)) {
+            chrom <- which(vec_chromosome_id == chrom_arm_library_copy$Chromosome[i_arm])
+            start <- chrom_arm_library_copy$Bin_start[i_arm]
+            end <- chrom_arm_library_copy$Bin_end[i_arm]
+            no_strands <- ploidy_chrom[chrom]
+            if (no_strands == 0) {
+                cn <- 0
+            } else {
+                vec_cn <- ploidy_block[[chrom]][[1]]
+                if (no_strands > 1) {
+                    for (strand in 2:no_strands) {
+                        vec_cn <- vec_cn + ploidy_block[[chrom]][[strand]]
+                    }
+                }
+                cn <- round(mean(vec_cn[start:end]))
+            }
+            chrom_arm_library_copy$cn[i_arm] <- cn
+        }
+        clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
     } else if (selection_model == "chrom-arm-selection") {
         #--------------------------------------------Find average ploidy
         ploidy <- round(mean(vec_CN_all))
@@ -120,17 +158,18 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(driver_count, driver_map, ploi
         #
         # clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
         # if (TMPTMP == 1) {
-        #     cat("CN profile:        ", chrom_arm_library_copy$cn, "\n")
+        #     cat("CN profile:        ", chrom_arm_library_copy$cn[1:(length(chrom_arm_library_copy$cn) / 2)], "\n")
+        #     cat("                   ", chrom_arm_library_copy$cn[(length(chrom_arm_library_copy$cn) / 2 + 1):length(chrom_arm_library_copy$cn)], "\n")
         #     cat("Ploidy:            ", ploidy, "\n")
-        #     cat("Real ploidy:       ", (mean(chrom_arm_library_copy$cn)), "\n")
+        #     # cat("Real ploidy:       ", (mean(chrom_arm_library_copy$cn)), "\n")
         #     # cat("Minimum CN:        ", min(chrom_arm_library_copy$cn), "\n")
         #     # cat("Maximum CN:        ", max(chrom_arm_library_copy$cn), "\n")
         #     cn_unique <- sort(unique(chrom_arm_library_copy$cn))
         #     for (i in 1:length(cn_unique)) {
         #         cat("Arms with CN=", cn_unique[i], ":  ", length(which(chrom_arm_library_copy$cn == cn_unique[i])), "\n")
         #     }
-        #     cat("\n")
-        #     cat("Fitness:           ", clone_selection_rate, "\n")
+        #     # cat("\n")
+        #     # cat("Fitness:           ", clone_selection_rate, "\n")
         #     cat("Misseg count:      ", sum(abs(chrom_arm_library_copy$cn - ploidy)), "\n")
         #
         #

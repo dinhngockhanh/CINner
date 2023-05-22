@@ -13,11 +13,13 @@ simulator_multivar <- function(model_variables_base = list(),
                                n_clones_min = 0,
                                n_clones_max = Inf,
                                save_simulation = TRUE,
+                               lite_memory = TRUE,
                                neutral_variations = FALSE,
                                internal_nodes_cn_info = FALSE,
                                save_newick_tree = FALSE,
                                save_cn_profile = FALSE,
                                save_cn_clones = FALSE,
+                               build_cn = FALSE,
                                format_cn_profile = "long",
                                model_readcount = FALSE,
                                model_readcount_base = "all",
@@ -61,10 +63,10 @@ simulator_multivar <- function(model_variables_base = list(),
             #   Initialize parameter set
             model_variables <- model_variables_base
             #   Fix variable 1 in parameter set
-            if (var1_name == "prob_CN_whole_genome_duplication") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var1_val
-            } else if (var1_name == "prob_CN_missegregation") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var1_val
+            if (var1_name %in% model_variables$general_variables$Variable) {
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == var1_name)] <- var1_val
+            } else if (var1_name %in% model_variables$selection_model$Variable) {
+                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == var1_name)] <- var1_val
             } else if (var1_name == "scale_selection") {
                 s_rate_scale <- var1_val
                 s_rate_base <- model_variables$chromosome_arm_library$s_rate
@@ -89,8 +91,6 @@ simulator_multivar <- function(model_variables_base = list(),
                 chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
                 model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_sel_gain_per_arm
                 model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_sel_loss_per_arm)
-            } else if (var1_name == "bound_homozygosity") {
-                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var1_val
             } else if (var1_name == "vec_cell_count") {
                 model_variables$population_dynamics$Total_cell_count <- var1_val * sum(model_variables$population_dynamics$Total_cell_count) / sum(var1_val)
             } else if (var1_name == "scale_cell_count") {
@@ -99,10 +99,10 @@ simulator_multivar <- function(model_variables_base = list(),
                 stop("VARIABLE 1 IS NOT RECOGNIZED")
             }
             #   Fix variable 2 in parameter set
-            if (var2_name == "prob_CN_whole_genome_duplication") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- var2_val
-            } else if (var2_name == "prob_CN_missegregation") {
-                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == "prob_CN_missegregation")] <- var2_val
+            if (var2_name %in% model_variables$general_variables$Variable) {
+                model_variables$general_variables$Value[which(model_variables$general_variables$Variable == var2_name)] <- var2_val
+            } else if (var2_name %in% model_variables$selection_model$Variable) {
+                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == var2_name)] <- var2_val
             } else if (var2_name == "scale_selection") {
                 s_rate_base <- model_variables_base$chromosome_arm_library$s_rate
                 s_rate_scale <- var2_val
@@ -127,8 +127,6 @@ simulator_multivar <- function(model_variables_base = list(),
                 chrom_losses <- setdiff(model_variables_base$cn_info$Chromosome, chrom_gains)
                 model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_gains)] <- 1 + delta_sel_gain_per_arm
                 model_variables$chromosome_arm_library$s_rate[which(model_variables$chromosome_arm_library$Chromosome %in% chrom_losses)] <- 1 / (1 + delta_sel_loss_per_arm)
-            } else if (var2_name == "bound_homozygosity") {
-                model_variables$selection_model$Value[which(model_variables$selection_model$Variable == "bound_homozygosity")] <- var2_val
             } else if (var2_name == "vec_cell_count") {
                 model_variables$population_dynamics$Total_cell_count <- var2_val * sum(model_variables$population_dynamics$Total_cell_count) / sum(var2_val)
             } else if (var2_name == "scale_cell_count") {
@@ -191,6 +189,7 @@ simulator_multivar <- function(model_variables_base = list(),
                 save_newick_tree = save_newick_tree,
                 save_cn_profile = save_cn_profile,
                 save_cn_clones = save_cn_clones,
+                build_cn = build_cn,
                 format_cn_profile = format_cn_profile,
                 model_readcount = model_readcount,
                 model_readcount_base = model_readcount_base,
@@ -204,6 +203,7 @@ simulator_multivar <- function(model_variables_base = list(),
                 output_variables = output_variables,
                 n_cores = n_cores,
                 save_simulation = save_simulation,
+                lite_memory = lite_memory,
                 R_libPaths = R_libPaths
             )
             end_time <- Sys.time()
@@ -211,15 +211,50 @@ simulator_multivar <- function(model_variables_base = list(),
             cat("\n")
             #-----------------------------Plot simulations for the batch
             if (plot == TRUE) {
-                plot_all(
+                start_time <- Sys.time()
+                # plot_all(
+                #     model = model_name,
+                #     n_simulations = n_simulations,
+                #     unit_time = model_variables$general_variables$Unit[which(model_variables$general_variables$Variable == "T_end_time")],
+                #     folder_workplace = folder_workplace,
+                #     folder_plots = folder_workplace,
+                #     compute_parallel = compute_parallel,
+                #     R_libPaths = R_libPaths
+                # )
+
+                plot_cn_heatmap(
                     model = model_name,
                     n_simulations = n_simulations,
-                    unit_time = model_variables$general_variables$Unit[which(model_variables$general_variables$Variable == "T_end_time")],
                     folder_workplace = folder_workplace,
                     folder_plots = folder_workplace,
+                    plotcol = "total-copy",
+                    CN_data = "TRUTH",
+                    phylo = "TRUTH",
+                    width = 1000,
+                    height = 1000,
                     compute_parallel = compute_parallel,
+                    n_cores = n_cores,
                     R_libPaths = R_libPaths
                 )
+
+                plot_cn_heatmap(
+                    model = model_name,
+                    n_simulations = n_simulations,
+                    folder_workplace = folder_workplace,
+                    folder_plots = folder_workplace,
+                    plotcol = "total-copy",
+                    CN_data = "NEUTRAL-VARIATIONS",
+                    phylo = "TRUTH",
+                    width = 1000,
+                    height = 1000,
+                    compute_parallel = compute_parallel,
+                    n_cores = n_cores,
+                    R_libPaths = R_libPaths
+                )
+
+                end_time <- Sys.time()
+                print(end_time - start_time)
+                cat("\n")
             }
             #-----Move model variable files for the batch into workplace
             if (file.exists(paste0(model_name, "-input-copy-number-blocks.csv"))) {
@@ -290,6 +325,8 @@ statistics_multivar_matrix <- function(model_prefix = "",
     library(scatterpie)
     if (var1_name == "prob_CN_whole_genome_duplication") {
         var1_lab <- "Probability of WGD"
+    } else if (var1_name == "alpha_aneuploidy") {
+        var1_lab <- "WGD-aneuploidy rate"
     } else if (var1_name == "scale_selection") {
         var1_lab <- "Scale of selection rates"
     } else if (var1_name == "scale_selection_gain") {
@@ -309,6 +346,8 @@ statistics_multivar_matrix <- function(model_prefix = "",
     }
     if (var2_name == "prob_CN_whole_genome_duplication") {
         var2_lab <- "Probability of WGD"
+    } else if (var2_name == "alpha_aneuploidy") {
+        var2_lab <- "WGD-aneuploidy rate"
     } else if (var2_name == "scale_selection") {
         var2_lab <- "Scale of selection rates"
     } else if (var2_name == "scale_selection_gain") {
@@ -366,6 +405,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
                 var2 <- scientific(var2_vals[1, col])
             }
             if (compute_parallel == FALSE) {
+                library(signals)
                 #--Get statistics for each simulation in sequential mode
                 df_stat_sims_list <- vector("list", n_simulations)
                 for (sim in 1:n_simulations) {
@@ -394,6 +434,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
                 }
                 clusterEvalQ(cl = cl, library(scales))
                 clusterEvalQ(cl = cl, library(vegan))
+                clusterEvalQ(cl = cl, library(signals))
                 #   Prepare input parameters for plotting
                 var1_name <<- var1_name
                 var2_name <<- var2_name
@@ -409,7 +450,8 @@ statistics_multivar_matrix <- function(model_prefix = "",
                     "var1",
                     "var2",
                     "plot_WGD",
-                    "statistics_multivar_one_simulation"
+                    "statistics_multivar_one_simulation",
+                    "get_cn_profile", "normalize_cell_ploidy", "calc_state_mode"
                 ))
                 #   Get statistics in parallel
                 pbo <- pboptions(type = "txt")
@@ -478,6 +520,51 @@ statistics_multivar_matrix <- function(model_prefix = "",
             #---Statistics: Shannon diversity index
             mean_Shannon_index <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "Shannon_index")]))
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "Shannon_index", mean_Shannon_index)
+
+
+
+            #---Statistics: proportion of WGD
+            mean_WGD_proportion <- mean(as.numeric(df_stat_sims_all$val[(which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD"))]))
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "WGD_proportion", mean_WGD_proportion)
+            #---Statistics: FGA in WGD-negative samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
+            if (length(list_sims) == 0) {
+                FGA_in_nonwgd <- NA
+            } else {
+                FGA_in_nonwgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_FGA" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_in_nonwgd", FGA_in_nonwgd)
+            #---Statistics: FGA in WGD-positive samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 1)])
+            if (length(list_sims) == 0) {
+                FGA_in_wgd <- NA
+            } else {
+                FGA_in_wgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_FGA" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_in_wgd", FGA_in_wgd)
+            #---Statistics: FGA difference between WGD-positive and WGD-negative samples
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_difference", FGA_in_wgd - FGA_in_nonwgd)
+            #---Statistics: event count in WGD-negative samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
+            if (length(list_sims) == 0) {
+                event_count_in_nonwgd <- NA
+            } else {
+                event_count_in_nonwgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_event_count" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "event_count_in_nonwgd", event_count_in_nonwgd)
+            #---Statistics: event count in WGD-positive samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 1)])
+            if (length(list_sims) == 0) {
+                event_count_in_wgd <- NA
+            } else {
+                event_count_in_wgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_event_count" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "event_count_in_wgd", event_count_in_wgd)
+            #---Statistics: event count difference between WGD-positive and WGD-negative samples
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "event_count_difference", event_count_in_wgd - event_count_in_nonwgd)
+
+
+
             #---Statistics: count of nonviable cells in diploid & tetraploid cells
             mean_nonviability_diploid <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=no_ploidy=2_cell_count")]))
             mean_nonviability_tetraploid <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "viability=no_ploidy=4_cell_count")]))
@@ -537,6 +624,13 @@ statistics_multivar_matrix <- function(model_prefix = "",
             }
         }
     }
+
+
+
+    print(df_stat_average)
+
+
+
     save(df_stat_average, file = paste0(folder_workplace, "/", model_prefix, "_average_stats.rda"))
     save(df_ploidy_dist, file = paste0(folder_workplace, "/", model_prefix, "_ploidy_distribution.rda"))
     save(df_nonviability, file = paste0(folder_workplace, "/", model_prefix, "_nonviability.rda"))
@@ -894,6 +988,55 @@ statistics_multivar_matrix <- function(model_prefix = "",
     }
     print(p)
     dev.off()
+
+
+
+
+    #-----------Plot statistics: Proportion of WGD-dominated simulations
+    filename <- paste0(model_prefix, "_9_WGD_proportion.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "WGD_proportion"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "WGD proportion") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #--Plot statistics: FGA difference between WGD & non-WGD simulations
+    filename <- paste0(model_prefix, "_10_WGD_FGA_difference.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "FGA_difference"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "WGD FGA difference") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #--Plot statistics: event count difference between WGD & non-WGD simulations
+    filename <- paste0(model_prefix, "_11_WGD_aneuploidy_difference.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "event_count_difference"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "WGD aneuploidy difference") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
 }
 
 statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg) {
@@ -906,8 +1049,16 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     evolution_origin <- simulation$clonal_evolution$evolution_origin
     genotype_list_ploidy_chrom <- simulation$clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- simulation$clonal_evolution$genotype_list_ploidy_block
+    genotype_list_WGD_count <- simulation$clonal_evolution$genotype_list_WGD_count
     evolution_origin <- simulation$clonal_evolution$evolution_origin
     evolution_genotype_changes <- simulation$clonal_evolution$evolution_genotype_changes
+    N_chromosomes <<- length(genotype_list_ploidy_chrom[[1]])
+    vec_CN_block_no <<- rep(0, N_chromosomes)
+    for (chrom in 1:N_chromosomes) {
+        vec_CN_block_no[chrom] <<- length(genotype_list_ploidy_block[[1]][[chrom]][[1]])
+    }
+    vec_chromosome_id <<- 1:N_chromosomes
+    size_CN_block_DNA <<- 500000
     #-------------------Function to find clonal ancestry of given clones
     find_clonal_ancestry <- function(list_subclonal_ancestry) {
         if (length(list_subclonal_ancestry) == 0) {
@@ -924,13 +1075,16 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     }
     #-------------------------------------------------Find unique clones
     table_clone <- as.data.frame(table(ID = simulation$sample$sample_clone_ID))
+    table_clone$ID <- as.numeric(as.vector(table_clone$ID))
     table_clone$ID_unique <- 0
     table_clone$ID_unique[1] <- 1
     ID_unique <- 1
     if (nrow(table_clone) > 1) {
-        for (clone_new in 2:nrow(table_clone)) {
+        for (j in 2:nrow(table_clone)) {
+            clone_new <- table_clone$ID[j]
             ID_unique_new <- 0
-            for (clone_old in 1:(clone_new - 1)) {
+            for (i in 1:(j - 1)) {
+                clone_old <- table_clone$ID[i]
                 #   Check if selection rate is same
                 if (genotype_list_selection_rate[clone_new] != genotype_list_selection_rate[clone_old]) next
                 #   Check if CN profile is same
@@ -943,13 +1097,13 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
                     }
                 }
                 if (tmp == 0) next
-                ID_unique_new <- table_clone$ID_unique[clone_old]
+                ID_unique_new <- table_clone$ID_unique[i]
             }
             if (ID_unique_new == 0) {
                 ID_unique <- ID_unique + 1
                 ID_unique_new <- ID_unique
             }
-            table_clone$ID_unique[clone_new] <- ID_unique_new
+            table_clone$ID_unique[j] <- ID_unique_new
         }
     }
     table_clone_unique <- data.frame(ID_unique = 1:ID_unique)
@@ -957,7 +1111,8 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     for (ID_unique in 1:nrow(table_clone_unique)) {
         table_clone_unique$Freq[ID_unique] <- sum(table_clone$Freq[which(table_clone$ID_unique == ID_unique)])
     }
-    Clone_ID <- as.numeric(as.vector(table_clone$ID))
+    Clone_ID <- table_clone$ID
+    Clone_ID_max <- Clone_ID[which(table_clone$Freq == max(table_clone$Freq))][1]
     Clone_ID_unique <- as.numeric(as.vector(table_clone_unique$ID_unique))
     #---------------------------------------Find ancestry of every clone
     subclonal_ancestry <- vector("list", length(Clone_ID))
@@ -968,7 +1123,6 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     }
     #-------------------------------------------------Statistics: ploidy
     compute_ploidy <- function(vec_CN_block_no, ploidy_chrom, ploidy_block) {
-        N_chromosomes <- length(vec_CN_block_no)
         vec_CN_all <- c()
         for (chrom in 1:N_chromosomes) {
             vec_CN <- rep(0, vec_CN_block_no[chrom])
@@ -982,11 +1136,6 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
         }
         ploidy <- mean(vec_CN_all)
         return(ploidy)
-    }
-    N_chromosomes <- length(genotype_list_ploidy_chrom[[1]])
-    vec_CN_block_no <- rep(0, N_chromosomes)
-    for (chrom in 1:N_chromosomes) {
-        vec_CN_block_no[chrom] <- length(genotype_list_ploidy_block[[1]][[chrom]][[1]])
     }
     #   Find ploidy and selection rate for each unique clone and its mother clone
     table_clone$ploidy <- 0
@@ -1032,6 +1181,122 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
     #--------------------------------Statistics: Shannon diversity index
     Shannon_index <- diversity(table_clone_unique$Freq)
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "Shannon_index", Shannon_index)
+    #--------------------------------Statistics: main clone's WGD status
+    if (genotype_list_WGD_count[Clone_ID_max] > 0) {
+        Clone_ID_WGD_status <- 1
+    } else {
+        Clone_ID_WGD_status <- 0
+    }
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_WGD", Clone_ID_WGD_status)
+    #----------------Statistics: main clone's Fraction of Genome Altered
+    get_FGA <- function(package_clonal_evolution,
+                        clone_ID) {
+        ploidy_normalization <- TRUE
+        plotcol <- "state"
+        fillna <- TRUE
+
+        WGD_count <- package_clonal_evolution$genotype_list_WGD_count[clone_ID]
+        state_mode <- 2^(WGD_count + 1)
+
+        #   Find total CN profile
+        CNbins_sims <- get_cn_profile(package_clonal_evolution, clone_ID)
+        CNbins_sims$cell_id <- paste0("SIMULATION1-Library-1-1")
+        CNbins_sims$chr <- as.character(CNbins_sims$chr)
+        class(CNbins_sims) <- "data.frame"
+        copynumber_sims <- createCNmatrix(CNbins_sims,
+            field = plotcol, wholegenome = FALSE,
+            fillnaplot = fillna, centromere = FALSE
+        )
+        if (ploidy_normalization == TRUE) {
+            copynumber_sims <- normalize_cell_ploidy(copynumber_sims, state_mode, round = FALSE)
+        }
+        #   Statistics - FGA
+        sample_CN <- copynumber_sims[[paste0("SIMULATION1-Library-1-1")]]
+        FGA <- length(which(sample_CN != 2)) / length(sample_CN)
+        #####
+        #####
+        #####
+        #####
+        #####
+        # if (WGD_count > 0) {
+        #     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
+        #     evolution_genotype_changes <- package_clonal_evolution$evolution_genotype_changes
+        #     evolution_traj_time <- package_clonal_evolution$evolution_traj_time
+        #     evolution_traj_clonal_ID <- package_clonal_evolution$evolution_traj_clonal_ID
+        #     evolution_origin <- package_clonal_evolution$evolution_origin
+        #     pre_misseg <- 0
+        #     pre_arm_misseg <- 0
+        #     WGD_clones <- c()
+        #     post_misseg <- 0
+        #     post_arm_misseg <- 0
+        #     clone <- clone_ID
+        #     while (clone > 0) {
+        #         n_misseg <- 0
+        #         n_arm_misseg <- 0
+        #         genotype_changes <- evolution_genotype_changes[[clone]]
+        #         if (length(genotype_changes) > 0) {
+        #             for (i in 1:length(genotype_changes)) {
+        #                 if (genotype_changes[[i]][1] == "missegregation") {
+        #                     n_misseg <- n_misseg + 1
+        #                 } else if (genotype_changes[[i]][1] == "chromosome-arm-missegregation") {
+        #                     post_arm_misseg <- post_arm_misseg + 1
+        #                 } else if (genotype_changes[[i]][1] == "whole-genome-duplication") {
+        #                     WGD_clones <- c(WGD_clones, clone)
+        #                 }
+        #             }
+        #         }
+        #         if (length(WGD_clones) > 0) {
+        #             post_misseg <- post_misseg + n_misseg
+        #             post_arm_misseg <- post_arm_misseg + n_arm_misseg
+        #         } else {
+        #             pre_misseg <- pre_misseg + n_misseg
+        #             pre_arm_misseg <- pre_arm_misseg + n_arm_misseg
+        #         }
+        #         clone <- evolution_origin[clone]
+        #     }
+        #     for (i in 1:length(evolution_traj_time)) {
+        #         if (WGD_clones %in% evolution_traj_clonal_ID[[i]]) {
+        #             WGD_age <- evolution_traj_time[i]
+        #             break
+        #         }
+        #     }
+        #     cat("-------------------------------------------------------\n")
+        #     cat(paste0("Pre-WGD missegregations      = ", pre_misseg, "\n"))
+        #     cat(paste0("Pre-WGD arm-missegregations  = ", pre_arm_misseg, "\n"))
+        #     cat(paste0("WGD ancestor                 = ", WGD_clones, "\n"))
+        #     cat(paste0("WGD ancestor age             = ", WGD_age / 365, "\n"))
+        #     cat(paste0("WGD ancestor CN profile      : \n"))
+        #     print(genotype_list_ploidy_chrom[[WGD_clones]])
+        #     cat(paste0("Post-WGD missegregations     = ", post_misseg, "\n"))
+        #     cat(paste0("Post-WGD arm-missegregations = ", post_arm_misseg, "\n"))
+        #     cat(paste0("Final CN profile             : \n"))
+        #     print(genotype_list_ploidy_chrom[[clone_ID]])
+        #     cat("-------------------------------------------------------\n")
+        # }
+        #####
+        #####
+        #####
+        #####
+        #####
+        #   Output statistics
+        return(FGA)
+    }
+    Clone_ID_FGA <- get_FGA(simulation$clonal_evolution, Clone_ID_max)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_FGA", Clone_ID_FGA)
+    #-------------------------------Statistics: main clone's event count
+    get_event_count <- function(package_clonal_evolution,
+                                clone_ID) {
+        event_count <- 0
+        clone <- clone_ID
+        while (clone > 0) {
+            genotype_changes <- evolution_genotype_changes[[clone]]
+            event_count <- event_count + length(genotype_changes)
+            clone <- evolution_origin[clone]
+        }
+        return(event_count)
+    }
+    Clone_ID_event_count <- get_event_count(simulation$clonal_evolution, Clone_ID_max)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_event_count", Clone_ID_event_count)
     #-----------------Statistics: classification as clonal/subclonal WGD
     if (plot_WGD == TRUE) {
         table_clone$WGD <- 0

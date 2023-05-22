@@ -8,14 +8,21 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
     ploidy_chrom_1 <- genotype_list_ploidy_chrom[[genotype_daughter_1]]
     ploidy_allele_1 <- genotype_list_ploidy_allele[[genotype_daughter_1]]
     ploidy_block_1 <- genotype_list_ploidy_block[[genotype_daughter_1]]
+    WGD_count_1 <- genotype_list_WGD_count[genotype_daughter_1]
     driver_count_1 <- genotype_list_driver_count[genotype_daughter_1]
     driver_map_1 <- genotype_list_driver_map[[genotype_daughter_1]]
     if (!is.null(genotype_daughter_2)) {
         ploidy_chrom_2 <- genotype_list_ploidy_chrom[[genotype_daughter_2]]
         ploidy_allele_2 <- genotype_list_ploidy_allele[[genotype_daughter_2]]
         ploidy_block_2 <- genotype_list_ploidy_block[[genotype_daughter_2]]
+        WGD_count_2 <- genotype_list_WGD_count[genotype_daughter_2]
         driver_count_2 <- genotype_list_driver_count[genotype_daughter_2]
         driver_map_2 <- genotype_list_driver_map[[genotype_daughter_2]]
+    }
+    #   Change the WGD count of daughter cells
+    WGD_count_1 <- WGD_count_1 + 1
+    if (!is.null(genotype_daughter_2)) {
+        WGD_count_2 <- WGD_count_2 + 1
     }
     #   Change the chromosome ploidy of daughter cells
     ploidy_chrom_1 <- 2 * ploidy_chrom_1
@@ -90,6 +97,7 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
     genotype_list_ploidy_chrom[[genotype_daughter_1]] <<- ploidy_chrom_1
     genotype_list_ploidy_allele[[genotype_daughter_1]] <<- ploidy_allele_1
     genotype_list_ploidy_block[[genotype_daughter_1]] <<- ploidy_block_1
+    genotype_list_WGD_count[genotype_daughter_1] <<- WGD_count_1
     genotype_list_driver_count[genotype_daughter_1] <<- driver_count_1
     genotype_list_driver_map[[genotype_daughter_1]] <<- driver_map_1
     loc_end <- length(evolution_genotype_changes[[genotype_daughter_1]])
@@ -98,6 +106,7 @@ SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication <- function(genotype_to_react
         genotype_list_ploidy_chrom[[genotype_daughter_2]] <<- ploidy_chrom_2
         genotype_list_ploidy_allele[[genotype_daughter_2]] <<- ploidy_allele_2
         genotype_list_ploidy_block[[genotype_daughter_2]] <<- ploidy_block_2
+        genotype_list_WGD_count[genotype_daughter_2] <<- WGD_count_2
         genotype_list_driver_count[genotype_daughter_2] <<- driver_count_2
         genotype_list_driver_map[[genotype_daughter_2]] <<- driver_map_2
         loc_end <- length(evolution_genotype_changes[[genotype_daughter_2]])

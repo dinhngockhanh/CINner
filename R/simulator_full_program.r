@@ -26,6 +26,7 @@ simulator_full_program <- function(model = "",
                                    n_clones_min = 1,
                                    n_clones_max = Inf,
                                    save_simulation = TRUE,
+                                   lite_memory = FALSE,
                                    neutral_variations = FALSE,
                                    internal_nodes_cn_info = FALSE,
                                    save_newick_tree = FALSE,
@@ -111,28 +112,29 @@ simulator_full_program <- function(model = "",
                 cat(paste("BEGINNING SIMULATION-", iteration, "...\n", sep = ""))
             }
             many_sims[[iteration]] <- one_simulation(
-                iteration,
-                model_parameters,
-                model_prefix_tmp,
-                stage_final,
-                n_clones_min,
-                n_clones_max,
-                save_simulation,
-                build_cn,
-                neutral_variations,
-                internal_nodes_cn_info,
-                save_newick_tree,
-                save_cn_profile,
-                save_cn_clones,
-                format_cn_profile,
-                model_readcount,
-                model_readcount_base,
-                pseudo_corrected_readcount,
-                HMM,
-                HMM_containner,
-                folder_workplace_tmp,
-                report_progress,
-                output_variables
+                iteration = iteration,
+                model_parameters = model_parameters,
+                model_prefix_tmp = model_prefix_tmp,
+                stage_final = stage_final,
+                n_clones_min = n_clones_min,
+                n_clones_max = n_clones_max,
+                save_simulation = save_simulation,
+                lite_memory = lite_memory,
+                build_cn = build_cn,
+                neutral_variations = neutral_variations,
+                internal_nodes_cn_info = internal_nodes_cn_info,
+                save_newick_tree = save_newick_tree,
+                save_cn_profile = save_cn_profile,
+                save_cn_clones = save_cn_clones,
+                format_cn_profile = format_cn_profile,
+                model_readcount = model_readcount,
+                model_readcount_base = model_readcount_base,
+                pseudo_corrected_readcount = pseudo_corrected_readcount,
+                HMM = HMM,
+                HMM_containner = HMM_containner,
+                folder_workplace_tmp = folder_workplace_tmp,
+                report_progress = report_progress,
+                output_variables = output_variables
             )
         }
     } else {
@@ -165,6 +167,7 @@ simulator_full_program <- function(model = "",
         n_clones_min <<- n_clones_min
         n_clones_max <<- n_clones_max
         save_simulation <<- save_simulation
+        lite_memory <<- lite_memory
         build_cn <<- build_cn
         neutral_variations <<- neutral_variations
         internal_nodes_cn_info <<- internal_nodes_cn_info
@@ -187,6 +190,7 @@ simulator_full_program <- function(model = "",
             "n_clones_min",
             "n_clones_max",
             "save_simulation",
+            "lite_memory",
             "build_cn",
             "neutral_variations",
             "internal_nodes_cn_info",
@@ -209,10 +213,11 @@ simulator_full_program <- function(model = "",
             "SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation", "SIMULATOR_FULL_PHASE_1_CN_cnloh_interstitial", "SIMULATOR_FULL_PHASE_1_CN_cnloh_terminal", "SIMULATOR_FULL_PHASE_1_CN_focal_amplification", "SIMULATOR_FULL_PHASE_1_CN_focal_deletion", "SIMULATOR_FULL_PHASE_1_CN_missegregation", "SIMULATOR_FULL_PHASE_1_CN_whole_genome_duplication", "SIMULATOR_FULL_PHASE_1_drivers",
             "SIMULATOR_FULL_PHASE_1_genotype_cleaning", "SIMULATOR_FULL_PHASE_1_genotype_comparison", "SIMULATOR_FULL_PHASE_1_genotype_initiation", "SIMULATOR_FULL_PHASE_1_genotype_update", "SIMULATOR_FULL_PHASE_1_selection_rate",
             "SIMULATOR_FULL_PHASE_2_main", "SIMULATOR_FULL_PHASE_3_main", "SIMULATOR_FULL_PHASE_4_main",
-            "get_cn_profile", "rbindlist",
+            "get_cn_profile", "rbindlist", "optimize_memory",
             "p0_write_cn_as_wig", "p0_write_gc_map_as_wig", "p0_append_with_hmm",
             "p2_cn_profiles_long", "p2_cn_profiles_wide", "p2_readcount_model", "p2_readcount_model_wide",
             "p3_cn_events_table", "p3_cn_profiles_internal", "p3_internal_node_cn_profiles_long", "p3_internal_node_cn_profiles_wide",
+            "p4_cn_profiles_internal", "p4_internal_node_cn_profiles_long", "p4_internal_node_cn_profiles_wide",
             "p4_cn_profiles_long", "p4_cn_profiles_wide", "p4_readcount_model", "p4_readcount_model_wide"
         ))
         #   Run CancerSimulator in parallel
@@ -221,56 +226,58 @@ simulator_full_program <- function(model = "",
             pbo <- pboptions(type = "txt")
             many_sims <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
                 one_sim <- one_simulation(
-                    iteration,
-                    model_parameters,
-                    model_prefix_tmp,
-                    stage_final,
-                    n_clones_min,
-                    n_clones_max,
-                    save_simulation,
-                    build_cn,
-                    neutral_variations,
-                    internal_nodes_cn_info,
-                    save_newick_tree,
-                    save_cn_profile,
-                    save_cn_clones,
-                    format_cn_profile,
-                    model_readcount,
-                    model_readcount_base,
-                    pseudo_corrected_readcount,
-                    HMM,
-                    HMM_containner,
-                    folder_workplace_tmp,
-                    report_progress,
-                    output_variables
+                    iteration = iteration,
+                    model_parameters = model_parameters,
+                    model_prefix_tmp = model_prefix_tmp,
+                    stage_final = stage_final,
+                    n_clones_min = n_clones_min,
+                    n_clones_max = n_clones_max,
+                    save_simulation = save_simulation,
+                    lite_memory = lite_memory,
+                    build_cn = build_cn,
+                    neutral_variations = neutral_variations,
+                    internal_nodes_cn_info = internal_nodes_cn_info,
+                    save_newick_tree = save_newick_tree,
+                    save_cn_profile = save_cn_profile,
+                    save_cn_clones = save_cn_clones,
+                    format_cn_profile = format_cn_profile,
+                    model_readcount = model_readcount,
+                    model_readcount_base = model_readcount_base,
+                    pseudo_corrected_readcount = pseudo_corrected_readcount,
+                    HMM = HMM,
+                    HMM_containner = HMM_containner,
+                    folder_workplace_tmp = folder_workplace_tmp,
+                    report_progress = report_progress,
+                    output_variables = output_variables
                 )
                 return(one_sim)
             })
         } else {
             many_sims <- parLapply(cl, 1:n_simulations, function(iteration) {
                 one_sim <- one_simulation(
-                    iteration,
-                    model_parameters,
-                    model_prefix_tmp,
-                    stage_final,
-                    n_clones_min,
-                    n_clones_max,
-                    save_simulation,
-                    build_cn,
-                    neutral_variations,
-                    internal_nodes_cn_info,
-                    save_newick_tree,
-                    save_cn_profile,
-                    save_cn_clones,
-                    format_cn_profile,
-                    model_readcount,
-                    model_readcount_base,
-                    pseudo_corrected_readcount,
-                    HMM,
-                    HMM_containner,
-                    folder_workplace_tmp,
-                    report_progress,
-                    output_variables
+                    iteration = iteration,
+                    model_parameters = model_parameters,
+                    model_prefix_tmp = model_prefix_tmp,
+                    stage_final = stage_final,
+                    n_clones_min = n_clones_min,
+                    n_clones_max = n_clones_max,
+                    save_simulation = save_simulation,
+                    lite_memory = lite_memory,
+                    build_cn = build_cn,
+                    neutral_variations = neutral_variations,
+                    internal_nodes_cn_info = internal_nodes_cn_info,
+                    save_newick_tree = save_newick_tree,
+                    save_cn_profile = save_cn_profile,
+                    save_cn_clones = save_cn_clones,
+                    format_cn_profile = format_cn_profile,
+                    model_readcount = model_readcount,
+                    model_readcount_base = model_readcount_base,
+                    pseudo_corrected_readcount = pseudo_corrected_readcount,
+                    HMM = HMM,
+                    HMM_containner = HMM_containner,
+                    folder_workplace_tmp = folder_workplace_tmp,
+                    report_progress = report_progress,
+                    output_variables = output_variables
                 )
                 return(one_sim)
             })
@@ -290,6 +297,7 @@ one_simulation <- function(iteration,
                            n_clones_min,
                            n_clones_max,
                            save_simulation,
+                           lite_memory,
                            build_cn,
                            neutral_variations,
                            internal_nodes_cn_info,
@@ -385,8 +393,12 @@ one_simulation <- function(iteration,
                 if (report_progress == TRUE) cat("Extra: build CN profile table in wide format...\n")
                 simulation <- p3_internal_node_cn_profiles_wide(simulation)
             }
-            if (report_progress == TRUE) cat("Extra: build table of CN events...\n")
-            simulation <- p3_cn_events_table(simulation)
+            if (nrow(simulation$sample_phylogeny$package_cell_phylogeny_hclust_extra$hclust_CN_events) == 0) {
+                if (report_progress == TRUE) cat("Warning: table of CN events cannot be built (likely because there are no new clones)...\n")
+            } else {
+                if (report_progress == TRUE) cat("Extra: build table of CN events...\n")
+                simulation <- p3_cn_events_table(simulation)
+            }
         }
     }
     # ===========================PREPARE DATA FROM PHASE 4 (NEUTRAL CNA)
@@ -407,6 +419,19 @@ one_simulation <- function(iteration,
             if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
                 if (report_progress == TRUE) cat("Extra: simulate readcount profiles with neutral variations with noise & bias in wide format...\n")
                 simulation <- p4_readcount_model_wide(simulation, report_progress)
+            }
+        }
+        #---Supplement sample phylogeny data with internal nodes
+        if (save_cn_profile == TRUE & internal_nodes_cn_info == TRUE) {
+            if (report_progress == TRUE) cat("Extra: find CN information with neutral variations for internal nodes...\n")
+            simulation <- p4_cn_profiles_internal(simulation)
+            if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
+                if (report_progress == TRUE) cat("Extra: add CN profiles for internal nodes in long format...\n")
+                simulation <- p4_internal_node_cn_profiles_long(simulation)
+            }
+            if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
+                if (report_progress == TRUE) cat("Extra: build CN profile for internal nodes table in wide format...\n")
+                simulation <- p4_internal_node_cn_profiles_wide(simulation)
             }
         }
     }
@@ -455,6 +480,14 @@ one_simulation <- function(iteration,
     # ======================================OUTPUT FILES FROM SIMULATION
     #----------------------------------------Save the simulation package
     if (save_simulation == TRUE) {
+        if (lite_memory == TRUE) {
+            if (report_progress == TRUE) cat("Optimize simulation package for memory...\n")
+            simulation <- optimize_memory(simulation)
+        }
+
+
+
+
         if (report_progress == TRUE) cat("Save simulation package...\n")
         save(simulation, file = paste(folder_workplace_tmp, model_prefix_tmp, "_simulation_", iteration, ".rda", sep = ""))
     }
@@ -479,8 +512,13 @@ one_simulation <- function(iteration,
         filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cell_phylogeny_", iteration, ".newick", sep = "")
         write(hc2Newick_MODIFIED(cell_phylogeny_hclust), file = filename)
         clone_phylogeny_hclust <- simulation$sample_phylogeny$clone_phylogeny_hclust
-        filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_clone_phylogeny_", iteration, ".newick", sep = "")
-        write(hc2Newick(clone_phylogeny_hclust), file = filename)
+        if (length(clone_phylogeny_hclust) == 0) {
+            if (report_progress == TRUE) cat("Warning: sampled clones' phylogeny in Newick format is empty (likely because there are no new clones)...\n")
+        } else {
+            if (report_progress == TRUE) cat("Save sampled clones' phylogeny in Newick format...\n")
+            filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_clone_phylogeny_", iteration, ".newick", sep = "")
+            write(hc2Newick(clone_phylogeny_hclust), file = filename)
+        }
     }
     #---------------------------------------Save the sampled CN profiles
     if (save_cn_profile == TRUE) {
@@ -500,13 +538,13 @@ one_simulation <- function(iteration,
     #---------------Save the sampled CN profiles with neutral variations
     if ((save_cn_profile == TRUE) & (neutral_variations == TRUE)) {
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
-            if (report_progress == TRUE) cat("Save true CN profiles in long format...\n")
+            if (report_progress == TRUE) cat("Save true CN profiles with neutral variations in long format...\n")
             cn_profiles_long <- simulation$neutral_variations$sample$cn_profiles_long
             filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_long_neuvar_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_long, filename, row.names = FALSE)
         }
         if ((format_cn_profile == "wide") | (format_cn_profile == "both")) {
-            if (report_progress == TRUE) cat("Save true CN profiles in wide format...\n")
+            if (report_progress == TRUE) cat("Save true CN profiles with neutral variations in wide format...\n")
             cn_profiles_wide <- simulation$neutral_variations$sample$cn_profiles_wide
             filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_wide_neuvar_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_wide, filename, row.names = FALSE)
