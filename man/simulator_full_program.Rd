@@ -12,6 +12,7 @@ simulator_full_program(
   n_clones_min = 1,
   n_clones_max = Inf,
   save_simulation = TRUE,
+  lite_memory = FALSE,
   neutral_variations = FALSE,
   internal_nodes_cn_info = FALSE,
   save_newick_tree = FALSE,

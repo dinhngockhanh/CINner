@@ -7,21 +7,17 @@
 BUILD_general_variables(
   model_name = "MODEL",
   cell_lifespan = 4,
+  cell_prob_division = NA,
   T_0 = list(0, "year"),
   T_end = list(100, "year"),
   T_tau_step = Inf,
   Table_sample = data.frame(),
   table_population_dynamics = matrix(0, ncol = 2, nrow = 2),
-  Population_end = Inf,
+  Max_cell_count = Inf,
+  Min_cell_count = 0,
   Max_events = Inf,
   CN_bin_length = 5e+05,
-  model_CN_whole_genome_duplication = "per_division",
-  model_CN_missegregation = "per_division",
-  model_CN_chrom_arm_missegregation = "per_division",
-  model_CN_focal_amplification = "per_division",
-  model_CN_focal_deletion = "per_division",
-  model_CN_cnloh_interstitial = "per_division",
-  model_CN_cnloh_terminal = "per_division",
+  alpha_aneuploidy = 1,
   prob_CN_whole_genome_duplication = 0,
   prob_CN_missegregation = 0,
   prob_CN_chrom_arm_missegregation = 0,
@@ -29,6 +25,13 @@ BUILD_general_variables(
   prob_CN_focal_deletion = 0,
   prob_CN_cnloh_interstitial = 0,
   prob_CN_cnloh_terminal = 0,
+  formula_CN_whole_genome_duplication = "per_division:prob_CN_whole_genome_duplication",
+  formula_CN_missegregation = "per_division:prob_CN_missegregation",
+  formula_CN_chrom_arm_missegregation = "per_division:prob_CN_chrom_arm_missegregation",
+  formula_CN_focal_amplification = "per_division:prob_CN_focal_amplification",
+  formula_CN_focal_deletion = "per_division:prob_CN_focal_deletion",
+  formula_CN_cnloh_interstitial = "per_division:prob_CN_cnloh_interstitial",
+  formula_CN_cnloh_terminal = "per_division:prob_CN_cnloh_terminal",
   prob_neutral_CN_whole_genome_duplication = 0,
   prob_neutral_CN_missegregation = 0,
   prob_neutral_CN_chrom_arm_missegregation = 0,
@@ -55,11 +58,12 @@ BUILD_general_variables(
   rate_driver = 0,
   rate_passenger = 0,
   selection_model = "",
-  bound_driver = 3,
-  bound_average_ploidy = 5,
+  bound_driver = Inf,
+  bound_average_ploidy = Inf,
   bound_homozygosity = 0,
   bound_maximum_CN = Inf,
   bound_maximum_CN_normalized = Inf,
+  bound_WGD = Inf,
   SFS_totalsteps = 25,
   prob_coverage = 0.05,
   alpha_coverage = 0.7,
@@ -88,7 +92,7 @@ BUILD_general_variables(
 
 \item{table_population_dynamics}{...}
 
-\item{Population_end}{...}
+\item{Max_cell_count}{...}
 
 \item{Max_events}{...}
 

@@ -1,3 +1,4 @@
+#' @export
 optimize_memory <- function(simulation) {
     # print(object.size(simulation))
     #--------------------------------Minimize clonal evolution variables
