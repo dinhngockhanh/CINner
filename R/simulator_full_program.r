@@ -78,7 +78,7 @@ simulator_full_program <- function(model = "",
     }
     if (save_cn_profile == TRUE) {
         stage_final <- max(stage_final, 2)
-        build_cn<-TRUE
+        build_cn <- TRUE
     }
     if (save_cn_clones == TRUE) stage_final <- max(stage_final, 2)
     if (model_readcount == TRUE) stage_final <- max(stage_final, 2)
@@ -170,6 +170,7 @@ simulator_full_program <- function(model = "",
         n_clones_min <<- n_clones_min
         n_clones_max <<- n_clones_max
         save_simulation <<- save_simulation
+        optimize_memory<<-optimize_memory
         lite_memory <<- lite_memory
         build_cn <<- build_cn
         neutral_variations <<- neutral_variations
