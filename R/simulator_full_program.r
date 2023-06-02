@@ -170,7 +170,6 @@ simulator_full_program <- function(model = "",
         n_clones_min <<- n_clones_min
         n_clones_max <<- n_clones_max
         save_simulation <<- save_simulation
-        optimize_memory <<- optimize_memory
         lite_memory <<- lite_memory
         build_cn <<- build_cn
         neutral_variations <<- neutral_variations
