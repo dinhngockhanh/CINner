@@ -72,9 +72,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         TABLE_INITIAL_OTHERS <- model$initial_others
     }
     #-------------------------------------------Set up general variables
-    # for (i in 1:nrow(TABLE_VARIABLES)) {
-    #     assign(TABLE_VARIABLES[i, 1], TABLE_VARIABLES[i, 2], envir = .GlobalEnv)
-    # }
     for (i in 1:nrow(TABLE_VARIABLES)) {
         if (is.na(suppressWarnings(as.numeric(TABLE_VARIABLES[i, 2])))) {
             assign(TABLE_VARIABLES[i, 1], TABLE_VARIABLES[i, 2], envir = .GlobalEnv)
@@ -139,9 +136,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     initial_WGD_count <<- rep(0, initial_N_clones)
     initial_driver_count <<- rep(0, initial_N_clones)
     initial_driver_map <<- vector("list", length = initial_N_clones)
-    initial_DNA_length <<- vector("list", length = initial_N_clones)
-    initial_selection_rate <<- rep(0, initial_N_clones)
-    initial_prob_new_drivers <<- rep(0, initial_N_clones)
     assign("initial_N_clones", initial_N_clones, envir = .GlobalEnv)
     assign("initial_ploidy_chrom", initial_ploidy_chrom, envir = .GlobalEnv)
     assign("initial_ploidy_allele", initial_ploidy_allele, envir = .GlobalEnv)
@@ -149,9 +143,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     assign("initial_WGD_count", initial_WGD_count, envir = .GlobalEnv)
     assign("initial_driver_count", initial_driver_count, envir = .GlobalEnv)
     assign("initial_driver_map", initial_driver_map, envir = .GlobalEnv)
-    assign("initial_DNA_length", initial_DNA_length, envir = .GlobalEnv)
-    assign("initial_selection_rate", initial_selection_rate, envir = .GlobalEnv)
-    assign("initial_prob_new_drivers", initial_prob_new_drivers, envir = .GlobalEnv)
     assign("initial_clonal_ID", initial_clonal_ID, envir = .GlobalEnv)
     assign("initial_population", initial_population, envir = .GlobalEnv)
     #---Set up the initial clones' CN genotypes
@@ -240,36 +231,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
             driver_map <- rbind(driver_map, c(driver_loc, driver_chrom, driver_strand, driver_block, driver_unit))
         }
         initial_driver_map[[clone]] <<- driver_map
-    }
-    #---Set up the initial clones' DNA length
-    size_CN_block_DNA <- as.double(size_CN_block_DNA)
-    for (clone in 1:initial_N_clones) {
-        ploidy_chrom <- initial_ploidy_chrom[[clone]]
-        ploidy_block <- initial_ploidy_block[[clone]]
-        DNA_length <- 0
-        for (chrom in 1:N_chromosomes) {
-            if (ploidy_chrom[chrom] == 0) {
-                next
-            }
-            for (strand in 1:ploidy_chrom[chrom]) {
-                DNA_length <- DNA_length + sum(ploidy_block[[chrom]][[strand]])
-            }
-        }
-        DNA_length <- size_CN_block_DNA * DNA_length
-        prob_new_drivers <- 1 - dpois(x = 0, lambda = rate_driver * DNA_length)
-        initial_DNA_length[[clone]] <<- DNA_length
-        initial_prob_new_drivers[clone] <<- prob_new_drivers
-    }
-    #---Set up the initial clones' selection rates
-    for (clone in 1:initial_N_clones) {
-        ploidy_chrom <- initial_ploidy_chrom[[clone]]
-        ploidy_allele <- initial_ploidy_allele[[clone]]
-        ploidy_block <- initial_ploidy_block[[clone]]
-        WGD_count <- initial_WGD_count[clone]
-        driver_count <- initial_driver_count[clone]
-        driver_map <- initial_driver_map[[clone]]
-        selection_rate <- SIMULATOR_FULL_PHASE_1_selection_rate(WGD_count, driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
-        initial_selection_rate[clone] <<- selection_rate
     }
     #-----------------------------------Set up total population dynamics
     #---------------------------------------as function of age (in days)

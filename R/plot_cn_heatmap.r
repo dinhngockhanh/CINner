@@ -179,6 +179,7 @@ plot_cn_heatmap_one_simulation <- function(model,
         #---Extract CN profiles from GROUND TRUTH + NEUTRAL VARIATIONS + HMMcopy
         sample_genotype_profiles <- simulation$neutral_variations$sample$cn_profiles_long_hmm
     }
+    sample_genotype_profiles$chr <- as.character(sample_genotype_profiles$chr)
     #-------------------------------Extract clustering and phylogeny
     if (phylo == "TRUTH") {
         #---Extract clustering and phylogeny from GROUND TRUTH

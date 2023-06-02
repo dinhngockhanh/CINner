@@ -76,7 +76,10 @@ simulator_full_program <- function(model = "",
         model_readcount <- TRUE
         save_simulation <- TRUE
     }
-    if (save_cn_profile == TRUE) stage_final <- max(stage_final, 2)
+    if (save_cn_profile == TRUE) {
+        stage_final <- max(stage_final, 2)
+        build_cn<-TRUE
+    }
     if (save_cn_clones == TRUE) stage_final <- max(stage_final, 2)
     if (model_readcount == TRUE) stage_final <- max(stage_final, 2)
 

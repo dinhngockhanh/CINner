@@ -1,5 +1,13 @@
 #' @export
 SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
+    #----------------------------Set up execution mode of CNA mechanisms
+    mode_CN_WGD <<- sub(":.*", "", formula_CN_whole_genome_duplication)
+    mode_CN_misseg <<- sub(":.*", "", formula_CN_missegregation)
+    mode_CN_arm_misseg <<- sub(":.*", "", formula_CN_chrom_arm_missegregation)
+    mode_CN_foc_amp <<- sub(":.*", "", formula_CN_focal_amplification)
+    mode_CN_foc_del <<- sub(":.*", "", formula_CN_focal_deletion)
+    mode_CN_cnloh_i <<- sub(":.*", "", formula_CN_cnloh_interstitial)
+    mode_CN_cnloh_t <<- sub(":.*", "", formula_CN_cnloh_terminal)
     #--------------------------------Set up the initial clonal genotypes
     #   Set up the strand count for each chromosome for each clone
     genotype_list_ploidy_chrom <<- initial_ploidy_chrom
@@ -19,15 +27,16 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     #   Set up the driver map for each clone
     genotype_list_driver_map <<- initial_driver_map
     assign("genotype_list_driver_map", genotype_list_driver_map, envir = .GlobalEnv)
-    #   Set up the selection rate for each clone
-    genotype_list_selection_rate <<- initial_selection_rate
-    assign("genotype_list_selection_rate", genotype_list_selection_rate, envir = .GlobalEnv)
-    #   Set up the DNA length for each clone
-    genotype_list_DNA_length <<- initial_DNA_length
-    assign("genotype_list_DNA_length", genotype_list_DNA_length, envir = .GlobalEnv)
-    #   Set up the probability of new drivers per division for each clone
-    genotype_list_prob_new_drivers <<- initial_prob_new_drivers
-    assign("genotype_list_prob_new_drivers", genotype_list_prob_new_drivers, envir = .GlobalEnv)
+    #   Set up properties of daughter cells
+    genotype_list_selection_rate <<- rep(0, initial_N_clones)
+    genotype_list_DNA_length <<- vector("list", initial_N_clones)
+    genotype_list_prob_new_drivers <<- rep(0, initial_N_clones)
+    genotype_list_prob_CNAs <<- vector("list", initial_N_clones)
+    if (mode_CN_misseg == "per_homolog") genotype_list_prob_CN_misseg_homolog <<- rep(0, initial_N_clones)
+    if (mode_CN_arm_misseg == "per_homolog") genotype_list_prob_CN_arm_misseg_homolog <<- rep(0, initial_N_clones)
+    for (clone in 1:initial_N_clones) {
+        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = clone)
+    }
     #---------------------------------Set up the clonal evolution record
     N_clones <<- initial_N_clones
     assign("N_clones", N_clones, envir = .GlobalEnv)
@@ -63,6 +72,19 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
             style = 3, width = 50, char = "="
         )
     }
+    #---test
+    start_time_TOTAL <- Sys.time()
+    runtime_clone_production <- 0
+    runtime_pre_clone_production <- 0
+    runtime_extra_1 <- 0
+    runtime_extra_2 <- 0
+    runtime_extra_3 <- 0
+    # #---test
+    # start_time_pre_clone_production <- Sys.time()
+
+    # #---test
+    # end_time_pre_clone_production <- Sys.time()
+    # runtime_pre_clone_production <- runtime_pre_clone_production + end_time_pre_clone_production - start_time_pre_clone_production
     while ((T_current < T_end_simulation) && (N_cells_current < Max_cell_count) && (N_events_current < Max_events)) {
         if (report_progress == TRUE) {
             setTxtProgressBar(pb, T_current)
@@ -102,21 +124,18 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                 genotype_to_react <- clone_to_react
                 #   Find current clonal population
                 clone_population <- clonal_population_current[i]
-                #   Find ingredients to compute probabilities of CNA/driver mutation
-                chrom_ploidy <- genotype_list_ploidy_chrom[[clone_to_react]]
-                DNA_length <- genotype_list_DNA_length[[clone_to_react]]
-                WGD_count <- genotype_list_WGD_count[clone_to_react]
                 #   Find probability of division
                 prob_division <- all_prob_division[i]
-                #   Find probability of new genotype
+                #   Find probabilities of new driver mutations & CNAs
                 prob_new_drivers <- genotype_list_prob_new_drivers[clone_to_react]
-                prob_CN_WGD <- min(1, eval(parse(text = formula_CN_whole_genome_duplication)))
-                prob_CN_misseg <- min(1, eval(parse(text = formula_CN_missegregation)))
-                prob_CN_arm_misseg <- min(1, eval(parse(text = formula_CN_chrom_arm_missegregation)))
-                prob_CN_foc_amp <- min(1, eval(parse(text = formula_CN_focal_amplification)))
-                prob_CN_foc_del <- min(1, eval(parse(text = formula_CN_focal_deletion)))
-                prob_CN_cnloh_i <- min(1, eval(parse(text = formula_CN_cnloh_interstitial)))
-                prob_CN_cnloh_t <- min(1, eval(parse(text = formula_CN_cnloh_terminal)))
+                prob_CN_WGD <- genotype_list_prob_CNAs[[clone_to_react]][1]
+                prob_CN_misseg <- genotype_list_prob_CNAs[[clone_to_react]][2]
+                prob_CN_arm_misseg <- genotype_list_prob_CNAs[[clone_to_react]][3]
+                prob_CN_foc_amp <- genotype_list_prob_CNAs[[clone_to_react]][4]
+                prob_CN_foc_del <- genotype_list_prob_CNAs[[clone_to_react]][5]
+                prob_CN_cnloh_i <- genotype_list_prob_CNAs[[clone_to_react]][6]
+                prob_CN_cnloh_t <- genotype_list_prob_CNAs[[clone_to_react]][7]
+                #   Find probability of new genotypes
                 prob_new_genotype <- 1 - (1 - prob_new_drivers) * (1 - prob_CN_WGD) * (1 - prob_CN_misseg) * (1 - prob_CN_arm_misseg) * (1 - prob_CN_foc_amp) * (1 - prob_CN_foc_del) * (1 - prob_CN_cnloh_i) * (1 - prob_CN_cnloh_t)
                 #   Find number of events
                 prop <- all_propensity[i]
@@ -188,19 +207,41 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                         }
                         #   Simulate missegregation event
                         if (flag_missegregation == 1) {
-                            SIMULATOR_FULL_PHASE_1_CN_missegregation(
-                                genotype_to_react = genotype_to_react,
-                                genotype_daughter_1 = genotype_daughter_1,
-                                genotype_daughter_2 = genotype_daughter_2
-                            )
+                            if (mode_CN_misseg == "per_division") {
+                                N_events <- 1
+                            } else if (mode_CN_misseg == "per_homolog") {
+                                prob_CN_misseg_homolog <- genotype_list_prob_CN_misseg_homolog[genotype_to_react]
+                                chrom_ploidy <- genotype_list_ploidy_chrom[[genotype_to_react]]
+                                N_events_prob <- dbinom(1:sum(chrom_ploidy), sum(chrom_ploidy), prob_CN_misseg_homolog)
+                                N_events_prob <- N_events_prob / sum(N_events_prob)
+                                N_events <- sample.int(sum(chrom_ploidy), size = 1, prob = N_events_prob)
+                            }
+                            for (i_event in 1:N_events) {
+                                SIMULATOR_FULL_PHASE_1_CN_missegregation(
+                                    genotype_to_react = genotype_to_react,
+                                    genotype_daughter_1 = genotype_daughter_1,
+                                    genotype_daughter_2 = genotype_daughter_2
+                                )
+                            }
                         }
                         #   Simulate chromosome-arm missegregation event
                         if (flag_chrom_arm_missegregation == 1) {
-                            SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(
-                                genotype_to_react = genotype_to_react,
-                                genotype_daughter_1 = genotype_daughter_1,
-                                genotype_daughter_2 = genotype_daughter_2
-                            )
+                            if (mode_CN_arm_misseg == "per_division") {
+                                N_events <- 1
+                            } else if (mode_CN_arm_misseg == "per_homolog") {
+                                prob_CN_arm_misseg_homolog <- genotype_list_prob_CN_arm_misseg_homolog[genotype_to_react]
+                                chrom_ploidy <- genotype_list_ploidy_chrom[[genotype_to_react]]
+                                N_events_prob <- dbinom(1:sum(chrom_ploidy), sum(chrom_ploidy), prob_CN_arm_misseg_homolog)
+                                N_events_prob <- N_events_prob / sum(N_events_prob)
+                                N_events <- sample.int(sum(chrom_ploidy), size = 1, prob = N_events_prob)
+                            }
+                            for (i_event in 1:N_events) {
+                                SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation(
+                                    genotype_to_react = genotype_to_react,
+                                    genotype_daughter_1 = genotype_daughter_1,
+                                    genotype_daughter_2 = genotype_daughter_2
+                                )
+                            }
                         }
                         #   Simulate focal amplification event
                         if (flag_amplification == 1) {
@@ -258,8 +299,9 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                                 )
                             }
                         }
-                        #   Update DNA length and selection rates of daughter cells
-                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype_daughter_1, genotype_daughter_2)
+                        #   Update properties of daughter cells
+                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = genotype_daughter_1)
+                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = genotype_daughter_2)
                         #   Check if either daughter cell did not create a new clone
                         output <- SIMULATOR_FULL_PHASE_1_genotype_cleaning(genotype_to_react, genotype_daughter_1, genotype_daughter_2, position_to_react, position_daughter_1, position_daughter_2)
                         genotype_to_react <- output[[1]]
@@ -303,147 +345,18 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         evolution_traj_clonal_ID[[evolution_traj_count]] <- clonal_ID_current
         evolution_traj_population[[evolution_traj_count]] <- clonal_population_current
         evolution_traj_divisions[[evolution_traj_count - 1]] <- mat_divisions
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # get_clonal_stats <- function(genotype_list_ploidy_chrom,
-        #                              genotype_list_ploidy_block,
-        #                              genotype_list_ploidy_allele,
-        #                              clone_ID) {
-        #     ploidy_normalization <- TRUE
-        #     plotcol <- "state"
-        #     fillna <- TRUE
-        #     state_mode <- NULL
-        #     #   Find total CN profile
-        #     tmp <- list()
-        #     tmp$genotype_list_ploidy_chrom <- genotype_list_ploidy_chrom
-        #     tmp$genotype_list_ploidy_block <- genotype_list_ploidy_block
-        #     tmp$genotype_list_ploidy_allele <- genotype_list_ploidy_allele
-        #     CNbins_sims <- get_cn_profile(tmp, clone_ID)
-        #     CNbins_sims$cell_id <- paste0("SIMULATION1-Library-1-1")
-        #     class(CNbins_sims) <- "data.frame"
-        #     copynumber_sims <- createCNmatrix(CNbins_sims,
-        #         field = plotcol, wholegenome = FALSE,
-        #         fillnaplot = fillna, centromere = FALSE
-        #     )
-        #     if (ploidy_normalization == TRUE) {
-        #         copynumber_sims <- normalize_cell_ploidy(copynumber_sims, state_mode)
-        #     }
-        #     #   Statistics - FGA
-        #     sample_CN <- copynumber_sims[[paste0("SIMULATION1-Library-1-1")]]
-        #     FGA <- length(which(sample_CN != 2)) / length(sample_CN)
-        #     #   Output statistics
-        #     stat <- list()
-        #     stat$FGA <- FGA
-        #     return(stat)
-        # }
-        #
-        #
-        # # TMP <<- TMP + 1
-        # # if ((TMP %% 50) == 0) {
-        # clonal_WGD_status <- rep(0, length(clonal_ID_current))
-        # for (i in 1:length(clonal_ID_current)) {
-        #     WGD_status <- 0
-        #     clone <- clonal_ID_current[i]
-        #     while (clone > 0) {
-        #         if (length(evolution_genotype_changes[[clone]]) > 0) {
-        #             for (j in 1:length(evolution_genotype_changes[[clone]])) {
-        #                 if (evolution_genotype_changes[[clone]][[j]][1] == "whole-genome-duplication") WGD_status <- 1
-        #             }
-        #         }
-        #         clone <- evolution_origin[clone]
-        #     }
-        #     clonal_WGD_status[i] <- WGD_status
-        # }
-        # if (length(which(clonal_WGD_status == 1)) > 0) {
-        #     clonal_fitness_current <- genotype_list_selection_rate[clonal_ID_current] / genotype_list_selection_rate[1]
-        #     cat("\n\n\n\n\n\n\n")
-        #     cat("==============================================================================================================\n")
-        #     cat("----------------------------------------------------------------------------   AVERAGES BY WGD STATUS:\n")
-        #     mean_fitness_non_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 0)] * clonal_fitness_current[which(clonal_WGD_status == 0)]) / sum(clonal_population_current[which(clonal_WGD_status == 0)])
-        #     pop_non_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 0)])
-        #     cat(paste0("non-WGD cells ---> mean fitness ratio = ", mean_fitness_non_WGD, "\n"))
-        #     if (!is.nan(mean_fitness_non_WGD)) {
-        #         cat(paste0("                   max fitness ratio = ", max(clonal_fitness_current[which(clonal_WGD_status == 0)]), "\n"))
-        #         cat(paste0("                   population = ", pop_non_WGD, "\n"))
-        #     }
-        #     mean_fitness_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 1)] * clonal_fitness_current[which(clonal_WGD_status == 1)]) / sum(clonal_population_current[which(clonal_WGD_status == 1)])
-        #     pop_WGD <- sum(clonal_population_current[which(clonal_WGD_status == 1)])
-        #     cat(paste0("WGD cells     ---> mean fitness ratio = ", mean_fitness_WGD, "\n"))
-        #     if (!is.nan(mean_fitness_WGD)) {
-        #         cat(paste0("                   max fitness ratio = ", max(clonal_fitness_current[which(clonal_WGD_status == 1)]), "\n"))
-        #         cat(paste0("                   population = ", pop_WGD, "\n"))
-        #     }
-        #     cat("------------------------------------------------------------------------------------------------------\n")
-        #     cat("-------------------------------------------------------------------------------   BEST NON-WGD PROFILE:\n")
-        #     tmp <- clonal_ID_current[which(clonal_WGD_status == 0)]
-        #     tmp2 <- clonal_fitness_current[which(clonal_WGD_status == 0)]
-        #     if (length(tmp) > 0) {
-        #         best_clone <- tmp[which(tmp2 == max(tmp2))[1]]
-        #         stats <- get_clonal_stats(
-        #             genotype_list_ploidy_chrom,
-        #             genotype_list_ploidy_block,
-        #             genotype_list_ploidy_allele,
-        #             best_clone
-        #         )
-        #         cat(paste0("FGA = ", stats$FGA, "\n"))
-        #         TMPTMP <<- 1
-        #         driver_count <- genotype_list_driver_count[best_clone]
-        #         driver_map <- genotype_list_driver_map[[best_clone]]
-        #         ploidy_chrom <- genotype_list_ploidy_chrom[[best_clone]]
-        #         ploidy_block <- genotype_list_ploidy_block[[best_clone]]
-        #         ploidy_allele <- genotype_list_ploidy_allele[[best_clone]]
-        #         # cat(sum(abs(genotype_list_ploidy_chrom[[best_clone]] - 4)), "\n")
-        #         SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
-        #         TMPTMP <<- 0
-        #     } else {
-        #         cat("No non-WGD clones remain\n")
-        #     }
-        #     cat("------------------------------------------------------------------------------------------------------\n")
-        #     cat("----------------------------------------------------------------------------------   BEST WGD PROFILE:\n")
-        #     tmp <- clonal_ID_current[which(clonal_WGD_status == 1)]
-        #     tmp2 <- clonal_fitness_current[which(clonal_WGD_status == 1)]
-        #     if (length(tmp) > 0) {
-        #         best_clone <- tmp[which(tmp2 == max(tmp2))][1]
-        #         stats <- get_clonal_stats(
-        #             genotype_list_ploidy_chrom,
-        #             genotype_list_ploidy_block,
-        #             genotype_list_ploidy_allele,
-        #             best_clone
-        #         )
-        #         cat(paste0("FGA = ", stats$FGA, "\n"))
-        #         TMPTMP <<- 1
-        #         driver_count <- genotype_list_driver_count[best_clone]
-        #         driver_map <- genotype_list_driver_map[[best_clone]]
-        #         ploidy_chrom <- genotype_list_ploidy_chrom[[best_clone]]
-        #         ploidy_block <- genotype_list_ploidy_block[[best_clone]]
-        #         ploidy_allele <- genotype_list_ploidy_allele[[best_clone]]
-        #         # cat(sum(abs(genotype_list_ploidy_chrom[[best_clone]] - 4)), "\n")
-        #         SIMULATOR_FULL_PHASE_1_selection_rate(driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele)
-        #         TMPTMP <<- 0
-        #     } else {
-        #         cat("No WGD clones remain\n")
-        #     }
-        #     cat("==============================================================================================================\n")
-        #     cat("\n\n\n")
-        # }
-        # # }
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
-        # ################################################################
     }
+    #---test
+    end_time_TOTAL <- Sys.time()
+    cat("\n\n\n")
+    cat(paste0("Runtime - total:                                    ", end_time_TOTAL - start_time_TOTAL, "\n"))
+    # cat(paste0("Runtime - probabilities for new clones:             ", runtime_pre_clone_production, "\n"))
+    # cat(paste0("Runtime - producing new clones:                     ", runtime_clone_production, "\n"))
+    # cat(paste0("Runtime - extra stuff 1:                            ", runtime_extra_1, "\n"))
+    # cat(paste0("Runtime - extra stuff 2:                            ", runtime_extra_2, "\n"))
+    # cat(paste0("Runtime - extra stuff 3:                            ", runtime_extra_3, "\n"))
+    print(N_clones)
+    cat("\n\n\n")
     # ################################################################
     # ################################################################
     # ################################################################

@@ -163,23 +163,24 @@ n_simulations_per_batch <- 50
 var1_name <- "prob_CN_whole_genome_duplication"
 var2_name <- "alpha_aneuploidy"
 
-var1_vals <- c(1, 2, 4, 6, 8, 10) * 1e-6
-var2_vals <- c(2, 20, 40, 60, 80, 100)
+var1_vals <- c(1e-5)
+var2_vals <- c(200)
 
 # var1_vals <- seq(1e-6, 1e-6, by = 1e-6)
 # var2_vals <- seq(log2(100), log2(100))
 ```
 
 ```{r}
-# simulator_multivar(
-#     model_prefix = model_prefix, folder_workplace = folder_workplace,
-#     model_variables_base = model_variables_base,
-#     var1_name = var1_name, var1_vals = var1_vals,
-#     var2_name = var2_name, var2_vals = var2_vals,
-#     n_simulations = n_simulations_per_batch,
-#     stage_final = 3,
-#     compute_parallel = TRUE
-# )
+simulator_multivar(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    model_variables_base = model_variables_base,
+    var1_name = var1_name, var1_vals = var1_vals,
+    var2_name = var2_name, var2_vals = var2_vals,
+    n_simulations = n_simulations_per_batch,
+    stage_final = 3,
+    compute_parallel = FALSE
+    # compute_parallel = TRUE
+)
 ```
 
 ```{r}

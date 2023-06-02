@@ -401,6 +401,8 @@ normalize_cell_ploidy <- function(copynumber, state_mode, round = TRUE) {
     for (cell_id in cell_ids) {
         if (is.null(state_mode)) {
             state_mode_cell <- calc_state_mode(copynumber[[cell_id]])
+        } else {
+            state_mode_cell <- state_mode
         }
         copynumber[[cell_id]] <- copynumber[[cell_id]] / (state_mode_cell / 2)
         if (round == TRUE) {

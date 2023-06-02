@@ -58,6 +58,7 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     # model_CN_focal_deletion = "per_division",
                                     # model_CN_cnloh_interstitial = "per_division",
                                     # model_CN_cnloh_terminal = "per_division",
+                                    alpha_aneuploidy = 1,
                                     prob_CN_whole_genome_duplication = 0,
                                     prob_CN_missegregation = 0,
                                     prob_CN_chrom_arm_missegregation = 0,
@@ -65,13 +66,13 @@ BUILD_general_variables <- function(model_name = "MODEL",
                                     prob_CN_focal_deletion = 0,
                                     prob_CN_cnloh_interstitial = 0,
                                     prob_CN_cnloh_terminal = 0,
-                                    formula_CN_whole_genome_duplication = "prob_CN_whole_genome_duplication",
-                                    formula_CN_missegregation = "prob_CN_missegregation",
-                                    formula_CN_chrom_arm_missegregation = "prob_CN_chrom_arm_missegregation",
-                                    formula_CN_focal_amplification = "prob_CN_focal_amplification",
-                                    formula_CN_focal_deletion = "prob_CN_focal_deletion",
-                                    formula_CN_cnloh_interstitial = "prob_CN_cnloh_interstitial",
-                                    formula_CN_cnloh_terminal = "prob_CN_cnloh_terminal",
+                                    formula_CN_whole_genome_duplication = "per_division:prob_CN_whole_genome_duplication",
+                                    formula_CN_missegregation = "per_division:prob_CN_missegregation",
+                                    formula_CN_chrom_arm_missegregation = "per_division:prob_CN_chrom_arm_missegregation",
+                                    formula_CN_focal_amplification = "per_division:prob_CN_focal_amplification",
+                                    formula_CN_focal_deletion = "per_division:prob_CN_focal_deletion",
+                                    formula_CN_cnloh_interstitial = "per_division:prob_CN_cnloh_interstitial",
+                                    formula_CN_cnloh_terminal = "per_division:prob_CN_cnloh_terminal",
                                     prob_neutral_CN_whole_genome_duplication = 0,
                                     prob_neutral_CN_missegregation = 0,
                                     prob_neutral_CN_chrom_arm_missegregation = 0,
@@ -189,6 +190,10 @@ BUILD_general_variables <- function(model_name = "MODEL",
     #   Set up CN bin width
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("size_CN_block_DNA", CN_bin_length, "bp", "CN bin width")
+
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("alpha_aneuploidy", alpha_aneuploidy, "", "Degree of aneuploidy associated with increased CNA rates depending on genotype")
+
     #   Set up CN event probabilities
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("formula_CN_whole_genome_duplication", formula_CN_whole_genome_duplication, "", "Formula of probability for a cell division to harbor a WGD event")

@@ -26,6 +26,9 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react, genotype
             genotype_list_DNA_length <<- genotype_list_DNA_length[-genotype_daughter_2]
             genotype_list_selection_rate <<- genotype_list_selection_rate[-genotype_daughter_2]
             genotype_list_prob_new_drivers <<- genotype_list_prob_new_drivers[-genotype_daughter_2]
+            genotype_list_prob_CNAs <<- genotype_list_prob_CNAs[-genotype_daughter_2]
+            if (mode_CN_misseg == "per_homolog") genotype_list_prob_CN_misseg_homolog <<- genotype_list_prob_CN_misseg_homolog[-genotype_daughter_2]
+            if (mode_CN_arm_misseg == "per_homolog") genotype_list_prob_CN_arm_misseg_homolog <<- genotype_list_prob_CN_arm_misseg_homolog[-genotype_daughter_2]
 
             clonal_ID_current <<- clonal_ID_current[-position_daughter_2]
             clonal_population_current <<- clonal_population_current[-position_daughter_2]
@@ -57,6 +60,9 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react, genotype
                 genotype_list_DNA_length <<- genotype_list_DNA_length[-genotype_daughter_1]
                 genotype_list_selection_rate <<- genotype_list_selection_rate[-genotype_daughter_1]
                 genotype_list_prob_new_drivers <<- genotype_list_prob_new_drivers[-genotype_daughter_1]
+                genotype_list_prob_CNAs <<- genotype_list_prob_CNAs[-genotype_daughter_1]
+                if (mode_CN_misseg == "per_homolog") genotype_list_prob_CN_misseg_homolog <<- genotype_list_prob_CN_misseg_homolog[-genotype_daughter_1]
+                if (mode_CN_arm_misseg == "per_homolog") genotype_list_prob_CN_arm_misseg_homolog <<- genotype_list_prob_CN_arm_misseg_homolog[-genotype_daughter_1]
 
                 clonal_ID_current <<- clonal_ID_current[-position_daughter_1]
                 clonal_population_current <<- clonal_population_current[-position_daughter_1]
@@ -88,6 +94,9 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react, genotype
                     genotype_list_DNA_length <<- genotype_list_DNA_length[-genotype_daughter_2]
                     genotype_list_selection_rate <<- genotype_list_selection_rate[-genotype_daughter_2]
                     genotype_list_prob_new_drivers <<- genotype_list_prob_new_drivers[-genotype_daughter_2]
+                    genotype_list_prob_CNAs <<- genotype_list_prob_CNAs[-genotype_daughter_1]
+                    if (mode_CN_misseg == "per_homolog") genotype_list_prob_CN_misseg_homolog <<- genotype_list_prob_CN_misseg_homolog[-genotype_daughter_1]
+                    if (mode_CN_arm_misseg == "per_homolog") genotype_list_prob_CN_arm_misseg_homolog <<- genotype_list_prob_CN_arm_misseg_homolog[-genotype_daughter_1]
 
                     clonal_ID_current <<- clonal_ID_current[-position_daughter_2]
                     clonal_population_current <<- clonal_population_current[-position_daughter_2]
@@ -119,6 +128,9 @@ SIMULATOR_FULL_PHASE_1_genotype_cleaning <- function(genotype_to_react, genotype
                         genotype_list_DNA_length <<- genotype_list_DNA_length[-c(genotype_daughter_1, genotype_daughter_2)]
                         genotype_list_selection_rate <<- genotype_list_selection_rate[-c(genotype_daughter_1, genotype_daughter_2)]
                         genotype_list_prob_new_drivers <<- genotype_list_prob_new_drivers[-c(genotype_daughter_1, genotype_daughter_2)]
+                        genotype_list_prob_CNAs <<- genotype_list_prob_CNAs[-c(genotype_daughter_1, genotype_daughter_2)]
+                        if (mode_CN_misseg == "per_homolog") genotype_list_prob_CN_misseg_homolog <<- genotype_list_prob_CN_misseg_homolog[-c(genotype_daughter_1, genotype_daughter_2)]
+                        if (mode_CN_arm_misseg == "per_homolog") genotype_list_prob_CN_arm_misseg_homolog <<- genotype_list_prob_CN_arm_misseg_homolog[-c(genotype_daughter_1, genotype_daughter_2)]
 
                         clonal_ID_current <<- clonal_ID_current[-c(position_daughter_1, position_daughter_2)]
                         clonal_population_current <<- clonal_population_current[-c(position_daughter_1, position_daughter_2)]
