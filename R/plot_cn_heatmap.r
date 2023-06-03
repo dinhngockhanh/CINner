@@ -114,6 +114,8 @@ plot_cn_heatmap <- function(model = "",
         stopCluster(cl)
     }
 }
+
+#' @export
 plot_cn_heatmap_one_simulation <- function(model,
                                            iteration,
                                            folder_workplace,
