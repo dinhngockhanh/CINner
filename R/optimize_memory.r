@@ -1,10 +1,8 @@
 #' @export
 optimize_memory <- function(simulation) {
-    # print(object.size(simulation))
     #--------------------------------Minimize clonal evolution variables
     evolution_origin <- simulation$clonal_evolution$evolution_origin
     N_clones <- simulation$clonal_evolution$N_clones
-    # genotype_list_ploidy_chrom<-simulation$clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- simulation$clonal_evolution$genotype_list_ploidy_block
     genotype_list_ploidy_allele <- simulation$clonal_evolution$genotype_list_ploidy_allele
     #   Find relevant clones to save
@@ -28,7 +26,6 @@ optimize_memory <- function(simulation) {
             genotype_list_ploidy_allele[[i]] <- -1
         }
     }
-    # simulation$clonal_evolution$genotype_list_ploidy_chrom<-genotype_list_ploidy_chrom
     simulation$clonal_evolution$genotype_list_ploidy_block <- genotype_list_ploidy_block
     simulation$clonal_evolution$genotype_list_ploidy_allele <- genotype_list_ploidy_allele
     return(simulation)

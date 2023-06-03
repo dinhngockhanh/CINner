@@ -301,6 +301,7 @@ library_bulk_arm_CN <- function(library_name,
 #' @export
 fitting_bulk_arm_CN <- function(library_name,
                                 model_name,
+                                model_variables,
                                 copynumber_DATA,
                                 type_sample_DATA = "individual",
                                 type_cn_DATA = "bin",
@@ -335,7 +336,7 @@ fitting_bulk_arm_CN <- function(library_name,
     #-----------------------------------------Input simulated CN library
     filename <- paste0(library_name, "_ABC_input.rda")
     load(filename)
-    model_variables <- ABC_input$model_variables
+    # model_variables <- ABC_input$model_variables
     n_samples <- ABC_input$n_samples
     parameter_IDs <- ABC_input$parameter_IDs
     sim_param <- ABC_input$sim_param
@@ -799,16 +800,22 @@ statistics_bulk_arm_WGD_status <- function(plotname,
             FIT_tsg_mean_selection_rate[i] <- 1
             FIT_tsg_max_selection_rate[i] <- 1
         } else {
-            FIT_tsg_mean_selection_rate[i] <- 1 / mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
-            FIT_tsg_max_selection_rate[i] <- 1 / max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
+            tmp <- cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)]
+            FIT_tsg_mean_selection_rate[i] <- 1 / prod(tmp)^(1 / length(tmp))
+            FIT_tsg_max_selection_rate[i] <- 1 / max(tmp)
+            # FIT_tsg_mean_selection_rate[i] <- 1 / mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
+            # FIT_tsg_max_selection_rate[i] <- 1 / max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
         }
         FIT_onc_count[i] <- length(which(cancer_types_fit_selection_rates > 1))
         if (FIT_onc_count[i] == 0) {
             FIT_onc_mean_selection_rate[i] <- 1
             FIT_onc_max_selection_rate[i] <- 1
         } else {
-            FIT_onc_mean_selection_rate[i] <- mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
-            FIT_onc_max_selection_rate[i] <- max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
+            tmp <- cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)]
+            FIT_onc_mean_selection_rate[i] <- prod(tmp)^(1 / length(tmp))
+            FIT_onc_max_selection_rate[i] <- max(tmp)
+            # FIT_onc_mean_selection_rate[i] <- mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
+            # FIT_onc_max_selection_rate[i] <- max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
         }
     }
     #-------------------------Find genome coordinate from one simulation

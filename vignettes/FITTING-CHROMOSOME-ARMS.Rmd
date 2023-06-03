@@ -41,12 +41,6 @@ prob_CN_cnloh_terminal_length <- 0.005
 rate_driver <- 0
 rate_passenger <- 1e-11
 #---------------------------------------------------VIABILITY THRESHOLDS
-# bound_driver <- 3
-# bound_average_ploidy <- 6
-# bound_homozygosity <- 0
-# bound_maximum_CN <- Inf
-# bound_maximum_CN_normalized <- 4
-
 bound_driver <- Inf
 bound_average_ploidy <- Inf
 bound_homozygosity <- 0
@@ -183,6 +177,7 @@ We then run the fitting routine:
 # fitting_bulk_arm_CN(
 #     library_name = library_name,
 #     model_name = "PAN-CANCER",
+#     model_variables = model_variables,
 #     copynumber_DATA = copynumber_DATA,
 #     list_parameters = list_parameters,
 #     list_parameters_library = list_parameters_library,
@@ -200,30 +195,47 @@ We then run the fitting routine:
 We first load the list of samples for all cancer types in PCAWG:
 
 ```{r}
-# copynumber_PCAWG <- read_excel(system.file("pcawg_sample_sheet.xlsx", package = "CancerSimulator"))
+copynumber_PCAWG <- read_excel(system.file("pcawg_sample_sheet.xlsx", package = "CancerSimulator"))
 ```
 
 List of cancer type-specific datasets in PCAWG:
 
 ```{r}
-# PCAWG_cancer_types <- unique(copynumber_PCAWG$dcc_project_code)
+PCAWG_cancer_types <- unique(copynumber_PCAWG$dcc_project_code)
 ```
 
-List of available samples per PCAWG cancer type:
+WGD status for each sample in PCAWG:
 
 ```{r}
-# PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
-# for (i in 1:length(PCAWG_cancer_types)) {
-#     sample_ids <- copynumber_PCAWG$aliquot_id[which(copynumber_PCAWG$dcc_project_code == PCAWG_cancer_types[i])]
-#     for (j in 1:length(sample_ids)) {
-#         sample_id <- sample_ids[j]
-#         if (file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) {
-#             tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
-#             if (max(tmp$star, na.rm = TRUE) < 2) next
-#             PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
-#         }
-#     }
-# }
+PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CancerSimulator"), header = TRUE)
+```
+
+List of all samples with available high-quality CN data, per PCAWG cancer type:
+
+```{r}
+PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    sample_ids <- copynumber_PCAWG$aliquot_id[which(copynumber_PCAWG$dcc_project_code == PCAWG_cancer_types[i])]
+    for (j in 1:length(sample_ids)) {
+        sample_id <- sample_ids[j]
+        if (!file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) next
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (max(tmp$star, na.rm = TRUE) < 2) next
+        PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
+    }
+}
+```
+
+List of only non-WGD samples with available high-quality CN data, per PCAWG cancer type:
+
+```{r}
+PCAWG_cancer_type_nonWGD_sample_ids <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
+    sample_wgd <- PCAWG_wgd[which(PCAWG_wgd$samplename %in% sample_ids),]
+    sample_nonwgd_ids <- sample_wgd$samplename[which(sample_wgd$wgd_uncertain==FALSE & sample_wgd$wgd_status=='no_wgd')]
+    PCAWG_cancer_type_nonWGD_sample_ids[[i]]<-sample_nonwgd_ids
+}
 ```
 
 Remove PCAWG cancer types with too few samples:
@@ -234,9 +246,34 @@ Remove PCAWG cancer types with too few samples:
 # PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 30)]
 ```
 
+Remove PCAWG cancer types with less than 30 non-WGD samples:
+
+```{r}
+sample_sizes <- sapply(PCAWG_cancer_type_nonWGD_sample_ids, length)
+PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 30)]
+PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 30)]
+PCAWG_cancer_type_nonWGD_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[-which(sample_sizes < 30)]
+```
+
 Combine CN profiles for all samples of each PCAWG cancer type into one:
 
 ```{r}
+copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    cancer_type <- PCAWG_cancer_types[i]
+    cancer_type_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[[i]]
+    copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
+    for (j in 1:length(cancer_type_sample_ids)) {
+        sample_id <- cancer_type_sample_ids[j]
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
+        tmp <- tmp[which(tmp$star >= 2), ]
+        tmp$donor_unique_id <- sample_id
+        copynumber_DATA_ls[[j]] <- tmp
+    }
+    copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+}
+
 # copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
 # for (i in 1:length(PCAWG_cancer_types)) {
 #     cancer_type <- PCAWG_cancer_types[i]
@@ -262,29 +299,27 @@ list_parameters <- list_parameters_library
 Fit the chromosome-arm-level gain/loss frequencies with ABC random forest:
 
 ```{r}
-# for (i in 1:length(PCAWG_cancer_types)) {
-#     cancer_type <- PCAWG_cancer_types[i]
-#     copynumber_DATA <- copynumber_DATA_cancer_types[[i]]
-#     cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
-#     fitting_bulk_arm_CN(
-#         library_name = library_name,
-#         model_name = cancer_type,
-#         copynumber_DATA = copynumber_DATA,
-#         list_parameters = list_parameters,
-#         list_parameters_library = list_parameters_library,
-#         list_targets = list_targets,
-#         list_targets_library = list_targets_library,
-#         library_shuffle = TRUE,
-#         folder_workplace = library_name
-#     )
-# }
+for (i in 1:length(PCAWG_cancer_types)) {
+    cancer_type <- PCAWG_cancer_types[i]
+    copynumber_DATA <- copynumber_DATA_cancer_types[[i]]
+    cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
+    fitting_bulk_arm_CN(
+        library_name = library_name,
+        model_name = cancer_type,
+        model_variables = model_variables,
+        copynumber_DATA = copynumber_DATA,
+        list_parameters = list_parameters,
+        list_parameters_library = list_parameters_library,
+        list_targets = list_targets,
+        list_targets_library = list_targets_library,
+        bound_freq = 0.1,
+        library_shuffle = TRUE,
+        folder_workplace = library_name
+    )
+}
 ```
 
 #   Statistics for PCAWG cancer types
-
-```{r}
-PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CancerSimulator"), header = TRUE)
-```
 
 ```{r}
 df_WGD_FGA <- statistics_bulk_arm_WGD_status(
@@ -390,6 +425,7 @@ for (i in 1:length(PCAWG_cancer_types)) {
     # fitting_bulk_arm_WGD(
     #     library_name = library_name_cancer_type,
     #     model_name = paste0(cancer_type,'_WGD'),
+    #     model_variables = model_variables,
     #     copynumber_DATA = copynumber_DATA,
     #     wgd_DATA = PCAWG_wgd,
     #     list_parameters = list_parameters_cancer_type_library,

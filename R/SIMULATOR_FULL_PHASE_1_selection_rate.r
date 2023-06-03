@@ -1,13 +1,6 @@
 # ==================================COMPUTE THE SELECTION RATE OF A CLONE
 #' @export
 SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
-    # print("***")
-    # print(WGD_count)
-    # print(driver_count)
-    # print(driver_map)
-    # print(ploidy_chrom)
-    # print(ploidy_block)
-    # print(ploidy_allele)
     #---------------------Cell is not viable if losing whole chromosomes
     #--------------------------------or exceeding maximum average ploidy
     vec_CN_all <- c()
