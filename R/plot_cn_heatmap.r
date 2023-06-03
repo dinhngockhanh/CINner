@@ -22,7 +22,7 @@ plot_cn_heatmap <- function(model = "",
     if (compute_parallel == FALSE) {
         #-----------------------------Plot CN heatmap in sequential mode
         for (iteration in 1:n_simulations) {
-            plot_cnheatmap_one_simulation(
+            plot_cn_heatmap_one_simulation(
                 model,
                 iteration,
                 folder_workplace,
@@ -58,7 +58,7 @@ plot_cn_heatmap <- function(model = "",
         }
         clusterEvalQ(cl = cl, library(signals))
         #   Prepare input parameters for plotting
-        plot_cnheatmap_one_simulation <<- plot_cnheatmap_one_simulation
+        # plot_cn_heatmap_one_simulation <<- plot_cn_heatmap_one_simulation
         model <<- model
         folder_workplace <<- folder_workplace
         folder_plots <<- folder_plots
@@ -74,7 +74,7 @@ plot_cn_heatmap <- function(model = "",
         width <<- width
         height <<- height
         clusterExport(cl, varlist = c(
-            "plot_cnheatmap_one_simulation",
+            "plot_cn_heatmap_one_simulation",
             "model",
             "folder_workplace",
             "folder_plots",
@@ -92,7 +92,7 @@ plot_cn_heatmap <- function(model = "",
         ))
         #   Plot in parallel
         pblapply(cl = cl, X = 1:n_simulations, FUN = function(iteration) {
-            plot_cnheatmap_one_simulation(
+            plot_cn_heatmap_one_simulation(
                 model,
                 iteration,
                 folder_workplace,
@@ -115,7 +115,8 @@ plot_cn_heatmap <- function(model = "",
     }
 }
 
-plot_cnheatmap_one_simulation <- function(model,
+#' @export
+plot_cn_heatmap_one_simulation <- function(model,
                                            iteration,
                                            folder_workplace,
                                            folder_plots,
