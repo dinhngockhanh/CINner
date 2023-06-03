@@ -52,7 +52,6 @@ plot_clonal_phylo <- function(model = "",
         folder_plots <<- folder_plots
         width <<- width
         height <<- height
-        plot_clonal_phylo_one_simulation <<- plot_clonal_phylo_one_simulation
         clusterExport(cl, varlist = c(
             "plot_clonal_phylo_one_simulation",
             "model",
@@ -80,6 +79,7 @@ plot_clonal_phylo <- function(model = "",
     }
 }
 
+#' @export
 plot_clonal_phylo_one_simulation <- function(model,
                                              iteration,
                                              folder_workplace,

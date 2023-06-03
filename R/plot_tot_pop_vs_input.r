@@ -46,7 +46,6 @@ plot_tot_pop_vs_input <- function(model = "",
         vec_time <<- vec_time
         unit_time <<- unit_time
         R_libPaths <<- R_libPaths
-        plot_tot_pop_vs_input_one_simulation <<- plot_tot_pop_vs_input_one_simulation
         SIMULATOR_VARIABLES_for_simulation <<- SIMULATOR_VARIABLES_for_simulation
         SIMULATOR_FULL_PHASE_1_selection_rate <<- SIMULATOR_FULL_PHASE_1_selection_rate
         clusterExport(cl, varlist = c(
@@ -84,6 +83,7 @@ plot_tot_pop_vs_input <- function(model = "",
     }
 }
 
+#' @export
 plot_tot_pop_vs_input_one_simulation <- function(model,
                                                  iteration,
                                                  folder_workplace,

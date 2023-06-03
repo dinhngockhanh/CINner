@@ -56,7 +56,6 @@ plot_average_ploidy <- function(model = "",
         height <<- height
         vec_time <<- vec_time
         unit_time <<- unit_time
-        plot_average_ploidy_one_simulation <<- plot_average_ploidy_one_simulation
         find_ploidy <<- find_ploidy
         clusterExport(cl, varlist = c(
             "plot_average_ploidy_one_simulation",
@@ -87,6 +86,7 @@ plot_average_ploidy <- function(model = "",
     }
 }
 
+#' @export
 plot_average_ploidy_one_simulation <- function(model,
                                                iteration,
                                                folder_workplace,
