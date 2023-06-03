@@ -58,7 +58,7 @@ plot_cn_heatmap <- function(model = "",
         }
         clusterEvalQ(cl = cl, library(signals))
         #   Prepare input parameters for plotting
-        plot_cn_heatmap_one_simulation <<- plot_cn_heatmap_one_simulation
+        # plot_cn_heatmap_one_simulation <<- plot_cn_heatmap_one_simulation
         model <<- model
         folder_workplace <<- folder_workplace
         folder_plots <<- folder_plots
