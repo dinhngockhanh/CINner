@@ -19,6 +19,7 @@ plot_cn_heatmap <- function(model = "",
                             n_cores = NULL,
                             R_libPaths = NULL) {
     library(signals)
+    print('HERE')
     plot_cn_heatmap_one_simulation <- function(model,
                                                iteration,
                                                folder_workplace,
@@ -240,6 +241,7 @@ plot_cn_heatmap <- function(model = "",
         #   Stop parallel cluster
         stopCluster(cl)
     }
+    print('THERE')
 }
 
 # plot_cn_heatmap_one_simulation <- function(model,
