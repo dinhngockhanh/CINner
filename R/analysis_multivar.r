@@ -376,7 +376,6 @@ statistics_multivar_matrix <- function(model_prefix = "",
         cols <- ncol(var2_vals):1
     }
     #------------------------------------Get statistics from simulations
-    df_stat_sims_all_list <- vector("list", length = length(rows) * length(cols))
     ind <- 0
     start_time <- Sys.time()
     for (row in rows) {
@@ -440,7 +439,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
                 var2_name <<- var2_name
                 var1 <<- var1
                 var2 <<- var2
-                statistics_multivar_one_simulation <<- statistics_multivar_one_simulation
+                # statistics_multivar_one_simulation <<- statistics_multivar_one_simulation
                 plot_WGD <<- plot_WGD
                 plot_misseg <<- plot_misseg
                 clusterExport(cl, varlist = c(
@@ -465,11 +464,45 @@ statistics_multivar_matrix <- function(model_prefix = "",
                 end_time <- Sys.time()
                 print(end_time - start_time)
             }
-            df_stat_sims_all_list[[ind]] <- rbindlist(df_stat_sims_list)
+            df_stat_sims <- rbindlist(df_stat_sims_list)
+            filename <- paste0(filename_prefix, "_simulation_stats.rda")
+            save(df_stat_sims, file = filename)
         }
     }
     end_time <- Sys.time()
     print(end_time - start_time)
+    #---------Combine statistics from all simulations into one dataframe
+    df_stat_sims_all_list <- vector("list", length = length(rows) * length(cols))
+    ind <- 0
+    for (row in rows) {
+        for (col in cols) {
+            ind <- ind + 1
+            filename_prefix <<- paste0(folder_workplace, "/", model_prefix, "_")
+            if (!is.null(var1_labs)) {
+                filename_prefix <<- paste0(filename_prefix, var1_name, "=", var1_labs[row], "_")
+                var1 <- var1_labs[row]
+            } else if (is.vector(var1_vals)) {
+                filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[row]), "_")
+                var1 <- scientific(var1_vals[row])
+            } else if (is.matrix(var1_vals)) {
+                filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]), "_")
+                var1 <- scientific(var1_vals[1, row])
+            }
+            if (!is.null(var2_labs)) {
+                filename_prefix <<- paste0(filename_prefix, var2_name, "=", var2_labs[col])
+                var2 <- var2_labs[col]
+            } else if (is.vector(var2_vals)) {
+                filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[col]))
+                var2 <- scientific(var2_vals[col])
+            } else if (is.matrix(var2_vals)) {
+                filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
+                var2 <- scientific(var2_vals[1, col])
+            }
+            filename <- paste0(filename_prefix, "_simulation_stats.rda")
+            load(filename)
+            df_stat_sims_all_list[[ind]] <- df_stat_sims
+        }
+    }
     df_stat_sims_all <- rbindlist(df_stat_sims_all_list)
     save(df_stat_sims_all, file = paste0(folder_workplace, "/", model_prefix, "_", "simulation_stats.rda"))
     #-----------------------------------------Compute average statistics
@@ -1039,6 +1072,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
     dev.off()
 }
 
+#' @export
 statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg) {
     load(filename)
     #--------------------------------Create dataframe for all statistics

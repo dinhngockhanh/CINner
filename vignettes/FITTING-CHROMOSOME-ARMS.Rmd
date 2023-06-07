@@ -258,7 +258,7 @@ PCAWG_cancer_type_nonWGD_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[-whic
 Combine CN profiles for all samples of each PCAWG cancer type into one:
 
 ```{r}
-copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
+copynumber_DATA_cancer_types_nonWGD <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
     cancer_type <- PCAWG_cancer_types[i]
     cancer_type_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[[i]]
@@ -271,24 +271,24 @@ for (i in 1:length(PCAWG_cancer_types)) {
         tmp$donor_unique_id <- sample_id
         copynumber_DATA_ls[[j]] <- tmp
     }
-    copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+    copynumber_DATA_cancer_types_nonWGD[[i]] <- rbindlist(copynumber_DATA_ls)
 }
 
-# copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
-# for (i in 1:length(PCAWG_cancer_types)) {
-#     cancer_type <- PCAWG_cancer_types[i]
-#     cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
-#     copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
-#     for (j in 1:length(cancer_type_sample_ids)) {
-#         sample_id <- cancer_type_sample_ids[j]
-#         tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
-#         if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
-#         tmp <- tmp[which(tmp$star >= 2), ]
-#         tmp$donor_unique_id <- sample_id
-#         copynumber_DATA_ls[[j]] <- tmp
-#     }
-#     copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
-# }
+copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    cancer_type <- PCAWG_cancer_types[i]
+    cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
+    copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
+    for (j in 1:length(cancer_type_sample_ids)) {
+        sample_id <- cancer_type_sample_ids[j]
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
+        tmp <- tmp[which(tmp$star >= 2), ]
+        tmp$donor_unique_id <- sample_id
+        copynumber_DATA_ls[[j]] <- tmp
+    }
+    copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+}
 ```
 
 ```{r}
@@ -301,7 +301,7 @@ Fit the chromosome-arm-level gain/loss frequencies with ABC random forest:
 ```{r}
 for (i in 1:length(PCAWG_cancer_types)) {
     cancer_type <- PCAWG_cancer_types[i]
-    copynumber_DATA <- copynumber_DATA_cancer_types[[i]]
+    copynumber_DATA <- copynumber_DATA_cancer_types_nonWGD[[i]]
     cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
     fitting_bulk_arm_CN(
         library_name = library_name,
