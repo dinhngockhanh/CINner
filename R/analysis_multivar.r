@@ -577,6 +577,30 @@ statistics_multivar_matrix <- function(model_prefix = "",
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_in_wgd", FGA_in_wgd)
             #---Statistics: FGA difference between WGD-positive and WGD-negative samples
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_difference", FGA_in_wgd - FGA_in_nonwgd)
+
+
+
+            #---Statistics: LOH in WGD-negative samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
+            if (length(list_sims) == 0) {
+                LOH_in_nonwgd <- NA
+            } else {
+                LOH_in_nonwgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_LOH" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "LOH_in_nonwgd", LOH_in_nonwgd)
+            #---Statistics: FGA in WGD-positive samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 1)])
+            if (length(list_sims) == 0) {
+                LOH_in_wgd <- NA
+            } else {
+                LOH_in_wgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_LOH" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "LOH_in_wgd", LOH_in_wgd)
+            #---Statistics: FGA difference between WGD-positive and WGD-negative samples
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "LOH_difference", LOH_in_wgd - LOH_in_nonwgd)
+
+
+
             #---Statistics: event count in WGD-negative samples
             list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
             if (length(list_sims) == 0) {
@@ -1021,10 +1045,6 @@ statistics_multivar_matrix <- function(model_prefix = "",
     }
     print(p)
     dev.off()
-
-
-
-
     #-----------Plot statistics: Proportion of WGD-dominated simulations
     filename <- paste0(model_prefix, "_9_WGD_proportion.jpeg")
     jpeg(file = filename, width = 1000, height = 1100)
@@ -1037,6 +1057,36 @@ statistics_multivar_matrix <- function(model_prefix = "",
         xlab(var1_lab) +
         ylab(var2_lab) +
         scale_fill_distiller(palette = "YlOrBr", name = "WGD proportion") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #------------------------Plot statistics: FGA in non-WGD simulations
+    filename <- paste0(model_prefix, "_10_WGD_FGA_in_nonWGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "FGA_in_nonwgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "FGA in nonWGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #----------------------------Plot statistics: FGA in WGD simulations
+    filename <- paste0(model_prefix, "_10_WGD_FGA_in_WGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "FGA_in_wgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "FGA in WGD samples") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
@@ -1055,8 +1105,87 @@ statistics_multivar_matrix <- function(model_prefix = "",
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
+
+
+    #------------------------Plot statistics: LOH in non-WGD simulations
+    filename <- paste0(model_prefix, "_11_WGD_LOH_in_nonWGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "LOH_in_nonwgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "LOH in nonWGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #----------------------------Plot statistics: LOH in WGD simulations
+    filename <- paste0(model_prefix, "_11_WGD_LOH_in_WGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "LOH_in_wgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "LOH in WGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #--Plot statistics: LOH difference between WGD & non-WGD simulations
+    filename <- paste0(model_prefix, "_11_WGD_LOH_difference.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "LOH_difference"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "WGD LOH difference") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+
+
+    #--Plot statistics: event count in non-WGD simulations
+    filename <- paste0(model_prefix, "_12_WGD_aneuploidy_in_nonWGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "event_count_in_nonwgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "Aneuploidy in nonWGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #--Plot statistics: event count in WGD simulations
+    filename <- paste0(model_prefix, "_12_WGD_aneuploidy_in_WGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "event_count_in_wgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "Aneuploidy in WGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
     #--Plot statistics: event count difference between WGD & non-WGD simulations
-    filename <- paste0(model_prefix, "_11_WGD_aneuploidy_difference.jpeg")
+    filename <- paste0(model_prefix, "_12_WGD_aneuploidy_difference.jpeg")
     jpeg(file = filename, width = 1000, height = 1100)
     df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "event_count_difference"), ]
     p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
@@ -1247,76 +1376,28 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
         #   Statistics - FGA
         sample_CN <- copynumber_sims[[paste0("SIMULATION1-Library-1-1")]]
         FGA <- length(which(sample_CN != 2)) / length(sample_CN)
-        #####
-        #####
-        #####
-        #####
-        #####
-        # if (WGD_count > 0) {
-        #     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
-        #     evolution_genotype_changes <- package_clonal_evolution$evolution_genotype_changes
-        #     evolution_traj_time <- package_clonal_evolution$evolution_traj_time
-        #     evolution_traj_clonal_ID <- package_clonal_evolution$evolution_traj_clonal_ID
-        #     evolution_origin <- package_clonal_evolution$evolution_origin
-        #     pre_misseg <- 0
-        #     pre_arm_misseg <- 0
-        #     WGD_clones <- c()
-        #     post_misseg <- 0
-        #     post_arm_misseg <- 0
-        #     clone <- clone_ID
-        #     while (clone > 0) {
-        #         n_misseg <- 0
-        #         n_arm_misseg <- 0
-        #         genotype_changes <- evolution_genotype_changes[[clone]]
-        #         if (length(genotype_changes) > 0) {
-        #             for (i in 1:length(genotype_changes)) {
-        #                 if (genotype_changes[[i]][1] == "missegregation") {
-        #                     n_misseg <- n_misseg + 1
-        #                 } else if (genotype_changes[[i]][1] == "chromosome-arm-missegregation") {
-        #                     post_arm_misseg <- post_arm_misseg + 1
-        #                 } else if (genotype_changes[[i]][1] == "whole-genome-duplication") {
-        #                     WGD_clones <- c(WGD_clones, clone)
-        #                 }
-        #             }
-        #         }
-        #         if (length(WGD_clones) > 0) {
-        #             post_misseg <- post_misseg + n_misseg
-        #             post_arm_misseg <- post_arm_misseg + n_arm_misseg
-        #         } else {
-        #             pre_misseg <- pre_misseg + n_misseg
-        #             pre_arm_misseg <- pre_arm_misseg + n_arm_misseg
-        #         }
-        #         clone <- evolution_origin[clone]
-        #     }
-        #     for (i in 1:length(evolution_traj_time)) {
-        #         if (WGD_clones %in% evolution_traj_clonal_ID[[i]]) {
-        #             WGD_age <- evolution_traj_time[i]
-        #             break
-        #         }
-        #     }
-        #     cat("-------------------------------------------------------\n")
-        #     cat(paste0("Pre-WGD missegregations      = ", pre_misseg, "\n"))
-        #     cat(paste0("Pre-WGD arm-missegregations  = ", pre_arm_misseg, "\n"))
-        #     cat(paste0("WGD ancestor                 = ", WGD_clones, "\n"))
-        #     cat(paste0("WGD ancestor age             = ", WGD_age / 365, "\n"))
-        #     cat(paste0("WGD ancestor CN profile      : \n"))
-        #     print(genotype_list_ploidy_chrom[[WGD_clones]])
-        #     cat(paste0("Post-WGD missegregations     = ", post_misseg, "\n"))
-        #     cat(paste0("Post-WGD arm-missegregations = ", post_arm_misseg, "\n"))
-        #     cat(paste0("Final CN profile             : \n"))
-        #     print(genotype_list_ploidy_chrom[[clone_ID]])
-        #     cat("-------------------------------------------------------\n")
-        # }
-        #####
-        #####
-        #####
-        #####
-        #####
         #   Output statistics
         return(FGA)
     }
     Clone_ID_FGA <- get_FGA(simulation$clonal_evolution, Clone_ID_max)
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_FGA", Clone_ID_FGA)
+    #---------------------------Statistics: main clone's Fraction of LOH
+    get_LOH <- function(package_clonal_evolution,
+                        clone_ID) {
+        plotcol <- "state"
+        fillna <- TRUE
+
+        #   Find allele-specific CN profile
+        CNbins_sims <- get_cn_profile(package_clonal_evolution, clone_ID)
+        CNbins_sims$cell_id <- paste0("SIMULATION1-Library-1-1")
+        CNbins_sims$chr <- as.character(CNbins_sims$chr)
+        #   Statistics - Fraction of LOH
+        LOH <- length(which(CNbins_sims$Min <= 0 & CNbins_sims$Maj <= 0)) / nrow(CNbins_sims)
+        #   Output statistics
+        return(LOH)
+    }
+    Clone_ID_FGA <- get_LOH(simulation$clonal_evolution, Clone_ID_max)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_LOH", Clone_ID_FGA)
     #-------------------------------Statistics: main clone's event count
     get_event_count <- function(package_clonal_evolution,
                                 clone_ID) {
