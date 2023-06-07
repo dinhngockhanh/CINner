@@ -381,6 +381,7 @@ gainloss_SIMS <- function(copynumber_sims,
     return(output)
 }
 
+#' @export
 calc_state_mode <- function(states) {
     state_levels <- unique(states)
 
@@ -395,6 +396,7 @@ calc_state_mode <- function(states) {
     return(state_mode)
 }
 
+#' @export
 normalize_cell_ploidy <- function(copynumber, state_mode, round = TRUE) {
     cell_ids <- colnames(copynumber)
     cell_ids <- cell_ids[!(cell_ids %in% c("chr", "start", "end", "width"))]
