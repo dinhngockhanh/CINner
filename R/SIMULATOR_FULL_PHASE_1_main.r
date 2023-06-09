@@ -72,19 +72,6 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
             style = 3, width = 50, char = "="
         )
     }
-    #---test
-    start_time_TOTAL <- Sys.time()
-    runtime_clone_production <- 0
-    runtime_pre_clone_production <- 0
-    runtime_extra_1 <- 0
-    runtime_extra_2 <- 0
-    runtime_extra_3 <- 0
-    # #---test
-    # start_time_pre_clone_production <- Sys.time()
-
-    # #---test
-    # end_time_pre_clone_production <- Sys.time()
-    # runtime_pre_clone_production <- runtime_pre_clone_production + end_time_pre_clone_production - start_time_pre_clone_production
     while ((T_current < T_end_simulation) && (N_cells_current < Max_cell_count) && (N_events_current < Max_events)) {
         if (report_progress == TRUE) {
             setTxtProgressBar(pb, T_current)
@@ -346,17 +333,6 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
         evolution_traj_population[[evolution_traj_count]] <- clonal_population_current
         evolution_traj_divisions[[evolution_traj_count - 1]] <- mat_divisions
     }
-    #---test
-    end_time_TOTAL <- Sys.time()
-    cat("\n\n\n")
-    cat(paste0("Runtime - total:                                    ", end_time_TOTAL - start_time_TOTAL, "\n"))
-    # cat(paste0("Runtime - probabilities for new clones:             ", runtime_pre_clone_production, "\n"))
-    # cat(paste0("Runtime - producing new clones:                     ", runtime_clone_production, "\n"))
-    # cat(paste0("Runtime - extra stuff 1:                            ", runtime_extra_1, "\n"))
-    # cat(paste0("Runtime - extra stuff 2:                            ", runtime_extra_2, "\n"))
-    # cat(paste0("Runtime - extra stuff 3:                            ", runtime_extra_3, "\n"))
-    print(N_clones)
-    cat("\n\n\n")
     # ################################################################
     # ################################################################
     # ################################################################
