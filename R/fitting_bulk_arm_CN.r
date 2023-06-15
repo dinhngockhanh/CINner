@@ -11,6 +11,7 @@ bulk_arm_CN_assign_paras <- function(model_variables, parameter_IDs, parameters)
     }
     return(model_variables)
 }
+
 #--------------------------Function to extract arm-level gain/loss delta
 bulk_arm_CN_get_arm_gainloss <- function(bin_gainloss, copynumber_coordinates, list_targets) {
     arm_gain <- rep(0, length(list_targets))

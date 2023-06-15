@@ -195,13 +195,18 @@ We then run the fitting routine:
 We first load the list of samples for all cancer types in PCAWG:
 
 ```{r}
-copynumber_PCAWG <- read_excel(system.file("pcawg_sample_sheet.xlsx", package = "CancerSimulator"))
+# copynumber_PCAWG <- read_excel(system.file("pcawg_sample_sheet.xlsx", package = "CancerSimulator"))
+
+copynumber_PCAWG <- read_excel(system.file("pcawg_specimen_histology_August2016_v9.xlsx", package = "CancerSimulator"))
 ```
 
 List of cancer type-specific datasets in PCAWG:
 
 ```{r}
-PCAWG_cancer_types <- unique(copynumber_PCAWG$dcc_project_code)
+# PCAWG_cancer_types <- unique(copynumber_PCAWG$dcc_project_code)
+
+PCAWG_cancer_types <- unique(copynumber_PCAWG$histology_abbreviation)
+PCAWG_cancer_types <- PCAWG_cancer_types[which(!is.na(PCAWG_cancer_types))]
 ```
 
 WGD status for each sample in PCAWG:
@@ -215,7 +220,10 @@ List of all samples with available high-quality CN data, per PCAWG cancer type:
 ```{r}
 PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
-    sample_ids <- copynumber_PCAWG$aliquot_id[which(copynumber_PCAWG$dcc_project_code == PCAWG_cancer_types[i])]
+    # sample_ids <- copynumber_PCAWG$aliquot_id[which(copynumber_PCAWG$dcc_project_code == PCAWG_cancer_types[i])]
+
+    sample_ids <- copynumber_PCAWG$tcga_sample_uuid[which(copynumber_PCAWG$histology_abbreviation == PCAWG_cancer_types[i])]
+
     for (j in 1:length(sample_ids)) {
         sample_id <- sample_ids[j]
         if (!file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) next
@@ -232,27 +240,19 @@ List of only non-WGD samples with available high-quality CN data, per PCAWG canc
 PCAWG_cancer_type_nonWGD_sample_ids <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
     sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
-    sample_wgd <- PCAWG_wgd[which(PCAWG_wgd$samplename %in% sample_ids),]
-    sample_nonwgd_ids <- sample_wgd$samplename[which(sample_wgd$wgd_uncertain==FALSE & sample_wgd$wgd_status=='no_wgd')]
-    PCAWG_cancer_type_nonWGD_sample_ids[[i]]<-sample_nonwgd_ids
+    sample_wgd <- PCAWG_wgd[which(PCAWG_wgd$samplename %in% sample_ids), ]
+    sample_nonwgd_ids <- sample_wgd$samplename[which(sample_wgd$wgd_uncertain == FALSE & sample_wgd$wgd_status == "no_wgd")]
+    PCAWG_cancer_type_nonWGD_sample_ids[[i]] <- sample_nonwgd_ids
 }
-```
-
-Remove PCAWG cancer types with too few samples:
-
-```{r}
-# sample_sizes <- sapply(PCAWG_cancer_type_sample_ids, length)
-# PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 30)]
-# PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 30)]
 ```
 
 Remove PCAWG cancer types with less than 30 non-WGD samples:
 
 ```{r}
 sample_sizes <- sapply(PCAWG_cancer_type_nonWGD_sample_ids, length)
-PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 30)]
-PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 30)]
-PCAWG_cancer_type_nonWGD_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[-which(sample_sizes < 30)]
+PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 10)]
+PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 10)]
+PCAWG_cancer_type_nonWGD_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[-which(sample_sizes < 10)]
 ```
 
 Combine CN profiles for all samples of each PCAWG cancer type into one:
@@ -323,7 +323,7 @@ for (i in 1:length(PCAWG_cancer_types)) {
 
 ```{r}
 df_WGD_FGA <- statistics_bulk_arm_WGD_status(
-    plotname = 'ALL_PCAWG',
+    plotname = "ALL_PCAWG",
     DATA_cancer_types = PCAWG_cancer_types,
     DATA_cancer_type_sample_ids = PCAWG_cancer_type_sample_ids,
     DATA_cancer_type_cn = copynumber_DATA_cancer_types,
@@ -395,7 +395,7 @@ for (i in 1:length(PCAWG_cancer_types)) {
 
 
 
-    if (cancer_type!='PACA-AU') next
+    if (cancer_type != "PACA-AU") next
 
 
 
@@ -437,8 +437,8 @@ for (i in 1:length(PCAWG_cancer_types)) {
 
 
 
-    model_variables_cancer_type$general_variables$Value[which(model_variables_cancer_type$general_variables$Variable=='prob_CN_whole_genome_duplication')] <- 1e-6
-    model_variables_cancer_type$general_variables$Value[which(model_variables_cancer_type$general_variables$Variable=='formula_CN_slope')] <- log2(100)
+    model_variables_cancer_type$general_variables$Value[which(model_variables_cancer_type$general_variables$Variable == "prob_CN_whole_genome_duplication")] <- 1e-6
+    model_variables_cancer_type$general_variables$Value[which(model_variables_cancer_type$general_variables$Variable == "formula_CN_slope")] <- log2(100)
     tmp <- simulator_full_program(
         model = model_variables_cancer_type,
         n_simulations = 100,

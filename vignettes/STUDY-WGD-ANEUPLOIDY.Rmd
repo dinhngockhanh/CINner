@@ -140,8 +140,10 @@ parameter_best <- read.csv("PAN-CANCER_fitted_parameters.csv")
 ######
 ######
 parameter_best$Best_value[which(parameter_best$Type == "Arm_selection_rate" & parameter_best$Best_value == 1)] <-
-    c(0.9920039, 0.9933136, 0.9952504, 0.9859580, 0.9887057, 0.9927065, 0.9871305,
-        1.0010945, 0.9868608, 0.9964952, 0.9866928, 1.0026826, 0.9981111)
+    c(
+        0.9920039, 0.9933136, 0.9952504, 0.9859580, 0.9887057, 0.9927065, 0.9871305,
+        1.0010945, 0.9868608, 0.9964952, 0.9866928, 1.0026826, 0.9981111
+    )
 # parameter_best$Best_value[which(parameter_best$Type == "Arm_selection_rate" & parameter_best$Best_value == 1)] <-
 #     runif(length(which(parameter_best$Type == "Arm_selection_rate" & parameter_best$Best_value == 1)), 0.9836265, 1.007644)
 ######

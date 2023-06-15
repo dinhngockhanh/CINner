@@ -439,7 +439,6 @@ statistics_multivar_matrix <- function(model_prefix = "",
                 var2_name <<- var2_name
                 var1 <<- var1
                 var2 <<- var2
-                # statistics_multivar_one_simulation <<- statistics_multivar_one_simulation
                 plot_WGD <<- plot_WGD
                 plot_misseg <<- plot_misseg
                 clusterExport(cl, varlist = c(
@@ -553,12 +552,34 @@ statistics_multivar_matrix <- function(model_prefix = "",
             #---Statistics: Shannon diversity index
             mean_Shannon_index <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "Shannon_index")]))
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "Shannon_index", mean_Shannon_index)
-
-
-
             #---Statistics: proportion of WGD
             mean_WGD_proportion <- mean(as.numeric(df_stat_sims_all$val[(which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD"))]))
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "WGD_proportion", mean_WGD_proportion)
+
+
+
+            #---Statistics: fitness in WGD-negative samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
+            if (length(list_sims) == 0) {
+                fitness_in_nonwgd <- NA
+            } else {
+                fitness_in_nonwgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_fitness" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "fitness_in_nonwgd", fitness_in_nonwgd)
+            #---Statistics: fitness in WGD-positive samples
+            list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 1)])
+            if (length(list_sims) == 0) {
+                fitness_in_wgd <- NA
+            } else {
+                fitness_in_wgd <- mean(as.numeric(df_stat_sims_all$val[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_fitness" & df_stat_sims_all$sim %in% list_sims)]))
+            }
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "fitness_in_wgd", fitness_in_wgd)
+            #---Statistics: fitness difference between WGD-positive and WGD-negative samples
+            df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "fitness_difference", fitness_in_wgd - fitness_in_nonwgd)
+
+
+
+
             #---Statistics: FGA in WGD-negative samples
             list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
             if (length(list_sims) == 0) {
@@ -577,9 +598,6 @@ statistics_multivar_matrix <- function(model_prefix = "",
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_in_wgd", FGA_in_wgd)
             #---Statistics: FGA difference between WGD-positive and WGD-negative samples
             df_stat_average[nrow(df_stat_average) + 1, ] <- c(var1, var2, "FGA_difference", FGA_in_wgd - FGA_in_nonwgd)
-
-
-
             #---Statistics: LOH in WGD-negative samples
             list_sims <- as.numeric(df_stat_sims_all$sim[which(df_stat_sims_all$var1 == var1 & df_stat_sims_all$var2 == var2 & df_stat_sims_all$stat == "major_clone_WGD" & df_stat_sims_all$val == 0)])
             if (length(list_sims) == 0) {
@@ -1105,8 +1123,6 @@ statistics_multivar_matrix <- function(model_prefix = "",
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
-
-
     #------------------------Plot statistics: LOH in non-WGD simulations
     filename <- paste0(model_prefix, "_11_WGD_LOH_in_nonWGD.jpeg")
     jpeg(file = filename, width = 1000, height = 1100)
@@ -1196,6 +1212,56 @@ statistics_multivar_matrix <- function(model_prefix = "",
         xlab(var1_lab) +
         ylab(var2_lab) +
         scale_fill_distiller(palette = "YlOrBr", name = "WGD aneuploidy difference") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+
+
+
+
+
+    #------------------------Plot statistics: fitness in non-WGD simulations
+    filename <- paste0(model_prefix, "_13_WGD_fitness_in_nonWGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "fitness_in_nonwgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "Fitness in nonWGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #----------------------------Plot statistics: fitness in WGD simulations
+    filename <- paste0(model_prefix, "_13_WGD_fitness_in_WGD.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "fitness_in_wgd"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "Fitness in WGD samples") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+    print(p)
+    dev.off()
+    #--Plot statistics: fitness difference between WGD & non-WGD simulations
+    filename <- paste0(model_prefix, "_13_WGD_fitness_difference.jpeg")
+    jpeg(file = filename, width = 1000, height = 1100)
+    df_stat_average_plot <- df_stat_average[which(df_stat_average$stat == "fitness_difference"), ]
+    p <- ggplot(df_stat_average_plot, aes(var1, var2, fill = val)) +
+        geom_tile() +
+        scale_x_discrete(expand = c(1 / length(rows), 1 / length(rows))) +
+        scale_y_discrete(expand = c(1 / length(cols), 1 / length(cols))) +
+        coord_equal() +
+        xlab(var1_lab) +
+        ylab(var2_lab) +
+        scale_fill_distiller(palette = "YlOrBr", name = "WGD fitness difference") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
@@ -1351,6 +1417,14 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
         Clone_ID_WGD_status <- 0
     }
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_WGD", Clone_ID_WGD_status)
+    #-----------------------------------Statistics: main clone's fitness
+    get_fitness <- function(package_clonal_evolution,
+                            clone_ID) {
+        fitness <- package_clonal_evolution$genotype_list_selection_rate[clone_ID]
+        return(fitness)
+    }
+    Clone_ID_fitness <- get_fitness(simulation$clonal_evolution, Clone_ID_max)
+    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_fitness", Clone_ID_fitness)
     #----------------Statistics: main clone's Fraction of Genome Altered
     get_FGA <- function(package_clonal_evolution,
                         clone_ID) {
