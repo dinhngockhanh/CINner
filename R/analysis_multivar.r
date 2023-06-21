@@ -1466,7 +1466,9 @@ statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, v
         CNbins_sims$cell_id <- paste0("SIMULATION1-Library-1-1")
         CNbins_sims$chr <- as.character(CNbins_sims$chr)
         #   Statistics - Fraction of LOH
-        LOH <- length(which(CNbins_sims$Min <= 0 & CNbins_sims$Maj <= 0)) / nrow(CNbins_sims)
+        # LOH <- length(which(CNbins_sims$Min <= 0 & CNbins_sims$Maj <= 0)) / nrow(CNbins_sims)
+        LOH <- length(which(CNbins_sims$Min <= 0 | CNbins_sims$Maj <= 0)) / nrow(CNbins_sims)
+        # print(CNbins_sims)
         #   Output statistics
         return(LOH)
     }
