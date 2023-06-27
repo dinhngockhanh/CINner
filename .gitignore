@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 .DS_Store
+.vscode
 .tmp.driveupload
 .tmp.drivedownload
 
