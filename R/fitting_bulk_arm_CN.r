@@ -252,7 +252,7 @@ library_bulk_arm_CN <- function(library_name,
     sim_param <<- sim_param
     parameter_IDs <<- parameter_IDs
     model_variables <<- model_variables
-    gainloss_SIMS <<- gainloss_SIMS
+    # gainloss_SIMS <<- gainloss_SIMS
     bulk_arm_CN_func_ABC <<- bulk_arm_CN_func_ABC
     bulk_arm_CN_assign_paras <<- bulk_arm_CN_assign_paras
     bulk_arm_CN_get_arm_gainloss <<- bulk_arm_CN_get_arm_gainloss
