@@ -475,6 +475,7 @@ densityPlot_MODIFIED <- function(object,
     return(p_plot)
 }
 
+#' @export
 densityPlot_df <- function(object,
                            obs,
                            training,
