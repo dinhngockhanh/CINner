@@ -317,7 +317,7 @@ one_simulation <- function(iteration,
                            report_progress,
                            output_variables) {
     # =============================================LOAD MODEL PARAMETERS
-    SIMULATOR_VARIABLES_for_simulation(model_parameters)
+    model_parameters <- SIMULATOR_VARIABLES_for_simulation(model_parameters)
     # ============================================PRODUCE ONE SIMULATION
     flag_success <- 0
     while (flag_success == 0) {

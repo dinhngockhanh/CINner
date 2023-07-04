@@ -2,25 +2,32 @@
 #' @export
 SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #------------------------------------Input tables of model variables
+    model_parameters <- list()
     if (class(model) == "character") {
         #   Input table of general variables
         filename <- paste(model, "-input-variables.csv", sep = "")
         TABLE_VARIABLES <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$general_variables <- TABLE_VARIABLES
         #   Input table of selection model
         filename <- paste(model, "-input-selection-model.csv", sep = "")
         TABLE_SELECTION <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$selection_model <- TABLE_SELECTION
         #   Input table of GC content and mappability per CN bin
         filename <- paste(model, "-input-gc.csv", sep = "")
         TABLE_GC <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$gc_and_mappability <- TABLE_GC
         #   Input table of total population dynamics
         filename <- paste(model, "-input-population-dynamics.csv", sep = "")
         TABLE_POPULATION_DYNAMICS <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$population_dynamics <- TABLE_POPULATION_DYNAMICS
         #   Input table of chromosome bin counts and centromere locations
         filename <- paste(model, "-input-copy-number-blocks.csv", sep = "")
         TABLE_CHROMOSOME_CN_INFO <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$cn_info <- TABLE_CHROMOSOME_CN_INFO
         #   Input table of sampling information
         filename <- paste(model, "-input-sampling.csv", sep = "")
         TABLE_SAMPLING_INFO <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$sampling_info <- TABLE_SAMPLING_INFO
         #   Input table of mutational and CNA genes
         filename <- paste(model, "-input-selection-genes.csv", sep = "")
         if (file.exists(filename)) {
@@ -28,6 +35,7 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         } else {
             TABLE_CANCER_GENES <- data.frame()
         }
+        model_parameters$driver_library <- TABLE_CANCER_GENES
         #   Input table of selection rates for individual chromosome arms
         filename <- paste(model, "-input-selection-chrom-arm.csv", sep = "")
         if (file.exists(filename)) {
@@ -35,41 +43,54 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
         } else {
             TABLE_CANCER_ARMS <- data.frame()
         }
+        model_parameters$chromosome_arm_library <- TABLE_CANCER_ARMS
         #   Input table of CN profiles for the initial population
         filename <- paste(model, "-input-initial-cn-profiles.csv", sep = "")
         TABLE_INITIAL_COPY_NUMBER_PROFILES <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$initial_cn <- TABLE_INITIAL_COPY_NUMBER_PROFILES
         #   Input other information for the initial population
         filename <- paste(model, "-input-initial-others.csv", sep = "")
         TABLE_INITIAL_OTHERS <- read.table(filename, header = TRUE, sep = ",")
+        model_parameters$initial_others <- TABLE_INITIAL_OTHERS
     } else if (class(model) == "list") {
         #   Input table of general variables
         TABLE_VARIABLES <- model$general_variables
+        model_parameters$general_variables <- TABLE_VARIABLES
         #   Input table of selection model
         TABLE_SELECTION <- model$selection_model
+        model_parameters$selection_model <- TABLE_SELECTION
         #   Input table of GC content and mappability per CN bin
         TABLE_GC <- model$gc_and_mappability
+        model_parameters$gc_and_mappability <- TABLE_GC
         #   Input table of total population dynamics
         TABLE_POPULATION_DYNAMICS <- model$population_dynamics
+        model_parameters$population_dynamics <- TABLE_POPULATION_DYNAMICS
         #   Input table of chromosome bin counts and centromere locations
         TABLE_CHROMOSOME_CN_INFO <- model$cn_info
+        model_parameters$cn_info <- TABLE_CHROMOSOME_CN_INFO
         #   Input table of sampling information
         TABLE_SAMPLING_INFO <- model$sampling_info
+        model_parameters$sampling_info <- TABLE_SAMPLING_INFO
         #   Input table of mutational and CNA genes
         if ("driver_library" %in% names(model)) {
             TABLE_CANCER_GENES <- model$driver_library
         } else {
             TABLE_CANCER_GENES <- data.frame()
         }
+        model_parameters$driver_library <- TABLE_CANCER_GENES
         #   Input table of selection rates for individual chromosome arms
         if ("chromosome_arm_library" %in% names(model)) {
             TABLE_CANCER_ARMS <- model$chromosome_arm_library
         } else {
             TABLE_CANCER_ARMS <- data.frame()
         }
+        model_parameters$chromosome_arm_library <- TABLE_CANCER_ARMS
         #   Input table of CN profiles for the initial population
         TABLE_INITIAL_COPY_NUMBER_PROFILES <- model$initial_cn
+        model_parameters$initial_cn <- TABLE_INITIAL_COPY_NUMBER_PROFILES
         #   Input other information for the initial population
         TABLE_INITIAL_OTHERS <- model$initial_others
+        model_parameters$initial_others <- TABLE_INITIAL_OTHERS
     }
     #-------------------------------------------Set up general variables
     for (i in 1:nrow(TABLE_VARIABLES)) {
@@ -244,4 +265,6 @@ SIMULATOR_VARIABLES_for_simulation <- function(model) {
     #--------------------------------------------------Set up event rate
     #--------------------------------------as function of time (in days)
     func_event_rate <<- function(time) 1 / cell_lifespan
+    #----------------------------------------Return the model parameters
+    return(model_parameters)
 }
