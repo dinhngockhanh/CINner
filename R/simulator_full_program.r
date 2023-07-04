@@ -355,6 +355,7 @@ one_simulation <- function(iteration,
     if (report_progress == TRUE) cat("\n")
     # ======================PREPARE DATA FROM PHASE 1 (CLONAL EVOLUTION)
     simulation <- list()
+    simulation$parameters <- model_parameters
     if (stage_final >= 1) {
         simulation$clonal_evolution <- package_clonal_evolution
     }
