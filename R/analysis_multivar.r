@@ -480,6 +480,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
                     "tmp_var1",
                     "tmp_var2",
                     "tmp_plot_WGD",
+                    "tmp_plot_misseg",
                     "statistics_multivar_matrix_one_simulation",
                     "get_cn_profile", "normalize_cell_ploidy", "calc_state_mode"
                 ))
