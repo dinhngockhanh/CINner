@@ -1745,11 +1745,11 @@ statistics_multivar_vector <- function(model_prefix = "",
             clusterEvalQ(cl = cl, library(scales))
             clusterEvalQ(cl = cl, library(vegan))
             #   Prepare input parameters for plotting
-            var1_name <<- var1_name
-            var2_name <<- var2_name
-            var1 <<- var1
-            var2 <<- var2
-            plot_WGD <<- plot_WGD
+            tmp_var1_name <<- var1_name
+            tmp_var2_name <<- var2_name
+            tmp_var1 <<- var1
+            tmp_var2 <<- var2
+            tmp_plot_WGD <<- plot_WGD
             statistics_multivar_vector_one_simulation <<- statistics_multivar_vector_one_simulation
             clusterExport(cl, varlist = c(
                 "filename_prefix",
@@ -1764,7 +1764,7 @@ statistics_multivar_vector <- function(model_prefix = "",
             pbo <- pboptions(type = "txt")
             df_stat_sims_list <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(sim) {
                 filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                df_stat_sim <- statistics_multivar_vector_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
+                df_stat_sim <- statistics_multivar_vector_one_simulation(filename, tmp_var1_name, tmp_var2_name, tmp_var1, tmp_var2, sim, tmp_plot_WGD)
                 return(df_stat_sim)
             })
             #   Stop parallel cluster
