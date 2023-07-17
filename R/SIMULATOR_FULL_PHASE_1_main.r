@@ -34,9 +34,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
     genotype_list_prob_CNAs <<- vector("list", initial_N_clones)
     if (mode_CN_misseg == "per_homolog") genotype_list_prob_CN_misseg_homolog <<- rep(0, initial_N_clones)
     if (mode_CN_arm_misseg == "per_homolog") genotype_list_prob_CN_arm_misseg_homolog <<- rep(0, initial_N_clones)
-    for (clone in 1:initial_N_clones) {
-        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = clone)
-    }
+    for (clone in 1:initial_N_clones) SIMULATOR_FULL_PHASE_1_genotype_update(genotype = clone, time = T_start_time)
     #---------------------------------Set up the clonal evolution record
     N_clones <<- initial_N_clones
     assign("N_clones", N_clones, envir = .GlobalEnv)
@@ -287,8 +285,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
                             }
                         }
                         #   Update properties of daughter cells
-                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = genotype_daughter_1)
-                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = genotype_daughter_2)
+                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = genotype_daughter_1, time = T_current)
+                        SIMULATOR_FULL_PHASE_1_genotype_update(genotype = genotype_daughter_2, time = T_current)
                         #   Check if either daughter cell did not create a new clone
                         output <- SIMULATOR_FULL_PHASE_1_genotype_cleaning(genotype_to_react, genotype_daughter_1, genotype_daughter_2, position_to_react, position_daughter_1, position_daughter_2)
                         genotype_to_react <- output[[1]]

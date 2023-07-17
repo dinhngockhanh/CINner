@@ -1,6 +1,6 @@
 # =================UPDATE DNA LENGTH AND SELECTION RATES OF NEW GENOTYPES
 #' @export
-SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype) {
+SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype, time) {
     #-----------------------------Get the CN profile of the new genotype
     ploidy_chrom <- genotype_list_ploidy_chrom[[genotype]]
     ploidy_allele <- genotype_list_ploidy_allele[[genotype]]
