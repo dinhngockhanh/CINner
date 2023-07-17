@@ -35,12 +35,16 @@ simulator_multivar <- function(model_variables_base = list(),
                                R_libPaths = NULL,
                                plot = FALSE) {
     library(scales)
-    if (is.vector(var1_vals)) {
+    if (var1_name == "") {
+        rows <- -1
+    } else if (is.vector(var1_vals)) {
         rows <- length(var1_vals):1
     } else if (is.matrix(var1_vals)) {
         rows <- ncol(var1_vals):1
     }
-    if (is.vector(var2_vals)) {
+    if (var2_name == "") {
+        cols <- -1
+    } else if (is.vector(var2_vals)) {
         cols <- length(var2_vals):1
     } else if (is.matrix(var2_vals)) {
         cols <- ncol(var2_vals):1
@@ -49,12 +53,16 @@ simulator_multivar <- function(model_variables_base = list(),
     for (row in rows) {
         for (col in cols) {
             ind <- ind + 1
-            if (is.vector(var1_vals)) {
+            if (var1_name == "") {
+                var1_val <- NA
+            } else if (is.vector(var1_vals)) {
                 var1_val <- var1_vals[row]
             } else if (is.matrix(var1_vals)) {
                 var1_val <- var1_vals[, row]
             }
-            if (is.vector(var2_vals)) {
+            if (var2_name == "") {
+                var2_val <- NA
+            } else if (is.vector(var2_vals)) {
                 var2_val <- var2_vals[col]
             } else if (is.matrix(var2_vals)) {
                 var2_val <- var2_vals[, col]
@@ -95,6 +103,7 @@ simulator_multivar <- function(model_variables_base = list(),
                 model_variables$population_dynamics$Total_cell_count <- var1_val * sum(model_variables$population_dynamics$Total_cell_count) / sum(var1_val)
             } else if (var1_name == "scale_cell_count") {
                 model_variables$population_dynamics$Total_cell_count <- model_variables$population_dynamics$Total_cell_count * var1_val * length(model_variables$population_dynamics$Total_cell_count) / sum(model_variables$population_dynamics$Total_cell_count)
+            } else if (var1_name == "") {
             } else {
                 stop("VARIABLE 1 IS NOT RECOGNIZED")
             }
@@ -131,6 +140,7 @@ simulator_multivar <- function(model_variables_base = list(),
                 model_variables$population_dynamics$Total_cell_count <- var2_val * sum(model_variables$population_dynamics$Total_cell_count) / sum(var2_val)
             } else if (var2_name == "scale_cell_count") {
                 model_variables$population_dynamics$Total_cell_count <- model_variables$population_dynamics$Total_cell_count * var2_val * length(model_variables$population_dynamics$Total_cell_count) / sum(model_variables$population_dynamics$Total_cell_count)
+            } else if (var2_name == "") {
             } else {
                 stop("VARIABLE 2 IS NOT RECOGNIZED")
             }
@@ -145,20 +155,24 @@ simulator_multivar <- function(model_variables_base = list(),
             }
             model_variables <- CHECK_model_variables(model_variables)
             #   Save model variables
-            model_name <- paste0(model_prefix, "_")
-            if (!is.null(var1_labs)) {
-                model_name <- paste0(model_name, var1_name, "=", var1_labs[row], "_")
+            model_name <- paste0(model_prefix)
+            if (var1_name == "") {
+                model_name <- model_name
+            } else if (!is.null(var1_labs)) {
+                model_name <- paste0(model_name, "_", var1_name, "=", var1_labs[row])
             } else if (is.vector(var1_vals)) {
-                model_name <- paste0(model_name, var1_name, "=", scientific(var1_vals[row]), "_")
+                model_name <- paste0(model_name, "_", var1_name, "=", scientific(var1_vals[row]))
             } else if (is.matrix(var1_vals)) {
-                model_name <- paste0(model_name, var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]), "_")
+                model_name <- paste0(model_name, "_", var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]))
             }
-            if (!is.null(var2_labs)) {
-                model_name <- paste0(model_name, var2_name, "=", var2_labs[col])
+            if (var2_name == "") {
+                model_name <- model_name
+            } else if (!is.null(var2_labs)) {
+                model_name <- paste0(model_name, "_", var2_name, "=", var2_labs[col])
             } else if (is.vector(var2_vals)) {
-                model_name <- paste0(model_name, var2_name, "=", scientific(var2_vals[col]))
+                model_name <- paste0(model_name, "_", var2_name, "=", scientific(var2_vals[col]))
             } else if (is.matrix(var2_vals)) {
-                model_name <- paste0(model_name, var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
+                model_name <- paste0(model_name, "_", var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
             }
             SAVE_model_variables(model_name = model_name, model_variables = model_variables)
             #   Create simulations
@@ -166,12 +180,14 @@ simulator_multivar <- function(model_variables_base = list(),
             cat("=======================================================\n")
             cat("=======================================================\n")
             cat(paste("\nSIMULATIONS FOR BATCH ", ind, "/", length(rows) * length(cols), "...\n", sep = ""))
-            if (is.matrix(var1_vals)) {
+            if (var1_name == "") {
+            } else if (is.matrix(var1_vals)) {
                 cat(paste(var1_name, " = ", scientific(var1_vals[1, row]), " & ", scientific(var1_vals[2, row]), "\n", sep = ""))
             } else {
                 cat(paste(var1_name, " = ", scientific(var1_vals[row]), "\n", sep = ""))
             }
-            if (is.matrix(var2_vals)) {
+            if (var2_name == "") {
+            } else if (is.matrix(var2_vals)) {
                 cat(paste(var2_name, " = ", scientific(var2_vals[1, col]), " & ", scientific(var2_vals[2, col]), "\n", sep = ""))
             } else {
                 cat(paste(var2_name, " = ", scientific(var2_vals[col]), "\n", sep = ""))
@@ -222,35 +238,37 @@ simulator_multivar <- function(model_variables_base = list(),
                 #     R_libPaths = R_libPaths
                 # )
 
-                plot_cn_heatmap(
-                    model = model_name,
-                    n_simulations = n_simulations,
-                    folder_workplace = folder_workplace,
-                    folder_plots = folder_workplace,
-                    plotcol = "total-copy",
-                    CN_data = "TRUTH",
-                    phylo = "TRUTH",
-                    width = 1000,
-                    height = 1000,
-                    compute_parallel = compute_parallel,
-                    n_cores = n_cores,
-                    R_libPaths = R_libPaths
-                )
-
-                # plot_cn_heatmap(
-                #     model = model_name,
-                #     n_simulations = n_simulations,
-                #     folder_workplace = folder_workplace,
-                #     folder_plots = folder_workplace,
-                #     plotcol = "total-copy",
-                #     CN_data = "NEUTRAL-VARIATIONS",
-                #     phylo = "TRUTH",
-                #     width = 1000,
-                #     height = 1000,
-                #     compute_parallel = compute_parallel,
-                #     n_cores = n_cores,
-                #     R_libPaths = R_libPaths
-                # )
+                if (neutral_variations) {
+                    plot_cn_heatmap(
+                        model = model_name,
+                        n_simulations = n_simulations,
+                        folder_workplace = folder_workplace,
+                        folder_plots = folder_workplace,
+                        plotcol = "total-copy",
+                        CN_data = "NEUTRAL-VARIATIONS",
+                        phylo = "TRUTH",
+                        width = 1000,
+                        height = 1000,
+                        compute_parallel = compute_parallel,
+                        n_cores = n_cores,
+                        R_libPaths = R_libPaths
+                    )
+                } else {
+                    plot_cn_heatmap(
+                        model = model_name,
+                        n_simulations = n_simulations,
+                        folder_workplace = folder_workplace,
+                        folder_plots = folder_workplace,
+                        plotcol = "total-copy",
+                        CN_data = "TRUTH",
+                        phylo = "TRUTH",
+                        width = 1000,
+                        height = 1000,
+                        compute_parallel = compute_parallel,
+                        n_cores = n_cores,
+                        R_libPaths = R_libPaths
+                    )
+                }
 
                 end_time <- Sys.time()
                 print(end_time - start_time)
@@ -323,7 +341,9 @@ statistics_multivar_matrix <- function(model_prefix = "",
     library(viridis)
     library(hrbrthemes)
     library(scatterpie)
-    if (var1_name == "prob_CN_whole_genome_duplication") {
+    if (var1_name == "") {
+        var1_lab <- ""
+    } else if (var1_name == "prob_CN_whole_genome_duplication") {
         var1_lab <- "Probability of WGD"
     } else if (var1_name == "alpha_aneuploidy") {
         var1_lab <- "WGD-aneuploidy rate"
@@ -344,7 +364,9 @@ statistics_multivar_matrix <- function(model_prefix = "",
     } else {
         stop("VARIABLE 1 IS NOT RECOGNIZED")
     }
-    if (var2_name == "prob_CN_whole_genome_duplication") {
+    if (var2_name == "") {
+        var2_lab <- ""
+    } else if (var2_name == "prob_CN_whole_genome_duplication") {
         var2_lab <- "Probability of WGD"
     } else if (var2_name == "alpha_aneuploidy") {
         var2_lab <- "WGD-aneuploidy rate"
@@ -365,12 +387,16 @@ statistics_multivar_matrix <- function(model_prefix = "",
     } else {
         stop("VARIABLE 2 IS NOT RECOGNIZED")
     }
-    if (is.vector(var1_vals)) {
+    if (var1_name == "") {
+        rows <- -1
+    } else if (is.vector(var1_vals)) {
         rows <- length(var1_vals):1
     } else if (is.matrix(var1_vals)) {
         rows <- ncol(var1_vals):1
     }
-    if (is.vector(var2_vals)) {
+    if (var2_name == "") {
+        cols <- -1
+    } else if (is.vector(var2_vals)) {
         cols <- length(var2_vals):1
     } else if (is.matrix(var2_vals)) {
         cols <- ncol(var2_vals):1
@@ -382,25 +408,31 @@ statistics_multivar_matrix <- function(model_prefix = "",
         for (col in cols) {
             ind <- ind + 1
             cat(paste("\nSTATISTICS FOR BATCH ", ind, "/", length(rows) * length(cols), "...\n", sep = ""))
-            filename_prefix <<- paste0(folder_workplace, "/", model_prefix, "_")
-            if (!is.null(var1_labs)) {
-                filename_prefix <<- paste0(filename_prefix, var1_name, "=", var1_labs[row], "_")
+            filename_prefix <<- paste0(folder_workplace, "/", model_prefix)
+            if (var1_name == "") {
+                filename_prefix <<- filename_prefix
+                var1 <- NA
+            } else if (!is.null(var1_labs)) {
+                filename_prefix <<- paste0(filename_prefix, "_", var1_name, "=", var1_labs[row])
                 var1 <- var1_labs[row]
             } else if (is.vector(var1_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[row]), "_")
+                filename_prefix <<- paste0(filename_prefix, "_", var1_name, "=", scientific(var1_vals[row]))
                 var1 <- scientific(var1_vals[row])
             } else if (is.matrix(var1_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]), "_")
+                filename_prefix <<- paste0(filename_prefix, "_", var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]))
                 var1 <- scientific(var1_vals[1, row])
             }
-            if (!is.null(var2_labs)) {
-                filename_prefix <<- paste0(filename_prefix, var2_name, "=", var2_labs[col])
+            if (var2_name == "") {
+                filename_prefix <<- filename_prefix
+                var2 <- NA
+            } else if (!is.null(var2_labs)) {
+                filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", var2_labs[col])
                 var2 <- var2_labs[col]
             } else if (is.vector(var2_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[col]))
+                filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", scientific(var2_vals[col]))
                 var2 <- scientific(var2_vals[col])
             } else if (is.matrix(var2_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
+                filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
                 var2 <- scientific(var2_vals[1, col])
             }
             if (compute_parallel == FALSE) {
@@ -409,7 +441,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
                 df_stat_sims_list <- vector("list", n_simulations)
                 for (sim in 1:n_simulations) {
                     filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                    df_stat_sim <- statistics_multivar_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg)
+                    df_stat_sim <- statistics_multivar_matrix_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg)
                     df_stat_sims_list[[sim]] <- df_stat_sim
                 }
             } else {
@@ -448,14 +480,14 @@ statistics_multivar_matrix <- function(model_prefix = "",
                     "var1",
                     "var2",
                     "plot_WGD",
-                    "statistics_multivar_one_simulation",
+                    "statistics_multivar_matrix_one_simulation",
                     "get_cn_profile", "normalize_cell_ploidy", "calc_state_mode"
                 ))
                 #   Get statistics in parallel
                 pbo <- pboptions(type = "txt")
                 df_stat_sims_list <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(sim) {
                     filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                    df_stat_sim <- statistics_multivar_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg)
+                    df_stat_sim <- statistics_multivar_matrix_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg)
                     return(df_stat_sim)
                 })
                 #   Stop parallel cluster
@@ -476,25 +508,31 @@ statistics_multivar_matrix <- function(model_prefix = "",
     for (row in rows) {
         for (col in cols) {
             ind <- ind + 1
-            filename_prefix <<- paste0(folder_workplace, "/", model_prefix, "_")
-            if (!is.null(var1_labs)) {
-                filename_prefix <<- paste0(filename_prefix, var1_name, "=", var1_labs[row], "_")
+            filename_prefix <<- paste0(folder_workplace, "/", model_prefix)
+            if (var1_name == "") {
+                filename_prefix <<- filename_prefix
+                var1 <- NA
+            } else if (!is.null(var1_labs)) {
+                filename_prefix <<- paste0(filename_prefix, "_", var1_name, "=", var1_labs[row])
                 var1 <- var1_labs[row]
             } else if (is.vector(var1_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[row]), "_")
+                filename_prefix <<- paste0(filename_prefix, "_", var1_name, "=", scientific(var1_vals[row]))
                 var1 <- scientific(var1_vals[row])
             } else if (is.matrix(var1_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]), "_")
+                filename_prefix <<- paste0(filename_prefix, "_", var1_name, "=", scientific(var1_vals[1, row]), "&", scientific(var1_vals[2, row]))
                 var1 <- scientific(var1_vals[1, row])
             }
-            if (!is.null(var2_labs)) {
-                filename_prefix <<- paste0(filename_prefix, var2_name, "=", var2_labs[col])
+            if (var2_name == "") {
+                filename_prefix <<- filename_prefix
+                var2 <- NA
+            } else if (!is.null(var2_labs)) {
+                filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", var2_labs[col])
                 var2 <- var2_labs[col]
             } else if (is.vector(var2_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[col]))
+                filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", scientific(var2_vals[col]))
                 var2 <- scientific(var2_vals[col])
             } else if (is.matrix(var2_vals)) {
-                filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
+                filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", scientific(var2_vals[1, col]), "&", scientific(var2_vals[2, col]))
                 var2 <- scientific(var2_vals[1, col])
             }
             filename <- paste0(filename_prefix, "_simulation_stats.rda")
@@ -504,6 +542,9 @@ statistics_multivar_matrix <- function(model_prefix = "",
     }
     df_stat_sims_all <- rbindlist(df_stat_sims_all_list)
     save(df_stat_sims_all, file = paste0(folder_workplace, "/", model_prefix, "_", "simulation_stats.rda"))
+    if ((var1_name == "") | (var2_name == "")) {
+        return()
+    }
     #-----------------------------------------Compute average statistics
     load(paste0(folder_workplace, "/", model_prefix, "_", "simulation_stats.rda"))
     df_ploidy_dist <- data.frame(matrix(ncol = 7, nrow = 0))
@@ -1268,7 +1309,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
 }
 
 #' @export
-statistics_multivar_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg) {
+statistics_multivar_matrix_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD, plot_misseg) {
     load(filename)
     #--------------------------------Create dataframe for all statistics
     df_stat_sim <- data.frame(matrix(ncol = 5, nrow = 0))
@@ -1634,7 +1675,9 @@ statistics_multivar_vector <- function(model_prefix = "",
     library(gridExtra)
     library(ggplot2)
     library(signals)
-    if (!is.null(var1_labs)) {
+    if (var1_name == "") {
+        inds <- -1
+    } else if (!is.null(var1_labs)) {
         inds <- 1:length(var1_labs)
     } else if (is.vector(var1_vals)) {
         inds <- 1:length(var1_vals)
@@ -1646,24 +1689,30 @@ statistics_multivar_vector <- function(model_prefix = "",
     for (ind in inds) {
         cat(paste("\nSTATISTICS FOR BATCH ", ind, "/", length(inds), "...\n", sep = ""))
         filename_prefix <<- paste0(folder_workplace, "/", model_prefix, "_")
-        if (!is.null(var1_labs)) {
-            filename_prefix <<- paste0(filename_prefix, var1_name, "=", var1_labs[ind], "_")
+        if (var1_name == "") {
+            filename_prefix <<- filename_prefix
+            var1 <- NA
+        } else if (!is.null(var1_labs)) {
+            filename_prefix <<- paste0(filename_prefix, var1_name, "=", var1_labs[ind])
             var1 <- var1_labs[ind]
         } else if (is.vector(var1_vals)) {
-            filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[ind]), "_")
+            filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[ind]))
             var1 <- scientific(var1_vals[ind])
         } else if (is.matrix(var1_vals)) {
-            filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[1, ind]), "&", scientific(var1_vals[2, ind]), "_")
+            filename_prefix <<- paste0(filename_prefix, var1_name, "=", scientific(var1_vals[1, ind]), "&", scientific(var1_vals[2, ind]))
             var1 <- scientific(var1_vals[1, ind])
         }
-        if (!is.null(var2_labs)) {
-            filename_prefix <<- paste0(filename_prefix, var2_name, "=", var2_labs[ind])
+        if (var2_name == "") {
+            filename_prefix <<- filename_prefix
+            var2 <- NA
+        } else if (!is.null(var2_labs)) {
+            filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", var2_labs[ind])
             var2 <- var2_labs[ind]
         } else if (is.vector(var2_vals)) {
-            filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[ind]))
+            filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", scientific(var2_vals[ind]))
             var2 <- scientific(var2_vals[ind])
         } else if (is.matrix(var2_vals)) {
-            filename_prefix <<- paste0(filename_prefix, var2_name, "=", scientific(var2_vals[1, ind]), "&", scientific(var2_vals[2, ind]))
+            filename_prefix <<- paste0(filename_prefix, "_", var2_name, "=", scientific(var2_vals[1, ind]), "&", scientific(var2_vals[2, ind]))
             var2 <- scientific(var2_vals[1, ind])
         }
         if (compute_parallel == FALSE) {
@@ -1671,7 +1720,7 @@ statistics_multivar_vector <- function(model_prefix = "",
             df_stat_sims_list <- vector("list", n_simulations)
             for (sim in 1:n_simulations) {
                 filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                df_stat_sim <- simulation_statistics_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
+                df_stat_sim <- statistics_multivar_vector_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
                 df_stat_sims_list[[sim]] <- df_stat_sim
             }
         } else {
@@ -1701,7 +1750,7 @@ statistics_multivar_vector <- function(model_prefix = "",
             var1 <<- var1
             var2 <<- var2
             plot_WGD <<- plot_WGD
-            simulation_statistics_one_simulation <<- simulation_statistics_one_simulation
+            statistics_multivar_vector_one_simulation <<- statistics_multivar_vector_one_simulation
             clusterExport(cl, varlist = c(
                 "filename_prefix",
                 "var1_name",
@@ -1709,13 +1758,13 @@ statistics_multivar_vector <- function(model_prefix = "",
                 "var1",
                 "var2",
                 "plot_WGD",
-                "simulation_statistics_one_simulation"
+                "statistics_multivar_vector_one_simulation"
             ))
             #   Get statistics in parallel
             pbo <- pboptions(type = "txt")
             df_stat_sims_list <- pblapply(cl = cl, X = 1:n_simulations, FUN = function(sim) {
                 filename <- paste0(filename_prefix, "_simulation_", sim, ".rda")
-                df_stat_sim <- simulation_statistics_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
+                df_stat_sim <- statistics_multivar_vector_one_simulation(filename, var1_name, var2_name, var1, var2, sim, plot_WGD)
                 return(df_stat_sim)
             })
             #   Stop parallel cluster
@@ -2048,7 +2097,7 @@ statistics_multivar_vector <- function(model_prefix = "",
     }
 }
 
-simulation_statistics_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD) {
+statistics_multivar_vector_one_simulation <- function(filename, var1_name, var2_name, var1, var2, sim, plot_WGD) {
     load(filename)
     #--------------------------------Create dataframe for all statistics
     df_stat_sim <- data.frame(matrix(ncol = 5, nrow = 0))
