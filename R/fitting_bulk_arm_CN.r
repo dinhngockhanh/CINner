@@ -702,9 +702,11 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         setTxtProgressBar(pb, i)
         cancer_type <- DATA_cancer_types[i]
         copynumber_DATA <- DATA_cancer_type_cn[[i]]
-        DATA_statistics <- DATA_WGD(copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info)
-        WGD_proportion <- DATA_statistics$WGD_proportion
-        WGD_increased_FGA <- DATA_statistics$WGD_increased_FGA
+        # DATA_statistics <- DATA_WGD(copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info)
+        DATA_statistics <- get_WGD_stats_from_data(copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info, list_targets = c("WGD_proportion", "FGA_difference"))
+        print(DATA_statistics)
+        WGD_proportion <- DATA_statistics[1]
+        WGD_increased_FGA <- DATA_statistics[2]
         df_WGD_FGA[i, ] <- c(cancer_type, WGD_proportion, WGD_increased_FGA)
     }
     cat("\n")
@@ -751,149 +753,150 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     tmp <- cor.test(FIT_onc_mean_selection_rate, DATA_wgd_proportion, method = "spearman", exact = FALSE)
     p_val_ONC_mean_selection_rate <- tmp$p.value
     #---Positions for p-values
+    x_left <- 0.0
     x_right <- 0.75
     y_down <- 0.0
-    y_up <- 0.9
-    #---Plot relationship between WGD status and count of TSG/ONCOGENE arms
-    filename <- paste0(plotname, "_WGD_vs_counts_TSG_ONC.jpeg")
+    y_up <- 0.95
+    #---Plot relationship between WGD status and count of GAIN/LOSS arms
+    filename <- paste0(plotname, "_WGD_vs_GAIN&LOSS_counts.jpeg")
     jpeg(filename, width = 1000, height = 1100)
     p <- ggplot(df_plot, aes(x = TSG_count, y = ONC_count, color = WGD)) +
         geom_point(size = 10) +
         geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + (x_right + 0.05) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            xend = min(df_plot$TSG_count) + (x_left + 0.05) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             yend = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + (x_right + 0.07) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + (x_left + 0.07) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            label = paste0("p.val=", scientific(p_val_TSG_count)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_TSG_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            xend = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             yend = min(df_plot$ONC_count) + (y_up + 0.05) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$ONC_count) + (y_up + 0.07) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            label = paste0("p.val=", scientific(p_val_ONC_count)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_ONC_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
-        xlab("Count of TSG arms") +
-        ylab("Count of ONC arms") +
+        xlab("Count of LOSS arms") +
+        ylab("Count of GAIN arms") +
         labs(fill = "WGD proportion") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
-    #---Plot relationship between WGD status and selection rates of TSG/ONCOGENE arms
-    filename <- paste0(plotname, "_WGD_vs_selection_rates_TSG_ONC.jpeg")
+    #---Plot relationship between WGD status and selection rates of GAIN/LOSS arms
+    filename <- paste0(plotname, "_WGD_vs_GAIN&LOSS_selection_rates.jpeg")
     jpeg(filename, width = 1000, height = 1100)
     p <- ggplot(df_plot, aes(x = TSG_mean_selection_rate, y = ONC_mean_selection_rate, color = WGD)) +
         geom_point(size = 10) +
         geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
         annotate("segment",
-            x = min(df_plot$TSG_mean_selection_rate) + x_right * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            xend = min(df_plot$TSG_mean_selection_rate) + (x_right + 0.05) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            xend = min(df_plot$TSG_mean_selection_rate) + (x_left + 0.05) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             yend = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_mean_selection_rate) + (x_right + 0.07) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot$TSG_mean_selection_rate) + (x_left + 0.07) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$TSG_mean_selection_rate) + x_right * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            xend = min(df_plot$TSG_mean_selection_rate) + x_right * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            xend = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             yend = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.05) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_mean_selection_rate) + x_right * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             y = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.07) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
-        xlab("Mean selection rate of TSG arms") +
-        ylab("Mean selection rate of ONC arms") +
+        xlab("Mean selection rate of LOSS arms") +
+        ylab("Mean selection rate of GAIN arms") +
         labs(fill = "WGD proportion") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
-    #---Plot relationship between WGD status and count/mean selection rate of TSG arms
-    filename <- paste0(plotname, "_WGD_vs_fitted_TSG.jpeg")
+    #---Plot relationship between WGD status and count/mean selection rate of LOSS arms
+    filename <- paste0(plotname, "_WGD_vs_LOSS_fitted.jpeg")
     jpeg(filename, width = 1000, height = 1100)
     p <- ggplot(df_plot, aes(x = TSG_count, y = TSG_mean_selection_rate, color = WGD)) +
         geom_point(size = 10) +
         geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + (x_right + 0.05) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            xend = min(df_plot$TSG_count) + (x_left + 0.05) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             yend = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + (x_right + 0.07) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + (x_left + 0.07) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            label = paste0("p.val=", scientific(p_val_TSG_count)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_TSG_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            xend = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             yend = min(df_plot$TSG_mean_selection_rate) + (y_up + 0.05) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + x_right * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
+            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
             y = min(df_plot$TSG_mean_selection_rate) + (y_up + 0.07) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
-        xlab("Count of TSG arms") +
-        ylab("Mean selection rate of TSG arms") +
+        xlab("Count of LOSS arms") +
+        ylab("Mean selection rate of LOSS arms") +
         labs(fill = "WGD proportion") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
-    #---Plot relationship between WGD status and count/mean selection rate of ONCOGENE arms
-    filename <- paste0(plotname, "_WGD_vs_fitted_ONC.jpeg")
+    #---Plot relationship between WGD status and count/mean selection rate of GAIN arms
+    filename <- paste0(plotname, "_WGD_vs_GAIN_fitted.jpeg")
     jpeg(filename, width = 1000, height = 1100)
     p <- ggplot(df_plot, aes(x = ONC_count, y = ONC_mean_selection_rate, color = WGD)) +
         geom_point(size = 10) +
         geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1, point.padding = 0.5) +
         annotate("segment",
-            x = min(df_plot$ONC_count) + x_right * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            xend = min(df_plot$ONC_count) + (x_right + 0.05) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            xend = min(df_plot$ONC_count) + (x_left + 0.05) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             yend = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$ONC_count) + (x_right + 0.07) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot$ONC_count) + (x_left + 0.07) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            label = paste0("p.val=", scientific(p_val_ONC_count)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_ONC_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$ONC_count) + x_right * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            xend = min(df_plot$ONC_count) + x_right * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            xend = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             yend = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.05) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$ONC_count) + x_right * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
             y = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.07) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate)), colour = "black", size = 8, hjust = 0
+            label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
-        xlab("Count of ONC arms") +
-        ylab("Mean selection rate of ONC arms") +
+        xlab("Count of GAIN arms") +
+        ylab("Mean selection rate of GAIN arms") +
         labs(fill = "WGD proportion") +
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)

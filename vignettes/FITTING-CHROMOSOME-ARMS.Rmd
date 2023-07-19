@@ -100,17 +100,17 @@ list_targets_library <- model_variables$chromosome_arm_library$Arm_ID
 We then create a simulated arm-level library with CancerSimulator:
 
 ```{r}
-start_time <- Sys.time()
-library_bulk_arm_CN(
-    library_name = library_name,
-    model_variables = model_variables,
-    list_parameters = list_parameters_library,
-    list_targets = list_targets_library,
-    ABC_simcount = 2000,
-    n_samples = 100
-)
-end_time <- Sys.time()
-print(end_time - start_time)
+# start_time <- Sys.time()
+# library_bulk_arm_CN(
+#     library_name = library_name,
+#     model_variables = model_variables,
+#     list_parameters = list_parameters_library,
+#     list_targets = list_targets_library,
+#     ABC_simcount = 2000,
+#     n_samples = 100
+# )
+# end_time <- Sys.time()
+# print(end_time - start_time)
 ```
 
 #   Fit the Copy Number data for pan-cancer from TCGA
@@ -118,39 +118,39 @@ print(end_time - start_time)
 We first load the pan-cancer arm-level gain/loss data from TCGA:
 
 ```{r}
-copynumber_DATA <- read.csv(file = system.file("extdata", "Davoli_Charm_score.csv", package = "CancerSimulator"))
-copynumber_DATA <- copynumber_DATA[, c(1, 2, 3, 14, 15)]
-colnames(copynumber_DATA) <- c("Arm", "Del_freq_all", "Amp_freq_all", "Charm.TSG.OG.score", "Charm.TSG.OG.Ess.score")
+# copynumber_DATA <- read.csv(file = system.file("extdata", "Davoli_Charm_score.csv", package = "CancerSimulator"))
+# copynumber_DATA <- copynumber_DATA[, c(1, 2, 3, 14, 15)]
+# colnames(copynumber_DATA) <- c("Arm", "Del_freq_all", "Amp_freq_all", "Charm.TSG.OG.score", "Charm.TSG.OG.Ess.score")
 ```
 
 Limit the list of parameters to chromosome arms with available data:
 
 ```{r}
-list_targets <- copynumber_DATA$Arm
-list_parameters <- list_parameters_library[c(
-    which(list_parameters_library$Type == "CNA_probability"),
-    which(list_parameters_library$Type == "Arm_selection_rate" & list_parameters_library$Variable %in% copynumber_DATA$Arm)
-), ]
+# list_targets <- copynumber_DATA$Arm
+# list_parameters <- list_parameters_library[c(
+#     which(list_parameters_library$Type == "CNA_probability"),
+#     which(list_parameters_library$Type == "Arm_selection_rate" & list_parameters_library$Variable %in% copynumber_DATA$Arm)
+# ), ]
 ```
 
 We then run the fitting routine:
 
 ```{r}
-cat(paste0("\n\n\nFITTING FOR PAN-CANCER\n"))
-fitting_bulk_arm_CN(
-    library_name = library_name,
-    model_name = "PAN-CANCER",
-    model_variables = model_variables,
-    copynumber_DATA = copynumber_DATA,
-    list_parameters = list_parameters,
-    list_parameters_library = list_parameters_library,
-    list_targets = list_targets,
-    list_targets_library = list_targets_library,
-    library_shuffle = TRUE,
-    type_sample_DATA = "average",
-    type_cn_DATA = "arm",
-    folder_workplace = library_name
-)
+# cat(paste0("\n\n\nFITTING FOR PAN-CANCER\n"))
+# fitting_bulk_arm_CN(
+#     library_name = library_name,
+#     model_name = "PAN-CANCER",
+#     model_variables = model_variables,
+#     copynumber_DATA = copynumber_DATA,
+#     list_parameters = list_parameters,
+#     list_parameters_library = list_parameters_library,
+#     list_targets = list_targets,
+#     list_targets_library = list_targets_library,
+#     library_shuffle = TRUE,
+#     type_sample_DATA = "average",
+#     type_cn_DATA = "arm",
+#     folder_workplace = library_name
+# )
 ```
 
 #   Fit the Copy Number data for each cancer type from PCAWG
@@ -217,7 +217,7 @@ Combine CN profiles for all samples of each PCAWG cancer type into one:
 copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
     cancer_type <- PCAWG_cancer_types[i]
-    cancer_type_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[[i]]
+    cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
     copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
     for (j in 1:length(cancer_type_sample_ids)) {
         sample_id <- cancer_type_sample_ids[j]
@@ -229,6 +229,21 @@ for (i in 1:length(PCAWG_cancer_types)) {
     }
     copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
 }
+copynumber_DATA_nonWGD_cancer_types <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    cancer_type <- PCAWG_cancer_types[i]
+    cancer_type_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[[i]]
+    copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
+    for (j in 1:length(cancer_type_sample_ids)) {
+        sample_id <- cancer_type_sample_ids[j]
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
+        tmp <- tmp[which(tmp$star >= 2), ]
+        tmp$donor_unique_id <- sample_id
+        copynumber_DATA_ls[[j]] <- tmp
+    }
+    copynumber_DATA_nonWGD_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+}
 ```
 
 ```{r}
@@ -239,24 +254,24 @@ list_parameters <- list_parameters_library
 Fit the chromosome-arm-level gain/loss frequencies with ABC random forest:
 
 ```{r}
-for (i in 1:length(PCAWG_cancer_types)) {
-    cancer_type <- PCAWG_cancer_types[i]
-    copynumber_DATA <- copynumber_DATA_cancer_types[[i]]
-    cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
-    fitting_bulk_arm_CN(
-        library_name = library_name,
-        model_name = cancer_type,
-        model_variables = model_variables,
-        copynumber_DATA = copynumber_DATA,
-        list_parameters = list_parameters,
-        list_parameters_library = list_parameters_library,
-        list_targets = list_targets,
-        list_targets_library = list_targets_library,
-        bound_freq = 0.1,
-        library_shuffle = TRUE,
-        folder_workplace = library_name
-    )
-}
+# for (i in 1:length(PCAWG_cancer_types)) {
+#     cancer_type <- PCAWG_cancer_types[i]
+#     copynumber_DATA <- copynumber_DATA_nonWGD_cancer_types[[i]]
+#     cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
+#     fitting_bulk_arm_CN(
+#         library_name = library_name,
+#         model_name = cancer_type,
+#         model_variables = model_variables,
+#         copynumber_DATA = copynumber_DATA,
+#         list_parameters = list_parameters,
+#         list_parameters_library = list_parameters_library,
+#         list_targets = list_targets,
+#         list_targets_library = list_targets_library,
+#         bound_freq = 0.1,
+#         library_shuffle = TRUE,
+#         folder_workplace = library_name
+#     )
+# }
 ```
 
 #   Statistics for PCAWG cancer types
