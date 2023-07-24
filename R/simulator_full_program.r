@@ -318,12 +318,21 @@ one_simulation <- function(iteration,
                            output_variables) {
     # =============================================LOAD MODEL PARAMETERS
     model_parameters <- SIMULATOR_VARIABLES_for_simulation(model_parameters)
+    # =============================OPTION TO MINIMIZE MEMORY REQUIREMENT
+    if (lite_memory == FALSE) {
+        option_lite_memory <- 0
+    } else {
+        option_lite_memory <- stage_final
+    }
     # ============================================PRODUCE ONE SIMULATION
     flag_success <- 0
     while (flag_success == 0) {
         #----------------------------------Simulate the clonal evolution
         if (report_progress == TRUE) cat("\nStage 1: clonal evolution...\n")
-        output <- SIMULATOR_FULL_PHASE_1_main(report_progress)
+        output <- SIMULATOR_FULL_PHASE_1_main(
+            option_lite_memory = option_lite_memory,
+            report_progress = report_progress
+        )
         flag_success <- output$flag_success
         package_clonal_evolution <- output$package_clonal_evolution
         if (flag_success == 0) {
@@ -333,7 +342,10 @@ one_simulation <- function(iteration,
         #--------------------------------------------Simulate the sample
         if (stage_final >= 2) {
             if (report_progress == TRUE) cat("\nStage 2: sampling...\n")
-            package_sample <- SIMULATOR_FULL_PHASE_2_main(package_clonal_evolution, report_progress)
+            package_sample <- SIMULATOR_FULL_PHASE_2_main(
+                package_clonal_evolution = package_clonal_evolution,
+                report_progress = report_progress
+            )
             N_clones <- nrow(package_sample$table_clone_ID_vs_letters)
             if ((N_clones < n_clones_min) | (N_clones > n_clones_max)) {
                 flag_success <- 0
@@ -344,12 +356,21 @@ one_simulation <- function(iteration,
         #---------------------------Simulate the phylogeny of the sample
         if (stage_final >= 3) {
             if (report_progress == TRUE) cat("\nStage 3: sample phylogeny...\n")
-            package_sample_phylogeny <- SIMULATOR_FULL_PHASE_3_main(package_clonal_evolution, package_sample, report_progress)
+            package_sample_phylogeny <- SIMULATOR_FULL_PHASE_3_main(
+                package_clonal_evolution = package_clonal_evolution,
+                package_sample = package_sample,
+                report_progress = report_progress
+            )
         }
         #------------------Simulate the neutral variations within clones
         if (stage_final >= 4) {
             if (report_progress == TRUE) cat("\nStage 4: subclonal neutral variations...\n")
-            package_sample_with_neutral_variations <- SIMULATOR_FULL_PHASE_4_main(package_clonal_evolution, package_sample, package_sample_phylogeny, report_progress)
+            package_sample_with_neutral_variations <- SIMULATOR_FULL_PHASE_4_main(
+                package_clonal_evolution = package_clonal_evolution,
+                package_sample = package_sample,
+                package_sample_phylogeny = package_sample_phylogeny,
+                report_progress = report_progress
+            )
         }
     }
     if (report_progress == TRUE) cat("\n")

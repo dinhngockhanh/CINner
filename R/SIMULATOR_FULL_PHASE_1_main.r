@@ -1,5 +1,5 @@
 #' @export
-SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
+SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
     #----------------------------Set up execution mode of CNA mechanisms
     mode_CN_WGD <<- sub(":.*", "", formula_CN_whole_genome_duplication)
     mode_CN_misseg <<- sub(":.*", "", formula_CN_missegregation)
@@ -316,7 +316,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(report_progress) {
             }
         }
         #   Clean clonal populations
-        SIMULATOR_FULL_PHASE_1_clonal_population_cleaning()
+        SIMULATOR_FULL_PHASE_1_clonal_population_cleaning(option_lite_memory)
         #   Update clonal populations
         clonal_population_current <<- clonal_population_next
         #   Update time
