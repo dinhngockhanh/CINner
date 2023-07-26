@@ -41,11 +41,11 @@ get_WGD_stats_from_data <- function(copynumber_DATA,
         df_sample_stats$FGA[i] <- length(which(sample_CN != 2)) / length(sample_CN)
     }
     #---Extract statistics
-    stat <- rep(0, length = length(list_targets))
+    stat <- list()
     for (i in 1:length(list_targets)) {
         target <- list_targets[i]
         if (target == "WGD_proportion") {
-            stat[i] <- length(which(df_sample_stats$WGD == 1)) / length(df_sample_stats$WGD)
+            stat$WGD_proportion <- length(which(df_sample_stats$WGD == 1)) / length(df_sample_stats$WGD)
         } else if (target == "FGA_difference") {
             if (length(which(df_sample_stats$WGD == 1)) > 0) {
                 FGA_WGD <- df_sample_stats$FGA[which(df_sample_stats$WGD == 1)]
@@ -57,7 +57,9 @@ get_WGD_stats_from_data <- function(copynumber_DATA,
             } else {
                 FGA_nonWGD <- 0
             }
-            stat[i] <- mean(FGA_WGD) - mean(FGA_nonWGD)
+            stat$FGA_difference <- mean(FGA_WGD) - mean(FGA_nonWGD)
+        } else if (target == "WGD_FGA_by_sample") {
+            stat$WGD_FGA_by_sample <- df_sample_stats
         }
     }
     #---Return statistics for sample cohort

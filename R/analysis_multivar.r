@@ -350,9 +350,9 @@ statistics_multivar_matrix <- function(model_prefix = "",
     } else if (var1_name == "scale_selection") {
         var1_lab <- "Scale of selection rates"
     } else if (var1_name == "scale_selection_gain") {
-        var1_lab <- "Scale of selection rates for ONCOGENE arms"
+        var1_lab <- "Scale of selection rates for GAIN arms"
     } else if (var1_name == "scale_selection_loss") {
-        var1_lab <- "Scale of selection rates for TSG arms"
+        var1_lab <- "Scale of selection rates for LOSS arms"
     } else if (var1_name == "delta_selection") {
         var1_lab <- "Selection rate"
     } else if (var1_name == "prob_CN_missegregation") {
@@ -373,9 +373,9 @@ statistics_multivar_matrix <- function(model_prefix = "",
     } else if (var2_name == "scale_selection") {
         var2_lab <- "Scale of selection rates"
     } else if (var2_name == "scale_selection_gain") {
-        var2_lab <- "Scale of selection rates for ONCOGENE arms"
+        var2_lab <- "Scale of selection rates for GAIN arms"
     } else if (var2_name == "scale_selection_loss") {
-        var2_lab <- "Scale of selection rates for TSG arms"
+        var2_lab <- "Scale of selection rates for LOSS arms"
     } else if (var2_name == "delta_selection") {
         var2_lab <- "Selection rate"
     } else if (var2_name == "prob_CN_missegregation") {
@@ -741,13 +741,7 @@ statistics_multivar_matrix <- function(model_prefix = "",
             }
         }
     }
-
-
-
-    print(df_stat_average)
-
-
-
+    # print(df_stat_average)
     save(df_stat_average, file = paste0(folder_workplace, "/", model_prefix, "_average_stats.rda"))
     save(df_ploidy_dist, file = paste0(folder_workplace, "/", model_prefix, "_ploidy_distribution.rda"))
     save(df_nonviability, file = paste0(folder_workplace, "/", model_prefix, "_nonviability.rda"))

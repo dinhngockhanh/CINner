@@ -638,6 +638,61 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     library(ggplot2)
     library(ggrepel)
     library(scales)
+    #-------------------------Find genome coordinate from one simulation
+    cn_info <- model_variables$cn_info
+    copynumber_sims <- simulator_full_program(
+        model = model_variables,
+        model_prefix = "TEST",
+        n_simulations = 1,
+        stage_final = 2,
+        save_simulation = FALSE,
+        report_progress = FALSE,
+        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+    )
+    simulation <- copynumber_sims[[1]]
+    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
+    CNbins_iteration <- sample_genotype_unique_profile[[1]]
+    copynumber_coordinates <- CNbins_iteration[, 1:3]
+    copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
+    #----------------Find WGD rate & FGA difference for each cancer type
+    df_WGD_FGA <- data.frame(matrix(0, nrow = length(DATA_cancer_types), ncol = 3))
+    colnames(df_WGD_FGA) <- c("cancer_type", "WGD", "WGD_increased_FGA")
+    pb <- txtProgressBar(min = 0, max = length(DATA_cancer_types), style = 3, width = 50, char = "=")
+    # for (i in 1:length(DATA_cancer_types)) {
+    for (i in 1:2) {
+        setTxtProgressBar(pb, i)
+        cancer_type <- DATA_cancer_types[i]
+        copynumber_DATA <- DATA_cancer_type_cn[[i]]
+        #   Find statistics for each cancer type
+        DATA_statistics <- get_WGD_stats_from_data(
+            copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info,
+            list_targets = c("WGD_proportion", "FGA_difference", "WGD_FGA_by_sample")
+        )
+        #   Get WGD proportion for each cancer type
+        WGD_proportion <- DATA_statistics$WGD_proportion
+        #   Get WGD-associated FGA difference for each cancer type
+        WGD_increased_FGA <- DATA_statistics$FGA_difference
+        #   Get table of sample WGD and FGA for each cancer type
+        WGD_FGA_by_sample <- DATA_statistics$WGD_FGA_by_sample
+        df_tmp <- data.frame(
+            cancer_type = cancer_type,
+            WGD = WGD_FGA_by_sample$WGD,
+            FGA = WGD_FGA_by_sample$FGA
+        )
+        if (i == 1) {
+            df_WGD_FGA_by_sample <- df_tmp
+        } else {
+            df_WGD_FGA_by_sample <- rbind(df_WGD_FGA_by_sample, df_tmp)
+        }
+        df_WGD_FGA[i, ] <- c(cancer_type, WGD_proportion, WGD_increased_FGA)
+    }
+    cat("\n")
+    df_WGD_FGA$WGD <- as.numeric(df_WGD_FGA$WGD)
+    df_WGD_FGA$WGD_increased_FGA <- as.numeric(df_WGD_FGA$WGD_increased_FGA)
+    write.csv(df_WGD_FGA, file = paste0(plotname, ".csv"))
+    if (length(which(df_WGD_FGA$WGD == 0)) > 0) {
+        df_WGD_FGA <- df_WGD_FGA[-which(df_WGD_FGA$WGD == 0), ]
+    }
     #---------------------------Find WGD proportions in each cancer type
     DATA_wgd_proportion <- rep(0, length(DATA_cancer_types))
     for (i in 1:length(DATA_cancer_types)) {
@@ -677,48 +732,54 @@ statistics_bulk_arm_WGD_status <- function(plotname,
             # FIT_onc_max_selection_rate[i] <- max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
         }
     }
-    #-------------------------Find genome coordinate from one simulation
-    cn_info <- model_variables$cn_info
-    copynumber_sims <- simulator_full_program(
-        model = model_variables,
-        model_prefix = "TEST",
-        n_simulations = 1,
-        stage_final = 2,
-        save_simulation = FALSE,
-        report_progress = FALSE,
-        output_variables = c("all_sample_genotype", "sample_cell_ID", "sample_genotype_unique", "sample_genotype_unique_profile")
+
+    #-------------Plot data FGA violin plots by cancer type & WGD status
+    geom_split_violin <- function(mapping = NULL, data = NULL, stat = "ydensity", position = "identity", ...,
+                                  draw_quantiles = NULL, trim = TRUE, scale = "area", na.rm = FALSE,
+                                  show.legend = NA, inherit.aes = TRUE) {
+        layer(
+            data = data, mapping = mapping, stat = stat, geom = GeomSplitViolin,
+            position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+            params = list(trim = trim, scale = scale, draw_quantiles = draw_quantiles, na.rm = na.rm, ...)
+        )
+    }
+
+
+    #   Function to make splitted violin plots
+    GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin,
+        draw_group = function(self, data, ..., draw_quantiles = NULL) {
+            data <- transform(data, xminv = x - violinwidth * (x - xmin), xmaxv = x + violinwidth * (xmax - x))
+            grp <- data[1, "group"]
+            newdata <- plyr::arrange(transform(data, x = if (grp %% 2 == 1) xminv else xmaxv), if (grp %% 2 == 1) y else -y)
+            newdata <- rbind(newdata[1, ], newdata, newdata[nrow(newdata), ], newdata[1, ])
+            newdata[c(1, nrow(newdata) - 1, nrow(newdata)), "x"] <- round(newdata[1, "x"])
+
+            if (length(draw_quantiles) > 0 & !scales::zero_range(range(data$y))) {
+                stopifnot(all(draw_quantiles >= 0), all(draw_quantiles <=
+                    1))
+                quantiles <- ggplot2:::create_quantile_segment_frame(data, draw_quantiles)
+                aesthetics <- data[rep(1, nrow(quantiles)), setdiff(names(data), c("x", "y")), drop = FALSE]
+                aesthetics$alpha <- rep(1, nrow(quantiles))
+                both <- cbind(quantiles, aesthetics)
+                quantile_grob <- GeomPath$draw_panel(both, ...)
+                ggplot2:::ggname("geom_split_violin", grid::grobTree(GeomPolygon$draw_panel(newdata, ...), quantile_grob))
+            } else {
+                ggplot2:::ggname("geom_split_violin", GeomPolygon$draw_panel(newdata, ...))
+            }
+        }
     )
-    simulation <- copynumber_sims[[1]]
-    sample_genotype_unique_profile <- simulation$sample$sample_genotype_unique_profile
-    CNbins_iteration <- sample_genotype_unique_profile[[1]]
-    copynumber_coordinates <- CNbins_iteration[, 1:3]
-    copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
-    CNbin_length <- copynumber_coordinates$end[1] - copynumber_coordinates$start[1] + 1
-    #--------------Find WGD rate & aneuploidy score for each cancer type
-    df_WGD_FGA <- data.frame(matrix(0, nrow = length(DATA_cancer_types), ncol = 3))
-    colnames(df_WGD_FGA) <- c("cancer_type", "WGD", "WGD_increased_FGA")
-    pb <- txtProgressBar(min = 0, max = length(DATA_cancer_types), style = 3, width = 50, char = "=")
-    for (i in 1:length(DATA_cancer_types)) {
-        setTxtProgressBar(pb, i)
-        cancer_type <- DATA_cancer_types[i]
-        copynumber_DATA <- DATA_cancer_type_cn[[i]]
-        # DATA_statistics <- DATA_WGD(copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info)
-        DATA_statistics <- get_WGD_stats_from_data(copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info, list_targets = c("WGD_proportion", "FGA_difference"))
-        print(DATA_statistics)
-        WGD_proportion <- DATA_statistics[1]
-        WGD_increased_FGA <- DATA_statistics[2]
-        df_WGD_FGA[i, ] <- c(cancer_type, WGD_proportion, WGD_increased_FGA)
-    }
-    cat("\n")
-    df_WGD_FGA$WGD <- as.numeric(df_WGD_FGA$WGD)
-    df_WGD_FGA$WGD_increased_FGA <- as.numeric(df_WGD_FGA$WGD_increased_FGA)
-    write.csv(df_WGD_FGA, file = paste0(plotname, ".csv"))
-    if (length(which(df_WGD_FGA$WGD == 0)) > 0) {
-        df_WGD_FGA <- df_WGD_FGA[-which(df_WGD_FGA$WGD == 0), ]
-    }
+    filename <- paste0(plotname, "FGA_from_data.jpeg")
+    jpeg(filename, width = 2000, height = 1100)
+    p <- ggplot(df_WGD_FGA_by_sample, aes(x = cancer_type, y = FGA, fill = WGD)) +
+        geom_violin(scale = "width")
+    # geom_split_violin(width = 1, alpha = 0.2, scale = "width")
+    print(p)
+    dev.off()
+    print(df_WGD_FGA_by_sample)
+
     #---------------------------Plot relationship between WGD proportion
     #-----------------------------------------------and aneuploidy score
-    filename <- paste0(plotname, "_WGD_vs_FGA_from_data.jpeg")
+    filename <- paste0(plotname, "_WGD_vs_FGA_DIFFERENCE_from_data.jpeg")
     jpeg(filename, width = 2000, height = 1100)
     p <- ggplot(df_WGD_FGA, aes(x = WGD, y = WGD_increased_FGA)) +
         geom_point(size = 10) +

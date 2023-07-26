@@ -505,10 +505,6 @@ one_simulation <- function(iteration,
     # ======================================OUTPUT FILES FROM SIMULATION
     #----------------------------------------Save the simulation package
     if (save_simulation == TRUE) {
-        if (lite_memory == TRUE) {
-            if (report_progress == TRUE) cat("Optimize simulation package for memory...\n")
-            simulation <- optimize_memory(simulation)
-        }
         if (report_progress == TRUE) cat("Save simulation package...\n")
         save(simulation, file = paste(folder_workplace_tmp, model_prefix_tmp, "_simulation_", iteration, ".rda", sep = ""))
     }
