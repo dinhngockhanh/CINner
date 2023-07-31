@@ -654,12 +654,19 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     CNbins_iteration <- sample_genotype_unique_profile[[1]]
     copynumber_coordinates <- CNbins_iteration[, 1:3]
     copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
+    #--------------------Initialize dataframe for cancer type statistics
+    df_plot_by_cancer_type <- data.frame(cancer_type = DATA_cancer_types)
+    df_plot_by_cancer_type$WGD <- 0
+    df_plot_by_cancer_type$WGD_increased_FGA <- 0
+    df_plot_by_cancer_type$TSG_count <- 0
+    df_plot_by_cancer_type$TSG_mean_selection_rate <- 0
+    df_plot_by_cancer_type$TSG_max_selection_rate <- 0
+    df_plot_by_cancer_type$ONC_count <- 0
+    df_plot_by_cancer_type$ONC_mean_selection_rate <- 0
+    df_plot_by_cancer_type$ONC_max_selection_rate <- 0
     #----------------Find WGD rate & FGA difference for each cancer type
-    df_WGD_FGA <- data.frame(matrix(0, nrow = length(DATA_cancer_types), ncol = 3))
-    colnames(df_WGD_FGA) <- c("cancer_type", "WGD", "WGD_increased_FGA")
     pb <- txtProgressBar(min = 0, max = length(DATA_cancer_types), style = 3, width = 50, char = "=")
-    # for (i in 1:length(DATA_cancer_types)) {
-    for (i in 1:2) {
+    for (i in 1:length(DATA_cancer_types)) {
         setTxtProgressBar(pb, i)
         cancer_type <- DATA_cancer_types[i]
         copynumber_DATA <- DATA_cancer_type_cn[[i]]
@@ -680,60 +687,50 @@ statistics_bulk_arm_WGD_status <- function(plotname,
             FGA = WGD_FGA_by_sample$FGA
         )
         if (i == 1) {
-            df_WGD_FGA_by_sample <- df_tmp
+            df_plot_by_sample <- df_tmp
         } else {
-            df_WGD_FGA_by_sample <- rbind(df_WGD_FGA_by_sample, df_tmp)
+            df_plot_by_sample <- rbind(df_plot_by_sample, df_tmp)
         }
-        df_WGD_FGA[i, ] <- c(cancer_type, WGD_proportion, WGD_increased_FGA)
+        df_plot_by_cancer_type$WGD[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- WGD_proportion
+        df_plot_by_cancer_type$WGD_increased_FGA[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- WGD_increased_FGA
     }
     cat("\n")
-    df_WGD_FGA$WGD <- as.numeric(df_WGD_FGA$WGD)
-    df_WGD_FGA$WGD_increased_FGA <- as.numeric(df_WGD_FGA$WGD_increased_FGA)
-    write.csv(df_WGD_FGA, file = paste0(plotname, ".csv"))
-    if (length(which(df_WGD_FGA$WGD == 0)) > 0) {
-        df_WGD_FGA <- df_WGD_FGA[-which(df_WGD_FGA$WGD == 0), ]
-    }
-    #---------------------------Find WGD proportions in each cancer type
-    DATA_wgd_proportion <- rep(0, length(DATA_cancer_types))
-    for (i in 1:length(DATA_cancer_types)) {
-        mini_DATA_wgd <- DATA_wgd[which(DATA_wgd$samplename %in% DATA_cancer_type_sample_ids[[i]] & DATA_wgd$wgd_uncertain == FALSE), ]
-        DATA_wgd_proportion[i] <- 100 * length(which(mini_DATA_wgd$wgd_status == "wgd")) / length(mini_DATA_wgd$wgd_status)
-    }
+    df_plot_by_cancer_type$WGD <- as.numeric(df_plot_by_cancer_type$WGD)
+    df_plot_by_cancer_type$WGD_increased_FGA <- as.numeric(df_plot_by_cancer_type$WGD_increased_FGA)
+    write.csv(df_plot_by_cancer_type, file = paste0(plotname, ".csv"))
     #------------Find count and strength of TSG arms in each cancer type
-    FIT_tsg_count <- rep(0, length(DATA_cancer_types))
-    FIT_tsg_mean_selection_rate <- rep(0, length(DATA_cancer_types))
-    FIT_tsg_max_selection_rate <- rep(0, length(DATA_cancer_types))
-    FIT_onc_count <- rep(0, length(DATA_cancer_types))
-    FIT_onc_mean_selection_rate <- rep(0, length(DATA_cancer_types))
-    FIT_onc_max_selection_rate <- rep(0, length(DATA_cancer_types))
     for (i in 1:length(DATA_cancer_types)) {
         cancer_types_fit <- read.csv(paste0(DATA_cancer_types[i], "_fitted_parameters.csv"), header = TRUE)
         cancer_types_fit_selection_rates <- cancer_types_fit$Best_value[which(cancer_types_fit$Type == "Arm_selection_rate")]
-        FIT_tsg_count[i] <- length(which(cancer_types_fit_selection_rates < 1))
-        if (FIT_tsg_count[i] == 0) {
-            FIT_tsg_mean_selection_rate[i] <- 1
-            FIT_tsg_max_selection_rate[i] <- 1
+        df_plot_by_cancer_type$TSG_count[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- length(which(cancer_types_fit_selection_rates < 1))
+        if (df_plot_by_cancer_type$TSG_count[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] == 0) {
+            df_plot_by_cancer_type$TSG_mean_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- 1
+            df_plot_by_cancer_type$TSG_max_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- 1
         } else {
             tmp <- cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)]
-            FIT_tsg_mean_selection_rate[i] <- 1 / prod(tmp)^(1 / length(tmp))
-            FIT_tsg_max_selection_rate[i] <- 1 / max(tmp)
-            # FIT_tsg_mean_selection_rate[i] <- 1 / mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
-            # FIT_tsg_max_selection_rate[i] <- 1 / max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates < 1)])
+            df_plot_by_cancer_type$TSG_mean_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- 1 / prod(tmp)^(1 / length(tmp))
+            df_plot_by_cancer_type$TSG_max_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- 1 / max(tmp)
         }
-        FIT_onc_count[i] <- length(which(cancer_types_fit_selection_rates > 1))
-        if (FIT_onc_count[i] == 0) {
-            FIT_onc_mean_selection_rate[i] <- 1
-            FIT_onc_max_selection_rate[i] <- 1
+        df_plot_by_cancer_type$ONC_count[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- length(which(cancer_types_fit_selection_rates > 1))
+        if (df_plot_by_cancer_type$ONC_count[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] == 0) {
+            df_plot_by_cancer_type$ONC_mean_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- 1
+            df_plot_by_cancer_type$ONC_max_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- 1
         } else {
             tmp <- cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)]
-            FIT_onc_mean_selection_rate[i] <- prod(tmp)^(1 / length(tmp))
-            FIT_onc_max_selection_rate[i] <- max(tmp)
-            # FIT_onc_mean_selection_rate[i] <- mean(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
-            # FIT_onc_max_selection_rate[i] <- max(cancer_types_fit_selection_rates[which(cancer_types_fit_selection_rates > 1)])
+            df_plot_by_cancer_type$ONC_mean_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- prod(tmp)^(1 / length(tmp))
+            df_plot_by_cancer_type$ONC_max_selection_rate[which(df_plot_by_cancer_type$cancer_type == DATA_cancer_types[i])] <- max(tmp)
         }
     }
-
+    #------------------Extract dataframes for cancer types with WGD% > 0
+    cancer_types_delete <- df_plot_by_cancer_type$cancer_type[which(df_plot_by_cancer_type$WGD < 0.1)]
+    df_plot_by_sample_WGDpos <- df_plot_by_sample
+    df_plot_by_cancer_type_WGDpos <- df_plot_by_cancer_type
+    if (length(cancer_types_delete) > 0) {
+        df_plot_by_sample_WGDpos <- df_plot_by_sample_WGDpos[-which(df_plot_by_sample_WGDpos$cancer_type %in% cancer_types_delete), ]
+        df_plot_by_cancer_type_WGDpos <- df_plot_by_cancer_type_WGDpos[-which(df_plot_by_cancer_type_WGDpos$cancer_type %in% cancer_types_delete), ]
+    }
     #-------------Plot data FGA violin plots by cancer type & WGD status
+    #   Functions to make splitted violin plots
     geom_split_violin <- function(mapping = NULL, data = NULL, stat = "ydensity", position = "identity", ...,
                                   draw_quantiles = NULL, trim = TRUE, scale = "area", na.rm = FALSE,
                                   show.legend = NA, inherit.aes = TRUE) {
@@ -743,9 +740,6 @@ statistics_bulk_arm_WGD_status <- function(plotname,
             params = list(trim = trim, scale = scale, draw_quantiles = draw_quantiles, na.rm = na.rm, ...)
         )
     }
-
-
-    #   Function to make splitted violin plots
     GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin,
         draw_group = function(self, data, ..., draw_quantiles = NULL) {
             data <- transform(data, xminv = x - violinwidth * (x - xmin), xmaxv = x + violinwidth * (xmax - x))
@@ -768,20 +762,22 @@ statistics_bulk_arm_WGD_status <- function(plotname,
             }
         }
     )
-    filename <- paste0(plotname, "FGA_from_data.jpeg")
+    filename <- paste0(plotname, "_FGA_from_data.jpeg")
     jpeg(filename, width = 2000, height = 1100)
-    p <- ggplot(df_WGD_FGA_by_sample, aes(x = cancer_type, y = FGA, fill = WGD)) +
-        geom_violin(scale = "width")
-    # geom_split_violin(width = 1, alpha = 0.2, scale = "width")
+    df_plot_by_sample_WGDpos$WGD <- as.factor(df_plot_by_sample_WGDpos$WGD)
+    p <- ggplot(df_plot_by_sample_WGDpos, aes(x = cancer_type, y = FGA, fill = WGD)) +
+        # geom_split_violin(width = 1, alpha = 0.2, scale = "width")
+        geom_split_violin() +
+        xlab("") +
+        scale_fill_discrete(labels = c("Non-WGD samples", "WGD samples"), name = "") +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
-    print(df_WGD_FGA_by_sample)
-
     #---------------------------Plot relationship between WGD proportion
     #-----------------------------------------------and aneuploidy score
     filename <- paste0(plotname, "_WGD_vs_FGA_DIFFERENCE_from_data.jpeg")
     jpeg(filename, width = 2000, height = 1100)
-    p <- ggplot(df_WGD_FGA, aes(x = WGD, y = WGD_increased_FGA)) +
+    p <- ggplot(df_plot_by_cancer_type_WGDpos, aes(x = WGD, y = WGD_increased_FGA)) +
         geom_point(size = 10) +
         geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1) +
         # geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
@@ -793,25 +789,14 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     dev.off()
     #-------------------Plot relationship between fitted selection rates
     #---------------------------------------and observed WGD proportions
-    #---Prepare the dataframe for plotting
-    df_plot <- data.frame(
-        cancer_types = DATA_cancer_types,
-        WGD = DATA_wgd_proportion,
-        TSG_count = FIT_tsg_count,
-        TSG_mean_selection_rate = FIT_tsg_mean_selection_rate,
-        TSG_max_selection_rate = FIT_tsg_max_selection_rate,
-        ONC_count = FIT_onc_count,
-        ONC_mean_selection_rate = FIT_onc_mean_selection_rate,
-        ONC_max_selection_rate = FIT_onc_max_selection_rate
-    )
     #---Find p-values for correlation between WGD status and either count or mean selection rate of TSG/ONC arms
-    tmp <- cor.test(FIT_tsg_count, DATA_wgd_proportion, method = "spearman", exact = FALSE)
+    tmp <- cor.test(df_plot_by_cancer_type$TSG_count, df_plot_by_cancer_type$WGD, method = "spearman", exact = FALSE)
     p_val_TSG_count <- tmp$p.value
-    tmp <- cor.test(FIT_tsg_mean_selection_rate, DATA_wgd_proportion, method = "spearman", exact = FALSE)
+    tmp <- cor.test(df_plot_by_cancer_type$TSG_mean_selection_rate, df_plot_by_cancer_type$WGD, method = "spearman", exact = FALSE)
     p_val_TSG_mean_selection_rate <- tmp$p.value
-    tmp <- cor.test(FIT_onc_count, DATA_wgd_proportion, method = "spearman", exact = FALSE)
+    tmp <- cor.test(df_plot_by_cancer_type$ONC_count, df_plot_by_cancer_type$WGD, method = "spearman", exact = FALSE)
     p_val_ONC_count <- tmp$p.value
-    tmp <- cor.test(FIT_onc_mean_selection_rate, DATA_wgd_proportion, method = "spearman", exact = FALSE)
+    tmp <- cor.test(df_plot_by_cancer_type$ONC_mean_selection_rate, df_plot_by_cancer_type$WGD, method = "spearman", exact = FALSE)
     p_val_ONC_mean_selection_rate <- tmp$p.value
     #---Positions for p-values
     x_left <- 0.0
@@ -821,31 +806,31 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     #---Plot relationship between WGD status and count of GAIN/LOSS arms
     filename <- paste0(plotname, "_WGD_vs_GAIN&LOSS_counts.jpeg")
     jpeg(filename, width = 1000, height = 1100)
-    p <- ggplot(df_plot, aes(x = TSG_count, y = ONC_count, color = WGD)) +
+    p <- ggplot(df_plot_by_cancer_type, aes(x = TSG_count, y = ONC_count, color = WGD)) +
         geom_point(size = 10) +
-        geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + (x_left + 0.05) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            yend = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            xend = min(df_plot_by_cancer_type$TSG_count) + (x_left + 0.05) * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$ONC_count) + y_up * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            yend = min(df_plot_by_cancer_type$ONC_count) + y_up * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + (x_left + 0.07) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot_by_cancer_type$TSG_count) + (x_left + 0.07) * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$ONC_count) + y_up * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
             label = paste0("p.val=", scientific(p_val_TSG_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$ONC_count) + y_up * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            yend = min(df_plot$ONC_count) + (y_up + 0.05) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            xend = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$ONC_count) + y_up * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            yend = min(df_plot_by_cancer_type$ONC_count) + (y_up + 0.05) * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$ONC_count) + (y_up + 0.07) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
+            x = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$ONC_count) + (y_up + 0.07) * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
             label = paste0("p.val=", scientific(p_val_ONC_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         xlab("Count of LOSS arms") +
@@ -857,31 +842,31 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     #---Plot relationship between WGD status and selection rates of GAIN/LOSS arms
     filename <- paste0(plotname, "_WGD_vs_GAIN&LOSS_selection_rates.jpeg")
     jpeg(filename, width = 1000, height = 1100)
-    p <- ggplot(df_plot, aes(x = TSG_mean_selection_rate, y = ONC_mean_selection_rate, color = WGD)) +
+    p <- ggplot(df_plot_by_cancer_type, aes(x = TSG_mean_selection_rate, y = ONC_mean_selection_rate, color = WGD)) +
         geom_point(size = 10) +
-        geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1) +
         annotate("segment",
-            x = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            xend = min(df_plot$TSG_mean_selection_rate) + (x_left + 0.05) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            yend = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + x_left * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            xend = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + (x_left + 0.05) * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
+            yend = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_mean_selection_rate) + (x_left + 0.07) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + (x_left + 0.07) * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            xend = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            yend = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.05) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + x_left * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            xend = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + x_left * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
+            yend = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + (y_up + 0.05) * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_mean_selection_rate) + x_left * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            y = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.07) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + x_left * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + (y_up + 0.07) * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         xlab("Mean selection rate of LOSS arms") +
@@ -893,31 +878,31 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     #---Plot relationship between WGD status and count/mean selection rate of LOSS arms
     filename <- paste0(plotname, "_WGD_vs_LOSS_fitted.jpeg")
     jpeg(filename, width = 1000, height = 1100)
-    p <- ggplot(df_plot, aes(x = TSG_count, y = TSG_mean_selection_rate, color = WGD)) +
+    p <- ggplot(df_plot_by_cancer_type, aes(x = TSG_count, y = TSG_mean_selection_rate, color = WGD)) +
         geom_point(size = 10) +
-        geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1) +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + (x_left + 0.05) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            yend = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            xend = min(df_plot_by_cancer_type$TSG_count) + (x_left + 0.05) * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            yend = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + (x_left + 0.07) * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_count) + (x_left + 0.07) * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
             label = paste0("p.val=", scientific(p_val_TSG_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            xend = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$TSG_mean_selection_rate) + y_up * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
-            yend = min(df_plot$TSG_mean_selection_rate) + (y_up + 0.05) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            xend = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
+            yend = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + (y_up + 0.05) * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$TSG_count) + x_left * (max(df_plot$TSG_count) - min(df_plot$TSG_count)),
-            y = min(df_plot$TSG_mean_selection_rate) + (y_up + 0.07) * (max(df_plot$TSG_mean_selection_rate) - min(df_plot$TSG_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$TSG_count) + x_left * (max(df_plot_by_cancer_type$TSG_count) - min(df_plot_by_cancer_type$TSG_count)),
+            y = min(df_plot_by_cancer_type$TSG_mean_selection_rate) + (y_up + 0.07) * (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - min(df_plot_by_cancer_type$TSG_mean_selection_rate)),
             label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         xlab("Count of LOSS arms") +
@@ -929,31 +914,31 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     #---Plot relationship between WGD status and count/mean selection rate of GAIN arms
     filename <- paste0(plotname, "_WGD_vs_GAIN_fitted.jpeg")
     jpeg(filename, width = 1000, height = 1100)
-    p <- ggplot(df_plot, aes(x = ONC_count, y = ONC_mean_selection_rate, color = WGD)) +
+    p <- ggplot(df_plot_by_cancer_type, aes(x = ONC_count, y = ONC_mean_selection_rate, color = WGD)) +
         geom_point(size = 10) +
-        geom_text_repel(aes(label = cancer_types), size = 10, box.padding = 1, point.padding = 0.5) +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1, point.padding = 0.5) +
         annotate("segment",
-            x = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            xend = min(df_plot$ONC_count) + (x_left + 0.05) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            yend = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$ONC_count) + x_left * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            xend = min(df_plot_by_cancer_type$ONC_count) + (x_left + 0.05) * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
+            yend = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$ONC_count) + (x_left + 0.07) * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$ONC_count) + (x_left + 0.07) * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             label = paste0("p.val=", scientific(p_val_ONC_count, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         annotate("segment",
-            x = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            xend = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            y = min(df_plot$ONC_mean_selection_rate) + y_up * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
-            yend = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.05) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$ONC_count) + x_left * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            xend = min(df_plot_by_cancer_type$ONC_count) + x_left * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + y_up * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
+            yend = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + (y_up + 0.05) * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             colour = "black", size = 2, alpha = 1, arrow = arrow()
         ) +
         annotate("text",
-            x = min(df_plot$ONC_count) + x_left * (max(df_plot$ONC_count) - min(df_plot$ONC_count)),
-            y = min(df_plot$ONC_mean_selection_rate) + (y_up + 0.07) * (max(df_plot$ONC_mean_selection_rate) - min(df_plot$ONC_mean_selection_rate)),
+            x = min(df_plot_by_cancer_type$ONC_count) + x_left * (max(df_plot_by_cancer_type$ONC_count) - min(df_plot_by_cancer_type$ONC_count)),
+            y = min(df_plot_by_cancer_type$ONC_mean_selection_rate) + (y_up + 0.07) * (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - min(df_plot_by_cancer_type$ONC_mean_selection_rate)),
             label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate, digits = 3)), colour = "black", size = 8, hjust = 0
         ) +
         xlab("Count of GAIN arms") +
@@ -962,5 +947,5 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
-    return(df_WGD_FGA)
+    return(df_plot_by_sample)
 }

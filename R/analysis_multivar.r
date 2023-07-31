@@ -1314,7 +1314,7 @@ statistics_multivar_matrix_one_simulation <- function(filename, var1_name, var2_
     evolution_origin <- simulation$clonal_evolution$evolution_origin
     genotype_list_ploidy_chrom <- simulation$clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- simulation$clonal_evolution$genotype_list_ploidy_block
-    genotype_list_WGD_count <- simulation$clonal_evolution$genotype_list_WGD_count
+    if ("genotype_list_WGD_count" %in% names(simulation$clonal_evolution)) genotype_list_WGD_count <- simulation$clonal_evolution$genotype_list_WGD_count
     evolution_origin <- simulation$clonal_evolution$evolution_origin
     evolution_genotype_changes <- simulation$clonal_evolution$evolution_genotype_changes
     N_chromosomes <<- length(genotype_list_ploidy_chrom[[1]])
@@ -1447,12 +1447,16 @@ statistics_multivar_matrix_one_simulation <- function(filename, var1_name, var2_
     Shannon_index <- diversity(table_clone_unique$Freq)
     df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "Shannon_index", Shannon_index)
     #--------------------------------Statistics: main clone's WGD status
-    if (genotype_list_WGD_count[Clone_ID_max] > 0) {
-        Clone_ID_WGD_status <- 1
+    if ("genotype_list_WGD_count" %in% names(simulation$clonal_evolution)) {
+        if (genotype_list_WGD_count[Clone_ID_max] > 0) {
+            Clone_ID_WGD_status <- 1
+        } else {
+            Clone_ID_WGD_status <- 0
+        }
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_WGD", Clone_ID_WGD_status)
     } else {
-        Clone_ID_WGD_status <- 0
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_WGD", 0)
     }
-    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_WGD", Clone_ID_WGD_status)
     #-----------------------------------Statistics: main clone's fitness
     get_fitness <- function(package_clonal_evolution,
                             clone_ID) {
@@ -1489,8 +1493,12 @@ statistics_multivar_matrix_one_simulation <- function(filename, var1_name, var2_
         #   Output statistics
         return(FGA)
     }
-    Clone_ID_FGA <- get_FGA(simulation$clonal_evolution, Clone_ID_max)
-    df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_FGA", Clone_ID_FGA)
+    if ("genotype_list_WGD_count" %in% names(simulation$clonal_evolution)) {
+        Clone_ID_FGA <- get_FGA(simulation$clonal_evolution, Clone_ID_max)
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_FGA", Clone_ID_FGA)
+    } else {
+        df_stat_sim[nrow(df_stat_sim) + 1, ] <- c(var1, var2, sim, "major_clone_FGA", 0)
+    }
     #---------------------------Statistics: main clone's Fraction of LOH
     get_LOH <- function(package_clonal_evolution,
                         clone_ID) {
@@ -1748,11 +1756,11 @@ statistics_multivar_vector <- function(model_prefix = "",
             statistics_multivar_vector_one_simulation <<- statistics_multivar_vector_one_simulation
             clusterExport(cl, varlist = c(
                 "filename_prefix",
-                "var1_name",
-                "var2_name",
-                "var1",
-                "var2",
-                "plot_WGD",
+                "tmp_var1_name",
+                "tmp_var2_name",
+                "tmp_var1",
+                "tmp_var2",
+                "tmp_plot_WGD",
                 "statistics_multivar_vector_one_simulation"
             ))
             #   Get statistics in parallel
