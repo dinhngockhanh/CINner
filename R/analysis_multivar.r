@@ -238,6 +238,21 @@ simulator_multivar <- function(model_variables_base = list(),
                 #     R_libPaths = R_libPaths
                 # )
 
+                plot_cn_heatmap(
+                    model = model_name,
+                    n_simulations = n_simulations,
+                    folder_workplace = folder_workplace,
+                    folder_plots = folder_workplace,
+                    plotcol = "total-copy",
+                    CN_data = "TRUTH",
+                    phylo = "TRUTH",
+                    width = 1000,
+                    height = 1000,
+                    compute_parallel = compute_parallel,
+                    n_cores = n_cores,
+                    R_libPaths = R_libPaths
+                )
+
                 if (neutral_variations) {
                     plot_cn_heatmap(
                         model = model_name,
@@ -246,21 +261,6 @@ simulator_multivar <- function(model_variables_base = list(),
                         folder_plots = folder_workplace,
                         plotcol = "total-copy",
                         CN_data = "NEUTRAL-VARIATIONS",
-                        phylo = "TRUTH",
-                        width = 1000,
-                        height = 1000,
-                        compute_parallel = compute_parallel,
-                        n_cores = n_cores,
-                        R_libPaths = R_libPaths
-                    )
-                } else {
-                    plot_cn_heatmap(
-                        model = model_name,
-                        n_simulations = n_simulations,
-                        folder_workplace = folder_workplace,
-                        folder_plots = folder_workplace,
-                        plotcol = "total-copy",
-                        CN_data = "TRUTH",
                         phylo = "TRUTH",
                         width = 1000,
                         height = 1000,

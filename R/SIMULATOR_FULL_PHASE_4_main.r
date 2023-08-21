@@ -183,10 +183,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
             genotype_current_tmp <- genotype_current
             selection_rate_tmp <- genotype_list_selection_rate[genotype_current]
             selection_rate <- 0
-            print("-------------------------------------------------------")
             T_current <- phylogeny_birthtime[branch] + (phylogeny_deathtime[branch] - phylogeny_birthtime[branch]) * elapsed_gen / length(original_elapsed_genotypes)
-            print(T_current)
-            print("-------------------------------------------------------")
 
             while ((selection_rate <= 0) & (selection_rate < selection_rate_tmp)) {
                 genotype_current <- genotype_current_tmp

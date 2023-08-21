@@ -202,7 +202,7 @@ for (i in 1:length(PCAWG_cancer_types)) {
 }
 ```
 
-Remove PCAWG cancer types with less than 30 non-WGD samples:
+Remove PCAWG cancer types with less than 10 non-WGD samples:
 
 ```{r}
 sample_sizes <- sapply(PCAWG_cancer_type_nonWGD_sample_ids, length)
