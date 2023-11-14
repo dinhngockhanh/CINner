@@ -539,6 +539,7 @@ one_simulation <- function(iteration,
     }
     #---------------------------------------Save the sampled CN profiles
     if (save_cn_profile == TRUE) {
+        print("START")
         if ((format_cn_profile == "long") | (format_cn_profile == "both")) {
             if (report_progress == TRUE) cat("Save true CN profiles in long format...\n")
             cn_profiles_long <- simulation$sample$cn_profiles_long
@@ -551,6 +552,7 @@ one_simulation <- function(iteration,
             filename <- paste(folder_workplace_tmp, model_prefix_tmp, "_cn_profiles_wide_", iteration, ".csv", sep = "")
             write.csv(cn_profiles_wide, filename, row.names = FALSE)
         }
+        print("END")
     }
     #---------------Save the sampled CN profiles with neutral variations
     if ((save_cn_profile == TRUE) & (neutral_variations == TRUE)) {

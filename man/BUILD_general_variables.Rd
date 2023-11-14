@@ -17,6 +17,7 @@ BUILD_general_variables(
   Min_cell_count = 0,
   Max_events = Inf,
   CN_bin_length = 5e+05,
+  CN_arm_level = FALSE,
   alpha_aneuploidy = 1,
   prob_CN_whole_genome_duplication = 0,
   prob_CN_missegregation = 0,
