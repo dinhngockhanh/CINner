@@ -74,6 +74,12 @@ SIMULATOR_FULL_PHASE_1_CN_chrom_arm_missegregation <- function(genotype_to_react
                 block_start <- centromere + 1
                 block_end <- chrom_length
             }
+            if (i_gain == 1) {
+                tmp <- sum(ploidy_block_2[[chrom]][[strand]][block_start:block_end])
+            } else if (i_gain == 2) {
+                tmp <- sum(ploidy_block_1[[chrom]][[strand]][block_start:block_end])
+            }
+            if (tmp == 0) next
             break
         }
     }

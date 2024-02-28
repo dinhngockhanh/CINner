@@ -638,6 +638,9 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     library(ggplot2)
     library(ggrepel)
     library(scales)
+    library(tidyr)
+    library(dplyr)
+    library(tidyverse)
     #-------------------------Find genome coordinate from one simulation
     cn_info <- model_variables$cn_info
     copynumber_sims <- simulator_full_program(
@@ -672,7 +675,10 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         copynumber_DATA <- DATA_cancer_type_cn[[i]]
         #   Find statistics for each cancer type
         DATA_statistics <- get_WGD_stats_from_data(
-            copynumber_DATA, DATA_wgd, copynumber_coordinates, cn_info,
+            copynumber_DATA = copynumber_DATA,
+            DATA_wgd = DATA_wgd,
+            copynumber_coordinates = copynumber_coordinates,
+            cn_info = cn_info,
             list_targets = c("WGD_proportion", "FGA_difference", "WGD_FGA_by_sample")
         )
         #   Get WGD proportion for each cancer type
@@ -839,6 +845,63 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
+
+
+
+    #---Plot relationship between WGD status and count of GAIN arms
+    filename <- paste0(plotname, "_WGD_vs_GAIN_counts.jpeg")
+    jpeg(filename, width = 2000, height = 1100)
+
+    scale <- (max(df_plot_by_cancer_type$ONC_count)) / max(df_plot_by_cancer_type$WGD)
+
+    df_long <- df_plot_by_cancer_type %>%
+        pivot_longer(cols = c(ONC_count, WGD), names_to = "variable") %>%
+        mutate(scaled_value = ifelse(variable == "WGD", value * scale, value))
+    p <- ggplot(df_long, aes(x = cancer_type, y = scaled_value, fill = variable)) +
+        geom_col(position = "dodge") +
+        scale_y_continuous(sec.axis = sec_axis(~ . / scale, name = "WGD proportion")) +
+        annotate("text",
+            x = 1.5, y = 1.1 * max(df_long$scaled_value),
+            label = paste0("p.val=", scientific(p_val_ONC_count, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "black"
+        ) +
+        xlab("") +
+        ylab("Count of GAIN arms") +
+        labs(fill = "") +
+        scale_fill_discrete(labels = c("Count of GAIN arms", "WGD proportion")) +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm")) +
+        theme(axis.text.x = element_text(size = 25, angle = 45, vjust = 1, hjust = 1))
+    print(p)
+    dev.off()
+
+
+
+    #---Plot relationship between WGD status and count of LOSS arms
+    filename <- paste0(plotname, "_WGD_vs_LOSS_counts.jpeg")
+    jpeg(filename, width = 2000, height = 1100)
+
+    scale <- (max(df_plot_by_cancer_type$TSG_count)) / max(df_plot_by_cancer_type$WGD)
+
+    df_long <- df_plot_by_cancer_type %>%
+        pivot_longer(cols = c(TSG_count, WGD), names_to = "variable") %>%
+        mutate(scaled_value = ifelse(variable == "WGD", value * scale, value))
+    p <- ggplot(df_long, aes(x = cancer_type, y = scaled_value, fill = variable)) +
+        geom_col(position = "dodge") +
+        scale_y_continuous(sec.axis = sec_axis(~ . / scale, name = "WGD proportion")) +
+        annotate("text",
+            x = 1.5, y = 1.1 * max(df_long$scaled_value),
+            label = paste0("p.val=", scientific(p_val_TSG_count, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "black"
+        ) +
+        xlab("") +
+        ylab("Count of LOSS arms") +
+        labs(fill = "") +
+        scale_fill_discrete(labels = c("Count of LOSS arms", "WGD proportion")) +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm")) +
+        theme(axis.text.x = element_text(size = 25, angle = 45, vjust = 1, hjust = 1))
+    print(p)
+    dev.off()
+
+
+
     #---Plot relationship between WGD status and selection rates of GAIN/LOSS arms
     filename <- paste0(plotname, "_WGD_vs_GAIN&LOSS_selection_rates.jpeg")
     jpeg(filename, width = 1000, height = 1100)
@@ -875,6 +938,65 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
+
+
+
+    #---Plot relationship between WGD status and count of GAIN arms
+    filename <- paste0(plotname, "_WGD_vs_GAIN_selection_rates.jpeg")
+    jpeg(filename, width = 2000, height = 1100)
+
+    scale <- (max(df_plot_by_cancer_type$ONC_mean_selection_rate) - 1) / max(df_plot_by_cancer_type$WGD)
+
+    df_long <- df_plot_by_cancer_type %>%
+        pivot_longer(cols = c(ONC_mean_selection_rate, WGD), names_to = "variable") %>%
+        mutate(scaled_value = ifelse(variable == "WGD", value * scale, value - 1))
+    p <- ggplot(df_long, aes(x = cancer_type, y = scaled_value, fill = variable)) +
+        geom_col(position = "dodge") +
+        scale_y_continuous(labels = function(x) x + 1, sec.axis = sec_axis(~ . / scale, name = "WGD proportion")) +
+        # scale_y_continuous(sec.axis = sec_axis(~ . / 0.25, name = "WGD proportion")) +
+        annotate("text",
+            x = 1.5, y = 1.1 * max(df_long$scaled_value),
+            label = paste0("p.val=", scientific(p_val_ONC_mean_selection_rate, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "black"
+        ) +
+        xlab("") +
+        ylab("Mean selection rate of GAIN arms") +
+        labs(fill = "") +
+        scale_fill_discrete(labels = c("Mean selection rate of GAIN arms", "WGD proportion")) +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm")) +
+        theme(axis.text.x = element_text(size = 25, angle = 45, vjust = 1, hjust = 1))
+    print(p)
+    dev.off()
+
+
+
+    #---Plot relationship between WGD status and count of LOSS arms
+    filename <- paste0(plotname, "_WGD_vs_LOSS_selection_rates.jpeg")
+    jpeg(filename, width = 2000, height = 1100)
+
+    scale <- (max(df_plot_by_cancer_type$TSG_mean_selection_rate) - 1) / max(df_plot_by_cancer_type$WGD)
+
+    df_long <- df_plot_by_cancer_type %>%
+        pivot_longer(cols = c(TSG_mean_selection_rate, WGD), names_to = "variable") %>%
+        mutate(scaled_value = ifelse(variable == "WGD", value * scale, value - 1))
+    p <- ggplot(df_long, aes(x = cancer_type, y = scaled_value, fill = variable)) +
+        geom_col(position = "dodge") +
+        scale_y_continuous(labels = function(x) x + 1, sec.axis = sec_axis(~ . / scale, name = "WGD proportion")) +
+        # scale_y_continuous(sec.axis = sec_axis(~ . / 2, name = "WGD proportion")) +
+        annotate("text",
+            x = 1.5, y = 1.1 * max(df_long$scaled_value),
+            label = paste0("p.val=", scientific(p_val_TSG_mean_selection_rate, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "black"
+        ) +
+        xlab("") +
+        ylab("Mean selection rate of LOSS arms") +
+        labs(fill = "") +
+        scale_fill_discrete(labels = c("Mean selection rate of LOSS arms", "WGD proportion")) +
+        theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm")) +
+        theme(axis.text.x = element_text(size = 25, angle = 45, vjust = 1, hjust = 1))
+    print(p)
+    dev.off()
+
+
+
     #---Plot relationship between WGD status and count/mean selection rate of LOSS arms
     filename <- paste0(plotname, "_WGD_vs_LOSS_fitted.jpeg")
     jpeg(filename, width = 1000, height = 1100)
