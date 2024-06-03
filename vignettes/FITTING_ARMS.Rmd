@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 ```
 
 
-Five vectors are used to fit the chromosome arm selection rates. Given values at the same location in the vectors, `arm_s` is the selection rate for the arm with ID `arm_id`, which runs from starting bin `arm_start` to ending bin `arm_end` on chromosome `arm_chromosome`. The selection rate is initialized to be 1 for each chromosome arm in `arm_ID`.
+Five vectors are used to fit the chromosome arm selection rates. 
+Given values at the same location in the vectors, `arm_s` is the selection rate for the arm with ID `arm_id`, which runs from starting bin `arm_start` to ending bin `arm_end` on chromosome `arm_chromosome`. 
+The selection rate is initialized to be 1 for each chromosome arm in `arm_ID`.
 
 ```{r}
 arm_id <- c(paste(model_variables$cn_info$Chromosome, "p", sep = ""), paste(model_variables$cn_info$Chromosome, "q", sep = ""))
@@ -46,16 +48,15 @@ drivers <- list()
 model_variables <- BUILD_initial_population(model_variables = model_variables, cell_count = cell_count, CN_matrix = CN_matrix, drivers = drivers)
 ```
 
-???????????????????????????????????????????????
 The final step of model variable preparation is using the function `CHECK_model_variables` to check the variables defined thus far in csv files. The variable `library_name` is incorporated into the csv files' names.
 
 ```{r}
 library_name <- "ABC-BULK-ARM-CN"
 model_variables <- CHECK_model_variables(model_variables)
 ```
-???????????????????????????????????????????????
 
-`list_parameters_library` is a dataframe consisting of the parameters (`variable`) to be fitted: `prob_CN_chrom_arm_missegregation` and the selection rate for each chromosome arm. `prob_CN_chrom_arm_missegregation` has lower and upper bounds of 10^-5^ and 10^-4^, respectively. Each chromosome arm has lower and upper bounds of 0.5 and 1.5, respectively.
+`list_parameters_library` is a dataframe consisting of the parameters (`variable`) to be fitted: `prob_CN_chrom_arm_missegregation` and the selection rate for each chromosome arm. 
+`prob_CN_chrom_arm_missegregation` has lower and upper bounds of 10^-5^ and 10^-4^, respectively. Each chromosome arm has lower and upper bounds of 0.5 and 1.5, respectively.
 
 ```{r}
 list_parameters_library <- data.frame(matrix(ncol = 4, nrow = 0))
@@ -76,7 +77,12 @@ Initialize a vector specifying the variables we want to fit.
 list_targets_library <- model_variables$chromosome_arm_library$Arm_ID
 ```
 
-Here, we build a library of simulations using our specified model variables. Our variables to fit are specified by the `list_targets` parameter. To generate statistics necessary for ABC, `n_sample` is the number of values from the prior distribution that are randomly selected for each simulation. `ABC_simcount` is then the number of simulations for a given parameters set. Each simulation is characterized by the copy number profile of the larest clone. The gain/loss frequencies of each chromosome arm are the important statistic used later for fitting arm selection rates.
+Here, we build a library of simulations using our specified model variables. 
+Our variables to fit are specified by the `list_targets` parameter. 
+To generate statistics necessary for ABC, `n_sample` is the number of values from the prior distribution that are randomly selected for each simulation. 
+`ABC_simcount` is then the number of simulations for a given parameters set. 
+Each simulation is characterized by the copy number profile of the larest clone. 
+The gain/loss frequencies of each chromosome arm are the important statistic used later for fitting arm selection rates.
 
 ```{r}
 ###################################    BUILD LIBRARY OF SIMULATED ARM-CN
