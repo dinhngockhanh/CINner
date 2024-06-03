@@ -1,1 +1,236 @@
-Translate from program_fitting_arms.r ...
+---
+title: "Chromosome Arm Fitting Program"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Chromosome Arm Fitting Program}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE, message = FALSE,
+  comment = "#>"
+)
+```
+
+
+Five vectors are used to fit the chromosome arm selection rates. Given values at the same location in the vectors, `arm_s` is the selection rate for the arm with ID `arm_id`, which runs from starting bin `arm_start` to ending bin `arm_end` on chromosome `arm_chromosome`. The selection rate is initialized to be 1 for each chromosome arm in `arm_ID`.
+
+```{r}
+arm_id <- c(paste(model_variables$cn_info$Chromosome, "p", sep = ""), paste(model_variables$cn_info$Chromosome, "q", sep = ""))
+arm_chromosome <- rep(model_variables$cn_info$Chromosome, 2)
+arm_start <- c(rep(1, length(model_variables$cn_info$Chromosome)), model_variables$cn_info$Centromere_location + 1)
+arm_end <- c(model_variables$cn_info$Centromere_location, model_variables$cn_info$Bin_count)
+arm_s <- rep(1, length(arm_id))
+```
+
+After initializing the selection rate for each chromosome arm, we can update `model_variables` with the variables for the selection model. Include only the tables required for the selected selection model:
+
+```{r}
+model_variables <- BUILD_driver_library(
+    model_variables = model_variables,
+    table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
+)
+```
+
+## Initial cell population
+
+We now specify the initial cell population. Here we assume that the initial state consists of one clone, where `cell_count` is its cell count. The variable `CN_matrix` specifies the clone's CN profile, here assumed to be normal diploid female cells. The variable `drivers` defines the existing driver mutations in the clone, here assumed to be none.
+
+```{r}
+cell_count <- 20
+CN_matrix <- BUILD_cn_normal_autosomes(model_variables$cn_info)
+drivers <- list()
+model_variables <- BUILD_initial_population(model_variables = model_variables, cell_count = cell_count, CN_matrix = CN_matrix, drivers = drivers)
+```
+
+???????????????????????????????????????????????
+The final step of model variable preparation is using the function `CHECK_model_variables` to check the variables defined thus far in csv files. The variable `library_name` is incorporated into the csv files' names.
+
+```{r}
+library_name <- "ABC-BULK-ARM-CN"
+model_variables <- CHECK_model_variables(model_variables)
+```
+???????????????????????????????????????????????
+
+`list_parameters_library` is a dataframe consisting of the parameters (`variable`) to be fitted: `prob_CN_chrom_arm_missegregation` and the selection rate for each chromosome arm. `prob_CN_chrom_arm_missegregation` has lower and upper bounds of 10^-5^ and 10^-4^, respectively. Each chromosome arm has lower and upper bounds of 0.5 and 1.5, respectively.
+
+```{r}
+list_parameters_library <- data.frame(matrix(ncol = 4, nrow = 0))
+colnames(list_parameters_library) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
+list_parameters_library[nrow(list_parameters_library) + 1, ] <- c("prob_CN_chrom_arm_missegregation", "CNA_probability", 1e-5, 1e-4)
+for (i in 1:length(model_variables$chromosome_arm_library$Arm_ID)) {
+    list_parameters_library[nrow(list_parameters_library) + 1, ] <- c(
+        model_variables$chromosome_arm_library$Arm_ID[i],
+        "Arm_selection_rate",
+        0.5, 1.5
+    )
+}
+```
+
+Initialize a vector specifying the variables we want to fit.
+
+```{r}
+list_targets_library <- model_variables$chromosome_arm_library$Arm_ID
+```
+
+Here, we build a library of simulations using our specified model variables. Our variables to fit are specified by the `list_targets` parameter. To generate statistics necessary for ABC, `n_sample` is the number of values from the prior distribution that are randomly selected for each simulation. `ABC_simcount` is then the number of simulations for a given parameters set. Each simulation is characterized by the copy number profile of the larest clone. The gain/loss frequencies of each chromosome arm are the important statistic used later for fitting arm selection rates.
+
+```{r}
+###################################    BUILD LIBRARY OF SIMULATED ARM-CN
+start_time <- Sys.time()
+library_bulk_arm_CN(
+    library_name = library_name,
+    model_variables = model_variables,
+    list_parameters = list_parameters_library,
+    list_targets = list_targets_library,
+    ABC_simcount = 2000,
+    n_samples = 100,
+    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+)
+end_time <- Sys.time()
+print(end_time - start_time)
+########################################################################
+```
+
+We then aggregate the arm deletion, arm amplification, and gene balance scores betweem tumor supressor, onco, and essential genes from TCGA pan-cancer data.
+
+```{r}
+#############################################    FIT FOR TCGA PAN-CANCER
+copynumber_DATA <- read.csv(file = system.file("extdata", "Davoli_Charm_score.csv", package = "CancerSimulator"))
+copynumber_DATA <- copynumber_DATA[, c(1, 2, 3, 14, 15)]
+colnames(copynumber_DATA) <- c("Arm", "Del_freq_all", "Amp_freq_all", "Charm.TSG.OG.score", "Charm.TSG.OG.Ess.score")
+```
+
+Because TCGA pan-cancer excludes chromosome arms 13p, 14p, 15p, 21q, 22p, and chromosomes X and Y, we need to modify the list of parameters that need to be fit by changing the value of `list_targets` and `list_parameters`. 
+
+```{r}
+list_targets <- copynumber_DATA$Arm
+list_parameters <- list_parameters_library[c(
+    which(list_parameters_library$Type == "CNA_probability"),
+    which(list_parameters_library$Type == "Arm_selection_rate" & list_parameters_library$Variable %in% copynumber_DATA$Arm)
+), ]
+```
+
+Fitting routine for each chromosome arm using ABCrf (and bootstrapping). ???more detail??? (Supplement 1)
+
+```{r}
+cat(paste0("\n\n\nFITTING FOR PAN-CANCER\n"))
+fitting_bulk_arm_CN(
+    library_name = library_name,
+    model_name = "PAN-CANCER",
+    model_variables = model_variables,
+    copynumber_DATA = copynumber_DATA,
+    list_parameters = list_parameters,
+    list_parameters_library = list_parameters_library,
+    list_targets = list_targets,
+    list_targets_library = list_targets_library,
+    library_shuffle = TRUE,
+    type_sample_DATA = "average",
+    type_cn_DATA = "arm",
+    folder_workplace = library_name,
+    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+)
+########################################################################
+```
+
+For fitting arm selection rates by cancer subtype in PCAWG data, we retrieve the different types of cancer present in PCAWG data and save it to `PCAWG_cancer_types`.
+
+```{r}
+#######################################    FIT FOR PCAWG CANCER SUBTYPES
+copynumber_PCAWG <- read_excel(system.file("pcawg_specimen_histology_August2016_v9.xlsx", package = "CancerSimulator"))
+
+PCAWG_cancer_types <- unique(copynumber_PCAWG$histology_abbreviation)
+PCAWG_cancer_types <- PCAWG_cancer_types[which(!is.na(PCAWG_cancer_types))]
+```
+
+
+
+```{r}
+PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CancerSimulator"), header = TRUE)
+```
+
+
+
+```{r}
+PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    sample_ids <- copynumber_PCAWG$tcga_sample_uuid[which(copynumber_PCAWG$histology_abbreviation == PCAWG_cancer_types[i])]
+    for (j in 1:length(sample_ids)) {
+        sample_id <- sample_ids[j]
+        if (!file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) next
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (max(tmp$star, na.rm = TRUE) < 2) next
+        PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
+    }
+}
+```
+
+
+PCAWG_cancer_type_nonWGD_sample_ids <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
+    sample_wgd <- PCAWG_wgd[which(PCAWG_wgd$samplename %in% sample_ids), ]
+    sample_nonwgd_ids <- sample_wgd$samplename[which(sample_wgd$wgd_uncertain == FALSE & sample_wgd$wgd_status == "no_wgd")]
+    PCAWG_cancer_type_nonWGD_sample_ids[[i]] <- sample_nonwgd_ids
+}
+
+sample_sizes <- sapply(PCAWG_cancer_type_nonWGD_sample_ids, length)
+PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 10)]
+PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 10)]
+PCAWG_cancer_type_nonWGD_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[-which(sample_sizes < 10)]
+
+copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
+for (i in 1:length(PCAWG_cancer_types)) {
+    cancer_type <- PCAWG_cancer_types[i]
+    cancer_type_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[[i]]
+    copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
+    for (j in 1:length(cancer_type_sample_ids)) {
+        sample_id <- cancer_type_sample_ids[j]
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
+        tmp <- tmp[which(tmp$star >= 2), ]
+        tmp$donor_unique_id <- sample_id
+        copynumber_DATA_ls[[j]] <- tmp
+    }
+    copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+}
+
+list_targets <- model_variables$chromosome_arm_library$Arm_ID
+list_parameters <- list_parameters_library
+
+for (i in 1:6) {
+    cancer_type <- PCAWG_cancer_types[i]
+    copynumber_DATA <- copynumber_DATA_cancer_types[[i]]
+    cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
+    fitting_bulk_arm_CN(
+        library_name = library_name,
+        model_name = cancer_type,
+        model_variables = model_variables,
+        copynumber_DATA = copynumber_DATA,
+        list_parameters = list_parameters,
+        list_parameters_library = list_parameters_library,
+        list_targets = list_targets,
+        list_targets_library = list_targets_library,
+        bound_freq = 0.1,
+        library_shuffle = TRUE,
+        folder_workplace = library_name,
+        R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+    )
+}
+########################################################################
+
+
+
+################################    STATISTICS FOR PCAWG CANCER SUBTYPES
+df_WGD_FGA <- statistics_bulk_arm_WGD_status(
+    plotname = "ALL_PCAWG",
+    DATA_cancer_types = PCAWG_cancer_types,
+    DATA_cancer_type_sample_ids = PCAWG_cancer_type_sample_ids,
+    DATA_cancer_type_cn = copynumber_DATA_cancer_types,
+    DATA_wgd = PCAWG_wgd,
+    model_variables = model_variables
+)
+########################################################################
