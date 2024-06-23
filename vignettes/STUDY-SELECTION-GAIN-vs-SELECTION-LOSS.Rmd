@@ -9,7 +9,7 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
-
+First, we set up the fixed parameters for the simulator.
 
 ```{r}
 cell_lifespan <- 1
@@ -165,6 +165,10 @@ model_prefix <- "GAIN-vs-LOSS"
 folder_workplace <- "GAIN-vs-LOSS"
 ```
 
+We set up parameter sweeps of the scale of selection of loss and gain chromosome arms.
+For every parameter combination, we create 1000 simulations.
+We set possible values for the selection scale of loss/gain chromosome arms to be from 1, 2,..., 9, 10.
+
 ```{r}
 n_simulations_per_batch <- 1000
 
@@ -176,6 +180,8 @@ var2_name <- "scale_selection_gain"
 var2_vals <- seq(1, 10)
 var2_labs <- paste0("x", var2_vals)
 ```
+
+We make the simulation run through the possible combinations between the two variables with each single variable combination consisting of 1000 simulations.
 
 ```{r}
 simulator_multivar(
@@ -189,6 +195,9 @@ simulator_multivar(
 )
 ```
 
+We obtain the average statistics from the simulations for each parameter value combination.
+The statistics we consider are clone count, shannon diversity index, clonal missegregation count, subclonal missegregation count, age of most recent common ancestor, and distribution of ploidy.
+
 ```{r}
 statistics_multivar_matrix(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
@@ -199,6 +208,8 @@ statistics_multivar_matrix(
     compute_parallel = TRUE
 )
 ```
+
+Here we can see how the statistics change by keeping the selection scale of gain arms constant for all values of selection scale for loss arms.
 
 ```{r}
 var2_fixed <- var2_labs[1]
@@ -213,6 +224,8 @@ statistics_multivar_vector(
     example_simulation = FALSE
 )
 ```
+
+And we can see how the statistics change by keeping the selection scale of loss arms constant for all values of selection scale for gain arms.
 
 ```{r}
 var1_fixed <- var1_labs[1]

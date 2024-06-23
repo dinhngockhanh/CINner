@@ -10,7 +10,8 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
-
+First, we set up the fixed parameters for the simulator.
+Note that we use the chromosome missegregation per homolog model instead of per division model.
 
 ```{r,fig.height=5,fig.width=10}
 cell_lifespan <- 1
@@ -159,7 +160,10 @@ folder_workplace <- "WGD-vs-MISSEGREGATION"
 # )
 ```
 
-
+We set up parameter sweeps of the probability of chromosome missegregation per homolog and probability of whole-genome duplication.
+For every parameter combination, we create 5 simulations.
+We set possible values for the probability of chromosome missegregation per homolog based on the probability of chromosome miseggregation per division divided by 44, the number of autosomes in a cell.
+We keep the probability of whole-genome duplication constant at 3x10^{-2}.
 
 ```{r}
 n_simulations_per_batch <- 5
@@ -200,6 +204,8 @@ simulator_multivar(
 #     compute_parallel = TRUE
 # )
 ```
+
+We can see how the statistics change by keeping the probability of whole-genome duplication constant for all values of the probability of chromosomal missegregation per homolog.
 
 ```{r}
 var2_fixed <- var2_labs[1]

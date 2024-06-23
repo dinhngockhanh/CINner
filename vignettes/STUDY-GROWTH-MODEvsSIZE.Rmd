@@ -11,7 +11,7 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
-
+First, we set up the fixed parameters for the simulator.
 
 ```{r}
 cell_lifespan <- 1
@@ -167,7 +167,9 @@ model_prefix <- "GROWTHMODE-vs-SIZE"
 folder_workplace <- "GROWTHMODE-vs-SIZE"
 ```
 
-
+We set up parameter sweeps for the growth mode, ranging from constant (growth mode 1) to exponential with high growth rate, and average cell population size.
+For every parameter combination, we create 1000 simulations.
+We set possible values for the average cell population size to be from 200, 400,...1800, 2000.
 
 ```{r}
 n_simulations_per_batch <- 1000
@@ -199,6 +201,10 @@ var2_name <- "scale_cell_count"
 var2_vals <- seq(200, 2000, by = 200)
 ```
 
+Here we can make a graph of the total cell count vs. time for each growth mode.
+Growth mode 1 is constant.
+Growth mode 10 is exponential with high growth rate
+
 ```{r}
 for (i in 1:length(P0_vals)) {
     df <- data.frame(t = vec_time, value = var1_vals[, i], mode = var1_labs[i])
@@ -224,6 +230,8 @@ print(p)
 dev.off()
 ```
 
+We make the simulation run through the possible combinations between the two variables with each single variable combination consisting of 1000 simulations.
+
 ```{r}
 simulator_multivar(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
@@ -236,6 +244,8 @@ simulator_multivar(
 )
 ```
 
+We obtain the average statistics from the simulations for each parameter value combination.
+
 ```{r}
 statistics_multivar_matrix(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
@@ -247,7 +257,7 @@ statistics_multivar_matrix(
 )
 ```
 
-
+Here we can see how the statistics change by keeping the average cell population size constant for all different growth modes.
 
 ```{r}
 var2_fixed <- var2_vals[length(var2_vals)]
@@ -264,7 +274,7 @@ statistics_multivar_vector(
 )
 ```
 
-
+Here we can see how the statistics change by keeping the growth mode constant for all average cell population sizes.
 
 ```{r}
 var1_fixed <- var1_labs[length(var1_labs)]

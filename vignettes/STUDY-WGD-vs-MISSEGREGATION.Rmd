@@ -9,7 +9,7 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
-
+First, we set up the fixed parameters for the simulator.
 
 ```{r,fig.height=5,fig.width=10}
 cell_lifespan <- 1
@@ -171,7 +171,10 @@ model_prefix <- "WGD-vs-MISSEGREGATION"
 folder_workplace <- "WGD-vs-MISSEGREGATION"
 ```
 
-
+We set up parameter sweeps of the probability of chromosome missegregation and probability of whole-genome duplication.
+For every parameter combination, we create 1000 simulations.
+We set possible values for the probability of chromosome missegregation to be from 10^{-3}, 2x10^{-3},..., 9x10^{-3}, 10^{-2}.
+We set possible values for the probability of whole-genome duplication to be from 10^{-3}, 2x10^{-3},..., 9x10^{-3}, 10^{-2}.
 
 ```{r}
 n_simulations_per_batch <- 1000
@@ -182,6 +185,8 @@ var1_vals <- seq(1e-3, 1e-2, by = 1e-3)
 var2_name <- "prob_CN_whole_genome_duplication"
 var2_vals <- seq(1e-3, 1e-2, by = 1e-3)
 ```
+
+We make the simulation run through the possible combinations between the two variables with each single variable combination consisting of 1000 simulations.
 
 ```{r}
 simulator_multivar(
@@ -195,6 +200,9 @@ simulator_multivar(
 )
 ```
 
+We obtain the average statistics from the simulations for each parameter value combination.
+The statistics we consider are clone count, shannon diversity index, clonal missegregation count, subclonal missegregation count, age of most recent common ancestor, and distribution of ploidy.
+
 ```{r}
 statistics_multivar_matrix(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
@@ -206,7 +214,7 @@ statistics_multivar_matrix(
 )
 ```
 
-
+Here we can see how the statistics change by keeping the probability of whole genome duplication constant for all values of probability of chromosomal missegregation.
 
 ```{r}
 var2_fixed <- var2_vals[1]
@@ -221,6 +229,8 @@ statistics_multivar_vector(
     example_simulation = FALSE
 )
 ```
+
+We can see how the statistics change by keeping the probability of chromosomal missegregation constant for all values of probability of whole-genome duplication.
 
 ```{r}
 var1_fixed <- var1_vals[length(var1_vals)]
