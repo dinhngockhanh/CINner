@@ -9,7 +9,7 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
-First, we set up the fixed parameters for the simulator.
+First, we set up the fixed parameters for the simulator.!
 
 ```{r}
 cell_lifespan <- 1
@@ -197,6 +197,7 @@ simulator_multivar(
 
 We obtain the average statistics from the simulations for each parameter value combination.
 The statistics we consider are clone count, shannon diversity index, clonal missegregation count, subclonal missegregation count, age of most recent common ancestor, and distribution of ploidy.
+
 
 ```{r}
 statistics_multivar_matrix(
