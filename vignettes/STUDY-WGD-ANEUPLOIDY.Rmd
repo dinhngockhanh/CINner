@@ -9,7 +9,9 @@ sapply(files_sources, source)
 # library(CancerSimulator)
 ```
 
-
+First, we set up the fixed parameters for the simulator.
+Note that we need to adjust the probability of chromosome miseggregation per division to reflect the fact that WGD cells have more chromosomes.
+We set the 'rate' of aneuploidy to be 1 initially, which means that the rates of chromosome and chromosome arm miseggregation are the same between WGD and non-WGD cells.
 
 ```{r}
 cell_lifespan <- 30
@@ -82,6 +84,8 @@ model_prefix <- "WGD-and-ANEUPLOIDY"
 folder_workplace <- "WGD-and-ANEUPLOIDY"
 ```
 
+We read the previously fitted parameter values for pan-cancer data.
+
 ```{r}
 parameter_best <- read.csv("PAN-CANCER_fitted_parameters.csv")
 # parameter_best$Best_value[which(parameter_best$Type == "Arm_selection_rate" & parameter_best$Best_value == 1)] <-
@@ -104,6 +108,11 @@ model_variables_base$general_variables$Value[which(model_variables_base$general_
     1 - (1 - tmp)^(1 / (2 * nrow(model_variables_base$cn_info)))
 ```
 
+We set up parameter sweeps of the probability of whole-genome duplication and aneuploidy level.
+For every parameter combination, we create 1000 simulations.
+We set possible values for the probability of chromosome missegregation to be from 10^{-6}, 2x10^{-6},..., 9x10^{-6}, 10^{-5}.
+We set possible values for the probability of aneuploidy to be from 20, 40,..., 180, 200.
+
 ```{r}
 n_simulations_per_batch <- 1000
 
@@ -113,6 +122,9 @@ var2_name <- "alpha_aneuploidy"
 var1_vals <- seq(1e-6, 1e-5, by = 1e-6)
 var2_vals <- seq(20, 200, by = 20)
 ```
+
+We make the simulation run through the possible combinations between the two variables with each single variable combination consisting of 1000 simulations.
+
 
 ```{r}
 simulator_multivar(
@@ -125,6 +137,8 @@ simulator_multivar(
     compute_parallel = TRUE
 )
 ```
+
+We obtain the average statistics from the simulations for each parameter value combination.
 
 ```{r}
 statistics_multivar_matrix(
