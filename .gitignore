@@ -9,6 +9,7 @@
 
 scripts/hmmcopy_v0.0.45.sif
 scripts/ov2295_cell_cn.csv
+vignettes/Extra_algorithms
 vignettes/.DS_Store
 vignettes/hmmcopy_v0.0.45.sif
 vignettes/ov2295_cell_cn.csv

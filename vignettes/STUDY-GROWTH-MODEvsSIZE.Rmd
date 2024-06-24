@@ -2,11 +2,12 @@
 library(readxl)
 library(mosaic)
 library(ggplot2)
-#-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
-#-----------------------------------------------------------------------
+library(CINner)
+# #-----------------------------------------------------------------------
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
+# #-----------------------------------------------------------------------
 # devtools::install_github("dinhngockhanh/CancerSimulator")
 # library(CancerSimulator)
 ```
@@ -48,7 +49,7 @@ bound_maximum_CN <- 8
 bound_homozygosity <- 0
 
 vec_time <- T_0[[1]]:T_end[[1]]
-vec_cell_count <- rep(1000,length(vec_time))
+vec_cell_count <- rep(1000, length(vec_time))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 
 gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
@@ -62,7 +63,6 @@ model_variables_base <- BUILD_general_variables(
     T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
     Table_sample = Table_sample,
     CN_bin_length = CN_bin_length,
-
     prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
     prob_CN_missegregation = prob_CN_missegregation,
     prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
@@ -70,7 +70,6 @@ model_variables_base <- BUILD_general_variables(
     prob_CN_focal_deletion = prob_CN_focal_deletion,
     prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
     prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
-
     model_CN_focal_amplification_length = model_CN_focal_amplification_length,
     model_CN_focal_deletion_length = model_CN_focal_deletion_length,
     prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
