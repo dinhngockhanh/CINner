@@ -8,8 +8,8 @@ library(CINner)
 # files_sources <- list.files(pattern = "*.r$")
 # sapply(files_sources, source)
 # #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+devtools::install_github("dinhngockhanh/CINner")
+library(CINner)
 ```
 
 First, we set up the fixed parameters for the simulator.
@@ -171,7 +171,8 @@ For every parameter combination, we create 1000 simulations.
 We set possible values for the average cell population size to be from 200, 400,...1800, 2000.
 
 ```{r}
-n_simulations_per_batch <- 1000
+# n_simulations_per_batch <- 1000
+n_simulations_per_batch <- 5
 
 var1_name <- "vec_cell_count"
 P0_vals <- seq(10, 1, by = -1) / 10
@@ -268,8 +269,8 @@ statistics_multivar_vector(
     plot_WGD = TRUE,
     n_simulations = n_simulations_per_batch,
     plotname = paste0(model_prefix, "_growth_mode_varies_and_average_cell_count=", var2_fixed),
-    example_simulation = FALSE,
-    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+    example_simulation = FALSE #,
+    #R_libPaths = "/burg/iicd/users/knd2127/rpackages"
 )
 ```
 

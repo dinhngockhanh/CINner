@@ -1,12 +1,15 @@
 ```{r setup}
 library(readxl)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/andrew/Desktop/CINner/R")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
+# setwd("/Users/andrew/Desktop/CINner/vignettes")
 #-----------------------------------------------------------------------
 # devtools::install_github("dinhngockhanh/CancerSimulator")
 # library(CancerSimulator)
+devtools::install_github("chandrew314/CINner")
+library(CINner)
 ```
 
 First, we set up the fixed parameters for the simulator.
@@ -171,12 +174,15 @@ We set possible values for the probability of chromosome missegregation to be fr
 We set possible values for the selection scale of chromosome arms to be from 1, 2,..., 9, 10.
 
 ```{r}
-n_simulations_per_batch <- 1000
+# n_simulations_per_batch <- 1000 actual
+n_simulations_per_batch <- 10
 
 var1_name <- "prob_CN_missegregation"
-var1_vals <- seq(1e-3, 1e-2, by = 1e-3)
+# var1_vals <- seq(1e-3, 1e-2, by = 1e-3)
+var1_vals <- seq(1e-4, 1e-3, by = 2e-3)
 
 var2_name <- "scale_selection"
+# var2_vals <- seq(1, 10) actual
 var2_vals <- seq(1, 10)
 var2_labs <- paste0("x", var2_vals)
 ```
@@ -184,27 +190,30 @@ var2_labs <- paste0("x", var2_vals)
 We make the simulation run through the possible combinations between the two variables with each single variable combination consisting of 1000 simulations.
 
 ```{r}
-# simulator_multivar(
-#     model_prefix = model_prefix, folder_workplace = folder_workplace,
-#     model_variables_base = model_variables_base,
-#     var1_name = var1_name, var1_vals = var1_vals,
-#     var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
-#     n_simulations = n_simulations_per_batch,
-#     stage_final = 3,
-#     compute_parallel = TRUE
-# )
+simulator_multivar(
+    model_prefix = model_prefix, folder_workplace = folder_workplace,
+    model_variables_base = model_variables_base,
+    var1_name = var1_name, var1_vals = var1_vals,
+    var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
+    n_simulations = n_simulations_per_batch,
+    stage_final = 3,
+    compute_parallel = TRUE
+)
 ```
 
 We obtain the average statistics from the simulations for each parameter value combination.
 
 ```{r}
+#################################### PROBLEM geom_arc_bar
+
 statistics_multivar_matrix(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
     var1_name = var1_name, var1_vals = var1_vals,
     var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
     n_simulations = n_simulations_per_batch,
     plot_WGD = TRUE,
-    compute_parallel = TRUE
+    # compute_parallel = TRUE
+    compute_parallel = FALSE
 )
 ```
 

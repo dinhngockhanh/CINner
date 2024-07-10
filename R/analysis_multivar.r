@@ -1753,7 +1753,7 @@ statistics_multivar_vector <- function(model_prefix = "",
             tmp_var1 <<- var1
             tmp_var2 <<- var2
             tmp_plot_WGD <<- plot_WGD
-            statistics_multivar_vector_one_simulation <<- statistics_multivar_vector_one_simulation
+            # statistics_multivar_vector_one_simulation <<- statistics_multivar_vector_one_simulation
             clusterExport(cl, varlist = c(
                 "filename_prefix",
                 "tmp_var1_name",

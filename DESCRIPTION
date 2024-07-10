@@ -1,4 +1,4 @@
-Package: CancerSimulator
+Package: CINner
 Title: Simulating Cancer Evolution as a Selective Model driven by Driver Mutations and Copy Number Aberrations
 Version: 0.0.0.9000
 Authors@R:
