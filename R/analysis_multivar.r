@@ -1359,7 +1359,10 @@ statistics_multivar_matrix_one_simulation <- function(filename, var1_name, var2_
                     if (genotype_list_ploidy_chrom[[clone_new]][chrom] <= 0) next
                     for (strand in 1:genotype_list_ploidy_chrom[[clone_new]][chrom]) {
                         print(genotype_list_ploidy_chrom[[clone_new]][chrom])
+                        print('hi')
                         print(genotype_list_ploidy_block[[clone_new]][chrom][[strand]])
+                        print('hi2')
+                        print(genotype_list_ploidy_block[[clone_new]][[chrom]][[strand]])
                         if (!setequal(genotype_list_ploidy_block[[clone_new]][[chrom]][[strand]], genotype_list_ploidy_block[[clone_old]][[chrom]][[strand]])) tmp <- 0
                     }
                 }
