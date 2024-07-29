@@ -1,15 +1,17 @@
 ```{r setup}
 library(readxl)
 #-----------------------------------------------------------------------
-setwd("/Users/dinhngockhanh/CancerSimulator/R/")
-files_sources <- list.files(pattern = "*.r$")
-sapply(files_sources, source)
+# setwd("/Users/dinhngockhanh/CancerSimulator/R/")
+# files_sources <- list.files(pattern = "*.r$")
+# sapply(files_sources, source)
 #-----------------------------------------------------------------------
 # devtools::install_github("dinhngockhanh/CancerSimulator")
 # library(CancerSimulator)
+devtools::install_github("chandrew314/CINner")
+library(CINner)
 ```
 
-First, we set up the fixed parameters for the simulator.!
+First, we set up the fixed parameters for the simulator.
 
 ```{r}
 cell_lifespan <- 1
@@ -49,7 +51,7 @@ vec_time <- T_0[[1]]:T_end[[1]]
 vec_cell_count <- rep(1000,length(vec_time))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 
-gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
 gc_slope <- 1.2
 gc_int <- 0
 sigma1 <- 0.02642392
@@ -170,14 +172,17 @@ For every parameter combination, we create 1000 simulations.
 We set possible values for the selection scale of loss/gain chromosome arms to be from 1, 2,..., 9, 10.
 
 ```{r}
-n_simulations_per_batch <- 1000
+# n_simulations_per_batch <- 1000
+n_simulations_per_batch <- 5
 
 var1_name <- "scale_selection_loss"
-var1_vals <- seq(1, 10)
+# var1_vals <- seq(1, 10)
+var1_vals <- seq(1, 2)
 var1_labs <- paste0("x", var1_vals)
 
 var2_name <- "scale_selection_gain"
-var2_vals <- seq(1, 10)
+# var2_vals <- seq(1, 10)
+var2_vals <- seq(1, 2)
 var2_labs <- paste0("x", var2_vals)
 ```
 
@@ -191,7 +196,7 @@ simulator_multivar(
     var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
     n_simulations = n_simulations_per_batch,
     stage_final = 3,
-    compute_parallel = TRUE
+    compute_parallel = FALSE
 )
 ```
 
@@ -213,6 +218,9 @@ statistics_multivar_matrix(
 Here we can see how the statistics change by keeping the selection scale of gain arms constant for all values of selection scale for loss arms.
 
 ```{r}
+
+######---Error in genotype_list_ploidy_block[[clone_new]][[chrom]][[strand]] : subscript out of bounds
+
 var2_fixed <- var2_labs[1]
 statistics_multivar_vector(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
@@ -222,7 +230,8 @@ statistics_multivar_vector(
     plot_WGD = FALSE,
     n_simulations = n_simulations_per_batch,
     plotname = paste0(model_prefix, "_scale_selection_loss_varies_and_scale_selection_gain=", var2_fixed),
-    example_simulation = FALSE
+    example_simulation = FALSE,
+    compute_parallel = FALSE
 )
 ```
 
@@ -238,6 +247,7 @@ statistics_multivar_vector(
     plot_WGD = FALSE,
     n_simulations = n_simulations_per_batch,
     plotname = paste0(model_prefix, "_scale_selection_gain_varies_and_scale_selection_loss=", var1_fixed),
-    example_simulation = FALSE
+    example_simulation = FALSE,
+    compute_parallel = FALSE
 )
 ```

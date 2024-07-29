@@ -1,3 +1,162 @@
+#' Evolutionary simulations with multivariable parameter values
+#'
+#' @description 
+#' `simulator_multivar` returns the R data for each evolutionary simulation given the values of the variables supplied to it. 
+#'
+#' @param model_variables_base A list containing named elements 'general_variables', 'selection_model', 'cn_info', 'population_dynamics', 'sampling_info', 'gc_and_mapability'.
+#'      These elements contain the general parameter values necessary to run the simulation.
+#' @param model_prefix A string specifying the name of the model to be used in the output files.
+#' @param var1_name A string specifying the variable to be studied. This can be any of the variables in the 'general_variables' or 'selection_model' in `model_variables_base` or 'scale_selection', 'scale_selection_gain', 'scale_selection_loss', 'delta_selection', 'vec_cell_count', or 'scale_cell_count'.
+#' @param var2_name A string specifying the variable to be studied. This can be any of the variables in the 'general_variables' or 'selection_model' in `model_variables_base` or 'scale_selection', 'scale_selection_gain', 'scale_selection_loss', 'delta_selection', 'vec_cell_count', or 'scale_cell_count'.
+#' @param var1_vals A vector of values corresponding to `var1_name`.
+#' @param var2_vals A vector of values corresponding to `var2_name`.
+#' @param var1_labs A vector of values to be used in labeling the corresponding variable 1 value in the simulation output files. Default is `NULL`.
+#' @param var2_labs A vector of values to be used in labeling the corresponding variable 2 value in the simulation output files. Default is `NULL`.
+#' @param extra_var ???
+#' @param n_simulations An integer value for the number of simulations run per each combination of variables. Default is `0`.
+#' @param stage_final ???
+#' @param n_clones_min An integer value for the minimum number of clones in a simulation. Default is `0`.
+#' @param n_clones_max An integer value for the maximum number of clones in a simulation. Default is `Inf``.
+#' @param save_simulation A boolean value for whether each simulation should be saved. Default is `TRUE`.
+#' @param little_memory ??? Default is `TRUE`.
+#' @param neutral_variations ??? Default is `FALSE`.
+#' @param internal_nodes_cn_info A boolean value for whether a table of chromosome number variations events in a cell's phylogeny is saved. Default is `FALSE`.
+#' @param save_newick_tree ??? Default is `FALSE`.
+#' @param save_cn_profile A boolean value for whether each cell's chromosome number variations profile is saved. Default is `FALSE`.
+#' @param save_cn_clones A boolean value for whether the cell-clone mapping table is saved. Default is `FALSE`.
+#' @param build_cn A boolean value for whether the copy number variations profile is generated in long format. Default is `FALSE`.
+#' @param format_cn_profile A string value for whether the copy number variations profile is generated in wide format. Default is `long`. ???
+#' @param model_readcount ??? Default is `FALSE`.
+#' @param model_readcount_base ??? Default is 'all'.
+#' @param pseudo_corrected_readcount ??? Default is `FALSE`.
+#' @param HMM ??? Default is `FALSE`.
+#' @param HMM_containner ??? Default is `docker`.
+#' @param folder_workplace A string value for the name of the folder where the simulation data will be stored. Default is `NULL`.
+#' @param report_progress A boolean value for whether the progress of the simulations is reported. Default is `TRUE`.
+#' @param compute_parallel A boolean value for whether the simulations should be computed in parallel. Default is `TRUE`.
+#' @param seed ??? Default is `inf`.
+#' @param output_variables ???
+#' @param n_cores An integer value specifying the number of cores to be used for parallel computation. Default is `NULL`.
+#' @param R_libpaths A string value specifying the location of the library containing the R libraries necessary for running CINner. This is usually necessary for use on a high-performance computing cluster. Default is `NULL`.
+#' @param plot ??? Default is `FALSE`.
+#' 
+#' @examples
+#' 
+#' cell_lifespan <- 1
+#' T_0 <- list(0, "day")
+#' T_end <- list(300, "day")
+#' Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+#' T_tau_step <- cell_lifespan / 2
+#' CN_bin_length <- 500000
+#' 
+#' selection_model <- "chrom-arm-selection"
+#' 
+#' prob_CN_whole_genome_duplication <- 0
+#' prob_CN_missegregation <- 0
+#' prob_CN_chrom_arm_missegregation <- 0
+#' prob_CN_focal_amplification <- 0
+#' prob_CN_focal_deletion <- 0
+#' prob_CN_cnloh_interstitial <- 0
+#' prob_CN_cnloh_terminal <- 0
+#' model_CN_focal_amplification_length <- "beta"
+#' model_CN_focal_deletion_length <- "beta"
+#' prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
+#' prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
+#' prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
+#' prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
+#' prob_CN_cnloh_interstitial_length <- 0.005
+#' prob_CN_cnloh_terminal_length <- 0.005
+#' rate_driver <- 0
+#' rate_passenger <- 1e-11
+#' 
+#' bound_driver <- 3
+#' bound_average_ploidy <- 6
+#' bound_maximum_CN <- 8
+#' bound_homozygosity <- 0
+#' 
+#' vec_time <- T_0[[1]]:T_end[[1]]
+#' vec_cell_count <- rep(1000,length(vec_time))
+#' table_population_dynamics <- cbind(vec_time, vec_cell_count)
+#'
+#' gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
+#' gc_slope <- 1.2
+#' gc_int <- 0
+#' sigma1 <- 0.02642392
+#' num_reads <- 3906632
+#'
+#' model_variables_base <- BUILD_general_variables(
+#'    cell_lifespan = cell_lifespan,
+#'    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+#'    Table_sample = Table_sample,
+#'    CN_bin_length = CN_bin_length,
+#'    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
+#'    prob_CN_missegregation = prob_CN_missegregation,
+#'    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
+#'    prob_CN_focal_amplification = prob_CN_focal_amplification,
+#'    prob_CN_focal_deletion = prob_CN_focal_deletion,
+#'    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
+#'    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
+#'    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
+#'    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
+#'    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
+#'    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+#'    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
+#'    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
+#'    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
+#'    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
+#'    rate_driver = rate_driver,
+#'    rate_passenger = rate_passenger,
+#'    selection_model = selection_model,
+#'    bound_driver = bound_driver,
+#'    bound_average_ploidy = bound_average_ploidy,
+#'    bound_maximum_CN = bound_maximum_CN,
+#'    bound_homozygosity = bound_homozygosity,
+#'    table_population_dynamics = table_population_dynamics,
+#'    gc = gc,
+#'    gc_slope = gc_slope,
+#'    gc_int = gc_int,
+#'    sigma1 = sigma1,
+#'    num_reads = num_reads)
+#' 
+#' arm_id <- c(paste(model_variables_base$cn_info$Chromosome, "p", sep = ""), paste(model_variables_base$cn_info$Chromosome, "q", sep = ""))
+#' arm_chromosome <- rep(model_variables_base$cn_info$Chromosome, 2)
+#' arm_start <- c(rep(1, length(model_variables_base$cn_info$Chromosome)), model_variables_base$cn_info$Centromere_location + 1)
+#' arm_end <- c(model_variables_base$cn_info$Centromere_location, model_variables_base$cn_info$Bin_count)
+#' arm_s <- rep(1, length(arm_id))
+#'
+#' model_variables_base <- BUILD_driver_library(
+#'    model_variables = model_variables_base,
+#'    table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s))
+#'
+#' cell_count <- 1000
+#' CN_matrix <- BUILD_cn_normal_XX(model_variables_base$cn_info)
+#' drivers <- list()
+#' model_variables_base <- BUILD_initial_population(
+#'    model_variables = model_variables_base,
+#'    cell_count = cell_count,
+#'    CN_matrix = CN_matrix,
+#'    drivers = drivers)
+#'
+#' model_prefix <- "MISSEGREGATION-vs-SELECTION"
+#' folder_workplace <- "MISSEGREGATION-vs-SELECTION"
+#'
+#' n_simulations_per_batch <- 10
+#' var1_name <- "prob_CN_missegregation"
+#' var1_vals <- seq(1e-4, 1e-3, by = 2e-3)
+#'
+#' var2_name <- "scale_selection"
+#' var2_vals <- seq(1, 10)
+#' var2_labs <- paste0("x", var2_vals)
+#'
+#' simulator_multivar(
+#'    model_prefix = model_prefix, folder_workplace = folder_workplace,
+#'    model_variables_base = model_variables_base,
+#'    var1_name = var1_name, var1_vals = var1_vals,
+#'    var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
+#'    n_simulations = n_simulations_per_batch,
+#'    stage_final = 3,
+#'    compute_parallel = TRUE)
+#'
 #' @export
 simulator_multivar <- function(model_variables_base = list(),
                                model_prefix = "",
@@ -318,7 +477,140 @@ simulator_multivar <- function(model_variables_base = list(),
         }
     }
 }
-
+#' Descriptive statistical plots of evolutionary simulations comparing multiple variables
+#'
+#' @description 
+#' `statistics_multivar_matrix` returns plots of the results from the evolutionary simulations. 
+#'
+#' @inheritParams simulator_multivar
+#' @param plot_WGD A boolean value specifying whether plots regarding whole-genome duplication should be plotted as part of the output. Default is `FALSE`.
+#' @param plot_misseg A boolean value specifying whether plots regarding missegregation events should be plotted as part of the output. Default is `FALSE`.
+#' 
+#' @examples
+#' 
+#' cell_lifespan <- 1
+#' T_0 <- list(0, "day")
+#' T_end <- list(300, "day")
+#' Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+#' T_tau_step <- cell_lifespan / 2
+#' CN_bin_length <- 500000
+#' 
+#' selection_model <- "chrom-arm-selection"
+#' 
+#' prob_CN_whole_genome_duplication <- 0
+#' prob_CN_missegregation <- 0
+#' prob_CN_chrom_arm_missegregation <- 0
+#' prob_CN_focal_amplification <- 0
+#' prob_CN_focal_deletion <- 0
+#' prob_CN_cnloh_interstitial <- 0
+#' prob_CN_cnloh_terminal <- 0
+#' model_CN_focal_amplification_length <- "beta"
+#' model_CN_focal_deletion_length <- "beta"
+#' prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
+#' prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
+#' prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
+#' prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
+#' prob_CN_cnloh_interstitial_length <- 0.005
+#' prob_CN_cnloh_terminal_length <- 0.005
+#' rate_driver <- 0
+#' rate_passenger <- 1e-11
+#' 
+#' bound_driver <- 3
+#' bound_average_ploidy <- 6
+#' bound_maximum_CN <- 8
+#' bound_homozygosity <- 0
+#' 
+#' vec_time <- T_0[[1]]:T_end[[1]]
+#' vec_cell_count <- rep(1000,length(vec_time))
+#' table_population_dynamics <- cbind(vec_time, vec_cell_count)
+#'
+#' gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
+#' gc_slope <- 1.2
+#' gc_int <- 0
+#' sigma1 <- 0.02642392
+#' num_reads <- 3906632
+#'
+#' model_variables_base <- BUILD_general_variables(
+#'    cell_lifespan = cell_lifespan,
+#'    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+#'    Table_sample = Table_sample,
+#'    CN_bin_length = CN_bin_length,
+#'    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
+#'    prob_CN_missegregation = prob_CN_missegregation,
+#'    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
+#'    prob_CN_focal_amplification = prob_CN_focal_amplification,
+#'    prob_CN_focal_deletion = prob_CN_focal_deletion,
+#'    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
+#'    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
+#'    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
+#'    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
+#'    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
+#'    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+#'    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
+#'    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
+#'    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
+#'    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
+#'    rate_driver = rate_driver,
+#'    rate_passenger = rate_passenger,
+#'    selection_model = selection_model,
+#'    bound_driver = bound_driver,
+#'    bound_average_ploidy = bound_average_ploidy,
+#'    bound_maximum_CN = bound_maximum_CN,
+#'    bound_homozygosity = bound_homozygosity,
+#'    table_population_dynamics = table_population_dynamics,
+#'    gc = gc,
+#'    gc_slope = gc_slope,
+#'    gc_int = gc_int,
+#'    sigma1 = sigma1,
+#'    num_reads = num_reads)
+#' 
+#' arm_id <- c(paste(model_variables_base$cn_info$Chromosome, "p", sep = ""), paste(model_variables_base$cn_info$Chromosome, "q", sep = ""))
+#' arm_chromosome <- rep(model_variables_base$cn_info$Chromosome, 2)
+#' arm_start <- c(rep(1, length(model_variables_base$cn_info$Chromosome)), model_variables_base$cn_info$Centromere_location + 1)
+#' arm_end <- c(model_variables_base$cn_info$Centromere_location, model_variables_base$cn_info$Bin_count)
+#' arm_s <- rep(1, length(arm_id))
+#'
+#' model_variables_base <- BUILD_driver_library(
+#'    model_variables = model_variables_base,
+#'    table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s))
+#'
+#' cell_count <- 1000
+#' CN_matrix <- BUILD_cn_normal_XX(model_variables_base$cn_info)
+#' drivers <- list()
+#' model_variables_base <- BUILD_initial_population(
+#'    model_variables = model_variables_base,
+#'    cell_count = cell_count,
+#'    CN_matrix = CN_matrix,
+#'    drivers = drivers)
+#'
+#' model_prefix <- "MISSEGREGATION-vs-SELECTION"
+#' folder_workplace <- "MISSEGREGATION-vs-SELECTION"
+#'
+#' n_simulations_per_batch <- 10
+#' var1_name <- "prob_CN_missegregation"
+#' var1_vals <- seq(1e-4, 1e-3, by = 2e-3)
+#'
+#' var2_name <- "scale_selection"
+#' var2_vals <- seq(1, 10)
+#' var2_labs <- paste0("x", var2_vals)
+#'
+#' simulator_multivar(
+#'    model_prefix = model_prefix, folder_workplace = folder_workplace,
+#'    model_variables_base = model_variables_base,
+#'    var1_name = var1_name, var1_vals = var1_vals,
+#'    var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
+#'    n_simulations = n_simulations_per_batch,
+#'    stage_final = 3,
+#'    compute_parallel = TRUE)
+#' 
+#' statistics_multivar_matrix(
+#'    model_prefix = model_prefix, folder_workplace = folder_workplace,
+#'    var1_name = var1_name, var1_vals = var1_vals,
+#'    var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
+#'    n_simulations = n_simulations_per_batch,
+#'    plot_WGD = TRUE,
+#'    compute_parallel = TRUE)
+#'
 #' @export
 statistics_multivar_matrix <- function(model_prefix = "",
                                        folder_workplace = "",
@@ -1652,6 +1944,146 @@ statistics_multivar_matrix_one_simulation <- function(filename, var1_name, var2_
     return(df_stat_sim)
 }
 
+#' Descriptive statistical plots of evolutionary simulations comparing multiple variables with one fixed variable value
+#'
+#' @description 
+#' `statistics_multivar_vector` returns plots of the results from the evolutionary simulations with one fixed variable value. 
+#'
+#' @inheritParams simulator_multivar
+#' @param plot_WGD A boolean value specifying whether plots regarding whole-genome duplication should be plotted as part of the output. Default is `FALSE`.
+#' @param plotname A string value specifying the name of the plot that will be output.
+#' @param example_simulation ??? Default is `FALSE`.
+#' 
+#' 
+#' @examples
+#' 
+#' cell_lifespan <- 1
+#' T_0 <- list(0, "day")
+#' T_end <- list(300, "day")
+#' Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+#' T_tau_step <- cell_lifespan / 2
+#' CN_bin_length <- 500000
+#' 
+#' selection_model <- "chrom-arm-selection"
+#' 
+#' prob_CN_whole_genome_duplication <- 0
+#' prob_CN_missegregation <- 0
+#' prob_CN_chrom_arm_missegregation <- 0
+#' prob_CN_focal_amplification <- 0
+#' prob_CN_focal_deletion <- 0
+#' prob_CN_cnloh_interstitial <- 0
+#' prob_CN_cnloh_terminal <- 0
+#' model_CN_focal_amplification_length <- "beta"
+#' model_CN_focal_deletion_length <- "beta"
+#' prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
+#' prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
+#' prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
+#' prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
+#' prob_CN_cnloh_interstitial_length <- 0.005
+#' prob_CN_cnloh_terminal_length <- 0.005
+#' rate_driver <- 0
+#' rate_passenger <- 1e-11
+#' 
+#' bound_driver <- 3
+#' bound_average_ploidy <- 6
+#' bound_maximum_CN <- 8
+#' bound_homozygosity <- 0
+#' 
+#' vec_time <- T_0[[1]]:T_end[[1]]
+#' vec_cell_count <- rep(1000,length(vec_time))
+#' table_population_dynamics <- cbind(vec_time, vec_cell_count)
+#'
+#' gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
+#' gc_slope <- 1.2
+#' gc_int <- 0
+#' sigma1 <- 0.02642392
+#' num_reads <- 3906632
+#'
+#' model_variables_base <- BUILD_general_variables(
+#'    cell_lifespan = cell_lifespan,
+#'    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+#'    Table_sample = Table_sample,
+#'    CN_bin_length = CN_bin_length,
+#'    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
+#'    prob_CN_missegregation = prob_CN_missegregation,
+#'    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
+#'    prob_CN_focal_amplification = prob_CN_focal_amplification,
+#'    prob_CN_focal_deletion = prob_CN_focal_deletion,
+#'    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
+#'    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
+#'    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
+#'    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
+#'    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
+#'    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+#'    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
+#'    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
+#'    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
+#'    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
+#'    rate_driver = rate_driver,
+#'    rate_passenger = rate_passenger,
+#'    selection_model = selection_model,
+#'    bound_driver = bound_driver,
+#'    bound_average_ploidy = bound_average_ploidy,
+#'    bound_maximum_CN = bound_maximum_CN,
+#'    bound_homozygosity = bound_homozygosity,
+#'    table_population_dynamics = table_population_dynamics,
+#'    gc = gc,
+#'    gc_slope = gc_slope,
+#'    gc_int = gc_int,
+#'    sigma1 = sigma1,
+#'    num_reads = num_reads)
+#' 
+#' arm_id <- c(paste(model_variables_base$cn_info$Chromosome, "p", sep = ""), paste(model_variables_base$cn_info$Chromosome, "q", sep = ""))
+#' arm_chromosome <- rep(model_variables_base$cn_info$Chromosome, 2)
+#' arm_start <- c(rep(1, length(model_variables_base$cn_info$Chromosome)), model_variables_base$cn_info$Centromere_location + 1)
+#' arm_end <- c(model_variables_base$cn_info$Centromere_location, model_variables_base$cn_info$Bin_count)
+#' arm_s <- rep(1, length(arm_id))
+#'
+#' model_variables_base <- BUILD_driver_library(
+#'    model_variables = model_variables_base,
+#'    table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s))
+#'
+#' cell_count <- 1000
+#' CN_matrix <- BUILD_cn_normal_XX(model_variables_base$cn_info)
+#' drivers <- list()
+#' model_variables_base <- BUILD_initial_population(
+#'    model_variables = model_variables_base,
+#'    cell_count = cell_count,
+#'    CN_matrix = CN_matrix,
+#'    drivers = drivers)
+#'
+#' model_prefix <- "MISSEGREGATION-vs-SELECTION"
+#' folder_workplace <- "MISSEGREGATION-vs-SELECTION"
+#'
+#' n_simulations_per_batch <- 10
+#' var1_name <- "prob_CN_missegregation"
+#' var1_vals <- seq(1e-4, 1e-3, by = 2e-3)
+#'
+#' var2_name <- "scale_selection"
+#' var2_vals <- seq(1, 10)
+#' var2_labs <- paste0("x", var2_vals)
+#'
+#' simulator_multivar(
+#'    model_prefix = model_prefix, folder_workplace = folder_workplace,
+#'    model_variables_base = model_variables_base,
+#'    var1_name = var1_name, var1_vals = var1_vals,
+#'    var2_name = var2_name, var2_vals = var2_vals, var2_labs = var2_labs,
+#'    n_simulations = n_simulations_per_batch,
+#'    stage_final = 3,
+#'    compute_parallel = TRUE)
+#' 
+#' var2_fixed <- var2_labs[1]
+#' statistics_multivar_vector(
+#'    model_prefix = model_prefix, folder_workplace = folder_workplace,
+#'    var1_name = var1_name, var1_vals = var1_vals,
+#'    var2_name = var2_name, var2_labs = rep(var2_fixed, length(var1_vals)),
+#'    var_labs = scientific(var1_vals), name_lab = "Probability of missegregation",
+#'    plot_WGD = FALSE,
+#'    n_simulations = n_simulations_per_batch,
+#'    plotname = paste0(model_prefix, "_prob_CN_missegregation_varies_and_scale_selection=", var2_fixed),
+#'    example_simulation = FALSE)
+#' 
+#' 
 #' @export
 statistics_multivar_vector <- function(model_prefix = "",
                                        folder_workplace = NULL,

@@ -8,8 +8,10 @@ library(CINner)
 # files_sources <- list.files(pattern = "*.r$")
 # sapply(files_sources, source)
 # #-----------------------------------------------------------------------
-# devtools::install_github("dinhngockhanh/CancerSimulator")
-# library(CancerSimulator)
+# devtools::install_github("dinhngockhanh/CINner")
+# library(CINner)
+devtools::install_github("chandrew314/CINner")
+library(CINner)
 ```
 
 First, we set up the fixed parameters for the simulator.
@@ -52,7 +54,7 @@ vec_time <- T_0[[1]]:T_end[[1]]
 vec_cell_count <- rep(1000, length(vec_time))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 
-gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
 gc_slope <- 1.2
 gc_int <- 0
 sigma1 <- 0.02642392
@@ -171,10 +173,12 @@ For every parameter combination, we create 1000 simulations.
 We set possible values for the average cell population size to be from 200, 400,...1800, 2000.
 
 ```{r}
-n_simulations_per_batch <- 1000
+# n_simulations_per_batch <- 1000
+n_simulations_per_batch <- 5
 
 var1_name <- "vec_cell_count"
-P0_vals <- seq(10, 1, by = -1) / 10
+# P0_vals <- seq(10, 1, by = -1) / 10
+P0_vals <- seq(2, 1, by = -1) / 10
 MASS <- T_end[[1]]
 fr <- function(growthrate) {
     if (growthrate != 0) {
@@ -197,7 +201,8 @@ for (i in 1:length(P0_vals)) {
 var1_labs <- paste0(1:length(P0_vals))
 
 var2_name <- "scale_cell_count"
-var2_vals <- seq(200, 2000, by = 200)
+# var2_vals <- seq(200, 2000, by = 200)
+var2_vals <- seq(200, 2000, by = 600)
 ```
 
 Here we can make a graph of the total cell count vs. time for each growth mode.
@@ -252,13 +257,14 @@ statistics_multivar_matrix(
     var2_name = var2_name, var2_vals = var2_vals,
     n_simulations = n_simulations_per_batch,
     plot_WGD = TRUE, plot_misseg = TRUE,
-    compute_parallel = TRUE
+    compute_parallel = FALSE
 )
 ```
 
 Here we can see how the statistics change by keeping the average cell population size constant for all different growth modes.
 
 ```{r}
+###---Error in genotype_list_ploidy_block[[clone_new]][[chrom]][[strand]] : subscript out of bounds
 var2_fixed <- var2_vals[length(var2_vals)]
 statistics_multivar_vector(
     model_prefix = model_prefix, folder_workplace = folder_workplace,
@@ -269,7 +275,8 @@ statistics_multivar_vector(
     n_simulations = n_simulations_per_batch,
     plotname = paste0(model_prefix, "_growth_mode_varies_and_average_cell_count=", var2_fixed),
     example_simulation = FALSE,
-    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+    compute_parallel = FALSE #,
+    #R_libPaths = "/burg/iicd/users/knd2127/rpackages"
 )
 ```
 

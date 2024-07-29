@@ -1,99 +1,63 @@
----
-title: "Chromosome Arm Fitting Program"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Chromosome Arm Fitting Program}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-    collapse = TRUE,
-    warning = FALSE, message = FALSE,
-    comment = "#>"
-)
+```{r setup}
+library(readxl)
+library(data.table)
+#-----------------------------------------------------------------------
+devtools::install_github("chandrew314/CINner")
+library(CINner)
 ```
 
 First, set up the fiexd parameters for the simulator.
 
 ```{r}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Set up model parameters
+#---Each cell's lifespan is exponentially distributed with mean 30 days
 cell_lifespan <- 30
+#---Simulation starts at 0 years
 T_0 <- list(0, "year")
+#---Simulation ends at 80 years
 T_end <- list(80, "year")
+#---All cells at final time are sampled, sample ID is SA01
 Table_sample <- data.frame(Sample_ID = c("SA01"), Cell_count = c(Inf), Age_sample = c(80))
-T_tau_step <- cell_lifespan / 2
-CN_bin_length <- 500000
+#---Mode of selection
 selection_model <- "chrom-arm-selection"
-#------------------------------------------------------CNA PROBABILITIES
-prob_CN_whole_genome_duplication <- 0e-4
+#---Probability of missegregation per homolog per cell division
 prob_CN_missegregation <- 5e-5
-prob_CN_chrom_arm_missegregation <- 0e-5
-prob_CN_focal_amplification <- 0e-5
-prob_CN_focal_deletion <- 0e-5
-prob_CN_cnloh_interstitial <- 0e-5
-prob_CN_cnloh_terminal <- 0e-5
-model_CN_focal_amplification_length <- "beta"
-model_CN_focal_deletion_length <- "beta"
-prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
-prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
-prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
-prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
-prob_CN_cnloh_interstitial_length <- 0.005
-prob_CN_cnloh_terminal_length <- 0.005
-rate_driver <- 0
-rate_passenger <- 1e-11
-#---------------------------------------------------VIABILITY THRESHOLDS
-bound_driver <- Inf
+#---Formula for probability of missegregation per cell division
+formula_CN_missegregation <- "per_division:prob_CN_missegregation"
+#---Formula for probability of arm-missegregation per cell division
+formula_CN_chrom_arm_missegregation <- "per_division:prob_CN_chrom_arm_missegregation"
+#---Conditions for cell viability: upper bound on (average) ploidy
 bound_average_ploidy <- Inf
+#---Conditions for cell viability: upper bound on bins with total CN = 0 (nullisomy)
 bound_homozygosity <- 0
+#---Conditions for cell viability: upper bound on bin CN
 bound_maximum_CN <- Inf
+#---Conditions for cell viability: upper bound on bin CN normalized by ploidy
 bound_maximum_CN_normalized <- 4
-#-----------------------------------------------------------------------
+#---Conditions for cell viability: upper bound on WGD count throughout cell's lineage
+bound_WGD <- 1
+#---Total cell population is expected to follow a logistic growth curve up to 10,000 cells
 vec_time <- T_0[[1]]:T_end[[1]]
 L <- 10000
 t_0 <- 20
 k <- 0.3
 vec_cell_count <- L / (1 + exp(-k * (vec_time - t_0)))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
-gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
-gc_slope <- 1.2
-gc_int <- 0
-sigma1 <- 0.1
-num_reads <- 2e6
+#---Create model variable dataframe
 model_variables <- BUILD_general_variables(
     cell_lifespan = cell_lifespan,
-    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    T_0 = T_0, T_end = T_end,
     Table_sample = Table_sample,
-    CN_bin_length = CN_bin_length,
-    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
-    prob_CN_missegregation = prob_CN_missegregation,
-    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
-    prob_CN_focal_amplification = prob_CN_focal_amplification,
-    prob_CN_focal_deletion = prob_CN_focal_deletion,
-    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
-    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
-    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
-    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
-    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
-    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
-    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
-    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
-    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
-    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
-    rate_driver = rate_driver,
-    rate_passenger = rate_passenger,
     selection_model = selection_model,
-    bound_driver = bound_driver,
-    bound_maximum_CN = bound_maximum_CN,
+    prob_CN_missegregation = prob_CN_missegregation,
+    formula_CN_missegregation = formula_CN_missegregation,
+    formula_CN_chrom_arm_missegregation = formula_CN_chrom_arm_missegregation,
     bound_average_ploidy = bound_average_ploidy,
     bound_homozygosity = bound_homozygosity,
-    table_population_dynamics = table_population_dynamics,
-    gc = gc,
-    gc_slope = gc_slope,
-    gc_int = gc_int,
-    sigma1 = sigma1,
-    num_reads = num_reads
+    bound_maximum_CN = bound_maximum_CN,
+    bound_maximum_CN_normalized = bound_maximum_CN_normalized,
+    bound_WGD = bound_WGD,
+    table_population_dynamics = table_population_dynamics
 )
 ```
 
@@ -102,6 +66,7 @@ Given values at the same location in the vectors, `arm_s` is the selection rate 
 The selection rate is initialized to be 1 for each chromosome arm in `arm_ID`.
 
 ```{r}
+#---Initialize library of chromosome arms
 arm_id <- c(paste(model_variables$cn_info$Chromosome, "p", sep = ""), paste(model_variables$cn_info$Chromosome, "q", sep = ""))
 arm_chromosome <- rep(model_variables$cn_info$Chromosome, 2)
 arm_start <- c(rep(1, length(model_variables$cn_info$Chromosome)), model_variables$cn_info$Centromere_location + 1)
@@ -123,26 +88,35 @@ model_variables <- BUILD_driver_library(
 We now specify the initial cell population. Here we assume that the initial state consists of one clone, where `cell_count` is its cell count. The variable `CN_matrix` specifies the clone's CN profile, here assumed to be normal diploid female cells. The variable `drivers` defines the existing driver mutations in the clone, here assumed to be none.
 
 ```{r}
+#---Initial population consists of 20 cells, each consisting of 22 diploid autosomes
 cell_count <- 20
 CN_matrix <- BUILD_cn_normal_autosomes(model_variables$cn_info)
 drivers <- list()
-model_variables <- BUILD_initial_population(model_variables = model_variables, cell_count = cell_count, CN_matrix = CN_matrix, drivers = drivers)
+model_variables <- BUILD_initial_population(
+    model_variables = model_variables,
+    cell_count = cell_count,
+    CN_matrix = CN_matrix,
+    drivers = drivers
+)
 ```
 
 The final step of model variable preparation is using the function `CHECK_model_variables` to check the variables defined thus far in csv files. The variable `library_name` is incorporated into the csv files' names.
 
 ```{r}
-library_name <- "ABC-BULK-ARM-CN"
+#---Check model variable dataframe for compatibility
 model_variables <- CHECK_model_variables(model_variables)
+#---Set up name of library
+library_name <- "ABC-BULK-ARM-CN"
 ```
 
 ## ABC Fitting for arm selection and missegregation rates
 ### Building the simulation library
 
-`list_parameters_library` is a dataframe consisting of the parameters (`variable`) to be fitted: `prob_CN_chrom_arm_missegregation` and the selection rate for each chromosome arm. 
+`list_parameters_library` is a dataframe consisting of the parameters ('Variable') to be fitted: `prob_CN_chrom_arm_missegregation` and the selection rate for each chromosome arm. 
 `prob_CN_chrom_arm_missegregation` has lower and upper bounds of 10^-5^ and 10^-4^, respectively. Each chromosome arm selection rate has lower and upper bounds of 0.5 and 1.5, respectively.
 
 ```{r}
+#---Create list of parameters and ranges for their prior distributions
 list_parameters_library <- data.frame(matrix(ncol = 4, nrow = 0))
 colnames(list_parameters_library) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
 list_parameters_library[nrow(list_parameters_library) + 1, ] <- c("prob_CN_chrom_arm_missegregation", "CNA_probability", 1e-5, 1e-4)
@@ -154,22 +128,21 @@ for (i in 1:length(model_variables$chromosome_arm_library$Arm_ID)) {
     )
 }
 ```
-
 Initialize a vector specifying the variables we want to fit.
-
 ```{r}
+#---Create list of target statistics
 list_targets_library <- model_variables$chromosome_arm_library$Arm_ID
 ```
 
 Here, we build a library of simulations using our specified model variables. 
-Our variables to fit are specified by the `list_targets` parameter. 
+Our variables to fit are specified by the `list_targets` variable. 
 To generate statistics necessary for ABC, `n_sample` is the number of values from the prior distribution that are randomly selected for each simulation. 
 `ABC_simcount` is then the number of simulations for a given parameters set. 
 Each simulation is characterized by the copy number profile of the larest clone. 
 The gain/loss frequencies of each chromosome arm are the important statistic used later for fitting arm selection rates.
 
 ```{r}
-###################################    BUILD LIBRARY OF SIMULATED ARM-CN
+#---Build simulation library
 start_time <- Sys.time()
 library_bulk_arm_CN(
     library_name = library_name,
@@ -178,77 +151,30 @@ library_bulk_arm_CN(
     list_targets = list_targets_library,
     ABC_simcount = 2000,
     n_samples = 100,
-    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+    R_libPaths = R_libPaths
 )
 end_time <- Sys.time()
 print(end_time - start_time)
-########################################################################
 ```
 
-We then aggregate the arm deletion, arm amplification, and gene balance scores betweem tumor supressor, onco, and essential genes from TCGA pan-cancer data.
-
-```{r}
-#############################################    FIT FOR TCGA PAN-CANCER
-copynumber_DATA <- read.csv(file = system.file("extdata", "Davoli_Charm_score.csv", package = "CINner"))
-copynumber_DATA <- copynumber_DATA[, c(1, 2, 3, 14, 15)]
-colnames(copynumber_DATA) <- c("Arm", "Del_freq_all", "Amp_freq_all", "Charm.TSG.OG.score", "Charm.TSG.OG.Ess.score")
-```
-
-Because TCGA pan-cancer excludes chromosome arms 13p, 14p, 15p, 21q, 22p, and chromosomes X and Y, we need to modify the list of parameters that need to be fit by changing the value of `list_targets` and `list_parameters`. 
-
-```{r}
-list_targets <- copynumber_DATA$Arm
-list_parameters <- list_parameters_library[c(
-    which(list_parameters_library$Type == "CNA_probability"),
-    which(list_parameters_library$Type == "Arm_selection_rate" & list_parameters_library$Variable %in% copynumber_DATA$Arm)
-), ]
-```
-
-### ABC fitting for chromosome arm selection and missegregation in pan-cancer data
-
-Fitting routine for each chromosome arm using ABC random forest for pan-cancer data.
-
-```{r}
-cat(paste0("\n\n\nFITTING FOR PAN-CANCER\n"))
-fitting_bulk_arm_CN(
-    library_name = library_name,
-    model_name = "PAN-CANCER",
-    model_variables = model_variables,
-    copynumber_DATA = copynumber_DATA,
-    list_parameters = list_parameters,
-    list_parameters_library = list_parameters_library,
-    list_targets = list_targets,
-    list_targets_library = list_targets_library,
-    library_shuffle = TRUE,
-    type_sample_DATA = "average",
-    type_cn_DATA = "arm",
-    folder_workplace = library_name,
-    R_libPaths = "/burg/iicd/users/knd2127/rpackages"
-)
-########################################################################
-```
-
-### ABC fitting for chromosome arm selection and missegregation in PCAWG data by cancer type
+### ABC fitting for chromosome arm selection and missegregation
 
 For fitting arm selection rates by cancer subtype in PCAWG data, we retrieve the different types of cancer present in PCAWG data and save it to `PCAWG_cancer_types`.
 
 ```{r}
-#######################################    FIT FOR PCAWG CANCER SUBTYPES
+#---Input list of PCAWG sample ID's
 copynumber_PCAWG <- read_excel(system.file("pcawg_specimen_histology_August2016_v9.xlsx", package = "CINner"))
-
+#---Find list of PCAWG cancer types
 PCAWG_cancer_types <- unique(copynumber_PCAWG$histology_abbreviation)
 PCAWG_cancer_types <- PCAWG_cancer_types[which(!is.na(PCAWG_cancer_types))]
 ```
 
-We read whole genome duplication data from PCAWG.
+We read whole genome duplication data from PCAWG and find the sample IDs associated with each cancer type.
 
 ```{r}
+#---Input WGD status for each PCAWG sample
 PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CINner"), header = TRUE)
-```
-
-For each cancer type in PCAWG, we obtain the ID for each sample in that cancer type.
-
-```{r}
+#---Find list of PCAWG sample ID's for each cancer type
 PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
     sample_ids <- copynumber_PCAWG$tcga_sample_uuid[which(copynumber_PCAWG$histology_abbreviation == PCAWG_cancer_types[i])]
@@ -262,10 +188,10 @@ for (i in 1:length(PCAWG_cancer_types)) {
 }
 ```
 
-For each cancer type, we save the sample IDs that do not have whole-genome duplication.
-We include only the PCWAG cancer types that contain more than 10 samples.
+We include only the PCWAG cancer types that contain more than 10 samples with WGD.
 
 ```{r}
+#---Find list of PCAWG sample ID's for each cancer type that are non-WGD
 PCAWG_cancer_type_nonWGD_sample_ids <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
     sample_ids <- PCAWG_cancer_type_sample_ids[[i]]
@@ -273,16 +199,12 @@ for (i in 1:length(PCAWG_cancer_types)) {
     sample_nonwgd_ids <- sample_wgd$samplename[which(sample_wgd$wgd_uncertain == FALSE & sample_wgd$wgd_status == "no_wgd")]
     PCAWG_cancer_type_nonWGD_sample_ids[[i]] <- sample_nonwgd_ids
 }
-
+#---Remove cancer types with less than 10 non-WGD samples
 sample_sizes <- sapply(PCAWG_cancer_type_nonWGD_sample_ids, length)
 PCAWG_cancer_types <- PCAWG_cancer_types[-which(sample_sizes < 10)]
 PCAWG_cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[-which(sample_sizes < 10)]
 PCAWG_cancer_type_nonWGD_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[-which(sample_sizes < 10)]
-```
-
-Combine CN profiles for all samples of each PCAWG cancer type into one:
-
-```{r}
+#---Create list of CN profiles for each non-WGD sample in each PCAWG cancer type
 copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
 for (i in 1:length(PCAWG_cancer_types)) {
     cancer_type <- PCAWG_cancer_types[i]
@@ -300,13 +222,15 @@ for (i in 1:length(PCAWG_cancer_types)) {
 }
 ```
 
-Fit the chromosome arm CNA probabilities and arm selection rates with ABC random forest:
+Fit the chromosome arm missegregation and selection rates with ABC random forest for the remaining PCAWG cancer types.
 
 ```{r}
-list_targets <- model_variables$chromosome_arm_library$Arm_ID
+#---Find list of parameters
 list_parameters <- list_parameters_library
-
-for (i in 1:6) {
+#---Find list of target statistics
+list_targets <- model_variables$chromosome_arm_library$Arm_ID
+#---ABC fitting for each PCAWG cancer type
+for (i in 1:length(PCAWG_cancer_types)) {
     cancer_type <- PCAWG_cancer_types[i]
     copynumber_DATA <- copynumber_DATA_cancer_types[[i]]
     cat(paste0("\n\n\nFITTING FOR ", cancer_type, "   [", i, "/", length(PCAWG_cancer_types), "]", "\n"))
@@ -322,14 +246,15 @@ for (i in 1:6) {
         bound_freq = 0.1,
         library_shuffle = TRUE,
         folder_workplace = library_name,
-        R_libPaths = "/burg/iicd/users/knd2127/rpackages"
+        R_libPaths = R_libPaths
     )
 }
-########################################################################
 ```
 
+Plot the results of the ABC fitting.
 
-################################    STATISTICS FOR PCAWG CANCER SUBTYPES
+```{r}
+#---Plot results from ABC fitting
 df_WGD_FGA <- statistics_bulk_arm_WGD_status(
     plotname = "ALL_PCAWG",
     DATA_cancer_types = PCAWG_cancer_types,
@@ -338,4 +263,4 @@ df_WGD_FGA <- statistics_bulk_arm_WGD_status(
     DATA_wgd = PCAWG_wgd,
     model_variables = model_variables
 )
-########################################################################
+```

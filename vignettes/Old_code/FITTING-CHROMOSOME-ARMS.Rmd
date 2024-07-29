@@ -158,7 +158,7 @@ We then run the fitting routine:
 We first load the list of samples for all cancer types in PCAWG:
 
 ```{r}
-copynumber_PCAWG <- read_excel(system.file("pcawg_specimen_histology_August2016_v9.xlsx", package = "CancerSimulator"))
+copynumber_PCAWG <- read_excel(system.file("pcawg_specimen_histology_August2016_v9.xlsx", package = "CINner"))
 ```
 
 List of cancer type-specific datasets in PCAWG:
@@ -171,7 +171,7 @@ PCAWG_cancer_types <- PCAWG_cancer_types[which(!is.na(PCAWG_cancer_types))]
 WGD status for each sample in PCAWG:
 
 ```{r}
-PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CancerSimulator"), header = TRUE)
+PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CINner"), header = TRUE)
 ```
 
 List of all samples with available high-quality CN data, per PCAWG cancer type:
@@ -182,8 +182,8 @@ for (i in 1:length(PCAWG_cancer_types)) {
     sample_ids <- copynumber_PCAWG$tcga_sample_uuid[which(copynumber_PCAWG$histology_abbreviation == PCAWG_cancer_types[i])]
     for (j in 1:length(sample_ids)) {
         sample_id <- sample_ids[j]
-        if (!file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"))) next
-        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        if (!file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"))) next
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"), header = TRUE)
         if (max(tmp$star, na.rm = TRUE) < 2) next
         PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
     }
@@ -221,7 +221,7 @@ for (i in 1:length(PCAWG_cancer_types)) {
     copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
     for (j in 1:length(cancer_type_sample_ids)) {
         sample_id <- cancer_type_sample_ids[j]
-        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"), header = TRUE)
         if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
         tmp <- tmp[which(tmp$star >= 2), ]
         tmp$donor_unique_id <- sample_id
@@ -236,7 +236,7 @@ for (i in 1:length(PCAWG_cancer_types)) {
     copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
     for (j in 1:length(cancer_type_sample_ids)) {
         sample_id <- cancer_type_sample_ids[j]
-        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CancerSimulator"), header = TRUE)
+        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"), header = TRUE)
         if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
         tmp <- tmp[which(tmp$star >= 2), ]
         tmp$donor_unique_id <- sample_id

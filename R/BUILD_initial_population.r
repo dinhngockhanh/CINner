@@ -1,3 +1,21 @@
+#' Update the initial population for clones
+#' 
+#' @description
+#' `BUILD_initial_population` returns an updated object specifying the characteristics, including any drivers and CN profile, of the initial population of cell(s). 
+#'
+#' @param model_variables ??? The object specifying the values of the parameters the simulation uses.
+#' @param cell_count An integer value specifying the initial population's cell count. Default is 1.
+#' @param CN_matrix A dataframe specifying the CN profile of the initial cell population.
+#' @param drivers ??? A list specifying the driver genes the initial population of cells have.
+#'
+#' @examples
+#' 
+#' model_variables_base <- BUILD_initial_population(
+#'    model_variables = model_variables_base,
+#'    cell_count = cell_count,
+#'    CN_matrix = CN_matrix,
+#'    drivers = drivers)
+#' 
 #' @export
 BUILD_initial_population <- function(model_variables = list(),
                                      cell_count = 1,
