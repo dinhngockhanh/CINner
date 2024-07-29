@@ -98,6 +98,19 @@ bulk_gene_get_best_para <- function(data_rf, model_rf, all_obs, post_rf) {
     best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))][1]
 }
 
+#' Fitting driver gene data for a cancer type from PCAWG
+#' 
+#' @inheritParams library_bulk_arm_CN
+#' 
+#' @examples 
+#' 
+#' list_parameters <- data.frame(matrix(ncol = 4, nrow = 0))
+#' colnames(list_parameters) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
+#' list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_deletion", "CNA_probability", 1e-6, 1e-5)
+#' 
+#' list_targets <- model_variables$driver_library$Gene_ID
+#' 
+#' 
 #' @export
 library_bulk_gene <- function(library_name,
                               model_variables,
@@ -243,7 +256,46 @@ fitting_bulk_focal_length <- function(cnv_DATA,
     #-------------------------------------------Return fitted parameters
     return(fit$estimate)
 }
-
+#' Fit driver gene data for a cancer type from PCAWG
+#' 
+#' @description 
+#' `fitting_bulk_gene` returns the fitted parameter values from the simulations using PCAWG data as reference.
+#' 
+#' @param library_name A string to be used in the resulting rda's name.
+#' @param model_name A string to be used to identify the model. ???
+#' @param sample_ids_DATA A list of the sample IDs from PCAWG data.
+#' @param driver_events_DATA A list of the driver events present in each PCAWG cancer type data (including only mutational and CNA events, excluding germline and SV events)
+#' @param list_parameters A dataframe consisting of the parameters to be fitted. The dataframe should have columns "Variable", "Type", "Lower_bound", "Upper_bound".
+#' @param list_targets A list specifying the target parameter(s) to be fitted by ABC.
+#' @param n_cores An integer number specifying the number of cores to be used for parallel processing. ???
+#' @param R_libPaths ??? The location of the necessary R packages to run CINner when using an HPC cluster. Default is NULL.
+#' @param folder_workplace The location of the folder to contain the output files and plots. Default is NULL.
+#' 
+#' @examples 
+#' 
+#' cancer_type <- "PRAD-CA"
+#' cancer_type_sample_ids <- PCAWG_cancer_type_sample_ids[[which(PCAWG_cancer_types == cancer_type)]]
+#' 
+#' PCAWG_cancer_type_driver_events <- read.table(system.file("TableS3_panorama_driver_mutations_ICGC_samples.controlled.tsv", package = "CancerSimulator"), header = TRUE)
+#' cancer_type_driver_events <- PCAWG_cancer_type_driver_events[
+#'    which(PCAWG_cancer_type_driver_events$sample_id %in% cancer_type_sample_ids &
+#'        PCAWG_cancer_type_driver_events$top_category %in% c("CNA", "mutational")), ]
+#'
+#' list_parameters <- data.frame(matrix(ncol = 4, nrow = 0))
+#' colnames(list_parameters) <- c("Variable", "Type", "Lower_bound", "Upper_bound")
+#' list_parameters[nrow(list_parameters) + 1, ] <- c("prob_CN_focal_deletion", "CNA_probability", 1e-6, 1e-5)
+#' 
+#' list_targets <- model_variables$driver_library$Gene_ID
+#' 
+#' fitting_bulk_gene(
+#'    library_name = paste0("ABC-BULK-DRIVER-GENE-", cancer_type),
+#'    model_name = cancer_type,
+#'    sample_ids_DATA = cancer_type_sample_ids,
+#'    driver_events_DATA = cancer_type_driver_events,
+#'    list_parameters = list_parameters,
+#'    list_targets = list_targets,
+#'    folder_workplace = 'PRAD-CA')
+#'
 #' @export
 fitting_bulk_gene <- function(library_name,
                               model_name,

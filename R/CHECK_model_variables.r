@@ -1,3 +1,15 @@
+#' Check/Clean up the model variables
+#' 
+#' @description
+#' `CHECK_model_variable` returns an updated object that checks the specified model variables to clean up the libraries of CN information and chromosome arm selection rates.
+#'
+#' @inheritParams BUILD_initial_population
+#' 
+#' @examples 
+#' 
+#' CHECK_model_variables(model_variables)
+#'
+#'
 #' @export
 CHECK_model_variables <- function(model_variables) {
     TABLE_INITIAL_CN <- model_variables$initial_cn

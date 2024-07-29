@@ -1,4 +1,16 @@
 #----------------------Function to assign parameters to proper positions
+#' Assign parameters to proper positions
+#' 
+#' @description 
+#' `bulk_arm_CN_assign_paras` returns an updated object that has parameters assigned to the correct position???
+#' 
+#' @inheritParams BUILD_initial_population
+#' @param parameter_IDs ???
+#' @param parameters ???
+#' 
+#' @examples 
+#' bulk_arm_CN_assign_paras(model_variables, parameter_IDs, parameters)
+#' 
 #' @export
 bulk_arm_CN_assign_paras <- function(model_variables, parameter_IDs, parameters) {
     for (i in 1:length(parameter_IDs)) {
@@ -56,6 +68,32 @@ bulk_arm_CN_get_best_para <- function(data_rf, model_rf, obs_rf, post_rf) {
     best_para <- df_dist$x[which(df_dist$y_posterior == max(df_dist$y_posterior))]
 }
 
+#' Build a library of simulated arm copy number profiles
+#'
+#' @description 
+#' `library_bulk_arm_CN` returns an rda object that contains the results of the simulated clonal evolution as well as the statistics about the clones from the resulted sampling.
+#' 
+#' @inheritParams bulk_arm_CN_assign_paras
+#' @param library_name A string to be used in the resulting rda's name.
+#' @param list_parameters A list of the parameter IDs to be fitted. ???
+#' @param list_targets A list specifying the target parameter(s) to be fitted by ABC.
+#' @param ABC_simcount An integer number specifying the number of simulations for a given parameters set. Default is 10000.
+#' @param n_cores An integer number specifying the number of cores to be used for parallel processing. ???
+#' @param n_samples An integer value specifying the number of values from the prior distribution that are randomly selected for each simulation. Default is 100.
+#' @param R_libPaths ??? The location of the necessary R packages to run CINner when using an HPC cluster. Default is NULL.
+#'
+#' @examples 
+#' 
+#' 
+#' library_bulk_arm_CN(
+#'    library_name = library_name,
+#'    model_variables = model_variables,
+#'    list_parameters = list_parameters_library,
+#'    list_targets = list_targets_library,
+#'    ABC_simcount = 2000,
+#'    n_samples = 100,
+#'    R_libPaths = R_libPaths)
+#'
 #' @export
 library_bulk_arm_CN <- function(library_name,
                                 model_variables,
@@ -157,6 +195,45 @@ library_bulk_arm_CN <- function(library_name,
     save(ABC_input, file = filename)
 }
 
+#' ABC fitting for the chromosome arms 
+#'
+#' @description 
+#' `fitting_bulk_arm_CN` returns the results of ABCrf fitting for the specified parameters using the simulated library. It increases the size of the simulated library via bootstrapping, and it saves the results of the parameter fitting to an output rda file. The function also returns a plot of the prior, posterior, and chosen best parameter value for the fitted parameters.
+#' 
+#' @inheritParams BUILD_initial_population
+#' @param library_name A string to be used in the resulting rda's name.
+#' @param model_name A string to be used to identify the model. ???
+#' @param copynumber_DATA A dataframe??? containing the copynumber profiles of the data for the parameters to be fit against.
+#' @param type_sample_DATA ???
+#' @param type_cn_DATA ???
+#' @param list_parameters ???
+#' @param list_parameters_library A dataframe consisting of the parameters to be fitted. The dataframe should have columns "Variable", "Type", "Lower_bound", "Upper_bound".
+#' @param list_targets A list specifying the target parameter(s) to be fitted by ABC.
+#' @param list_targets_library ???
+#' @param bound_freq ??? Default is 0.1.
+#' @param ntree An integer specifying the number of trees to grow in the forest. Default is 200 trees
+#' @param library_shuffle ???
+#' @param ABC_simcount An integer number specifying the number of simulations for a given parameters set. Default is 10000.
+#' @param n_cores An integer number specifying the number of cores to be used for parallel processing. ???
+#' @param R_libPaths ??? The location of the necessary R packages to run CINner when using an HPC cluster. Default is NULL.
+#' @param folder_workplace The location of the folder to contain the output files and plots. Default is NULL.
+#' 
+#' @examples 
+#' ???
+#' fitting_bulk_arm_CN(
+#'        library_name = library_name,
+#'        model_name = cancer_type,
+#'        model_variables = model_variables,
+#'        copynumber_DATA = copynumber_DATA,
+#'        list_parameters = list_parameters,
+#'        list_parameters_library = list_parameters_library,
+#'        list_targets = list_targets,
+#'        list_targets_library = list_targets_library,
+#'        bound_freq = 0.1,
+#'        library_shuffle = TRUE,
+#'        folder_workplace = library_name,
+#'        R_libPaths = R_libPaths)
+#' 
 #' @export
 fitting_bulk_arm_CN <- function(library_name,
                                 model_name,
@@ -628,6 +705,62 @@ fitting_bulk_arm_CN <- function(library_name,
     }
 }
 
+#' Find statistics from PCAWG data and plot the relevant analyses
+#' 
+#' @description
+#' `statistics_bulk_arm_WGD_status` finds the statistics from the given data and plots the relevant analyses.
+#' 
+#' @param plotname A string value to be incorporated into the output plots.
+#' @param DATA_cancer_types A list containing the names of the cancer types from the data that were fitted.
+#' @param DATA_cancer_type_sample_ids A list containing the sample IDs from the data.
+#' @param DATA_cancer_type_cn ??? A list containing the copynumber data for each sample from the data.
+#' @param DATA_wgd A list containing the sample IDs that are considered WGD.
+#' @param model_variables The model variables used to specify the parameter values used for the simulation.
+#' 
+#' @examples 
+#' 
+#' copynumber_PCAWG <- read_excel(system.file("pcawg_specimen_histology_August2016_v9.xlsx", package = "CINner"))
+#' PCAWG_cancer_types <- unique(copynumber_PCAWG$histology_abbreviation)
+#' PCAWG_cancer_types <- PCAWG_cancer_types[which(!is.na(PCAWG_cancer_types))
+#' 
+#' PCAWG_cancer_type_sample_ids <- vector("list", length(PCAWG_cancer_types))
+#' for (i in 1:length(PCAWG_cancer_types)) {
+#'    sample_ids <- copynumber_PCAWG$tcga_sample_uuid[which(copynumber_PCAWG$histology_abbreviation == PCAWG_cancer_types[i])]
+#'    for (j in 1:length(sample_ids)) {
+#'        sample_id <- sample_ids[j]
+#'        if (!file.exists(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"))) next
+#'        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"), header = TRUE)
+#'        if (max(tmp$star, na.rm = TRUE) < 2) next
+#'        PCAWG_cancer_type_sample_ids[[i]] <- c(PCAWG_cancer_type_sample_ids[[i]], sample_id)
+#'    }
+#' }
+#'
+#' copynumber_DATA_cancer_types <- vector("list", length(PCAWG_cancer_types))
+#' for (i in 1:length(PCAWG_cancer_types)) {
+#'    cancer_type <- PCAWG_cancer_types[i]
+#'    cancer_type_sample_ids <- PCAWG_cancer_type_nonWGD_sample_ids[[i]]
+#'    copynumber_DATA_ls <- vector("list", length(cancer_type_sample_ids))
+#'    for (j in 1:length(cancer_type_sample_ids)) {
+#'        sample_id <- cancer_type_sample_ids[j]
+#'        tmp <- read.table(system.file(paste0("consensus.20170119.somatic.cna.annotated/", sample_id, ".consensus.20170119.somatic.cna.annotated.txt"), package = "CINner"), header = TRUE)
+#'        if (any(is.na(tmp$star))) tmp <- tmp[-which(is.na(tmp))]
+#'        tmp <- tmp[which(tmp$star >= 2), ]
+#'        tmp$donor_unique_id <- sample_id
+#'        copynumber_DATA_ls[[j]] <- tmp
+#'    }
+#'    copynumber_DATA_cancer_types[[i]] <- rbindlist(copynumber_DATA_ls)
+#' }
+#' 
+#' PCAWG_wgd <- read.table(system.file("consensus.20170218.purity.ploidy.txt", package = "CINner"), header = TRUE)
+#'
+#' statistics_bulk_arm_WGD_status(
+#'    plotname = "ALL_PCAWG",
+#'    DATA_cancer_types = PCAWG_cancer_types,
+#'    DATA_cancer_type_sample_ids = PCAWG_cancer_type_sample_ids,
+#'    DATA_cancer_type_cn = copynumber_DATA_cancer_types,
+#'    DATA_wgd = PCAWG_wgd,
+#'    model_variables = model_variables)
+#' 
 #' @export
 statistics_bulk_arm_WGD_status <- function(plotname,
                                            DATA_cancer_types,

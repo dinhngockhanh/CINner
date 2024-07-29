@@ -1,10 +1,10 @@
 ```{r setup}
 library(readxl)
 #-----------------------------------------------------------------------
-# setwd("/Users/andrew/Desktop/CINner/R")
-# files_sources <- list.files(pattern = "*.r$")
-# sapply(files_sources, source)
-# setwd("/Users/andrew/Desktop/CINner/vignettes")
+setwd("/Users/andrew/Desktop/CINner/R")
+files_sources <- list.files(pattern = "*.r$")
+sapply(files_sources, source)
+setwd("/Users/andrew/Desktop/CINner/vignettes")
 #-----------------------------------------------------------------------
 # devtools::install_github("dinhngockhanh/CancerSimulator")
 # library(CancerSimulator)
@@ -52,7 +52,7 @@ vec_time <- T_0[[1]]:T_end[[1]]
 vec_cell_count <- rep(1000,length(vec_time))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 
-gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CancerSimulator"))
+gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
 gc_slope <- 1.2
 gc_int <- 0
 sigma1 <- 0.02642392
