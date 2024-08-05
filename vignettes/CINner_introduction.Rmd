@@ -24,33 +24,39 @@ library(CINner)
 # Set up model variables
 
 CINner requires many input parameters about the assumed characteristics of cancer growth. 
-One easy method to load the parameters is by creating `model_variables`, 
+One easy method to load the parameters to `CINner` is by creating `model_variables`, 
 which is a list containing relevant variables in a specific order, 
 then using function `SAVE_model_variables` to save them as csv files that can be read in the next sections when the simulator is called. 
-Here we detail how to create and the parameter list.
+Here we detail how to create the parameter list.
 
 ## General variables for every cell
 
-We first specify the cell lifespan (always in days). This is the mean of the exponentially distributed lifetime of every cell during cancer evolution, regardless of their driver mutation or CN profiles.
+We first specify the cell lifespan (always in days). 
+This is the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
+regardless of their driver mutation or CN profiles.
 
 ```{r}
 cell_lifespan <- 30
 ```
 
-Next, we specify the time points at the beginning and the end of the simulation. The unit can be `day`, `week` (= 7 days), `month` (= 30 days) or `year` (= 365 days). The unit should be the same for both time points.
+Next, we specify the time points at the beginning and the end of the simulation. 
+The unit can be `day`, `week` (= 7 days), `month` (= 30 days) or `year` (= 365 days). 
+The unit should be the same for both time points.
 
 ```{r}
 T_0 <- list(0, "year")
 T_end <- list(80, "year")
 ```
 
-Next variables dictate the time points that each sample is taken (same unit as the beginning and end time points), how many cells are in each sample, and the unique ID for each sample.
+The next variable dictates the time points that each sample is taken (same unit as the beginning and end time points), 
+how many cells are in each sample, and the unique ID for each sample.
 
 ```{r}
 Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80)
 ```
 
-The simulator's efficiency is based partially on its use of the tau-leaping algorithm, which simulates the evolution in fixed steps instead of the exact Gillespie algorithm. As such, it requires a suggested time step. If not specified, the time step is automatically set to be half the cell lifespan. For statistical accuracy, it should not be higher. However, setting significantly low numbers for time step will lead to increased simulation run time.
+The simulator's efficiency is based partially on its use of the tau-leaping algorithm, 
+which simulates the evolution in fixed steps instead of the exact Gillespie algorithm. As such, it requires a suggested time step. If not specified, the time step is automatically set to be half the cell lifespan. For statistical accuracy, it should not be higher. However, setting significantly low numbers for time step will lead to increased simulation run time.
 
 ```{r}
 T_tau_step <- cell_lifespan / 2
@@ -395,9 +401,9 @@ tmp <- simulator_full_program(
 A variety of plots from the simulation:
 
 ```{r}
-plot_all(
-    model = model_name,
-    n_simulations = 10,
-    compute_parallel = TRUE
-)
+# plot_all(
+#     model = model_name,
+#     n_simulations = 10,
+#     compute_parallel = TRUE
+# )
 ```

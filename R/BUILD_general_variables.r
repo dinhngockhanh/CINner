@@ -1,17 +1,17 @@
 #' Produce simulations and outputs files as requested by user
 #'
-#' 
+#'
 #' @description
-#' `BUILD_general_variables` returns an object containing information about all the variables needed to produce simulations and output files specificed by the user. 
-#' 
-#' 
+#' `BUILD_general_variables` returns an object containing information about all the variables needed to produce simulations and output files specificed by the user.
+#'
+#'
 #' @param model_name A string representing the name to be given to the model. Default is 'MODEL'.
-#' @param cell_lifespan An integer number representing the mean lifespan of a cell. Each cell's lifespan is exponentially distributed. Default is 4. 
+#' @param cell_lifespan An integer number representing the mean lifespan of a cell. Each cell's lifespan is exponentially distributed. Default is 4.
 #' @param cell_prob_division A float representing the probability of division of a cell. Default is NA. If NA, it overrides the selection model and the population follows neutral exponential growth.
 #' @param T_0 A list consisting of an integer followed by a string specifying the start of the simulation and the unit of time eg. `list(0, 'days')`. Default is `list(0, "year")`.
 #' @param T_end A list consisting of an integer followed by a string specifying the end of the simulation and the unit of time eg. `list(100, 'days')`. Default is `list(100, "year")`.
 #' @param T_tau_step A numerical value represeting the time step for the tau-leaping algorithm for the simulation. Default is Inf.
-#' @param Table_sample A dataframe specifying the information about sampled cells. Must have 'Age_sample' column, which is the age at which the sample is taken, usually the `T_end`. Default is `data.frame()`. 
+#' @param Table_sample A dataframe specifying the information about sampled cells. Must have 'Age_sample' column, which is the age at which the sample is taken, usually the `T_end`. Default is `data.frame()`.
 #' @param table_population_dynamics A matrix consisting of the start and end time of the simulation as well as the initial and final population size??? Default is `matrix(0, ncol = 2, nrow = 2)`.
 #' @param Max_cell_count An integer value specifying the maximum number of cells in the simulation??? Default is Inf.
 #' @param Min_cell_count An integer value specifying the minimum number of cells in the simulation??? Default is 0.
@@ -72,19 +72,19 @@
 #' @param gc_slope A numerical value for the slope of the linear GC model. Default is 1.2.
 #' @param gc_int A numerical value for the intercept of the linear GC model. Default is 0.
 #' @param sigma1 A numerical value for the gamma scale for read depth noise. Default is 0.1.
-#' @param num_reads A numerical value for the number of reads per cell. Default is 1e6. 
-#' 
+#' @param num_reads A numerical value for the number of reads per cell. Default is 1e6.
+#'
 #' @examples
-#' 
+#'
 #' cell_lifespan <- 1
 #' T_0 <- list(0, "day")
 #' T_end <- list(300, "day")
 #' Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
 #' T_tau_step <- cell_lifespan / 2
 #' CN_bin_length <- 500000
-#' 
+#'
 #' selection_model <- "chrom-arm-selection"
-#' 
+#'
 #' prob_CN_whole_genome_duplication <- 0
 #' prob_CN_missegregation <- 0
 #' prob_CN_chrom_arm_missegregation <- 0
@@ -102,14 +102,14 @@
 #' prob_CN_cnloh_terminal_length <- 0.005
 #' rate_driver <- 0
 #' rate_passenger <- 1e-11
-#' 
+#'
 #' bound_driver <- 3
 #' bound_average_ploidy <- 6
 #' bound_maximum_CN <- 8
 #' bound_homozygosity <- 0
-#' 
+#'
 #' vec_time <- T_0[[1]]:T_end[[1]]
-#' vec_cell_count <- rep(1000,length(vec_time))
+#' vec_cell_count <- rep(1000, length(vec_time))
 #' table_population_dynamics <- cbind(vec_time, vec_cell_count)
 #'
 #' gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
@@ -119,42 +119,43 @@
 #' num_reads <- 3906632
 #'
 #' model_variables_base <- BUILD_general_variables(
-#'    cell_lifespan = cell_lifespan,
-#'    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
-#'    Table_sample = Table_sample,
-#'    CN_bin_length = CN_bin_length,
-#'    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
-#'    prob_CN_missegregation = prob_CN_missegregation,
-#'    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
-#'    prob_CN_focal_amplification = prob_CN_focal_amplification,
-#'    prob_CN_focal_deletion = prob_CN_focal_deletion,
-#'    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
-#'    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
-#'    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
-#'    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
-#'    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
-#'    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
-#'    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
-#'    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
-#'    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
-#'    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
-#'    rate_driver = rate_driver,
-#'    rate_passenger = rate_passenger,
-#'    selection_model = selection_model,
-#'    bound_driver = bound_driver,
-#'    bound_average_ploidy = bound_average_ploidy,
-#'    bound_maximum_CN = bound_maximum_CN,
-#'    bound_homozygosity = bound_homozygosity,
-#'    table_population_dynamics = table_population_dynamics,
-#'    gc = gc,
-#'    gc_slope = gc_slope,
-#'    gc_int = gc_int,
-#'    sigma1 = sigma1,
-#'    num_reads = num_reads)
-#' 
+#'     cell_lifespan = cell_lifespan,
+#'     T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+#'     Table_sample = Table_sample,
+#'     CN_bin_length = CN_bin_length,
+#'     prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
+#'     prob_CN_missegregation = prob_CN_missegregation,
+#'     prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
+#'     prob_CN_focal_amplification = prob_CN_focal_amplification,
+#'     prob_CN_focal_deletion = prob_CN_focal_deletion,
+#'     prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
+#'     prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
+#'     model_CN_focal_amplification_length = model_CN_focal_amplification_length,
+#'     model_CN_focal_deletion_length = model_CN_focal_deletion_length,
+#'     prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
+#'     prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+#'     prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
+#'     prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
+#'     prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
+#'     prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
+#'     rate_driver = rate_driver,
+#'     rate_passenger = rate_passenger,
+#'     selection_model = selection_model,
+#'     bound_driver = bound_driver,
+#'     bound_average_ploidy = bound_average_ploidy,
+#'     bound_maximum_CN = bound_maximum_CN,
+#'     bound_homozygosity = bound_homozygosity,
+#'     table_population_dynamics = table_population_dynamics,
+#'     gc = gc,
+#'     gc_slope = gc_slope,
+#'     gc_int = gc_int,
+#'     sigma1 = sigma1,
+#'     num_reads = num_reads
+#' )
+#'
 #' @export
-BUILD_general_variables <- function(model_name = "MODEL",
-                                    cell_lifespan = 4,
+BUILD_general_variables <- function(model_name = "CINner_model",
+                                    cell_lifespan = 10,
                                     cell_prob_division = NA,
                                     T_0 = list(0, "year"),
                                     T_end = list(100, "year"),
