@@ -1,16 +1,16 @@
-CancerSimulator is a tool to simulate cancer evolution as a selective model driven by mutations and Copy Number (CN) changes. It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preperation + (DLP+).
+CINner is a tool to simulate cancer evolution as a selective model driven by mutations and Copy Number (CN) changes. It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preperation + (DLP+).
 
 ## Installation
 
-You can install CancerSimulator with the following command
+You can install CINner with the following command
 
 ``` r
-devtools::install_github("dinhngockhanh/CancerSimulator")
+devtools::install_github("dinhngockhanh/CINner")
 ```
 
 ## Input data
 
-`CancerSimulator` takes as input several `csv` files that dictate the evolution model. The user can either create them from scratch or by using a suite of R functions. The prefix `*` in the filenames must match the model name to be given later to the simulator.
+`CINner` takes as input several `csv` files that dictate the evolution model. The user can either create them from scratch or by using a suite of R functions. The prefix `*` in the filenames must match the model name to be given later to the simulator.
 
 ### Model variables
 
@@ -26,7 +26,7 @@ The file `*-input-copy-number-blocks.csv` contains the length of each chromosome
 
 ### Population dynamics
 
-CancerSimulator is designed so that the total cell population follows a given dynamics. This is given in the file `*-input-population-dynamics.csv`, which lists the time points and desired population sizes at those time points. Within two time points, the simulator interpolates to find the desired population size.
+CINner is designed so that the total cell population follows a given dynamics. This is given in the file `*-input-population-dynamics.csv`, which lists the time points and desired population sizes at those time points. Within two time points, the simulator interpolates to find the desired population size.
 
 ### Driver gene library.
 
