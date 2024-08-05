@@ -1,8 +1,20 @@
-CINner is a tool to simulate cancer evolution as a selective model driven by mutations and Copy Number (CN) changes. It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preperation + (DLP+).
+#   Simulating chromosomal instability during cancer evolution
+
+CINner is a tool to simulate tumorigenesis as a selective model driven by mutations and Copy Number Aberrations (CNAs).
+It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preperation+ (DLP+).
 
 ## Installation
 
-You can install CINner with the following command
+CINner requires some external libraries:
+
+``` r
+BiocManager::install("ggtree")
+BiocManager::install("HMMcopy")
+devtools::install_github("shahcompbio/signals")
+devtools::install_github("chrisamiller/fishplot")
+```
+
+You can then install CINner with the following command:
 
 ``` r
 devtools::install_github("dinhngockhanh/CINner")
