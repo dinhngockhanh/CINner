@@ -22,7 +22,7 @@ devtools::install_github("dinhngockhanh/CINner")
 
 ## Input data
 
-`r CINner` takes as input several `csv` files that dictate the evolution model. The user can either create them from scratch or by using a suite of R functions. The prefix `*` in the filenames must match the model name to be given later to the simulator.
+`CINner` takes as input several `csv` files that dictate the evolution model. The user can either create them from scratch or by using a suite of R functions. The prefix `*` in the filenames must match the model name to be given later to the simulator.
 
 ### Model variables
 
