@@ -24,4 +24,4 @@ devtools::install_github("dinhngockhanh/CINner")
 
 See the vignettes for further analyses that can be performed with `CINner`.
 
-For more detailed examples and usage, please refer to the [CINner_introduction](https://github.com/dinhngockhanh/CINner/vignettes/CINner_introduction.html).
+For more detailed examples and usage, please refer to `vignettes/CINner_introduction.html`.
