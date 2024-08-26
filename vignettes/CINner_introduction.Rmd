@@ -1,10 +1,6 @@
 ---
 title: "An introduction to CINner"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{An introduction to CINner}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output: html_document
 ---
 
 ```{r, include = FALSE}
@@ -32,43 +28,54 @@ Here we detail how to create the parameter list.
 ## General variables for every cell
 
 We first specify the cell lifespan (always in days). 
-This is the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
+`cell_lifespan` is the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
 regardless of their driver mutation or CN profiles.
 
 ```{r}
 cell_lifespan <- 30
 ```
 
-Next, we specify the time points at the beginning and the end of the simulation. 
+Next, we specify the time points at the beginning and the end of each simulation. 
 The unit can be `day`, `week` (= 7 days), `month` (= 30 days) or `year` (= 365 days). 
-The unit should be the same for both time points.
+The unit should be the same for `T_0` and `T_end`.
 
 ```{r}
 T_0 <- list(0, "year")
 T_end <- list(80, "year")
 ```
 
-The next variable dictates the time points that each sample is taken (same unit as the beginning and end time points), 
+`Table_sample` dictates the time points that each DNA sample is taken (same unit as the beginning and end time points), 
 how many cells are in each sample, and the unique ID for each sample.
+For example, the following line specifies that the sample in each `CINner` simulation is called "SA01" and consists of 300 cells, taken at 80 years.
 
 ```{r}
 Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80)
 ```
 
-The simulator's efficiency is based partially on its use of the tau-leaping algorithm, 
-which simulates the evolution in fixed steps instead of the exact Gillespie algorithm. As such, it requires a suggested time step. If not specified, the time step is automatically set to be half the cell lifespan. For statistical accuracy, it should not be higher. However, setting significantly low numbers for time step will lead to increased simulation run time.
+`CINner`'s efficiency is based partially on its use of the tau-leaping algorithm, 
+instead of the exact Gillespie algorithm. 
+As such, it requires a suggested `T_tau_step`.
+Each CINner result then simulates the cell population at `T_0`, `T_0 + T_tau_step`, `T_0 + 2 * T_tau_step`, and so on, 
+until `T_end`.
+If not specified in `BUILD_general_variables`, `T_tau_step` is automatically set to be half of `cell_lifespan`. 
+High time steps will lead to decreased simulation run time, but the simulations might not be statistically accurate.
+Low time steps will lead to longer run time, but the simulations will be more reliable.
 
 ```{r}
 T_tau_step <- cell_lifespan / 2
 ```
 
-To speed up the simulations and in accordance with the current state of single-cell DNA sequencing, the genome is divided into bins of equal lengths. Here we specify the length of each bin, understood in number of base pairs.
+To speed up the simulations and in accordance with the current state of single-cell DNA sequencing, 
+the genome is divided into bins of equal lengths (measured in number of base pairs).
+The CN profile of each cell is represented as a vector, consisting of the CN of each bin.
+If not specified in `BUILD_general_variables`, `CN_bin_length` is automatically set to 500,000 base pairs.
 
 ```{r}
 CN_bin_length <- 500000
 ```
 
-Three selection models are included in the framework:
+Three selection models are included in `CINner`:
+
 - `chrom-arm-selection` models the selection for gains and losses of chromosome arms, depending on their genetic balances.
 - `driver-gene-selection` models the selection for gains and losses and mutations of specific driver genes.
 - `chrom-arm-and-driver-gene-selection` combines both models into a hybrid model, where cancer is driven both by large-scale genetic imbalance and local events targeting specific genes.
@@ -82,9 +89,12 @@ The next variables are the probabilities that each class of CNA events occurs in
 - Missegregation targets a uniformly chosen chromosome strand, which is then gained in one daughter cell and lost in the other.
 - The same occurs for chromosome-arm missegregation but only for one of the chromosome's arms with equal probabilities.
 
-The local events target a randomly chosen region in a uniformly chosen chromosome arm in one of the daughter cells. All of these events require additional parameters for the region length distributions, to be discussed next. There are four local CNA mechanisms:
+The local events target a randomly chosen region in a uniformly chosen chromosome arm in one of the daughter cells. 
+All of these events require additional parameters for the region length distributions, to be discussed next. 
+There are four local CNA mechanisms:
 - Focal amplification and deletion duplicate or delete the region, respectively.
-- Interstitial and terminal CNLOH replace all alleles within the region across chromosome strands with an allele chosen at random. Interstitial CNLOH can occur anywhere in the arm, but terminal CNLOH has to occur at the chromosome's end.
+- Interstitial and terminal CNLOH replace all alleles within the region across chromosome strands with an allele chosen at random. 
+Interstitial CNLOH can occur anywhere in the arm, but terminal CNLOH has to occur at the chromosome's end.
 
 ```{r}
 prob_CN_whole_genome_duplication <- 0.5e-4
@@ -358,6 +368,7 @@ SAVE_model_variables(model_name = model_name, model_variables = model_variables)
 The function `simulator_full_program` produces simulations according to the model variables listed in the csv files resulting from the previous section.
 
 There are several options for conditioning on the simulations or requesting specific results:
+
 - `model`: Prefix of the csv input files. This should be the same as `model_name` from the previous section.
 - `n_simulations`: Number of simulations requested.
 - `compute_parallel`: Simulations are produced sequentially if `FALSE`, or in parallel if `TRUE`. Default is `FALSE`.
@@ -386,16 +397,16 @@ There are several options for conditioning on the simulations or requesting spec
 - `pseudo_corrected_readcount`: if `TRUE`, the pseudo-corrected readcounts (= cell's HMM-inferred mean readcount X bin GC level) are computed and saved in a csv file. The specific data used depends on `model_readcount_base`. Default is `FALSE`.
 
 ```{r}
-tmp <- simulator_full_program(
-    model = model_name,
-    n_simulations = 10,
-    save_cn_profile = TRUE,
-    save_cn_clones = TRUE,
-    internal_nodes_cn_info = TRUE,
-    report_progress = TRUE,
-    seed = 10,
-    compute_parallel = TRUE
-)
+# tmp <- simulator_full_program(
+#     model = model_name,
+#     n_simulations = 10,
+#     save_cn_profile = TRUE,
+#     save_cn_clones = TRUE,
+#     internal_nodes_cn_info = TRUE,
+#     report_progress = TRUE,
+#     seed = 10,
+#     compute_parallel = TRUE
+# )
 ```
 
 A variety of plots from the simulation:

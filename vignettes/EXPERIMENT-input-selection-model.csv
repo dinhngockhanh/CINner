@@ -1,0 +1,8 @@
+"Variable","Value","Unit","Note"
+"selection_model","chrom-arm-and-driver-gene-selection","","Choice of selection model"
+"bound_driver","3","driver count","Maximum driver count in viable cells (cells exceeding this will die)"
+"bound_average_ploidy","4.5","","Maximum average ploidy across genome (cells exceeding this will die)"
+"bound_maximum_CN","Inf","","Maximum CN at any bin (cells exceeding this will die)"
+"bound_maximum_CN_normalized","Inf","","Maximum CN normalized by average ploidy at any bin (cells exceeding this will die)"
+"bound_WGD","Inf","","Maximum WGD allowed for a cell (cells are not allowed to exceed this)"
+"bound_homozygosity","500","","Maximum number of bins under homozygosity (cells exceeding this will die)"

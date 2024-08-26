@@ -5,8 +5,8 @@
 \title{Produce simulations and outputs files as requested by user}
 \usage{
 BUILD_general_variables(
-  model_name = "MODEL",
-  cell_lifespan = 4,
+  model_name = "CINner_model",
+  cell_lifespan = 10,
   cell_prob_division = NA,
   T_0 = list(0, "year"),
   T_end = list(100, "year"),
@@ -79,82 +79,222 @@ BUILD_general_variables(
 )
 }
 \arguments{
-\item{model_name}{...}
+\item{model_name}{A string representing the name to be given to the model. Default is 'MODEL'.}
 
-\item{cell_lifespan}{...}
+\item{cell_lifespan}{An integer number representing the mean lifespan of a cell. Each cell's lifespan is exponentially distributed. Default is 4.}
 
-\item{T_0}{...}
+\item{cell_prob_division}{A float representing the probability of division of a cell. Default is NA. If NA, it overrides the selection model and the population follows neutral exponential growth.}
 
-\item{T_end}{...}
+\item{T_0}{A list consisting of an integer followed by a string specifying the start of the simulation and the unit of time eg. \code{list(0, 'days')}. Default is \code{list(0, "year")}.}
 
-\item{T_tau_step}{...}
+\item{T_end}{A list consisting of an integer followed by a string specifying the end of the simulation and the unit of time eg. \code{list(100, 'days')}. Default is \code{list(100, "year")}.}
 
-\item{Table_sample}{...}
+\item{T_tau_step}{A numerical value represeting the time step for the tau-leaping algorithm for the simulation. Default is Inf.}
 
-\item{table_population_dynamics}{...}
+\item{Table_sample}{A dataframe specifying the information about sampled cells. Must have 'Age_sample' column, which is the age at which the sample is taken, usually the \code{T_end}. Default is \code{data.frame()}.}
 
-\item{Max_cell_count}{...}
+\item{table_population_dynamics}{A matrix consisting of the start and end time of the simulation as well as the initial and final population size??? Default is \code{matrix(0, ncol = 2, nrow = 2)}.}
 
-\item{Max_events}{...}
+\item{Max_cell_count}{An integer value specifying the maximum number of cells in the simulation??? Default is Inf.}
 
-\item{CN_bin_length}{...}
+\item{Min_cell_count}{An integer value specifying the minimum number of cells in the simulation??? Default is 0.}
 
-\item{prob_CN_whole_genome_duplication}{...}
+\item{Max_events}{An integer value specifying the maximum number of mutation events??? Default is Inf.}
 
-\item{prob_CN_missegregation}{...}
+\item{CN_bin_length}{An integer value specifying the number of basepairs belongs in a single bin of a chomosome. Default is 500000.}
 
-\item{prob_CN_chrom_arm_missegregation}{...}
+\item{CN_arm_level}{??? Default is FALSE.}
 
-\item{prob_CN_focal_amplification}{...}
+\item{alpha_aneuploidy}{An integer value representing the rate of chromosomal missegregations in WGD cells as compared to non-WGD cells. Default is 1.}
 
-\item{prob_CN_focal_deletion}{...}
+\item{prob_CN_whole_genome_duplication}{A numerical value representing the probability for a cell division to harbor a WGD event. Default is 0.}
 
-\item{prob_CN_cnloh_interstitial}{...}
+\item{prob_CN_missegregation}{A numerical value representing the probability of whole chromosome missegregation. Default is 0.}
 
-\item{prob_CN_cnloh_terminal}{...}
+\item{prob_CN_chrom_arm_missegregation}{A numerical value representing the probability of chromosome arm missegregation. Default is 0.}
 
-\item{prob_CN_focal_amplification_length}{...}
+\item{prob_CN_focal_amplification}{A numerical value representing the probability for a cell division to harbor a focal amplification event. Default is 0.}
 
-\item{prob_CN_focal_deletion_length}{...}
+\item{prob_CN_focal_deletion}{A numerical value representing the probability for a cell division to harbor a focal deletion event. Default is 0.}
 
-\item{prob_CN_cnloh_interstitial_length}{...}
+\item{prob_CN_cnloh_interstitial}{A numerical value representing the probability for a cell division to harbor an interstitial CN-LOH event. Default is 0.}
 
-\item{prob_CN_cnloh_terminal_length}{...}
+\item{prob_CN_cnloh_terminal}{A numerical value representing the probability for a cell division to harbor a terminal CN-LOH event. Default is 0.}
 
-\item{rate_driver}{...}
+\item{formula_CN_whole_genome_duplication}{A formula of probability for a cell division to harbor a WGD event. Default is "per_division:prob_CN_whole_genome_duplication".}
 
-\item{rate_passenger}{...}
+\item{formula_CN_missegregation}{A formula of probability for a cell division to harbor a whole chromosome missegregation event. Default is "per_division:prob_CN_missegregation".}
 
-\item{selection_model}{...}
+\item{formula_CN_chrom_arm_missegregation}{A formula of probability for a cell division to harbor a chromosome arm missegregation event. Default is "per_division:prob_CN_chrom_arm_missegregation".}
 
-\item{bound_driver}{...}
+\item{formula_CN_focal_amplification}{A formula of probability for a cell division to harbor a focal amplification event. Default is "per_division:prob_CN_focal_amplification".}
 
-\item{bound_average_ploidy}{...}
+\item{formula_CN_focal_deletion}{A formula of probability for a cell division to harbor a whole focal deletion event. Default is "per_division:prob_CN_focal_deletion".}
 
-\item{bound_homozygosity}{...}
+\item{formula_CN_cnloh_interstitial}{A formula of probability for a cell division to harbor an interstitial CN-LOH event. Default is "per_division:prob_CN_cnloh_interstitial".}
 
-\item{SFS_totalsteps}{...}
+\item{formula_CN_cnloh_terminal}{A formula of probability for a cell division to harbor a terminal CN-LOH event. Default is "per_division:prob_CN_cnloh_terminal".}
 
-\item{prob_coverage}{...}
+\item{prob_neutral_CN_whole_genome_duplication}{A numerical value representing the probability for a cell division to harbor a neutral WGD event. Default is 0.}
 
-\item{alpha_coverage}{...}
+\item{prob_neutral_CN_missegregation}{A numerical value representing the probability for a cell division to harbor a neutral whole chromosome missegregation event. Default is 0.}
 
-\item{lower_limit_cell_counts}{...}
+\item{prob_neutral_CN_chrom_arm_missegregation}{A numerical value representing the probability for a cell division to harbor a neutral chromosome arm missegregation event. Default is 0.}
 
-\item{lower_limit_alt_counts}{...}
+\item{prob_neutral_CN_focal_amplification}{A numerical value representing the probability for a cell division to harbor a neutral focal amplification event. Default is 0.}
 
-\item{lower_limit_tot_counts}{...}
+\item{prob_neutral_CN_focal_deletion}{A numerical value representing the probability for a cell division to harbor a neutral focal deletion event. Default is 0.}
 
-\item{gc}{...}
+\item{prob_neutral_CN_cnloh_interstitial}{A numerical value representing the probability for a cell division to harbor a neutral interstitial CN-LOH event. Default is 0.}
 
-\item{gc_slope}{...}
+\item{prob_neutral_CN_cnloh_terminal}{A numerical value representing the probability for a cell division to harbor a neutral terminal CN-LOH event. Default is 0.}
 
-\item{gc_int}{...}
+\item{model_CN_focal_amplification_length}{A string value specifying the choice of distribution for the block length of a focal amplification event. Options are 'geom' and 'beta'. Default is "geom".}
 
-\item{sigma1}{...}
+\item{prob_CN_focal_amplification_length}{A numerical value for the geometric parameter for the block length of a focal amplification event. Only used if a geometric distribution is specified. Default is 0.1.}
 
-\item{num_reads}{...}
+\item{prob_CN_focal_amplification_length_shape_1}{A numerical value for the beta parameter shape 1 for the block length of a focal amplification event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{prob_CN_focal_amplification_length_shape_2}{A numerical value for the beta parameter shape 2 for the block length of a focal amplification event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{model_CN_focal_deletion_length}{A string value specifying the choice of distribution for the block length of a focal deletion event. Options are 'geom' and 'beta'. Default is "geom".}
+
+\item{prob_CN_focal_deletion_length_shape_1}{A numerical value for the beta parameter shape 1 for the block length of a focal deletion event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{prob_CN_focal_deletion_length_shape_2}{A numerical value for the beta parameter shape 2 for the block length of a focal deletion event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{prob_CN_focal_deletion_length}{A numerical value for the geometric parameter for the block length of a focal deletion event. Only used if a geometric distribution is specified. Default is 0.1.}
+
+\item{model_CN_cnloh_interstitial_length}{A string value specifying the choice of distribution for the block length of an interstitial CN-LOH event. Options are 'geom' and 'beta'. Default is "geom".}
+
+\item{prob_CN_cnloh_interstitial_length}{A numerical value for the geometric parameter for the block length of an interstitial CN-LOH deletion event. Only used if a geometric distribution is specified. Default is 0.1.}
+
+\item{prob_CN_cnloh_interstitial_length_shape_1}{A numerical value for the beta parameter shape 1 for the block length of an interstitial CN-LOH event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{prob_CN_cnloh_interstitial_length_shape_2}{A numerical value for the beta parameter shape 2 for the block length of an interstitial CN-LOH event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{model_CN_cnloh_terminal_length}{A string value specifying the choice of distribution for the block length of a terminal CN-LOH event. Options are 'geom' and 'beta'. Default is "geom".}
+
+\item{prob_CN_cnloh_terminal_length}{A numerical value for the geometric parameter for the block length of a terminal CN-LOH deletion event. Only used if a geometric distribution is specified. Default is 0.1.}
+
+\item{prob_CN_cnloh_terminal_length_shape_1}{A numerical value for the beta parameter shape 1 for the block length of a terminal CN-LOH event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{prob_CN_cnloh_terminal_length_shape_2}{A numerical value for the beta parameter shape 2 for the block length of a terminal CN-LOH event. Only used if a beta distribution is specified. Default is 0.}
+
+\item{rate_driver}{A numerical value for the poisson rate of getting new driver mutations. Default is 0.}
+
+\item{rate_passenger}{A numerical value for the poisson rate of getting a new passenger mutation. Default is 0.}
+
+\item{selection_model}{A string specifying the selection model to be used. ???}
+
+\item{bound_driver}{An integer number representing the maximum driver count in viable cells (cells exceeding this will die). Default is Inf.}
+
+\item{bound_average_ploidy}{An integer number representing the maximum average ploidy across genome (cells exceeding this will die). Default is Inf.}
+
+\item{bound_homozygosity}{An integer number representing the maximum number of bins under homozygosity (cells exceeding this will die). Default is 0.}
+
+\item{SFS_totalsteps}{An integer number representing the bin count in SFS data. Default is 25.}
+
+\item{prob_coverage}{A numerical value representing the mean coverage depth. Default is 0.05.}
+
+\item{alpha_coverage}{A numerical value representing the alpha parameter for coverage depth. Default is 0.7.}
+
+\item{lower_limit_cell_counts}{A numerical value representing the lower limit of cell counts for mutations to be detected. Default is 0.}
+
+\item{lower_limit_alt_counts}{A numerical value representing the lower limit of alternate read counts for mutations to be detected. Default is 3.}
+
+\item{lower_limit_tot_counts}{A numerical value representing the lower limit of total read counts for mutations to be detected. Default is 0.}
+
+\item{gc}{???}
+
+\item{gc_slope}{A numerical value for the slope of the linear GC model. Default is 1.2.}
+
+\item{gc_int}{A numerical value for the intercept of the linear GC model. Default is 0.}
+
+\item{sigma1}{A numerical value for the gamma scale for read depth noise. Default is 0.1.}
+
+\item{num_reads}{A numerical value for the number of reads per cell. Default is 1e6.}
 }
 \description{
-Produce simulations and outputs files as requested by user
+\code{BUILD_general_variables} returns an object containing information about all the variables needed to produce simulations and output files specificed by the user.
+}
+\examples{
+
+cell_lifespan <- 1
+T_0 <- list(0, "day")
+T_end <- list(300, "day")
+Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+T_tau_step <- cell_lifespan / 2
+CN_bin_length <- 500000
+
+selection_model <- "chrom-arm-selection"
+
+prob_CN_whole_genome_duplication <- 0
+prob_CN_missegregation <- 0
+prob_CN_chrom_arm_missegregation <- 0
+prob_CN_focal_amplification <- 0
+prob_CN_focal_deletion <- 0
+prob_CN_cnloh_interstitial <- 0
+prob_CN_cnloh_terminal <- 0
+model_CN_focal_amplification_length <- "beta"
+model_CN_focal_deletion_length <- "beta"
+prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
+prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
+prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
+prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
+prob_CN_cnloh_interstitial_length <- 0.005
+prob_CN_cnloh_terminal_length <- 0.005
+rate_driver <- 0
+rate_passenger <- 1e-11
+
+bound_driver <- 3
+bound_average_ploidy <- 6
+bound_maximum_CN <- 8
+bound_homozygosity <- 0
+
+vec_time <- T_0[[1]]:T_end[[1]]
+vec_cell_count <- rep(1000, length(vec_time))
+table_population_dynamics <- cbind(vec_time, vec_cell_count)
+
+gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
+gc_slope <- 1.2
+gc_int <- 0
+sigma1 <- 0.02642392
+num_reads <- 3906632
+
+model_variables_base <- BUILD_general_variables(
+    cell_lifespan = cell_lifespan,
+    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    Table_sample = Table_sample,
+    CN_bin_length = CN_bin_length,
+    prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
+    prob_CN_missegregation = prob_CN_missegregation,
+    prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
+    prob_CN_focal_amplification = prob_CN_focal_amplification,
+    prob_CN_focal_deletion = prob_CN_focal_deletion,
+    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
+    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
+    model_CN_focal_amplification_length = model_CN_focal_amplification_length,
+    model_CN_focal_deletion_length = model_CN_focal_deletion_length,
+    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
+    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+    prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
+    prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
+    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
+    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
+    rate_driver = rate_driver,
+    rate_passenger = rate_passenger,
+    selection_model = selection_model,
+    bound_driver = bound_driver,
+    bound_average_ploidy = bound_average_ploidy,
+    bound_maximum_CN = bound_maximum_CN,
+    bound_homozygosity = bound_homozygosity,
+    table_population_dynamics = table_population_dynamics,
+    gc = gc,
+    gc_slope = gc_slope,
+    gc_int = gc_int,
+    sigma1 = sigma1,
+    num_reads = num_reads
+)
+
 }
