@@ -24,6 +24,8 @@ BUILD_driver_library(
 
 \item{table_arm_selection_rates}{A dataframe consisting of columns 'Arm_ID', 'Chromosome', 'Bin_start', 'Bin_end', 's_rate'. 'Arm_ID' refers to the name of each chromosome arm eg. 1p, 1q, etc. 'Chromosome' refers to the chromosome number. 'Bin_start' refers to the ???. 'Bin_end' refers to the ???. 's_rate' refers to the selective value of the chromosome arm as a float.}
 
+\item{table_gene_selection_rates}{...}
+
 \item{vec_driver_genes}{A list of driver genes. Only needed if \code{selection_model} is 'ancient'.}
 
 \item{vec_driver_role}{A list corresponding to \code{vec_driver_genes} classifying each driver gene as a TSG or Oncogene. Only needed if \code{selection_model} is 'ancient'.}
@@ -48,7 +50,8 @@ BUILD_driver_library(
 \examples{
 
 model_variables_base <- BUILD_driver_library(
-   model_variables = model_variables_base,
-   table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s))
+    model_variables = model_variables_base,
+    table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
+)
 
 }

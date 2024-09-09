@@ -2,10 +2,10 @@
 #'
 #' @description
 #' `BUILD_driver_library` returns an updated version of `model_variables` that includes information about the chosen selection model and the resulting selection rates for different driver alleles based on whether they are classified as TSGs or Oncogenes.
-#' 
+#'
 #' @param model_variables The object returned by `BUILD_general_variables`.
 #' @param table_arm_selection_rates A dataframe consisting of columns 'Arm_ID', 'Chromosome', 'Bin_start', 'Bin_end', 's_rate'. 'Arm_ID' refers to the name of each chromosome arm eg. 1p, 1q, etc. 'Chromosome' refers to the chromosome number. 'Bin_start' refers to the ???. 'Bin_end' refers to the ???. 's_rate' refers to the selective value of the chromosome arm as a float.
-#' @param table_gene_selection_rates
+#' @param table_gene_selection_rates ...
 #' @param vec_driver_genes A list of driver genes. Only needed if `selection_model` is 'ancient'.
 #' @param vec_driver_role A list corresponding to `vec_driver_genes` classifying each driver gene as a TSG or Oncogene. Only needed if `selection_model` is 'ancient'.
 #' @param vec_chromosome ???
@@ -17,10 +17,11 @@
 #' @param vec_arm_s ???
 #'
 #' @examples
-#' 
+#'
 #' model_variables_base <- BUILD_driver_library(
-#'    model_variables = model_variables_base,
-#'    table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s))
+#'     model_variables = model_variables_base,
+#'     table_arm_selection_rates = data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
+#' )
 #'
 #' @export
 BUILD_driver_library <- function(model_variables = list(),
