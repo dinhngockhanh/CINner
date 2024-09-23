@@ -1,7 +1,7 @@
 Package: CINner
 Title: Simulating Cancer Evolution as a Selective Model driven by Driver Mutations and Copy Number Aberrations
 Version: 0.0.0.9000
-Authors@R:
+Authors@R: 
     person(given = "Khanh", family = "Dinh",
            role = c("aut", "cre"),
            email = "khanhdinh1991@gmail.com")
@@ -10,23 +10,53 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 LazyData: true
-Imports:
-    ggplot2,
-    ggtree,
-    signals,
-    dendextend,
-    fishplot,
-    ctc,
+Imports: 
+    abcrf,
     adephylo,
+    ape,
+    cowplot,
+    ctc,
     data.table,
-    HMMcopy,
-    plyr,
-    matrixStats,
-    parallel,
-    RColorBrewer,
+    dplyr,
+    fishplot,
+    fitdistrplus,
+    ggforce,
+    ggimage,
+    ggplot2,
+    ggrastr,
+    ggrepel,
+    ggtree,
+    grid,
+    gridExtra,
     hrbrthemes,
-    gridExtra
-Remotes:
-    github::shahcompbio/signals
+    parallel,
+    pbapply,
+    plyr,
+    RColorBrewer,
+    RcppHungarian,
+    readr,
+    scales,
+    scatterpie,
+    signals,
+    tidyr,
+    tidyverse,
+    vegan,
+    viridis,
+    wesanderson
+Remotes: 
+    github::shahcompbio/signals,
+    github::chrisamiller/fishplot
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Suggests: 
+    abc,
+    dendextend,
+    devtools,
+    HMMcopy,
+    knitr,
+    matrixStats,
+    mosaic,
+    phyloTop,
+    readxl,
+    reticulate,
+    rmarkdown

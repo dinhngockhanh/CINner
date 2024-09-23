@@ -1,5 +1,5 @@
 ---
-title: "An introduction to CINner"
+title: "Introduction to CINner"
 output: html_document
 ---
 
@@ -11,25 +11,28 @@ knitr::opts_chunk$set(
 )
 ```
 
-We first load `CINner`:
+We first load `CINner` and library `readxl` for reading Excel files:
 
 ```{r}
 library(CINner)
+library(readxl)
+set.seed(1)
 ```
 
-# Set up model variables
+# Set up CINner model variables
 
-CINner requires many input parameters about the assumed characteristics of cancer growth. 
+CINner requires a number of input parameters about the assumed characteristics of tumor growth. 
 One easy method to load the parameters to `CINner` is by creating `model_variables`, 
-which is a list containing relevant variables in a specific order, 
-then using function `SAVE_model_variables` to save them as csv files that can be read in the next sections when the simulator is called. 
-Here we detail how to create the parameter list.
+a list containing relevant variables in a specific order.
+Here we detail how to create `model_variables`.
 
-## General variables for every cell
+## 1. General variables for every cell
 
-We first specify the cell lifespan (always in days). 
+### 1a. Tissue-specific and sampling variables
+
+We first specify the cell lifespan, measured in days.
 `cell_lifespan` is the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
-regardless of their driver mutation or CN profiles.
+independent of their particular cellular profiles.
 
 ```{r}
 cell_lifespan <- 30
@@ -37,16 +40,16 @@ cell_lifespan <- 30
 
 Next, we specify the time points at the beginning and the end of each simulation. 
 The unit can be `day`, `week` (= 7 days), `month` (= 30 days) or `year` (= 365 days). 
-The unit should be the same for `T_0` and `T_end`.
+The unit for `T_0` and `T_end` should be consistent.
 
 ```{r}
 T_0 <- list(0, "year")
 T_end <- list(80, "year")
 ```
 
-`Table_sample` dictates the time points that each DNA sample is taken (same unit as the beginning and end time points), 
-how many cells are in each sample, and the unique ID for each sample.
-For example, the following line specifies that the sample in each `CINner` simulation is called "SA01" and consists of 300 cells, taken at 80 years.
+`Table_sample` details the time point that the DNA sample is taken (in the same unit as `T_0` and `T_end`), 
+how many cells are in the sample, and the sample's ID.
+The following code specifies that the sample in each `CINner` simulation is labeled "SA01" and consists of 300 cells, taken at 80 years.
 
 ```{r}
 Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80)
@@ -55,9 +58,9 @@ Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80
 `CINner`'s efficiency is based partially on its use of the tau-leaping algorithm, 
 instead of the exact Gillespie algorithm. 
 As such, it requires a suggested `T_tau_step`.
-Each CINner result then simulates the cell population at `T_0`, `T_0 + T_tau_step`, `T_0 + 2 * T_tau_step`, and so on, 
-until `T_end`.
-If not specified in `BUILD_general_variables`, `T_tau_step` is automatically set to be half of `cell_lifespan`. 
+Each CINner result then simulates the cell population starting from `T_0` at time points `T_0 + T_tau_step`, `T_0 + 2 * T_tau_step`, ..., 
+until it reaches `T_end`.
+If not specified, `T_tau_step` is automatically set to be half of `cell_lifespan`. 
 High time steps will lead to decreased simulation run time, but the simulations might not be statistically accurate.
 Low time steps will lead to longer run time, but the simulations will be more reliable.
 
@@ -65,10 +68,10 @@ Low time steps will lead to longer run time, but the simulations will be more re
 T_tau_step <- cell_lifespan / 2
 ```
 
-To speed up the simulations and in accordance with the current state of single-cell DNA sequencing, 
-the genome is divided into bins of equal lengths (measured in number of base pairs).
+To speed up the simulations and in accordance with currently available DNA data, 
+the genome is divided into bins of equal lengths (measured in number of nucleotides).
 The CN profile of each cell is represented as a vector, consisting of the CN of each bin.
-If not specified in `BUILD_general_variables`, `CN_bin_length` is automatically set to 500,000 base pairs.
+If not specified, `CN_bin_length` is automatically set to 500,000 nucleotides.
 
 ```{r}
 CN_bin_length <- 500000
@@ -76,37 +79,48 @@ CN_bin_length <- 500000
 
 Three selection models are included in `CINner`:
 
-- `chrom-arm-selection` models the selection for gains and losses of chromosome arms, depending on their genetic balances.
-- `driver-gene-selection` models the selection for gains and losses and mutations of specific driver genes.
-- `chrom-arm-and-driver-gene-selection` combines both models into a hybrid model, where cancer is driven both by large-scale genetic imbalance and local events targeting specific genes.
+- `chrom-arm-selection` models the selection for gains and losses of chromosome arms, depending on their genetic imbalances.
+- `driver-gene-selection` models the selection for gains, losses and mutations of specific driver genes.
+- `chrom-arm-and-driver-gene-selection` combines `chrom-arm-selection` and `driver-gene-selection` into a hybrid model, where cancer is driven both by large-scale genetic imbalance at whole-chromosome and chromosome-arm level and focal events targeting specific genes.
 
 ```{r}
 selection_model <- "chrom-arm-and-driver-gene-selection"
 ```
 
-The next variables are the probabilities that each class of CNA events occurs in a cell division. There are three large-scale CNA mechanisms:
-- Whole Genome Duplication results in one daughter cell with double the genomic material of the mother cell.
-- Missegregation targets a uniformly chosen chromosome strand, which is then gained in one daughter cell and lost in the other.
-- The same occurs for chromosome-arm missegregation but only for one of the chromosome's arms with equal probabilities.
+Each selection model may require additional variables, which will be detailed in the following sections.
 
-The local events target a randomly chosen region in a uniformly chosen chromosome arm in one of the daughter cells. 
+### 1b. Occurence rates and length distributions of copy number aberrations (CNAs)
+
+For `selection_model` = `chrom-arm-selection` or `chrom-arm-and-driver-gene-selection`, we need to specify the probabilities that each CNA mechanism occurs in a mitotic division.
+These events have an impact on the fitness of the progeny cells and therefore the selection landscape.
+There are three large-scale CNA mechanisms:
+
+- Whole Genome Duplication (WGD) results in one progeny cell with double the genomic material of the parent cell.
+- Missegregation targets a uniformly chosen chromosome strand, which is then gained in one progeny cell and lost in the other.
+- The same occurs for chromosome-arm missegregation, but only for one of the chromosome's arms (selected with equal probabilities).
+
+The regional events target a randomly chosen region in a uniformly selected chromosome arm in one of the progeny cells. 
 All of these events require additional parameters for the region length distributions, to be discussed next. 
-There are four local CNA mechanisms:
+There are four regional CNA mechanisms:
+
 - Focal amplification and deletion duplicate or delete the region, respectively.
-- Interstitial and terminal CNLOH replace all alleles within the region across chromosome strands with an allele chosen at random. 
+- Interstitial and terminal copy-neutral loss of heterozygosity (CNLOH) replace all alleles within the region across chromosome strands with an allele chosen at random. 
 Interstitial CNLOH can occur anywhere in the arm, but terminal CNLOH has to occur at the chromosome's end.
 
 ```{r}
 prob_CN_whole_genome_duplication <- 0.5e-4
 prob_CN_missegregation <- 2e-4
 prob_CN_chrom_arm_missegregation <- 2e-4
-prob_CN_focal_amplification <- 0.e-4
+prob_CN_focal_amplification <- 2e-4
 prob_CN_focal_deletion <- 2e-4
-prob_CN_cnloh_interstitial <- 0e-4
-prob_CN_cnloh_terminal <- 0e-4
+prob_CN_cnloh_interstitial <- 0
+prob_CN_cnloh_terminal <- 0
 ```
 
-In specific applications, we might also consider neutral versions of the aforementioned CNA mechanisms. These events are assumed to change the CN profiles of the daughter cells without affecting their fitness. The rules dictating how the daughter cells' CN profiles change as a result of neutral CNAs are similar to the selective CNA mechanisms above, including the additional parameters specifying the region length distributions of the local CNA events.
+In specific applications, we might also consider neutral versions of the aforementioned CNA mechanisms.
+These events change the CN profiles of the progeny cells without affecting their fitness.
+The rules dictating how the progeny cells' CN profiles change as a result of neutral CNAs are similar to the selective CNA mechanisms above,
+including the additional parameters specifying the region length distributions of the regional CNA events.
 
 ```{r}
 prob_neutral_CN_whole_genome_duplication <- 0
@@ -118,34 +132,43 @@ prob_neutral_CN_cnloh_interstitial <- 0
 prob_neutral_CN_cnloh_terminal <- 0
 ```
 
-We now specify the parameters for the region length distributions of the local CNA mechanisms. Let `X` be a given local CNA mechanism (`X` = `CN_focal_amplification_length`, `CN_focal_deletion_length`, `CN_cnloh_interstitial_length`, `CN_cnloh_terminal_length`). We choose between two distributions:
-- `model_X` = `geom`: the region length is geometrically distributed, with the rate given by another parameter `prob_X` (unit is bin counts). If `model_X` is not specified, then this is the default.
-- `model_X` = `beta`: the region length equals a beta distributed ratio of the chosen chromosome arm. This requires two parameters for the beta distribution, given by `prob_X_shape_1` and `prob_X_shape_2`.
+We now specify the parameters for the region length distributions of the regional CNA mechanisms.
+For a given regional CNA mechanism `X` (= `CN_focal_amplification_length`, `CN_focal_deletion_length`, `CN_cnloh_interstitial_length`, or `CN_cnloh_terminal_length`), we can choose between two distributions:
+
+- `model_X` = `geom`: the targeted region length is geometrically distributed, with the rate given by another parameter `prob_X` (unit is bin counts).
+- `model_X` = `beta`: the ratio of the targeted region length over the chromosome arm follows the Beta distribution.
+This requires two parameters for the Beta distribution, given by `prob_X_shape_1` and `prob_X_shape_2`.
 
 ```{r}
-model_CN_focal_amplification_length <- "beta"
-prob_CN_focal_amplification_length_shape_1 <- 0.758304780825031
-prob_CN_focal_amplification_length_shape_2 <- 5.33873409782625
+model_CN_focal_amplification_length <- "geom"
+prob_CN_focal_amplification_length <- 10
 model_CN_focal_deletion_length <- "beta"
-prob_CN_focal_deletion_length_shape_1 <- 0.814054548726361
-prob_CN_focal_deletion_length_shape_2 <- 6.16614890284825
-prob_CN_cnloh_interstitial_length <- 0.005
-prob_CN_cnloh_terminal_length <- 0.005
+prob_CN_focal_deletion_length_shape_1 <- 1
+prob_CN_focal_deletion_length_shape_2 <- 7
 ```
 
-The rate of driver mutations is per base pair per division. Therefore, cells with more genomic materials, for instance after Whole Genome Duplication, would mutate at increased rates. If a driver mutation occurs, the gene to acquire the new mutation is chosen from an input list of driver genes, excluding the genes already mutated in the cell. A cell's fitness increases with the number of driver mutations it has acquired.
+### 1c. Occurence rate of driver and passenger mutations
+
+For `selection_model` = `driver-gene-selection` or `chrom-arm-and-driver-gene-selection`, we need to specify the rate of driver mutations (per nucleotide per division).
+If a driver mutation occurs, the gene to be mutated is chosen from an input list of driver genes (to be discussed next), excluding the genes already mutated in the cell. 
+A cell's fitness increases with the number of driver mutations it has acquired.
 
 ```{r}
 rate_driver <- 0
 ```
 
-The rate of passenger mutations is likewise per base pair per division. However, passenger mutations do not change a cell's fitness.
+The rate of passenger mutations is likewise per nucleotide per division. However, passenger mutations do not change the cell's fitness.
 
 ```{r}
 rate_passenger <- 1e-11
 ```
 
-A cell increases its fitness by acquiring CNAs and driver mutations. However, the cell is above all subject to viability conditions. If it violates any of these conditions, the cell is deemed unviable and its fitness is set to 0, therefore will die:
+### 1d. Viability conditions
+
+Cells increase their fitness by acquiring favorable CNAs and driver mutations. 
+However, they are also subject to viability conditions. 
+If it violates any of these conditions, a cell is deemed unviable and its fitness is set to 0, therefore will die:
+
 - `bound_driver` is the upper bound on how many driver mutations the cell has acquired.
 - `bound_average_ploidy` is the upper bound on the ploidy (i.e. average CN among all bins) of the cell.
 - `bound_maximum_CN` is the upper bound on the CN in any bin in the cell.
@@ -155,12 +178,16 @@ A cell increases its fitness by acquiring CNAs and driver mutations. However, th
 bound_driver <- 3
 bound_average_ploidy <- 4.5
 bound_maximum_CN <- 8
-bound_homozygosity <- 500
+bound_homozygosity <- 0
 ```
 
-The algorithm is designed to follow any dynamics (within the limit imposed by how fast the cells can divide or die, defined by their lifespan). The expected population dynamics is input as two vectors: `vec_cell_count` lists the requested total cell counts at the corresponding time points listed in `vec_time`, and both vectors are combined in variable `table_population_dynamics`. The expected population size in the simulations at any time point is interpolated from the two nearest time points in this variable.
+### 1e. Population dynamics
 
-Here, we request a logistic expansion from 20 cells at the beginning time point to 10000 cells at the final time point.
+CINner simulations are designed to follow any population dynamic (limited by how fast the cells can divide or die, defined by their lifespan). 
+The dataframe `table_population_dynamics` lists the expected total cell counts at corresponding time points.
+The expected population size in the CINner simulations at any time point is interpolated from the two nearest time points in this variable.
+
+Here, we expect the cell population to follow a logistic expansion, growing from 20 cells at `T_0` to 10000 cells at `T_end`, with the midpoint at 20 years.
 
 ```{r}
 vec_time <- T_0[[1]]:T_end[[1]]
@@ -168,17 +195,9 @@ vec_cell_count <- 10000 / (1 + exp(-0.3 * (vec_time - 20)))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 ```
 
-If noisy readcounts based on the cells' true CN profiles are requested, we need to also set the parameters for the sequencing noise and bias model:
+### 1f. Initiate CINner model variables
 
-```{r}
-gc <- read.csv(file = system.file("extdata", "gc_map_500kb.csv", package = "CINner"))
-gc_slope <- 1.2
-gc_int <- 0
-sigma1 <- 0.02642392
-num_reads <- 3906632
-```
-
-Finally, using the function `BUILD_general_variables`, we can build `model_variables`, an R list containing all variables described thus far:
+Finally, we use function `BUILD_general_variables` to initiate `model_variables`, a list object containing all variables described thus far:
 
 ```{r}
 model_variables <- BUILD_general_variables(
@@ -202,131 +221,99 @@ model_variables <- BUILD_general_variables(
     prob_neutral_CN_cnloh_terminal = prob_neutral_CN_cnloh_terminal,
     model_CN_focal_amplification_length = model_CN_focal_amplification_length,
     model_CN_focal_deletion_length = model_CN_focal_deletion_length,
-    prob_CN_focal_amplification_length_shape_1 = prob_CN_focal_amplification_length_shape_1,
-    prob_CN_focal_amplification_length_shape_2 = prob_CN_focal_amplification_length_shape_2,
+    prob_CN_focal_amplification_length = prob_CN_focal_amplification_length,
     prob_CN_focal_deletion_length_shape_1 = prob_CN_focal_deletion_length_shape_1,
     prob_CN_focal_deletion_length_shape_2 = prob_CN_focal_deletion_length_shape_2,
-    prob_CN_cnloh_interstitial_length = prob_CN_cnloh_interstitial_length,
-    prob_CN_cnloh_terminal_length = prob_CN_cnloh_terminal_length,
     rate_driver = rate_driver,
     rate_passenger = rate_passenger,
     selection_model = selection_model,
     bound_driver = bound_driver,
     bound_average_ploidy = bound_average_ploidy,
     bound_homozygosity = bound_homozygosity,
-    table_population_dynamics = table_population_dynamics,
-    gc = gc,
-    gc_slope = gc_slope,
-    gc_int = gc_int,
-    sigma1 = sigma1,
-    num_reads = num_reads
+    table_population_dynamics = table_population_dynamics
 )
 ```
 
-## Selection variables
+## 2. Selection rates
 
-Depending on which selection model is specified in the variable `selection_model` to drive cancer evolution, we need to define additional variables.
+Depending on which selection model is specified in the variable `selection_model` to drive cancer evolution, we need to define the selection rates of each chromosome arm and/or each driver gene, 
+which then define a cell's fitness as it acquires new CNAs and/or driver mutations.
 
-### Chromosome arm selection model
+### 2a. Chromosome arm selection rates
 
 If `selection_model` = `chrom-arm-selection` or `chrom-arm-and-driver-gene-selection`, then cancer is driven solely or partially by gains and losses of chromosome arms, based on their gene imbalances.
 
-Five vectors in combination establish the chromosome arm selection rates. Given values at the same location in the vectors, `arm_s` is the selection rate for the arm with ID `arm_id`, which runs from starting bin `arm_start` to ending bin `arm_end` on chromosome `arm_chromosome`. The selection rate ranges from 0 to infinity. Arms with more Tumor Suppressor Genes than Oncogenes have selection rate less than 1, for which losses are advantageous and gains are deleterious. Arms with more Oncogenes than Tumor Suppressor Genes have selection rate higher than 1, for which gains are advantageous and losses are deleterious. The selective increases or decreases of the gains and losses of an arm depend on how far its selection rate is from 1.
+Each row in `table_arm_selection_rates` details the information for one chromosome arm.
+Its ID is listed in column `Arm_ID`, and its location is recorded in columns `Chromosome`, `Bin_start` and `Bin_end`.
+Its selection rate is specified in column `s_rate` as a positive number.
+Arms with more Tumor Suppressor Genes than Oncogenes have selection rate less than 1, for which losses are advantageous and gains are deleterious. 
+Arms with more Oncogenes than Tumor Suppressor Genes have selection rate higher than 1, for which gains are advantageous and losses are deleterious. 
+The strength of the selection force depends on the distance between the selection rate to 1:
+chromosome arms with very small or very large selection rates are strongly selected for, and chromosome arms with selection rates very close to 1 are essentially neutral.
 
 ```{r}
-arm_id <- c(paste(model_variables$cn_info$Chromosome, "p", sep = ""), paste(model_variables$cn_info$Chromosome, "q", sep = ""))
-arm_chromosome <- rep(model_variables$cn_info$Chromosome, 2)
-arm_start <- c(rep(1, length(model_variables$cn_info$Chromosome)), model_variables$cn_info$Centromere_location + 1)
-arm_end <- c(model_variables$cn_info$Centromere_location, model_variables$cn_info$Bin_count)
-arm_s <- rep(1, length(arm_id))
-arm_s[which(arm_id == "1p")] <- 1 + 0.05
-arm_s[which(arm_id == "1q")] <- 1 + 0.065
-arm_s[which(arm_id == "2p")] <- 1 + 0.06
-arm_s[which(arm_id == "2q")] <- 1 + 0.05
-arm_s[which(arm_id == "3p")] <- 1 + 0.02
-arm_s[which(arm_id == "3q")] <- 1 + 0.095
-arm_s[which(arm_id == "4p")] <- 1 - 0.013
-arm_s[which(arm_id == "4q")] <- 1 - 0.016
-arm_s[which(arm_id == "5p")] <- 1 + 0.18
-arm_s[which(arm_id == "5q")] <- 1 - 0.1
-arm_s[which(arm_id == "6p")] <- 1 + 0.2
-arm_s[which(arm_id == "6q")] <- 1 - 0.17
-arm_s[which(arm_id == "7p")] <- 1 + 0.02
-arm_s[which(arm_id == "7q")] <- 1 + 0.1
-arm_s[which(arm_id == "8p")] <- 1 - 0.14
-arm_s[which(arm_id == "8q")] <- 1 + 0.2
-arm_s[which(arm_id == "9p")] <- 1 + 0.022
-arm_s[which(arm_id == "9q")] <- 1 + 0.022
-arm_s[which(arm_id == "10p")] <- 1 + 0.03
-arm_s[which(arm_id == "10q")] <- 1 + 0.035
-arm_s[which(arm_id == "11p")] <- 1 - 0.15
-arm_s[which(arm_id == "11q")] <- 1 + 0.13
-arm_s[which(arm_id == "12p")] <- 1 + 0.08
-arm_s[which(arm_id == "12q")] <- 1 + 0.04
-arm_s[which(arm_id == "13p")] <- 1 + 0.03
-arm_s[which(arm_id == "13q")] <- 1 + 0.022
-arm_s[which(arm_id == "14p")] <- 1 + 0.022
-arm_s[which(arm_id == "14q")] <- 1 + 0.016
-arm_s[which(arm_id == "15p")] <- 1 + 0.02
-arm_s[which(arm_id == "15q")] <- 1 + 0.01
-arm_s[which(arm_id == "16p")] <- 1 + 0.01
-arm_s[which(arm_id == "16q")] <- 1 - 0.08
-arm_s[which(arm_id == "17p")] <- 1 - 0.07
-arm_s[which(arm_id == "17q")] <- 1 + 0.01
-arm_s[which(arm_id == "18p")] <- 1 - 0.04
-arm_s[which(arm_id == "18q")] <- 1 - 0.03
-arm_s[which(arm_id == "19p")] <- 1 + 0.06
-arm_s[which(arm_id == "19q")] <- 1 + 0.06
-arm_s[which(arm_id == "20p")] <- 1 + 0.05
-arm_s[which(arm_id == "20q")] <- 1 + 0.06
-arm_s[which(arm_id == "21p")] <- 1 - 0.22
-arm_s[which(arm_id == "21q")] <- 1 + 0.08
-arm_s[which(arm_id == "22p")] <- 1 - 0.02
-arm_s[which(arm_id == "22q")] <- 1 - 0.02
-arm_s[which(arm_id == "Xp")] <- 1 - 0.04
-arm_s[which(arm_id == "Xq")] <- 1 - 0.04
+Arm_ID <- c(
+    paste(model_variables$cn_info$Chromosome, "p", sep = ""),
+    paste(model_variables$cn_info$Chromosome, "q", sep = "")
+)
+Chromosome <- rep(model_variables$cn_info$Chromosome, 2)
+Bin_start <- c(
+    rep(1, length(model_variables$cn_info$Chromosome)),
+    model_variables$cn_info$Centromere_location + 1
+)
+Bin_end <- c(
+    model_variables$cn_info$Centromere_location,
+    model_variables$cn_info$Bin_count
+)
+s_rate <- runif(length(Arm_ID), 1 / 1.2, 1.2)
+table_arm_selection_rates <- data.frame(
+    Arm_ID = Arm_ID,
+    Chromosome = Chromosome,
+    Bin_start = Bin_start,
+    Bin_end = Bin_end,
+    s_rate = s_rate
+)
 ```
 
-The five vectors are combined into one data frame describing the chromosome arm selection model:
-
-```{r}
-table_arm_selection_rates <- data.frame(Arm_ID = arm_id, Chromosome = arm_chromosome, Bin_start = arm_start, Bin_end = arm_end, s_rate = arm_s)
-```
-
-### Driver gene selection model
+### 2b. Driver gene selection rates
 
 If `selection_model` = `driver-gene-selection` or `chrom-arm-and-driver-gene-selection`, then cancer is driven solely or partially by gains, losses and mutations of driver genes.
 
-Five vectors in combination establish the driver gene selection rates. Given values at the same location in the vectors, the gene with ID `gene_id`, which functions as `gene_role` (either `TSG` for Tumor Suppressor Genes or `ONCOGENE` for Oncogenes) at bin `gene_bin` on chromosome `gene_chromosome`, has selection rate `gene_s`. Similar to the chromosome arm selection model, here the driver gene's selection rate also ranges from 0 to infinity. However, which CNA events are selective or deleterious for a gene depends also on its role. For a Tumor Suppressor Gene:
-- Amplification of the wild-type alleles is deleterious.
+Each row in `table_gene_selection_rates` details the information for one driver gene.
+Its name is listed in column `Gene_ID`, and its location is recorded in columns `Chromosome` and `Bin`.
+The gene's function as cancer driver is specified in column `Gene_role` (either `TSG` for Tumor Suppressor Genes or `ONCOGENE` for Oncogenes; other functions or dual roles are not currently supported), and its (positive) selection rate is in column `s_rate`.
+
+The impact of CNA events on the cell's fitness depends on the mutated gene's function.
+For a Tumor Suppressor Gene:
+
 - Deletion of the wild-type alleles is advantageous.
-- Amplification and deletion of the mutant alleles are neutral.
-- Mutation, i.e. a wild-type allele changes to mutant, is advantageous.
+- Amplification of the wild-type alleles is deleterious.
+- Deletion of the mutant alleles is neutral.
+- Mutation and amplification of the mutant alleles are advantageous.
+
 On the other hand, for an Oncogene:
-- Amplification of the wild-type allele or the mutant allele is advantageous.
+
+- Amplification of the wild-type or mutant allele is advantageous.
 - Deletion of the wild-type allele or the mutant allele is deleterious.
-- Mutation, i.e. a wild-type allele changes to mutant, is advantageous.
-The selective increases or decreases resulting from gain/loss or mutation of a gene (making the cell more advantageous or deleterious) depend on how far its selection rate is from 1.
+- Mutation is advantageous.
+
+Similar to the chromosome arm model, the strength of the selection force depends on the distance between the selection rate to 1.
 
 ```{r}
-library(readxl)
 driver_gene_list <- read_excel("HGSOC_driver_genes.xlsx")
-gene_id <- driver_gene_list$Gene_ID
-gene_role <- driver_gene_list$Gene_role
-gene_chromosome <- driver_gene_list$Chromosome
-gene_bin <- round(driver_gene_list$Start / CN_bin_length)
-gene_s <- rep(1, length(gene_id))
+table_gene_selection_rates <- data.frame(
+    Gene_ID = driver_gene_list$Gene_ID,
+    Gene_role = driver_gene_list$Gene_role,
+    s_rate = runif(nrow(driver_gene_list), 1 / 1.2, 1.2),
+    Chromosome = driver_gene_list$Chromosome,
+    Bin = round(driver_gene_list$Start / CN_bin_length)
+)
 ```
 
-The five vectors are combined into one data frame describing the driver gene selection model:
+### 2c. Update CINner model variables
 
-```{r}
-table_gene_selection_rates <- data.frame(Gene_ID = gene_id, Gene_role = gene_role, s_rate = gene_s, Chromosome = gene_chromosome, Bin = gene_bin)
-```
-
-### Update the model variables with the selection model
-
-After the table(s) are finished, we can update `model_variables` with the variables for the selection model. Include only the tables required for the selected selection model:
+We now update `model_variables` to include the selection rates with function `BUILD_driver_library`.
+Only the relevant selection rate dataframes should be included.
 
 ```{r}
 model_variables <- BUILD_driver_library(
@@ -336,27 +323,51 @@ model_variables <- BUILD_driver_library(
 )
 ```
 
-## Initial cell population
+## 3. Initial cell population
 
-We now specify the initial cell population. Here we assume that the initial state consists of one clone, where `cell_count` is its cell count. The variable `CN_matrix` specifies the clone's CN profile, here assumed to be normal diploid female cells. The variable `drivers` defines the existing driver mutations in the clone, here assumed to be none.
+We now specify the initial cell population. 
+Each clone in this population is described by its CN profile and list of driver mutations.
+
+The variable `CN_matrix` specifies the clone's CN profile, consisting of 5 columns: `Chromosome`, `Strand`, `Bin_start`, `Bin_end`, and `Allele`.
+For convenience, we can use function `BUILD_cn_normal_autosomes` to build a normal genome consisting only of autosomes (chromosomes 1 to 22, each with 2 alleles A and B),
+or `BUILD_cn_normal_XX` to build a normal female genome (chromosomes 1 to 22 and X, each with 2 alleles A and B),
+or `BUILD_cn_normal_XY` to build a normal male genome (chromosome 1 to 22, each with 2 alleles A and B; and chromosomes X and Y, each with 1 allele A).
 
 ```{r}
-cell_count <- 20
-CN_matrix <- BUILD_cn_normal_XX(model_variables$cn_info)
-drivers <- list()
+CN_matrix <- BUILD_cn_normal_autosomes(model_variables$cn_info)
+```
+
+The variable `drivers` lists the driver mutations that are pre-existing in the clone.
+
+```{r}
+drivers <- list("TP53")
+```
+
+To add this clone to the initial cell population, we use function `BUILD_initial_population` to update `model_variables`.
+Beside `CN_matrix` and `drivers`, we also need to specify its `cell_count`.
+
+```{r}
 model_variables <- BUILD_initial_population(
     model_variables = model_variables,
-    cell_count = cell_count,
+    cell_count = 20,
     CN_matrix = CN_matrix,
-    drivers = drivers
+    drivers = list()
 )
 ```
 
 If the initial cell population consists of multiple clones, the function `BUILD_initial_population` can be repeated for each distinct clone with different `cell_count`, `CN_matrix` and `drivers`.
 
-## Save the input files
+## 4. Save CINner's model parameters
 
-The final step of model variable preparation is using the function `SAVE_model_variables` to save the variables defined thus far in csv files. The variable `model_name` is incorporated into the csv files' names, and the simulator will look up files starting with this string to set up the simulations. Therefore, if different models are simulated in the same folder, they should be saved with different `model_name` so as not to overwrite older models.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The final step of model variable preparation is using the function `SAVE_model_variables` to save the variables defined thus far in csv files. 
+The variable `model_name` is incorporated into the csv files' names, and the simulator will look up files starting with this string to set up the simulations. 
+Therefore, if different models are simulated in the same folder, they should be saved with different `model_name` so as not to overwrite older models.
 
 ```{r}
 model_name <- "EXPERIMENT"
@@ -399,7 +410,7 @@ There are several options for conditioning on the simulations or requesting spec
 ```{r}
 # tmp <- simulator_full_program(
 #     model = model_name,
-#     n_simulations = 10,
+#     n_simulations = 1,
 #     save_cn_profile = TRUE,
 #     save_cn_clones = TRUE,
 #     internal_nodes_cn_info = TRUE,
