@@ -20,23 +20,6 @@ functions_spectrum/
 functions_ginsburg/
 functions_old/
 
-vignettes/batch_GAINvsLOSS.sh
-vignettes/program_GAINvsLOSS.r
-
-vignettes/batch_GROWTHMODEvsSIZE.sh
-vignettes/program_GROWTHMODEvsSIZE.r
-
-vignettes/batch_MISSvsSEL.sh
-vignettes/program_MISSvsSEL.r
-
-vignettes/batch_MISSvsWGD.sh
-vignettes/program_MISSvsWGD.r
-
-vignettes/batch_neuvar.sh
-vignettes/program_neuvar.r
-
-vignettes/batch_pancancer.sh
-vignettes/program_pancancer.r
-
-vignettes/batch_pcawg.sh
-vignettes/program_pcawg.r
+vignettes/Old_code/
+vignettes/Other_vignettes/
+vignettes/Extra_algorithms/
