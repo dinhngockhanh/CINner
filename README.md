@@ -1,9 +1,11 @@
-#   Simulating chromosomal instability during tumorigenesis
+#   Simulation algorithm for chromosomal instability during cancer development
 
-CINner [1] is a tool to simulate cancer evolution as a selective model driven by mutations and Copy Number Aberrations (CNAs).
-It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preparation+ (DLP+).
+##  Installation
 
-## Installation
+CINner [1] is an algorithm to simulate cancer evolution
+as a selective model driven by mutations and Copy Number Aberrations (CNAs).
+It is designed to reproduce data from single-cell DNA sequencing
+such as Direct Library Preparation+ (DLP+).
 
 CINner requires some external libraries:
 
@@ -14,9 +16,9 @@ devtools::install_github("shahcompbio/signals")
 devtools::install_github("chrisamiller/fishplot")
 ```
 
-You can then install CINner with the following command:
+The CINner library can then be installed with
 
-```{r}
+```R
 devtools::install_github("dinhngockhanh/CINner")
 ```
 
@@ -27,4 +29,6 @@ and other files in `vignettes`, which recreate results in [1].
 
 ##  References
 
-1.  Dinh KN, Vázquez-García I, Chan A, Malhotra R, Weiner A, McPherson AW, Tavaré S. CINner: modeling and simulation of chromosomal instability in cancer at single-cell resolution. bioRxiv. 2024 Apr 3.
+1.  Dinh KN, Vázquez-García I, Chan A, Malhotra R, Weiner A, McPherson AW, Tavaré S.
+CINner: modeling and simulation of chromosomal instability in cancer at single-cell resolution.
+bioRxiv. 2024 Apr 3.
