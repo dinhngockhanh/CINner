@@ -20,6 +20,7 @@ functions_spectrum/
 functions_ginsburg/
 functions_old/
 
-vignettes/Old_code/
-vignettes/Other_vignettes/
 vignettes/Extra_algorithms/
+inst/doc
+/doc/
+/Meta/

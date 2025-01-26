@@ -10,7 +10,7 @@ Authors@R: c(
     person("Rhea", "Malhotra", email = "rheamal@stanford.edu", role = "aut"),
     person("Adam", "Weiner", email = "weinera2@mskcc.org", role = "aut"),
     person("Andrew", "McPherson", email = "mcphera1@mskcc.org", role = "aut"),
-    person("Simon", "Tavaré", email = "st3193@columbia.edu", role = "aut"),
+    person("Simon", "Tavaré", email = "st3193@columbia.edu", role = "aut")
     )
 Description: Modeling and simulating the occurrence and selection of copy number aberrations during tumorigenesis.
 License: GPL (>= 2)
@@ -66,3 +66,4 @@ Suggests:
     rmarkdown
 Encoding: UTF-8
 LazyData: true
+VignetteBuilder: knitr

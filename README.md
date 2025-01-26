@@ -12,6 +12,8 @@ The CINner library can be installed with
 devtools::install_github("dinhngockhanh/CINner")
 ```
 
+[View the vignette here](https://dinhngockhanh.github.io/CINner/CINner.html)
+
 ## Run CINner
 
 For more detailed examples and usage, please refer to `vignettes/CINner_introduction.html`
