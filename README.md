@@ -40,7 +40,7 @@ Driver mutation does not affect the CN profiles, but one allele of a randomly se
 ![Image](Figure2.jpg)
 
 Three selection models are included.
-The first model characterizes the selection of chromosome arms (left on the figure below), with the following assumptions:
+The first model characterizes the selection of chromosome arms (left schematic on the figure below), with the following assumptions:
 
 - For chromosome arms with selection parameter s > 1: gains increase the cell fitness and losses decrease fitness.
 This change increases with higher s.
@@ -50,7 +50,7 @@ The impact increases with higher 1/s.
 
 The selection parameter serves as an indicator for the balance of tumor suppressor genes (TSGs) and oncogenes (OGs), as arms with high OG counts are commonly amplified and arms with many TSGs frequently get lost in cancer.
 
-The model for selection of driver mutations (right on the figure below) seeks to portray the selection of individual TSGs and OGs directly.
+The model for selection of driver mutations (right schematic on the figure below) seeks to portray the selection of individual TSGs and OGs directly.
 In this model, the selection parameters for the wild-type (WT) and mutant (MUT) alleles of a gene, are defined according to whether the gene functions as a TSG or an OG in that specific cancer type.
 We assume that a cell’s fitness increases when
 
