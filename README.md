@@ -42,12 +42,27 @@ Driver mutation does not affect the CN profiles, but one allele of a randomly se
 Three selection models are included.
 The first model characterizes the selection of chromosome arms (left on the figure below), with the following assumptions:
 
-- For chromosome arms with selection parameter s>1: gains increase the cell fitness and losses decrease fitness. This change increases with higher s.
+- For chromosome arms with selection parameter s > 1: gains increase the cell fitness and losses decrease fitness.
+This change increases with higher s.
 
-- For arms with s<1: losses increase fitness and gains decrease fitness. The impact increases with higher 1/s.
+- For arms with s < 1: losses increase fitness and gains decrease fitness.
+The impact increases with higher 1/s.
 
-The selection parameter serves as an indicator for the balance of tumor suppressor genes (TSGs) and oncogenes (OGs), as arms with high OG counts are commonly amplified and arms with many TSGs frequently get lost in cancer
+The selection parameter serves as an indicator for the balance of tumor suppressor genes (TSGs) and oncogenes (OGs), as arms with high OG counts are commonly amplified and arms with many TSGs frequently get lost in cancer.
 
+The model for selection of driver mutations (right on the figure below) seeks to portray the selection of individual TSGs and OGs directly.
+In this model, the selection parameters for the wild-type (WT) and mutant (MUT) alleles of a gene, are defined according to whether the gene functions as a TSG or an OG in that specific cancer type.
+We assume that a cell’s fitness increases when
+
+- a TSG is mutated or lost, or
+
+- an OG is mutated or gained.
+
+This model is based on the “one-hit” hypothesis, where each additional driver gene hit renders the cell more advantageous.
+
+The third selection model in CINner is a combination of these two models, describing cancer as driven both by small events targeting driver genes and large CNAs changing gene balance across the genome.
+
+![Image](Figure3.jpg)
 
 ##  References
 
