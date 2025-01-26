@@ -792,6 +792,9 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     copynumber_coordinates$width <- copynumber_coordinates$end - copynumber_coordinates$start + 1
     #--------------------Initialize dataframe for cancer type statistics
     df_plot_by_cancer_type <- data.frame(cancer_type = DATA_cancer_types)
+    df_plot_by_cancer_type$n_total <- 0
+    df_plot_by_cancer_type$n_nonWGD <- 0
+    df_plot_by_cancer_type$n_WGD <- 0
     df_plot_by_cancer_type$WGD <- 0
     df_plot_by_cancer_type$WGD_increased_FGA <- 0
     df_plot_by_cancer_type$TSG_count <- 0
@@ -830,6 +833,9 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         } else {
             df_plot_by_sample <- rbind(df_plot_by_sample, df_tmp)
         }
+        df_plot_by_cancer_type$n_total[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- DATA_statistics$n_total
+        df_plot_by_cancer_type$n_nonWGD[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- DATA_statistics$n_nonWGD
+        df_plot_by_cancer_type$n_WGD[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- DATA_statistics$n_WGD
         df_plot_by_cancer_type$WGD[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- WGD_proportion
         df_plot_by_cancer_type$WGD_increased_FGA[which(df_plot_by_cancer_type$cancer_type == cancer_type)] <- WGD_increased_FGA
     }
@@ -902,14 +908,21 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         }
     )
     filename <- paste0(plotname, "_FGA_from_data.jpeg")
-    jpeg(filename, width = 2000, height = 1100)
+    jpeg(filename, width = 4000, height = 4000)
     df_plot_by_sample_WGDpos$WGD <- as.factor(df_plot_by_sample_WGDpos$WGD)
     p <- ggplot(df_plot_by_sample_WGDpos, aes(x = cancer_type, y = FGA, fill = WGD)) +
-        # geom_split_violin(width = 1, alpha = 0.2, scale = "width")
         geom_split_violin() +
         xlab("") +
         scale_fill_discrete(labels = c("Non-WGD samples", "WGD samples"), name = "") +
-        theme(panel.background = element_rect(fill = "white", colour = "grey50"), axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
+        theme(
+            panel.background = element_rect(fill = "white", colour = "grey50"), 
+            axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1), 
+            text = element_text(size = 100), 
+            legend.position = "top", 
+            legend.justification = "left", 
+            legend.direction = "horizontal", 
+            legend.key.width = unit(2.5, "cm")
+        )
     print(p)
     dev.off()
     #---------------------------Plot relationship between WGD proportion
@@ -984,9 +997,7 @@ statistics_bulk_arm_WGD_status <- function(plotname,
     #---Plot relationship between WGD status and count of GAIN arms
     filename <- paste0(plotname, "_WGD_vs_GAIN_counts.jpeg")
     jpeg(filename, width = 2000, height = 1100)
-
     scale <- (max(df_plot_by_cancer_type$ONC_count)) / max(df_plot_by_cancer_type$WGD)
-
     df_long <- df_plot_by_cancer_type %>%
         pivot_longer(cols = c(ONC_count, WGD), names_to = "variable") %>%
         mutate(scaled_value = ifelse(variable == "WGD", value * scale, value))
@@ -1202,5 +1213,102 @@ statistics_bulk_arm_WGD_status <- function(plotname,
         theme(panel.background = element_rect(fill = "white", colour = "grey50"), text = element_text(size = 40), legend.position = "top", legend.justification = "left", legend.direction = "horizontal", legend.key.width = unit(2.5, "cm"))
     print(p)
     dev.off()
+
+
+    #---Plot relationship between WGD status and count of GAIN arms
+    filename <- paste0(plotname, "_WGD_vs_GAIN_counts_scatter.jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    p <- ggplot(df_plot_by_cancer_type, aes(x = ONC_count, y = WGD)) +
+        geom_point(size = 10,color='darkorchid1') +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1, point.padding = 0.5) +
+        annotate("text",
+            x = min(df_plot_by_cancer_type$ONC_count), y = max(df_plot_by_cancer_type$WGD),
+            label = paste0("p-value=", scientific(p_val_ONC_count, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "darkorchid1"
+        ) +
+        xlab("Count of GAIN arms") +
+        ylab("WGD proportion") +
+        theme(
+            panel.background = element_rect(fill = "white", colour = "grey50"), 
+            text = element_text(size = 40), 
+            legend.position = "top", 
+            legend.justification = "left", 
+            legend.direction = "horizontal", 
+            legend.key.width = unit(2.5, "cm")
+        )
+    print(p)
+    dev.off()
+    #---Plot relationship between WGD status and count of LOSS arms
+    filename <- paste0(plotname, "_WGD_vs_LOSS_counts_scatter.jpeg")
+    jpeg(filename, width = 1000, height = 1100)
+    p <- ggplot(df_plot_by_cancer_type, aes(x = TSG_count, y = WGD)) +
+        geom_point(size = 10, color = "darkorchid1") +
+        geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1, point.padding = 0.5) +
+        annotate("text",
+            x = min(df_plot_by_cancer_type$TSG_count), y = max(df_plot_by_cancer_type$WGD),
+            label = paste0("p-value=", scientific(p_val_TSG_count, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "darkorchid1"
+        ) +
+        xlab("Count of LOSS arms") +
+        ylab("WGD proportion") +
+        theme(
+            panel.background = element_rect(fill = "white", colour = "grey50"),
+            text = element_text(size = 40),
+            legend.position = "top",
+            legend.justification = "left",
+            legend.direction = "horizontal",
+            legend.key.width = unit(2.5, "cm")
+        )
+    print(p)
+    dev.off()
+
+
+
+
+        #---Plot relationship between WGD status and mean selection rate of GAIN arms
+        filename <- paste0(plotname, "_WGD_vs_GAIN_selection_rates_scatter.jpeg")
+        jpeg(filename, width = 1000, height = 1100)
+        p <- ggplot(df_plot_by_cancer_type, aes(x = ONC_mean_selection_rate, y = WGD)) +
+            geom_point(size = 10, color = "chartreuse3") +
+            geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1, point.padding = 0.5) +
+            annotate("text",
+                x = 1, y = max(df_plot_by_cancer_type$WGD),
+                label = paste0("p-value=", scientific(p_val_ONC_mean_selection_rate, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "chartreuse3"
+            ) +
+            xlab("Mean selection rate of GAIN arms") +
+            ylab("WGD proportion") +
+            theme(
+                panel.background = element_rect(fill = "white", colour = "grey50"),
+                text = element_text(size = 40),
+                legend.position = "top",
+                legend.justification = "left",
+                legend.direction = "horizontal",
+                legend.key.width = unit(2.5, "cm")
+            )
+        print(p)
+        dev.off()
+        #---Plot relationship between WGD status and mean selection rate of LOSS arms
+        filename <- paste0(plotname, "_WGD_vs_LOSS_selection_rates_scatter.jpeg")
+        jpeg(filename, width = 1000, height = 1100)
+        p <- ggplot(df_plot_by_cancer_type, aes(x = TSG_mean_selection_rate, y = WGD)) +
+            geom_point(size = 10, color = "chartreuse3") +
+            geom_text_repel(aes(label = cancer_type), size = 10, box.padding = 1, point.padding = 0.5) +
+            annotate("text",
+                x = 1, y = max(df_plot_by_cancer_type$WGD),
+                label = paste0("p-value=", scientific(p_val_TSG_mean_selection_rate, digits = 3)), hjust = 0, vjust = 1, size = 10, colour = "chartreuse3"
+            ) +
+            xlab("Mean selection rate of LOSS arms") +
+            ylab("WGD proportion") +
+            theme(
+                panel.background = element_rect(fill = "white", colour = "grey50"),
+                text = element_text(size = 40),
+                legend.position = "top",
+                legend.justification = "left",
+                legend.direction = "horizontal",
+                legend.key.width = unit(2.5, "cm")
+            )
+        print(p)
+        dev.off()
+
+
+
     return(df_plot_by_sample)
 }

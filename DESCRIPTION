@@ -1,15 +1,19 @@
 Package: CINner
-Title: Simulating Cancer Evolution as a Selective Model driven by Driver Mutations and Copy Number Aberrations
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "Khanh", family = "Dinh",
-           role = c("aut", "cre"),
-           email = "khanhdinh1991@gmail.com")
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
-Encoding: UTF-8
-LazyData: true
+Type: Package
+Version: 1.0.0
+Date: 2025-01-26
+Title: Simulation algorithm for chromosomal instability during cancer development
+Authors@R: c(
+    person("Khanh", "Dinh", email = "knd2127@columbia.edu", role = c("aut", "cre")),
+    person("Ignacio", "Vázquez-García", email = "ivazquez-garcia@mgh.harvard.edu", role = "aut"),
+    person("Andrew", "Chan", email = "chandrew314@gmail.com", role = "aut"),
+    person("Rhea", "Malhotra", email = "rheamal@stanford.edu", role = "aut"),
+    person("Adam", "Weiner", email = "weinera2@mskcc.org", role = "aut"),
+    person("Andrew", "McPherson", email = "mcphera1@mskcc.org", role = "aut"),
+    person("Simon", "Tavaré", email = "st3193@columbia.edu", role = "aut"),
+    )
+Description: Modeling and simulating the occurrence and selection of copy number aberrations during tumorigenesis.
+License: GPL (>= 2)
 Imports: 
     abcrf,
     adephylo,
@@ -60,3 +64,5 @@ Suggests:
     readxl,
     reticulate,
     rmarkdown
+Encoding: UTF-8
+LazyData: true

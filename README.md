@@ -1,7 +1,7 @@
 #   Simulating chromosomal instability during tumorigenesis
 
 CINner [1] is a tool to simulate cancer evolution as a selective model driven by mutations and Copy Number Aberrations (CNAs).
-It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preperation+ (DLP+).
+It is designed to reproduce data from single-cell DNA sequencing such as Direct Library Preparation+ (DLP+).
 
 ## Installation
 

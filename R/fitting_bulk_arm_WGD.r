@@ -45,6 +45,9 @@ get_WGD_stats_from_data <- function(copynumber_DATA,
     for (i in 1:length(list_targets)) {
         target <- list_targets[i]
         if (target == "WGD_proportion") {
+            stat$n_total <- length(df_sample_stats$WGD)
+            stat$n_WGD <- length(which(df_sample_stats$WGD == 1))
+            stat$n_nonWGD <- length(which(df_sample_stats$WGD == 0))
             stat$WGD_proportion <- length(which(df_sample_stats$WGD == 1)) / length(df_sample_stats$WGD)
         } else if (target == "FGA_difference") {
             if (length(which(df_sample_stats$WGD == 1)) > 0) {
