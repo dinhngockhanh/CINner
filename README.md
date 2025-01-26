@@ -12,7 +12,9 @@ The CINner library can be installed with
 devtools::install_github("dinhngockhanh/CINner")
 ```
 
-[View the vignette here](https://dinhngockhanh.github.io/CINner/CINner.html)
+Detailed descriptions of how to run CINner and its capabilities can be viewed in the [introductory vignette](https://dinhngockhanh.github.io/CINner/CINner.html).
+
+##  CINner's mathematical model
 
 ## Run CINner
 
