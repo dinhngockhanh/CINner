@@ -16,10 +16,7 @@ Detailed descriptions of how to run CINner and its capabilities can be viewed in
 
 ##  CINner's mathematical model
 
-## Run CINner
-
-For more detailed examples and usage, please refer to `vignettes/CINner_introduction.html`
-and other files in `vignettes`, which recreate results in [1].
+![Image](Figure1.jpg)
 
 ##  References
 
