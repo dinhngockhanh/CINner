@@ -341,7 +341,28 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(CINner)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(CINner)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div id="set-up-cinner" class="section level1">
+<h1>Set up CINner</h1>
+<p>CINner requires a number of input parameters about the assumed
+characteristics of tumor growth. One easy method to load the parameters
+to <code>CINner</code> is by creating <code>model_variables</code>, a
+list containing relevant variables in a specific order. Here we detail
+how to create <code>model_variables</code>.</p>
+<div id="general-variables-for-every-cell" class="section level2">
+<h2>1. General variables for every cell</h2>
+<div id="a.-tissue-specific-and-sampling-variables" class="section level3">
+<h3>1a. Tissue-specific and sampling variables</h3>
+<p>We first specify the cell lifespan, measured in days.
+<code>cell_lifespan</code> is the mean of the exponentially distributed
+lifetime of every cell during cancer evolution, independent of their
+particular cellular profiles.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cell_lifespan <span class="ot">&lt;-</span> <span class="dv">30</span></span></code></pre></div>
+</div>
+</div>
+</div>
 
 
 

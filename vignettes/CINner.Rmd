@@ -9,11 +9,32 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
 ```{r setup}
 library(CINner)
+library(readxl)
+set.seed(1)
+```
+
+# Set up CINner
+
+CINner requires a number of input parameters about the assumed characteristics of tumor growth. 
+One easy method to load the parameters to `CINner` is by creating `model_variables`, 
+a list containing relevant variables in a specific order.
+Here we detail how to create `model_variables`.
+
+## 1. General variables for every cell
+
+### 1a. Tissue-specific and sampling variables
+
+We first specify the cell lifespan, measured in days.
+`cell_lifespan` is the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
+independent of their particular cellular profiles.
+
+```{r}
+cell_lifespan <- 30
 ```
