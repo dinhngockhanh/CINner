@@ -76,7 +76,8 @@ Two observations are utilized to increase the efficiency of CINner:
 - Cells with the same phylogenetic origin share the same CN and mutational profiles, therefore they evolve similarly throughout time.
 
 - The information relevant for downstream analysis is restricted to only the sampled cells.
-Therefore, it is not necessary to simulate single cells in the whole population individually, and instead we focus on clones, defined as groups of cells that have identical CN and mutational characteristics.
+
+As a result, it is not necessary to simulate single cells in the whole population individually, and instead we focus on clones, defined as groups of cells that have identical CN and mutational characteristics.
 
 The first step of CINner consists of simulating the evolution of clones in forward time. 
 New clones are generated when CNAs or driver mutations occur, and the clone sizes change through time according to the branching process governing cell division and death.
