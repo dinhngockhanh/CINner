@@ -2,21 +2,11 @@
 
 ##  Installation
 
-CINner [[1]](https://www.biorxiv.org/content/10.1101/2024.04.03.587939v1) is an algorithm to simulate cancer evolution
-as a selective model driven by mutations and Copy Number Aberrations (CNAs).
-It is designed to reproduce data from single-cell DNA sequencing
-such as Direct Library Preparation+ (DLP+).
+CINner [1] (read preprint on [bioRxiv](https://www.biorxiv.org/content/10.1101/2024.04.03.587939v1))
+is an algorithm to simulate cancer evolution driven by the occurrence and selection of mutations and Copy Number Aberrations (CNAs).
+It is designed to reproduce data from single-cell DNA sequencing such as [Direct Library Preparation+ (DLP+)](https://www.cell.com/cell/fulltext/S0092-8674(19)31176-6).
 
-CINner requires some external libraries:
-
-```{r}
-BiocManager::install("ggtree")
-BiocManager::install("HMMcopy")
-devtools::install_github("shahcompbio/signals")
-devtools::install_github("chrisamiller/fishplot")
-```
-
-The CINner library can then be installed with
+The CINner library can be installed with
 
 ```R
 devtools::install_github("dinhngockhanh/CINner")
