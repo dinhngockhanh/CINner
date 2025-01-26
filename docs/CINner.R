@@ -163,11 +163,6 @@ model_variables <- CHECK_model_variables(model_variables)
 tmp <- simulator_full_program(
     model = model_variables,
     n_simulations = 8,
-    save_cn_profile = TRUE,
-    save_cn_clones = TRUE,
-    internal_nodes_cn_info = TRUE,
-    report_progress = TRUE,
-    seed = 10,
     compute_parallel = TRUE
 )
 
