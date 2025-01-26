@@ -111,8 +111,8 @@ Interstitial CNLOH can occur anywhere in the arm, but terminal CNLOH has to occu
 prob_CN_whole_genome_duplication <- 0.5e-4
 prob_CN_missegregation <- 2e-4
 prob_CN_chrom_arm_missegregation <- 2e-4
-prob_CN_focal_amplification <- 2e-4
-prob_CN_focal_deletion <- 2e-4
+prob_CN_focal_amplification <- 0
+prob_CN_focal_deletion <- 0
 prob_CN_cnloh_interstitial <- 0
 prob_CN_cnloh_terminal <- 0
 ```
@@ -354,4 +354,51 @@ model_variables <- BUILD_initial_population(
 
 If the initial cell population consists of multiple clones, the function `BUILD_initial_population` can be repeated for each distinct clone with different `cell_count`, `CN_matrix` and `drivers`.
 
-## 4. Save CINner's model parameters
+# Run CINner
+
+Before running CINner, we need to check that the model parameters are correctly defined.
+
+```{r}
+model_variables <- CHECK_model_variables(model_variables)
+```
+
+The function `simulator_full_program` produces simulations according to the model variables listed in the csv files resulting from the previous section.
+
+There are several options for conditioning on the simulations or requesting specific results:
+
+- `model`: Includes the model parameters defined thus far.
+- `n_simulations`: Number of simulations requested.
+- `compute_parallel`: Simulations are produced sequentially if `FALSE`, or in parallel if `TRUE`. Default is `FALSE`.
+- `n_cores`: Number of computer CPUs to use to produce simulations in parallel (therefore only applied when `compute_parallel`=`TRUE`). If `n_cores` is not specified when `compute_parallel`=`TRUE`, the algorithm uses all available CPU cores except one.
+- `seed`: Seed to produce replicable stochastic simulations. Only applicable when `compute_parallel`=`FALSE`.
+- `report_progress`: The simulator prints updates of the progress if set to `TRUE`.
+- `save_simulation`: All output variables from each simulation are saved in separate `rda` files if set to `TRUE`. Default is `TRUE`.
+- `output_variables`: Vector of specific output variables from each simulation to return in the list format in R. Default is `NULL`, in which case no variable is returned.
+- `folder_workplace`: Name of folder in the current directory to store output files from the simulations. If the folder does not exist, it will be created. Default is `NULL`, in which case files are saved within the current directory.
+- `R_libPaths`: Name of folder where required R libraries are stored. Default is `NULL`, in which case the simulator assumes relevent R libraries are automatically usable.
+- `n_clones_min`: Lower limit for number of clones at the ending time point for simulations to be accepted. Default is `0`.
+- `n_clones_max`: Upper limit for number of clones at the ending time point for simulations to be accepted. Default is `Inf`.
+- `neutral_variations`: Whether neutral CNAs are simulated on top of the selective CNAs.
+- `save_newick_tree`: If `TRUE`, the phylogeny of sampled cells from each simulation is saved in the Newick format. Default is `FALSE`.
+- `save_cn_profile`: If `TRUE`, the CN profiles of sampled cells from each simulation are saved in a csv file. Default is `FALSE`.
+- `format_cn_profile`: If `long` when `save_cn_profile`=`TRUE`, the CN profiles are saved in the long format (subsequent cells are appended by row). If `wide` when `save_cn_profile`=`TRUE`, the CN profiles are saved in the wide format (each cell occupies a column). If `both` when `save_cn_profile`=`TRUE`, the CN profiles are saved in both formats (resulting in two csv files per simulation). Default is `long`.
+- `save_cn_clones`: If `TRUE`, the assignment of which cell belongs in which clone is saved in a csv file. Default is `FALSE`.
+- `internal_nodes_cn_info`: If `TRUE` when `save_cn_profile`=`TRUE`, the CN profiles of both the sampled cells and the internal nodes of their phylogeny are saved in the requested format(s). The internal node labels correspond to those in the Newick tree if `save_newick_tree`=`TRUE`. Default is `FALSE`.
+- `model_readcount`: If `TRUE`, noisy readcounts are simulated from each sampled cell's CN profile and saved in a csv file. Default is `FALSE`.
+- `model_readcount_base`: If `truth` when `model_readcount`=`TRUE`, noisy readcounts are simulated from the CN profile without neutral variations. If `neuvar` when `model_readcount`=`TRUE`, noisy readcounts are simulated from the CN profile with neutral variations. Both are simulated and saved in separate csv files if `model_readcount_base`=`all` when `model_readcount`=`TRUE`. Default is `all`.
+- `HMM`: If `TRUE`, the cell's CN profiles are inferred back from the simulated noisy readcounts using HMMcopy. Default is `FALSE`.
+- `HMM_containner`: Specifies which HMMcopy container is used when `HMM`=`TRUE`. Two available options are `singularity` and `docker`, which might have different efficiency.
+- `pseudo_corrected_readcount`: if `TRUE`, the pseudo-corrected readcounts (= cell's HMM-inferred mean readcount X bin GC level) are computed and saved in a csv file. The specific data used depends on `model_readcount_base`. Default is `FALSE`.
+
+```{r}
+tmp <- simulator_full_program(
+    model = model_variables,
+    n_simulations = 8,
+    save_cn_profile = TRUE,
+    save_cn_clones = TRUE,
+    internal_nodes_cn_info = TRUE,
+    report_progress = TRUE,
+    seed = 10,
+    compute_parallel = TRUE
+)
+```

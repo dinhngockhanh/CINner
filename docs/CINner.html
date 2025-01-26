@@ -440,8 +440,8 @@ end.</li>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>prob_CN_whole_genome_duplication <span class="ot">&lt;-</span> <span class="fl">0.5e-4</span></span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>prob_CN_missegregation <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>prob_CN_chrom_arm_missegregation <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>prob_CN_focal_amplification <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>prob_CN_focal_deletion <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>prob_CN_focal_amplification <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>prob_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>prob_CN_cnloh_interstitial <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>prob_CN_cnloh_terminal <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
 <p>In specific applications, we might also consider neutral versions of
@@ -708,9 +708,121 @@ function <code>BUILD_initial_population</code> can be repeated for each
 distinct clone with different <code>cell_count</code>,
 <code>CN_matrix</code> and <code>drivers</code>.</p>
 </div>
-<div id="save-cinners-model-parameters" class="section level2">
-<h2>4. Save CINner’s model parameters</h2>
 </div>
+<div id="run-cinner" class="section level1">
+<h1>Run CINner</h1>
+<p>Before running CINner, we need to check that the model parameters are
+correctly defined.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>model_variables <span class="ot">&lt;-</span> <span class="fu">CHECK_model_variables</span>(model_variables)</span></code></pre></div>
+<p>The function <code>simulator_full_program</code> produces simulations
+according to the model variables listed in the csv files resulting from
+the previous section.</p>
+<p>There are several options for conditioning on the simulations or
+requesting specific results:</p>
+<ul>
+<li><code>model</code>: Includes the model parameters defined thus
+far.</li>
+<li><code>n_simulations</code>: Number of simulations requested.</li>
+<li><code>compute_parallel</code>: Simulations are produced sequentially
+if <code>FALSE</code>, or in parallel if <code>TRUE</code>. Default is
+<code>FALSE</code>.</li>
+<li><code>n_cores</code>: Number of computer CPUs to use to produce
+simulations in parallel (therefore only applied when
+<code>compute_parallel</code>=<code>TRUE</code>). If
+<code>n_cores</code> is not specified when
+<code>compute_parallel</code>=<code>TRUE</code>, the algorithm uses all
+available CPU cores except one.</li>
+<li><code>seed</code>: Seed to produce replicable stochastic
+simulations. Only applicable when
+<code>compute_parallel</code>=<code>FALSE</code>.</li>
+<li><code>report_progress</code>: The simulator prints updates of the
+progress if set to <code>TRUE</code>.</li>
+<li><code>save_simulation</code>: All output variables from each
+simulation are saved in separate <code>rda</code> files if set to
+<code>TRUE</code>. Default is <code>TRUE</code>.</li>
+<li><code>output_variables</code>: Vector of specific output variables
+from each simulation to return in the list format in R. Default is
+<code>NULL</code>, in which case no variable is returned.</li>
+<li><code>folder_workplace</code>: Name of folder in the current
+directory to store output files from the simulations. If the folder does
+not exist, it will be created. Default is <code>NULL</code>, in which
+case files are saved within the current directory.</li>
+<li><code>R_libPaths</code>: Name of folder where required R libraries
+are stored. Default is <code>NULL</code>, in which case the simulator
+assumes relevent R libraries are automatically usable.</li>
+<li><code>n_clones_min</code>: Lower limit for number of clones at the
+ending time point for simulations to be accepted. Default is
+<code>0</code>.</li>
+<li><code>n_clones_max</code>: Upper limit for number of clones at the
+ending time point for simulations to be accepted. Default is
+<code>Inf</code>.</li>
+<li><code>neutral_variations</code>: Whether neutral CNAs are simulated
+on top of the selective CNAs.</li>
+<li><code>save_newick_tree</code>: If <code>TRUE</code>, the phylogeny
+of sampled cells from each simulation is saved in the Newick format.
+Default is <code>FALSE</code>.</li>
+<li><code>save_cn_profile</code>: If <code>TRUE</code>, the CN profiles
+of sampled cells from each simulation are saved in a csv file. Default
+is <code>FALSE</code>.</li>
+<li><code>format_cn_profile</code>: If <code>long</code> when
+<code>save_cn_profile</code>=<code>TRUE</code>, the CN profiles are
+saved in the long format (subsequent cells are appended by row). If
+<code>wide</code> when <code>save_cn_profile</code>=<code>TRUE</code>,
+the CN profiles are saved in the wide format (each cell occupies a
+column). If <code>both</code> when
+<code>save_cn_profile</code>=<code>TRUE</code>, the CN profiles are
+saved in both formats (resulting in two csv files per simulation).
+Default is <code>long</code>.</li>
+<li><code>save_cn_clones</code>: If <code>TRUE</code>, the assignment of
+which cell belongs in which clone is saved in a csv file. Default is
+<code>FALSE</code>.</li>
+<li><code>internal_nodes_cn_info</code>: If <code>TRUE</code> when
+<code>save_cn_profile</code>=<code>TRUE</code>, the CN profiles of both
+the sampled cells and the internal nodes of their phylogeny are saved in
+the requested format(s). The internal node labels correspond to those in
+the Newick tree if <code>save_newick_tree</code>=<code>TRUE</code>.
+Default is <code>FALSE</code>.</li>
+<li><code>model_readcount</code>: If <code>TRUE</code>, noisy readcounts
+are simulated from each sampled cell’s CN profile and saved in a csv
+file. Default is <code>FALSE</code>.</li>
+<li><code>model_readcount_base</code>: If <code>truth</code> when
+<code>model_readcount</code>=<code>TRUE</code>, noisy readcounts are
+simulated from the CN profile without neutral variations. If
+<code>neuvar</code> when <code>model_readcount</code>=<code>TRUE</code>,
+noisy readcounts are simulated from the CN profile with neutral
+variations. Both are simulated and saved in separate csv files if
+<code>model_readcount_base</code>=<code>all</code> when
+<code>model_readcount</code>=<code>TRUE</code>. Default is
+<code>all</code>.</li>
+<li><code>HMM</code>: If <code>TRUE</code>, the cell’s CN profiles are
+inferred back from the simulated noisy readcounts using HMMcopy. Default
+is <code>FALSE</code>.</li>
+<li><code>HMM_containner</code>: Specifies which HMMcopy container is
+used when <code>HMM</code>=<code>TRUE</code>. Two available options are
+<code>singularity</code> and <code>docker</code>, which might have
+different efficiency.</li>
+<li><code>pseudo_corrected_readcount</code>: if <code>TRUE</code>, the
+pseudo-corrected readcounts (= cell’s HMM-inferred mean readcount X bin
+GC level) are computed and saved in a csv file. The specific data used
+depends on <code>model_readcount_base</code>. Default is
+<code>FALSE</code>.</li>
+</ul>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>    <span class="at">model =</span> model_variables,</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>    <span class="at">n_simulations =</span> <span class="dv">8</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">save_cn_profile =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>    <span class="at">save_cn_clones =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>    <span class="at">internal_nodes_cn_info =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>    <span class="at">report_progress =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">10</span>,</span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a>)</span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;data.table&#39; was built under R version 4.3.3</span></span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ape&#39; was built under R version 4.3.3</span></span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a><span class="co">#&gt; Loading required package: amap</span></span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;amap&#39; was built under R version 4.3.3</span></span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a><span class="co">#&gt; Parallel cluster with 9 cores...</span></span></code></pre></div>
 </div>
 
 

@@ -31,8 +31,8 @@ selection_model <- "chrom-arm-and-driver-gene-selection"
 prob_CN_whole_genome_duplication <- 0.5e-4
 prob_CN_missegregation <- 2e-4
 prob_CN_chrom_arm_missegregation <- 2e-4
-prob_CN_focal_amplification <- 2e-4
-prob_CN_focal_deletion <- 2e-4
+prob_CN_focal_amplification <- 0
+prob_CN_focal_deletion <- 0
 prob_CN_cnloh_interstitial <- 0
 prob_CN_cnloh_terminal <- 0
 
@@ -154,5 +154,20 @@ model_variables <- BUILD_initial_population(
     cell_count = 20,
     CN_matrix = CN_matrix,
     drivers = list()
+)
+
+## -----------------------------------------------------------------------------
+model_variables <- CHECK_model_variables(model_variables)
+
+## -----------------------------------------------------------------------------
+tmp <- simulator_full_program(
+    model = model_variables,
+    n_simulations = 8,
+    save_cn_profile = TRUE,
+    save_cn_clones = TRUE,
+    internal_nodes_cn_info = TRUE,
+    report_progress = TRUE,
+    seed = 10,
+    compute_parallel = TRUE
 )
 
