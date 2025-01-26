@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(CINner)
-library(readxl)
 set.seed(1)
 ```
 
@@ -233,3 +232,126 @@ model_variables <- BUILD_general_variables(
     table_population_dynamics = table_population_dynamics
 )
 ```
+## 2. Selection rates
+
+Depending on which selection model is specified in the variable `selection_model` to drive cancer evolution, we need to define the selection rates of each chromosome arm and/or each driver gene, 
+which then define a cell's fitness as it acquires new CNAs and/or driver mutations.
+
+### 2a. Chromosome arm selection rates
+
+If `selection_model` = `chrom-arm-selection` or `chrom-arm-and-driver-gene-selection`, then cancer is driven solely or partially by gains and losses of chromosome arms, based on their gene imbalances.
+
+Each row in `table_arm_selection_rates` details the information for one chromosome arm.
+Its ID is listed in column `Arm_ID`, and its location is recorded in columns `Chromosome`, `Bin_start` and `Bin_end`.
+Its selection rate is specified in column `s_rate` as a positive number.
+Arms with more Tumor Suppressor Genes than Oncogenes have selection rate less than 1, for which losses are advantageous and gains are deleterious. 
+Arms with more Oncogenes than Tumor Suppressor Genes have selection rate higher than 1, for which gains are advantageous and losses are deleterious. 
+The strength of the selection force depends on the distance between the selection rate to 1:
+chromosome arms with very small or very large selection rates are strongly selected for, and chromosome arms with selection rates very close to 1 are essentially neutral.
+
+```{r}
+Arm_ID <- c(
+    paste(model_variables$cn_info$Chromosome, "p", sep = ""),
+    paste(model_variables$cn_info$Chromosome, "q", sep = "")
+)
+Chromosome <- rep(model_variables$cn_info$Chromosome, 2)
+Bin_start <- c(
+    rep(1, length(model_variables$cn_info$Chromosome)),
+    model_variables$cn_info$Centromere_location + 1
+)
+Bin_end <- c(
+    model_variables$cn_info$Centromere_location,
+    model_variables$cn_info$Bin_count
+)
+s_rate <- runif(length(Arm_ID), 1 / 1.2, 1.2)
+table_arm_selection_rates <- data.frame(
+    Arm_ID = Arm_ID,
+    Chromosome = Chromosome,
+    Bin_start = Bin_start,
+    Bin_end = Bin_end,
+    s_rate = s_rate
+)
+```
+
+### 2b. Driver gene selection rates
+
+If `selection_model` = `driver-gene-selection` or `chrom-arm-and-driver-gene-selection`, then cancer is driven solely or partially by gains, losses and mutations of driver genes.
+
+Each row in `table_gene_selection_rates` details the information for one driver gene.
+Its name is listed in column `Gene_ID`, and its location is recorded in columns `Chromosome` and `Bin`.
+The gene's function as cancer driver is specified in column `Gene_role` (either `TSG` for Tumor Suppressor Genes or `ONCOGENE` for Oncogenes; other functions or dual roles are not currently supported), and its (positive) selection rate is in column `s_rate`.
+
+The impact of CNA events on the cell's fitness depends on the mutated gene's function.
+For a Tumor Suppressor Gene:
+
+- Deletion of the wild-type alleles is advantageous.
+- Amplification of the wild-type alleles is deleterious.
+- Deletion of the mutant alleles is neutral.
+- Mutation and amplification of the mutant alleles are advantageous.
+
+On the other hand, for an Oncogene:
+
+- Amplification of the wild-type or mutant allele is advantageous.
+- Deletion of the wild-type allele or the mutant allele is deleterious.
+- Mutation is advantageous.
+
+Similar to the chromosome arm model, the strength of the selection force depends on the distance between the selection rate to 1.
+
+```{r}
+table_gene_selection_rates <- data.frame(
+    Gene_ID = c("Driver_1", "Driver_2", "Driver_3"),
+    Gene_role = c("TSG", "ONCOGENE", "TSG"),
+    s_rate = c(0.8, 1.2, 0.9),
+    Chromosome = c(1, 2, 3),
+    Bin = c(10, 20, 30)
+)
+```
+
+### 2c. Update CINner model variables
+
+We now update `model_variables` to include the selection rates with function `BUILD_driver_library`.
+Only the relevant selection rate dataframes should be included.
+
+```{r}
+model_variables <- BUILD_driver_library(
+    model_variables = model_variables,
+    table_arm_selection_rates = table_arm_selection_rates,
+    table_gene_selection_rates = table_gene_selection_rates
+)
+```
+
+## 3. Initial cell population
+
+We now specify the initial cell population. 
+Each clone in this population is described by its CN profile and list of driver mutations.
+
+The variable `CN_matrix` specifies the clone's CN profile, consisting of 5 columns: `Chromosome`, `Strand`, `Bin_start`, `Bin_end`, and `Allele`.
+For convenience, we can use function `BUILD_cn_normal_autosomes` to build a normal genome consisting only of autosomes (chromosomes 1 to 22, each with 2 alleles A and B),
+or `BUILD_cn_normal_XX` to build a normal female genome (chromosomes 1 to 22 and X, each with 2 alleles A and B),
+or `BUILD_cn_normal_XY` to build a normal male genome (chromosome 1 to 22, each with 2 alleles A and B; and chromosomes X and Y, each with 1 allele A).
+
+```{r}
+CN_matrix <- BUILD_cn_normal_autosomes(model_variables$cn_info)
+```
+
+The variable `drivers` lists the driver mutations that are pre-existing in the clone.
+
+```{r}
+drivers <- list("Driver_1")
+```
+
+To add this clone to the initial cell population, we use function `BUILD_initial_population` to update `model_variables`.
+Beside `CN_matrix` and `drivers`, we also need to specify its `cell_count`.
+
+```{r}
+model_variables <- BUILD_initial_population(
+    model_variables = model_variables,
+    cell_count = 20,
+    CN_matrix = CN_matrix,
+    drivers = list()
+)
+```
+
+If the initial cell population consists of multiple clones, the function `BUILD_initial_population` can be repeated for each distinct clone with different `cell_count`, `CN_matrix` and `drivers`.
+
+## 4. Save CINner's model parameters
