@@ -1,6 +1,11 @@
 ---
 title: "Introduction to CINner"
-output: html_document
+title: "Title of Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to CINner}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -19,7 +24,7 @@ library(readxl)
 set.seed(1)
 ```
 
-# Set up CINner model variables
+# Set up CINner
 
 CINner requires a number of input parameters about the assumed characteristics of tumor growth. 
 One easy method to load the parameters to `CINner` is by creating `model_variables`, 
