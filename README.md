@@ -68,7 +68,42 @@ The third selection model in CINner is a combination of these two models, descri
 
 ##  Output from CINner
 
+CINner is developed to efficiently simulate observed SNVs and CNAs in a tumor sample.
+To optimize for computing memory and runtime, the genome is divided into bins of a fixed size, and the allele-specific bin-level copy number profile of each cell is tracked throughout tumor progression.
+Each new mutation is assigned a genomic location, and gets multiplied or deleted if the site is affected by later CNAs.
+Two observations are utilized to increase the efficiency of CINner:
+
+- Cells with the same phylogenetic origin share the same CN and mutational profiles, therefore they evolve similarly throughout time.
+
+- The information relevant for downstream analysis is restricted to only the sampled cells.
+Therefore, it is not necessary to simulate single cells in the whole population individually, and instead we focus on clones, defined as groups of cells that have identical CN and mutational characteristics.
+
+The first step of CINner consists of simulating the evolution of clones in forward time. 
+New clones are generated when CNAs or driver mutations occur, and the clone sizes change through time according to the branching process governing cell division and death.
+We use the tau-leaping algorithm for efficiency, as the exact Gillespie algorithm is time-consuming for cell populations of the typical size of tumors.
+In the second step, CINner samples cells from predefined time points.
+Next, it constructs the phylogeny for the sampled cells by using the “down-up-down” simulation technique.
+In short, the sampled cell phylogeny is generated as a coalescent, informed by the recorded clone-specific cell division counts throughout time from step 1.
+Finally, cell-to-cell variations due to neutral CNAs and passenger mutations are simulated on top of the phylogeny tree and trickle down to the sample observations.
+CINner can complete prematurely if the later steps are not necessary, depending on the data requested by the user.
+
 ![Image](Figure4.jpg)
+
+The use of the “down-up-down” strategy and tau-leaping algorithm allows for significantly reduced runtime of CINner, compared to directly simulating the branching process for the whole population and then extracting the phylogeny only for the sampled cells.
+The runtime of simulating the clonal evolution (step 1) scales with the number of clones and the number of time steps.
+The clone count increases with higher CNA and driver mutation probabilities.
+The number of time steps increases inversely with the step size selected for the tau-leaping algorithm.
+Meanwhile, the computational cost of simulating the phylogeny (step 3) scales with the number of sampled cells, which is typically of magnitudes smaller than the population size.
+
+We note that the data simulated in the forward and backward steps capture complementary views of cancer evolution.
+Step 1 in CINner simulates the whole population throughout time.
+The population at each time point is characterized by distinct co-existing clones, their CN and driver mutation profiles, and their cell counts.
+This information contains all clones that arise during the whole process, including those that become extinct or are rare at the final time and hence unrepresented in the sample taken in step 2.
+Therefore, the output data allows for the examination of the expansion and/or extinction of any given clone in the simulation.
+On the other hand, the sample phylogeny from step 3 in CINner captures the history of a subsample of cells taken at the final time point.
+It therefore represents information that is observable from a hypothetical tumor biopsy. 
+The phylogeny depicts recent subclonal evolution, but may lack (a) a full view of the heterogeneity in the whole cell population, and (b) information about early population genetic processes, e.g. before the sample MRCA.
+Depending on the applications, the users may utilize the data from either step for their analyses.
 
 ##  References
 
