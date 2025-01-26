@@ -14,7 +14,7 @@ devtools::install_github("dinhngockhanh/CINner")
 
 Detailed descriptions of how to run CINner and its capabilities can be viewed in the [introductory vignette](https://dinhngockhanh.github.io/CINner/CINner.html).
 
-##  CINner's mathematical model
+##  Mathematical model
 
 In CINner, each cell is characterized by its copy number (CN) profile, or driver single nucleotide variant (SNV) profile, or both.
 As genomic regions are amplified or deleted as copy number aberrations (CNAs) occur, the SNVs residing in those regions are correspondingly multiplied or lost.
@@ -38,6 +38,8 @@ Focal amplification and deletion target a random region on a random chromosome a
 Driver mutation does not affect the CN profiles, but one allele of a randomly selected driver gene is changed from wild-type to mutant in a cell (lightning symbol). 
 
 ![Image](Figure2.jpg)
+
+##  Selection models
 
 Three selection models are included.
 The first model characterizes the selection of chromosome arms (left schematic on the figure below), with the following assumptions:
