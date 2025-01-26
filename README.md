@@ -41,7 +41,7 @@ Driver mutation does not affect the CN profiles, but one allele of a randomly se
 
 ##  Selection models
 
-Three selection models are included.
+Three selection models are included in CINner.
 The first model characterizes the selection of chromosome arms (left schematic on the figure below), with the following assumptions:
 
 - For chromosome arms with selection parameter s > 1: gains increase the cell fitness and losses decrease fitness.
@@ -65,6 +65,10 @@ This model is based on the “one-hit” hypothesis, where each additional drive
 The third selection model in CINner is a combination of these two models, describing cancer as driven both by small events targeting driver genes and large CNAs changing gene balance across the genome.
 
 ![Image](Figure3.jpg)
+
+##  Output from CINner
+
+![Image](Figure4.jpg)
 
 ##  References
 
