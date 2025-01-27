@@ -415,10 +415,13 @@ There are several options for conditioning on the simulations or requesting spec
 - `HMM_containner`: Specifies which HMMcopy container is used when `HMM`=`TRUE`. Two available options are `singularity` and `docker`, which might have different efficiency.
 - `pseudo_corrected_readcount`: if `TRUE`, the pseudo-corrected readcounts (= cell's HMM-inferred mean readcount X bin GC level) are computed and saved in a csv file. The specific data used depends on `model_readcount_base`. Default is `FALSE`.
 
+Here we make 8 CINner simulations in parallel.
+
 ```{r}
 CINner_simulations <- simulator_full_program(
     model = model_variables,
-    n_simulations = 8,
-    compute_parallel = TRUE
+    n_simulations = 1,
+    stage_final = 4,
+    compute_parallel = FALSE
 )
 ```

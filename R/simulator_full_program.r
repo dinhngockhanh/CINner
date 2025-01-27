@@ -43,7 +43,7 @@ simulator_full_program <- function(model = "",
                                    report_progress = TRUE,
                                    compute_parallel = FALSE,
                                    seed = Inf,
-                                   output_variables = c(),
+                                   output_variables = "all",
                                    n_cores = NULL,
                                    R_libPaths = NULL) {
     library(data.table)
