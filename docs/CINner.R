@@ -16,7 +16,11 @@ T_0 <- list(0, "year")
 T_end <- list(80, "year")
 
 ## -----------------------------------------------------------------------------
-Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80)
+Table_sample <- data.frame(
+    Sample_ID = "SA01",
+    Cell_count = 300,
+    Age_sample = 80
+)
 
 ## -----------------------------------------------------------------------------
 T_tau_step <- cell_lifespan / 2

@@ -360,9 +360,13 @@ evolution, independent of their particular cellular profiles (measured
 in days).</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cell_lifespan <span class="ot">&lt;-</span> <span class="dv">30</span></span></code></pre></div>
 <p>Next, we specify the time points at the beginning and the end of each
-simulation. The unit can be - <code>day</code> - <code>week</code> (= 7
-days) - <code>month</code> (= 30 days), or - <code>year</code> (= 365
-days).</p>
+simulation. The unit can be</p>
+<ul>
+<li><code>day</code></li>
+<li><code>week</code> (= 7 days)</li>
+<li><code>month</code> (= 30 days), or</li>
+<li><code>year</code> (= 365 days).</li>
+</ul>
 <p>The unit for <code>T_0</code> and <code>T_end</code> should be
 consistent.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>T_0 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="st">&quot;year&quot;</span>)</span>
@@ -370,17 +374,21 @@ consistent.</p>
 <p><code>Table_sample</code> details the time point that the DNA sample
 is taken (in the same unit as <code>T_0</code> and <code>T_end</code>),
 how many cells are in the sample, and the sample’s ID. The following
-code specifies that the sample in each CINner simulation is labeled
-“SA01” and consists of 300 cells, taken at 80 years.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>Table_sample <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Sample_ID =</span> <span class="st">&quot;SA01&quot;</span>, <span class="at">Cell_count =</span> <span class="dv">300</span>, <span class="at">Age_sample =</span> <span class="dv">80</span>)</span></code></pre></div>
+code specifies that the sample in each CINner simulation is to be
+labeled “SA01” and consist of 300 cells, taken at 80 years.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>Table_sample <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>    <span class="at">Sample_ID =</span> <span class="st">&quot;SA01&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    <span class="at">Cell_count =</span> <span class="dv">300</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="at">Age_sample =</span> <span class="dv">80</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span></code></pre></div>
 <p>CINner’s efficiency is based partially on its use of the tau-leaping
 algorithm, instead of the exact Gillespie algorithm. As such, it
 requires a suggested <code>T_tau_step</code>. Each CINner result then
 simulates the cell population starting from <code>T_0</code> at time
 points <code>T_0 + T_tau_step</code>, <code>T_0 + 2 * T_tau_step</code>,
 …, until it reaches <code>T_end</code>. If not specified,
-<code>T_tau_step</code> is automatically set to be half of
-<code>cell_lifespan</code>. High time steps will lead to decreased
+<code>T_tau_step</code> is automatically set to be
+<code>cell_lifespan / 2</code>. High time steps will lead to decreased
 simulation run time, but the simulations might not be statistically
 accurate. Low time steps will lead to longer run time, but the
 simulations will be more reliable.</p>

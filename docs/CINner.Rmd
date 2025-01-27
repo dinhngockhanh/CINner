@@ -39,6 +39,7 @@ cell_lifespan <- 30
 
 Next, we specify the time points at the beginning and the end of each simulation. 
 The unit can be
+
 - `day`
 - `week` (= 7 days)
 - `month` (= 30 days), or
@@ -54,10 +55,14 @@ T_end <- list(80, "year")
 `Table_sample` details the time point that the DNA sample is taken (in the same unit as `T_0` and `T_end`), 
 how many cells are in the sample, and the sample's ID.
 The following code specifies that the sample in each CINner simulation
-is labeled "SA01" and consists of 300 cells, taken at 80 years.
+is to be labeled "SA01" and consist of 300 cells, taken at 80 years.
 
 ```{r}
-Table_sample <- data.frame(Sample_ID = "SA01", Cell_count = 300, Age_sample = 80)
+Table_sample <- data.frame(
+    Sample_ID = "SA01",
+    Cell_count = 300,
+    Age_sample = 80
+)
 ```
 
 CINner's efficiency is based partially on its use of the tau-leaping algorithm, 
@@ -65,7 +70,7 @@ instead of the exact Gillespie algorithm.
 As such, it requires a suggested `T_tau_step`.
 Each CINner result then simulates the cell population starting from `T_0` at time points `T_0 + T_tau_step`, `T_0 + 2 * T_tau_step`, ..., 
 until it reaches `T_end`.
-If not specified, `T_tau_step` is automatically set to be half of `cell_lifespan`. 
+If not specified, `T_tau_step` is automatically set to be `cell_lifespan / 2`. 
 High time steps will lead to decreased simulation run time, but the simulations might not be statistically accurate.
 Low time steps will lead to longer run time, but the simulations will be more reliable.
 
