@@ -82,14 +82,15 @@ Two observations are utilized to increase the efficiency of CINner:
 - The information relevant for downstream analysis is restricted to only the sampled cells.
 
 As a result, it is not necessary to simulate single cells in the whole population individually, and instead we focus on clones, defined as groups of cells that have identical CN and mutational characteristics.
-
-The first step of CINner consists of simulating the evolution of clones in forward time. 
+Hence, there are four main steps in CINner:
+- The first step consists of simulating the evolution of clones in forward time. 
 New clones are generated when CNAs or driver mutations occur, and the clone sizes change through time according to the branching process governing cell division and death.
-We use the tau-leaping algorithm for efficiency, as the exact Gillespie algorithm is time-consuming for cell populations of the typical size of tumors.
-In the second step, CINner samples cells from predefined time points.
-Next, it constructs the phylogeny for the sampled cells by using the “down-up-down” simulation technique.
+We use the [tau-leaping algorithm](https://pubs.aip.org/aip/jcp/article/123/5/054104/905859) for efficiency, as the [exact Gillespie algorithm](https://www.annualreviews.org/content/journals/10.1146/annurev.physchem.58.032806.104637) is time-consuming for cell populations of the typical size of tumors.
+- In the second step, CINner samples cells from predefined time points.
+- Next, it constructs the phylogeny for the sampled cells by using the [“down-up-down” simulation technique](https://www.columbia.edu/cu/simontavare/STpapers-pdf/T04b.pdf).
 In short, the sampled cell phylogeny is generated as a coalescent, informed by the recorded clone-specific cell division counts throughout time from step 1.
-Finally, cell-to-cell variations due to neutral CNAs and passenger mutations are simulated on top of the phylogeny tree and trickle down to the sample observations.
+- Finally, cell-to-cell variations due to neutral CNAs and passenger mutations are simulated on top of the phylogeny tree, starting from the root node in the phylogeny tree and trickling down to the sample observations.
+
 CINner can complete prematurely if the later steps are not necessary, depending on the data requested by the user.
 
 ![Image](Figure5.jpg)
