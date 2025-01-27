@@ -80,7 +80,8 @@ T_tau_step <- cell_lifespan / 2
 
 To speed up the simulations and in accordance with currently available DNA data, 
 the genome is divided into bins of equal lengths (measured in number of nucleotides).
-The CN profile of each cell is represented as a vector, consisting of the CN of each bin.
+The CN profile of each cell is represented as a group of vectors,
+each of which corresponds to one chromosome homolog and consists of the CN of each bin.
 If not specified, `CN_bin_length` is automatically set to 500,000 nucleotides.
 
 ```{r}
@@ -89,14 +90,19 @@ CN_bin_length <- 500000
 
 Three selection models are included in `CINner`:
 
-- `chrom-arm-selection` models the selection for gains and losses of chromosome arms, depending on their genetic imbalances.
+- `chrom-arm-selection` models the selection for gains and losses of chromosome arms,
+depending on their genetic imbalances.
+This model requires additional probabilities in Section 1b and selection parameters in Section 2a.
 - `driver-gene-selection` models the selection for gains, losses and mutations of specific driver genes.
+This model requires additional probabilities in Section 1c and selection parameters in Section 2b.
 - `chrom-arm-and-driver-gene-selection` combines `chrom-arm-selection` and `driver-gene-selection` into a hybrid model, where cancer is driven both by large-scale genetic imbalance at whole-chromosome and chromosome-arm level and focal events targeting specific genes.
+This model requires additional probabilities in Sections 1b-c and selection parameters in Sections 2a-b.
+
+For generality, we will employ `chrom-arm-and-driver-gene-selection`.
 
 ```{r}
 selection_model <- "chrom-arm-and-driver-gene-selection"
 ```
-Each selection model may require additional variables, which will be detailed in the following sections.
 
 ### 1b. Occurence rates and length distributions of copy number aberrations (CNAs)
 
@@ -105,16 +111,14 @@ These events have an impact on the fitness of the progeny cells and therefore th
 There are three large-scale CNA mechanisms:
 
 - Whole Genome Duplication (WGD) results in one progeny cell with double the genomic material of the parent cell.
-- Missegregation targets a uniformly chosen chromosome strand, which is then gained in one progeny cell and lost in the other.
+- Missegregation targets a uniformly chosen chromosome homolog, which is then gained in one progeny cell and lost in the other.
 - The same occurs for chromosome-arm missegregation, but only for one of the chromosome's arms (selected with equal probabilities).
 
 The regional events target a randomly chosen region in a uniformly selected chromosome arm in one of the progeny cells. 
 All of these events require additional parameters for the region length distributions, to be discussed next. 
-There are four regional CNA mechanisms:
+There are two regional CNA mechanisms: focal amplification and deletion, which duplicate or delete the region respectively.
 
-- Focal amplification and deletion duplicate or delete the region, respectively.
-- Interstitial and terminal copy-neutral loss of heterozygosity (CNLOH) replace all alleles within the region across chromosome strands with an allele chosen at random. 
-Interstitial CNLOH can occur anywhere in the arm, but terminal CNLOH has to occur at the chromosome's end.
+Unspecified CNA probabilities in CINner will be set to 0 by default.
 
 ```{r}
 prob_CN_whole_genome_duplication <- 0.5e-4
@@ -122,8 +126,6 @@ prob_CN_missegregation <- 2e-4
 prob_CN_chrom_arm_missegregation <- 2e-4
 prob_CN_focal_amplification <- 0
 prob_CN_focal_deletion <- 0
-prob_CN_cnloh_interstitial <- 0
-prob_CN_cnloh_terminal <- 0
 ```
 
 In specific applications, we might also consider neutral versions of the aforementioned CNA mechanisms.
@@ -137,12 +139,10 @@ prob_neutral_CN_missegregation <- 0
 prob_neutral_CN_chrom_arm_missegregation <- 0
 prob_neutral_CN_focal_amplification <- 0
 prob_neutral_CN_focal_deletion <- 0
-prob_neutral_CN_cnloh_interstitial <- 0
-prob_neutral_CN_cnloh_terminal <- 0
 ```
 
 We now specify the parameters for the region length distributions of the regional CNA mechanisms.
-For a given regional CNA mechanism `X` (= `CN_focal_amplification_length`, `CN_focal_deletion_length`, `CN_cnloh_interstitial_length`, or `CN_cnloh_terminal_length`), we can choose between two distributions:
+For a given regional CNA mechanism `X` (= `CN_focal_amplification_length` or `CN_focal_deletion_length`), we can choose between two distributions:
 
 - `model_X` = `geom`: the targeted region length is geometrically distributed, with the rate given by another parameter `prob_X` (unit is bin counts).
 - `model_X` = `beta`: the ratio of the targeted region length over the chromosome arm follows the Beta distribution.
@@ -218,15 +218,11 @@ model_variables <- BUILD_general_variables(
     prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
     prob_CN_focal_amplification = prob_CN_focal_amplification,
     prob_CN_focal_deletion = prob_CN_focal_deletion,
-    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
-    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
     prob_neutral_CN_whole_genome_duplication = prob_neutral_CN_whole_genome_duplication,
     prob_neutral_CN_missegregation = prob_neutral_CN_missegregation,
     prob_neutral_CN_chrom_arm_missegregation = prob_neutral_CN_chrom_arm_missegregation,
     prob_neutral_CN_focal_amplification = prob_neutral_CN_focal_amplification,
     prob_neutral_CN_focal_deletion = prob_neutral_CN_focal_deletion,
-    prob_neutral_CN_cnloh_interstitial = prob_neutral_CN_cnloh_interstitial,
-    prob_neutral_CN_cnloh_terminal = prob_neutral_CN_cnloh_terminal,
     model_CN_focal_amplification_length = model_CN_focal_amplification_length,
     model_CN_focal_deletion_length = model_CN_focal_deletion_length,
     prob_CN_focal_amplification_length = prob_CN_focal_amplification_length,

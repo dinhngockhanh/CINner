@@ -37,8 +37,6 @@ prob_CN_missegregation <- 2e-4
 prob_CN_chrom_arm_missegregation <- 2e-4
 prob_CN_focal_amplification <- 0
 prob_CN_focal_deletion <- 0
-prob_CN_cnloh_interstitial <- 0
-prob_CN_cnloh_terminal <- 0
 
 ## -----------------------------------------------------------------------------
 prob_neutral_CN_whole_genome_duplication <- 0
@@ -46,8 +44,6 @@ prob_neutral_CN_missegregation <- 0
 prob_neutral_CN_chrom_arm_missegregation <- 0
 prob_neutral_CN_focal_amplification <- 0
 prob_neutral_CN_focal_deletion <- 0
-prob_neutral_CN_cnloh_interstitial <- 0
-prob_neutral_CN_cnloh_terminal <- 0
 
 ## -----------------------------------------------------------------------------
 model_CN_focal_amplification_length <- "geom"
@@ -84,15 +80,11 @@ model_variables <- BUILD_general_variables(
     prob_CN_chrom_arm_missegregation = prob_CN_chrom_arm_missegregation,
     prob_CN_focal_amplification = prob_CN_focal_amplification,
     prob_CN_focal_deletion = prob_CN_focal_deletion,
-    prob_CN_cnloh_interstitial = prob_CN_cnloh_interstitial,
-    prob_CN_cnloh_terminal = prob_CN_cnloh_terminal,
     prob_neutral_CN_whole_genome_duplication = prob_neutral_CN_whole_genome_duplication,
     prob_neutral_CN_missegregation = prob_neutral_CN_missegregation,
     prob_neutral_CN_chrom_arm_missegregation = prob_neutral_CN_chrom_arm_missegregation,
     prob_neutral_CN_focal_amplification = prob_neutral_CN_focal_amplification,
     prob_neutral_CN_focal_deletion = prob_neutral_CN_focal_deletion,
-    prob_neutral_CN_cnloh_interstitial = prob_neutral_CN_cnloh_interstitial,
-    prob_neutral_CN_cnloh_terminal = prob_neutral_CN_cnloh_terminal,
     model_CN_focal_amplification_length = model_CN_focal_amplification_length,
     model_CN_focal_deletion_length = model_CN_focal_deletion_length,
     prob_CN_focal_amplification_length = prob_CN_focal_amplification_length,

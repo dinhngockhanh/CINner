@@ -396,25 +396,31 @@ simulations will be more reliable.</p>
 <p>To speed up the simulations and in accordance with currently
 available DNA data, the genome is divided into bins of equal lengths
 (measured in number of nucleotides). The CN profile of each cell is
-represented as a vector, consisting of the CN of each bin. If not
-specified, <code>CN_bin_length</code> is automatically set to 500,000
+represented as a group of vectors, each of which corresponds to one
+chromosome homolog and consists of the CN of each bin. If not specified,
+<code>CN_bin_length</code> is automatically set to 500,000
 nucleotides.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>CN_bin_length <span class="ot">&lt;-</span> <span class="dv">500000</span></span></code></pre></div>
 <p>Three selection models are included in <code>CINner</code>:</p>
 <ul>
 <li><code>chrom-arm-selection</code> models the selection for gains and
-losses of chromosome arms, depending on their genetic imbalances.</li>
+losses of chromosome arms, depending on their genetic imbalances. This
+model requires additional probabilities in Section 1b and selection
+parameters in Section 2a.</li>
 <li><code>driver-gene-selection</code> models the selection for gains,
-losses and mutations of specific driver genes.</li>
+losses and mutations of specific driver genes. This model requires
+additional probabilities in Section 1c and selection parameters in
+Section 2b.</li>
 <li><code>chrom-arm-and-driver-gene-selection</code> combines
 <code>chrom-arm-selection</code> and <code>driver-gene-selection</code>
 into a hybrid model, where cancer is driven both by large-scale genetic
 imbalance at whole-chromosome and chromosome-arm level and focal events
-targeting specific genes.</li>
+targeting specific genes. This model requires additional probabilities
+in Sections 1b-c and selection parameters in Sections 2a-b.</li>
 </ul>
+<p>For generality, we will employ
+<code>chrom-arm-and-driver-gene-selection</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>selection_model <span class="ot">&lt;-</span> <span class="st">&quot;chrom-arm-and-driver-gene-selection&quot;</span></span></code></pre></div>
-<p>Each selection model may require additional variables, which will be
-detailed in the following sections.</p>
 </div>
 <div id="b.-occurence-rates-and-length-distributions-of-copy-number-aberrations-cnas" class="section level3">
 <h3>1b. Occurence rates and length distributions of copy number
@@ -428,7 +434,7 @@ mechanisms:</p>
 <ul>
 <li>Whole Genome Duplication (WGD) results in one progeny cell with
 double the genomic material of the parent cell.</li>
-<li>Missegregation targets a uniformly chosen chromosome strand, which
+<li>Missegregation targets a uniformly chosen chromosome homolog, which
 is then gained in one progeny cell and lost in the other.</li>
 <li>The same occurs for chromosome-arm missegregation, but only for one
 of the chromosome’s arms (selected with equal probabilities).</li>
@@ -436,23 +442,16 @@ of the chromosome’s arms (selected with equal probabilities).</li>
 <p>The regional events target a randomly chosen region in a uniformly
 selected chromosome arm in one of the progeny cells. All of these events
 require additional parameters for the region length distributions, to be
-discussed next. There are four regional CNA mechanisms:</p>
-<ul>
-<li>Focal amplification and deletion duplicate or delete the region,
-respectively.</li>
-<li>Interstitial and terminal copy-neutral loss of heterozygosity
-(CNLOH) replace all alleles within the region across chromosome strands
-with an allele chosen at random. Interstitial CNLOH can occur anywhere
-in the arm, but terminal CNLOH has to occur at the chromosome’s
-end.</li>
-</ul>
+discussed next. There are two regional CNA mechanisms: focal
+amplification and deletion, which duplicate or delete the region
+respectively.</p>
+<p>Unspecified CNA probabilities in CINner will be set to 0 by
+default.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>prob_CN_whole_genome_duplication <span class="ot">&lt;-</span> <span class="fl">0.5e-4</span></span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>prob_CN_missegregation <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>prob_CN_chrom_arm_missegregation <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>prob_CN_focal_amplification <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>prob_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>prob_CN_cnloh_interstitial <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>prob_CN_cnloh_terminal <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>prob_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
 <p>In specific applications, we might also consider neutral versions of
 the aforementioned CNA mechanisms. These events change the CN profiles
 of the progeny cells without affecting their fitness. The rules
@@ -464,15 +463,11 @@ distributions of the regional CNA events.</p>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>prob_neutral_CN_missegregation <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>prob_neutral_CN_chrom_arm_missegregation <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>prob_neutral_CN_focal_amplification <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>prob_neutral_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>prob_neutral_CN_cnloh_interstitial <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>prob_neutral_CN_cnloh_terminal <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>prob_neutral_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
 <p>We now specify the parameters for the region length distributions of
 the regional CNA mechanisms. For a given regional CNA mechanism
-<code>X</code> (= <code>CN_focal_amplification_length</code>,
-<code>CN_focal_deletion_length</code>,
-<code>CN_cnloh_interstitial_length</code>, or
-<code>CN_cnloh_terminal_length</code>), we can choose between two
+<code>X</code> (= <code>CN_focal_amplification_length</code> or
+<code>CN_focal_deletion_length</code>), we can choose between two
 distributions:</p>
 <ul>
 <li><code>model_X</code> = <code>geom</code>: the targeted region length
@@ -555,28 +550,24 @@ variables described thus far:</p>
 <span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>    <span class="at">prob_CN_chrom_arm_missegregation =</span> prob_CN_chrom_arm_missegregation,</span>
 <span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>    <span class="at">prob_CN_focal_amplification =</span> prob_CN_focal_amplification,</span>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion =</span> prob_CN_focal_deletion,</span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>    <span class="at">prob_CN_cnloh_interstitial =</span> prob_CN_cnloh_interstitial,</span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>    <span class="at">prob_CN_cnloh_terminal =</span> prob_CN_cnloh_terminal,</span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>    <span class="at">prob_neutral_CN_whole_genome_duplication =</span> prob_neutral_CN_whole_genome_duplication,</span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>    <span class="at">prob_neutral_CN_missegregation =</span> prob_neutral_CN_missegregation,</span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>    <span class="at">prob_neutral_CN_chrom_arm_missegregation =</span> prob_neutral_CN_chrom_arm_missegregation,</span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>    <span class="at">prob_neutral_CN_focal_amplification =</span> prob_neutral_CN_focal_amplification,</span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>    <span class="at">prob_neutral_CN_focal_deletion =</span> prob_neutral_CN_focal_deletion,</span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>    <span class="at">prob_neutral_CN_cnloh_interstitial =</span> prob_neutral_CN_cnloh_interstitial,</span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>    <span class="at">prob_neutral_CN_cnloh_terminal =</span> prob_neutral_CN_cnloh_terminal,</span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>    <span class="at">model_CN_focal_amplification_length =</span> model_CN_focal_amplification_length,</span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>    <span class="at">model_CN_focal_deletion_length =</span> model_CN_focal_deletion_length,</span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>    <span class="at">prob_CN_focal_amplification_length =</span> prob_CN_focal_amplification_length,</span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion_length_shape_1 =</span> prob_CN_focal_deletion_length_shape_1,</span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion_length_shape_2 =</span> prob_CN_focal_deletion_length_shape_2,</span>
-<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>    <span class="at">rate_driver =</span> rate_driver,</span>
-<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a>    <span class="at">rate_passenger =</span> rate_passenger,</span>
-<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>    <span class="at">selection_model =</span> selection_model,</span>
-<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>    <span class="at">bound_driver =</span> bound_driver,</span>
-<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a>    <span class="at">bound_average_ploidy =</span> bound_average_ploidy,</span>
-<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a>    <span class="at">bound_homozygosity =</span> bound_homozygosity,</span>
-<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a>    <span class="at">table_population_dynamics =</span> table_population_dynamics</span>
-<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>    <span class="at">prob_neutral_CN_whole_genome_duplication =</span> prob_neutral_CN_whole_genome_duplication,</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>    <span class="at">prob_neutral_CN_missegregation =</span> prob_neutral_CN_missegregation,</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>    <span class="at">prob_neutral_CN_chrom_arm_missegregation =</span> prob_neutral_CN_chrom_arm_missegregation,</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>    <span class="at">prob_neutral_CN_focal_amplification =</span> prob_neutral_CN_focal_amplification,</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>    <span class="at">prob_neutral_CN_focal_deletion =</span> prob_neutral_CN_focal_deletion,</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>    <span class="at">model_CN_focal_amplification_length =</span> model_CN_focal_amplification_length,</span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>    <span class="at">model_CN_focal_deletion_length =</span> model_CN_focal_deletion_length,</span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>    <span class="at">prob_CN_focal_amplification_length =</span> prob_CN_focal_amplification_length,</span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion_length_shape_1 =</span> prob_CN_focal_deletion_length_shape_1,</span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion_length_shape_2 =</span> prob_CN_focal_deletion_length_shape_2,</span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>    <span class="at">rate_driver =</span> rate_driver,</span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>    <span class="at">rate_passenger =</span> rate_passenger,</span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>    <span class="at">selection_model =</span> selection_model,</span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>    <span class="at">bound_driver =</span> bound_driver,</span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>    <span class="at">bound_average_ploidy =</span> bound_average_ploidy,</span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a>    <span class="at">bound_homozygosity =</span> bound_homozygosity,</span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>    <span class="at">table_population_dynamics =</span> table_population_dynamics</span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 </div>
 <div id="selection-rates" class="section level2">
