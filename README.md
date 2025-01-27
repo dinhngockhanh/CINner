@@ -29,8 +29,8 @@ After a cell division, daughter cells either have the same profiles as the mothe
 
 CINner can accommodate five distinct CNA mechanisms, each with distinct alteration patterns and varying impacts on cell fitness.
 These events occur during a cell division with probabilities defined by the user.
-Each chromosome homolog is represented as a vector, where each entry is the CN in a bin (vertical solid lines represent centrosomes, separating the two chromosome arms).
-Whole Genome Duplication results in one progeny with two copies of each homolog in the parent cell’s genome.
+In the schematic below, each chromosome homolog is represented as a vector, where each entry is the CN in a bin (vertical solid lines represent centrosomes, separating the two chromosome arms).
+- Whole Genome Duplication results in one progeny with two copies of each homolog in the parent cell’s genome.
 Other events are chromosome specific.
 During a whole-chromosome missegregation, one random homolog is misplaced between the two progeny cells.
 During a chromosome-arm missegregation, a homolog is torn between the progeny, with one cell gaining a random arm and the other cell losing that arm.
