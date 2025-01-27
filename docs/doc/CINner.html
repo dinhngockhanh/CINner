@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Introduction to CINner</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to CINner</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(CINner)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span></code></pre></div>
+<div id="set-up-cinner" class="section level1">
+<h1>Set up CINner</h1>
+<p>CINner requires a number of input parameters for the assumed
+characteristics of tumor growth. One easy method to load the parameters
+to <code>CINner</code> is by creating <code>model_variables</code>, a
+list containing relevant variables in a specific order. Here we detail
+how to create <code>model_variables</code>.</p>
+<div id="general-variables-for-every-cell" class="section level2">
+<h2>1. General variables for every cell</h2>
+<div id="a.-tissue-specific-and-sampling-variables" class="section level3">
+<h3>1a. Tissue-specific and sampling variables</h3>
+<p>We first specify <code>cell_lifespan</code>, the mean of the
+exponentially distributed lifetime of every cell during cancer
+evolution, independent of their particular cellular profiles (measured
+in days).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cell_lifespan <span class="ot">&lt;-</span> <span class="dv">30</span></span></code></pre></div>
+<p>Next, we specify the time points at the beginning and the end of each
+simulation. The unit can be</p>
+<ul>
+<li><code>day</code></li>
+<li><code>week</code> (= 7 days)</li>
+<li><code>month</code> (= 30 days), or</li>
+<li><code>year</code> (= 365 days).</li>
+</ul>
+<p>The unit for <code>T_0</code> and <code>T_end</code> should be
+consistent.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>T_0 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="st">&quot;year&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>T_end <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">80</span>, <span class="st">&quot;year&quot;</span>)</span></code></pre></div>
+<p><code>Table_sample</code> details the time point that the DNA sample
+is taken (in the same unit as <code>T_0</code> and <code>T_end</code>),
+how many cells are in the sample, and the sample’s ID. The following
+code specifies that the sample in each CINner simulation is to be
+labeled “SA01” and consist of 300 cells, taken at 80 years.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>Table_sample <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>    <span class="at">Sample_ID =</span> <span class="st">&quot;SA01&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    <span class="at">Cell_count =</span> <span class="dv">300</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="at">Age_sample =</span> <span class="dv">80</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>CINner’s efficiency is based partially on its use of the tau-leaping
+algorithm, instead of the exact Gillespie algorithm. As such, it
+requires a suggested <code>T_tau_step</code>. Each CINner result then
+simulates the cell population starting from <code>T_0</code> at time
+points <code>T_0 + T_tau_step</code>, <code>T_0 + 2 * T_tau_step</code>,
+…, until it reaches <code>T_end</code>. If not specified,
+<code>T_tau_step</code> is automatically set to be
+<code>cell_lifespan / 2</code>. High time steps will lead to decreased
+simulation run time, but the simulations might not be statistically
+accurate. Low time steps will lead to longer run time, but the
+simulations will be more reliable.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>T_tau_step <span class="ot">&lt;-</span> cell_lifespan <span class="sc">/</span> <span class="dv">2</span></span></code></pre></div>
+<p>To speed up the simulations and in accordance with currently
+available DNA data, the genome is divided into bins of equal lengths
+(measured in number of nucleotides). The CN profile of each cell is
+represented as a group of vectors, each of which corresponds to one
+chromosome homolog and consists of the CN of each bin. If not specified,
+<code>CN_bin_length</code> is automatically set to 500,000
+nucleotides.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>CN_bin_length <span class="ot">&lt;-</span> <span class="dv">500000</span></span></code></pre></div>
+<p>Three selection models are included in <code>CINner</code>:</p>
+<ul>
+<li><code>chrom-arm-selection</code> models the selection for gains and
+losses of chromosome arms, depending on their genetic imbalances. This
+model requires additional probabilities in Section 1b and selection
+parameters in Section 2a.</li>
+<li><code>driver-gene-selection</code> models the selection for gains,
+losses and mutations of specific driver genes. This model requires
+additional probabilities in Section 1c and selection parameters in
+Section 2b.</li>
+<li><code>chrom-arm-and-driver-gene-selection</code> combines
+<code>chrom-arm-selection</code> and <code>driver-gene-selection</code>
+into a hybrid model, where cancer is driven both by large-scale genetic
+imbalance at whole-chromosome and chromosome-arm level and focal events
+targeting specific genes. This model requires additional probabilities
+in Sections 1b-c and selection parameters in Sections 2a-b.</li>
+</ul>
+<p>For generality, we will employ
+<code>chrom-arm-and-driver-gene-selection</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>selection_model <span class="ot">&lt;-</span> <span class="st">&quot;chrom-arm-and-driver-gene-selection&quot;</span></span></code></pre></div>
+</div>
+<div id="b.-occurence-rates-and-length-distributions-of-copy-number-aberrations-cnas" class="section level3">
+<h3>1b. Occurence rates and length distributions of copy number
+aberrations (CNAs)</h3>
+<p>For <code>selection_model</code> = <code>chrom-arm-selection</code>
+or <code>chrom-arm-and-driver-gene-selection</code>, we need to specify
+the probabilities that each CNA mechanism occurs in a mitotic division.
+These events have an impact on the fitness of the progeny cells and
+therefore the selection landscape. There are three large-scale CNA
+mechanisms:</p>
+<ul>
+<li>Whole Genome Duplication (WGD) results in one progeny cell with
+double the genomic material of the parent cell.</li>
+<li>Missegregation targets a uniformly chosen chromosome strand, which
+is then gained in one progeny cell and lost in the other.</li>
+<li>The same occurs for chromosome-arm missegregation, but only for one
+of the chromosome’s arms (selected with equal probabilities).</li>
+</ul>
+<p>The regional events target a randomly chosen region in a uniformly
+selected chromosome arm in one of the progeny cells. All of these events
+require additional parameters for the region length distributions, to be
+discussed next. There are four regional CNA mechanisms:</p>
+<ul>
+<li>Focal amplification and deletion duplicate or delete the region,
+respectively.</li>
+<li>Interstitial and terminal copy-neutral loss of heterozygosity
+(CNLOH) replace all alleles within the region across chromosome strands
+with an allele chosen at random. Interstitial CNLOH can occur anywhere
+in the arm, but terminal CNLOH has to occur at the chromosome’s
+end.</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>prob_CN_whole_genome_duplication <span class="ot">&lt;-</span> <span class="fl">0.5e-4</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>prob_CN_missegregation <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>prob_CN_chrom_arm_missegregation <span class="ot">&lt;-</span> <span class="fl">2e-4</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>prob_CN_focal_amplification <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>prob_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>prob_CN_cnloh_interstitial <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>prob_CN_cnloh_terminal <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+<p>In specific applications, we might also consider neutral versions of
+the aforementioned CNA mechanisms. These events change the CN profiles
+of the progeny cells without affecting their fitness. The rules
+dictating how the progeny cells’ CN profiles change as a result of
+neutral CNAs are similar to the selective CNA mechanisms above,
+including the additional parameters specifying the region length
+distributions of the regional CNA events.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>prob_neutral_CN_whole_genome_duplication <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>prob_neutral_CN_missegregation <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>prob_neutral_CN_chrom_arm_missegregation <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>prob_neutral_CN_focal_amplification <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>prob_neutral_CN_focal_deletion <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>prob_neutral_CN_cnloh_interstitial <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>prob_neutral_CN_cnloh_terminal <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+<p>We now specify the parameters for the region length distributions of
+the regional CNA mechanisms. For a given regional CNA mechanism
+<code>X</code> (= <code>CN_focal_amplification_length</code>,
+<code>CN_focal_deletion_length</code>,
+<code>CN_cnloh_interstitial_length</code>, or
+<code>CN_cnloh_terminal_length</code>), we can choose between two
+distributions:</p>
+<ul>
+<li><code>model_X</code> = <code>geom</code>: the targeted region length
+is geometrically distributed, with the rate given by another parameter
+<code>prob_X</code> (unit is bin counts).</li>
+<li><code>model_X</code> = <code>beta</code>: the ratio of the targeted
+region length over the chromosome arm follows the Beta distribution.
+This requires two parameters for the Beta distribution, given by
+<code>prob_X_shape_1</code> and <code>prob_X_shape_2</code>.</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>model_CN_focal_amplification_length <span class="ot">&lt;-</span> <span class="st">&quot;geom&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>prob_CN_focal_amplification_length <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>model_CN_focal_deletion_length <span class="ot">&lt;-</span> <span class="st">&quot;beta&quot;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>prob_CN_focal_deletion_length_shape_1 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>prob_CN_focal_deletion_length_shape_2 <span class="ot">&lt;-</span> <span class="dv">7</span></span></code></pre></div>
+</div>
+<div id="c.-occurence-rate-of-driver-and-passenger-mutations" class="section level3">
+<h3>1c. Occurence rate of driver and passenger mutations</h3>
+<p>For <code>selection_model</code> = <code>driver-gene-selection</code>
+or <code>chrom-arm-and-driver-gene-selection</code>, we need to specify
+the rate of driver mutations (per nucleotide per division). If a driver
+mutation occurs, the gene to be mutated is chosen from an input list of
+driver genes (to be discussed next), excluding the genes already mutated
+in the cell. A cell’s fitness increases with the number of driver
+mutations it has acquired.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>rate_driver <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+<p>The rate of passenger mutations is likewise per nucleotide per
+division. However, passenger mutations do not change the cell’s
+fitness.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>rate_passenger <span class="ot">&lt;-</span> <span class="fl">1e-11</span></span></code></pre></div>
+</div>
+<div id="d.-viability-conditions" class="section level3">
+<h3>1d. Viability conditions</h3>
+<p>Cells increase their fitness by acquiring favorable CNAs and driver
+mutations. However, they are also subject to viability conditions. If it
+violates any of these conditions, a cell is deemed unviable and its
+fitness is set to 0, therefore will die:</p>
+<ul>
+<li><code>bound_driver</code> is the upper bound on how many driver
+mutations the cell has acquired.</li>
+<li><code>bound_average_ploidy</code> is the upper bound on the ploidy
+(i.e. average CN among all bins) of the cell.</li>
+<li><code>bound_maximum_CN</code> is the upper bound on the CN in any
+bin in the cell.</li>
+<li><code>bound_homozygosity</code> is the upper bound on the bin count
+with homozygosity (i.e. bins with CN=0).</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>bound_driver <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>bound_average_ploidy <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>bound_maximum_CN <span class="ot">&lt;-</span> <span class="dv">8</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>bound_homozygosity <span class="ot">&lt;-</span> <span class="dv">0</span></span></code></pre></div>
+</div>
+<div id="e.-population-dynamics" class="section level3">
+<h3>1e. Population dynamics</h3>
+<p>CINner simulations are designed to follow any population dynamic
+(limited by how fast the cells can divide or die, defined by their
+lifespan). The dataframe <code>table_population_dynamics</code> lists
+the expected total cell counts at corresponding time points. The
+expected population size in the CINner simulations at any time point is
+interpolated from the two nearest time points in this variable.</p>
+<p>Here, we expect the cell population to follow a logistic expansion,
+growing from 20 cells at <code>T_0</code> to 10000 cells at
+<code>T_end</code>, with the midpoint at 20 years.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>vec_time <span class="ot">&lt;-</span> T_0[[<span class="dv">1</span>]]<span class="sc">:</span>T_end[[<span class="dv">1</span>]]</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>vec_cell_count <span class="ot">&lt;-</span> <span class="dv">10000</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fl">0.3</span> <span class="sc">*</span> (vec_time <span class="sc">-</span> <span class="dv">20</span>)))</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>table_population_dynamics <span class="ot">&lt;-</span> <span class="fu">cbind</span>(vec_time, vec_cell_count)</span></code></pre></div>
+</div>
+<div id="f.-initiate-cinner-model-variables" class="section level3">
+<h3>1f. Initiate CINner model variables</h3>
+<p>Finally, we use function <code>BUILD_general_variables</code> to
+initiate <code>model_variables</code>, a list object containing all
+variables described thus far:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>model_variables <span class="ot">&lt;-</span> <span class="fu">BUILD_general_variables</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>    <span class="at">cell_lifespan =</span> cell_lifespan,</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>    <span class="at">T_0 =</span> T_0, <span class="at">T_end =</span> T_end, <span class="at">T_tau_step =</span> T_tau_step,</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>    <span class="at">Table_sample =</span> Table_sample,</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>    <span class="at">CN_bin_length =</span> CN_bin_length,</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>    <span class="at">prob_CN_whole_genome_duplication =</span> prob_CN_whole_genome_duplication,</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>    <span class="at">prob_CN_missegregation =</span> prob_CN_missegregation,</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>    <span class="at">prob_CN_chrom_arm_missegregation =</span> prob_CN_chrom_arm_missegregation,</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>    <span class="at">prob_CN_focal_amplification =</span> prob_CN_focal_amplification,</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion =</span> prob_CN_focal_deletion,</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>    <span class="at">prob_CN_cnloh_interstitial =</span> prob_CN_cnloh_interstitial,</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>    <span class="at">prob_CN_cnloh_terminal =</span> prob_CN_cnloh_terminal,</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>    <span class="at">prob_neutral_CN_whole_genome_duplication =</span> prob_neutral_CN_whole_genome_duplication,</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>    <span class="at">prob_neutral_CN_missegregation =</span> prob_neutral_CN_missegregation,</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>    <span class="at">prob_neutral_CN_chrom_arm_missegregation =</span> prob_neutral_CN_chrom_arm_missegregation,</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>    <span class="at">prob_neutral_CN_focal_amplification =</span> prob_neutral_CN_focal_amplification,</span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>    <span class="at">prob_neutral_CN_focal_deletion =</span> prob_neutral_CN_focal_deletion,</span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>    <span class="at">prob_neutral_CN_cnloh_interstitial =</span> prob_neutral_CN_cnloh_interstitial,</span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>    <span class="at">prob_neutral_CN_cnloh_terminal =</span> prob_neutral_CN_cnloh_terminal,</span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>    <span class="at">model_CN_focal_amplification_length =</span> model_CN_focal_amplification_length,</span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>    <span class="at">model_CN_focal_deletion_length =</span> model_CN_focal_deletion_length,</span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>    <span class="at">prob_CN_focal_amplification_length =</span> prob_CN_focal_amplification_length,</span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion_length_shape_1 =</span> prob_CN_focal_deletion_length_shape_1,</span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>    <span class="at">prob_CN_focal_deletion_length_shape_2 =</span> prob_CN_focal_deletion_length_shape_2,</span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>    <span class="at">rate_driver =</span> rate_driver,</span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a>    <span class="at">rate_passenger =</span> rate_passenger,</span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>    <span class="at">selection_model =</span> selection_model,</span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>    <span class="at">bound_driver =</span> bound_driver,</span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a>    <span class="at">bound_average_ploidy =</span> bound_average_ploidy,</span>
+<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a>    <span class="at">bound_homozygosity =</span> bound_homozygosity,</span>
+<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a>    <span class="at">table_population_dynamics =</span> table_population_dynamics</span>
+<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+</div>
+<div id="selection-rates" class="section level2">
+<h2>2. Selection rates</h2>
+<p>Depending on which selection model is specified in the variable
+<code>selection_model</code> to drive cancer evolution, we need to
+define the selection rates of each chromosome arm and/or each driver
+gene, which then define a cell’s fitness as it acquires new CNAs and/or
+driver mutations.</p>
+<div id="a.-chromosome-arm-selection-rates" class="section level3">
+<h3>2a. Chromosome arm selection rates</h3>
+<p>If <code>selection_model</code> = <code>chrom-arm-selection</code> or
+<code>chrom-arm-and-driver-gene-selection</code>, then cancer is driven
+solely or partially by gains and losses of chromosome arms, based on
+their gene imbalances.</p>
+<p>Each row in <code>table_arm_selection_rates</code> details the
+information for one chromosome arm. Its ID is listed in column
+<code>Arm_ID</code>, and its location is recorded in columns
+<code>Chromosome</code>, <code>Bin_start</code> and
+<code>Bin_end</code>. Its selection rate is specified in column
+<code>s_rate</code> as a positive number. Arms with more Tumor
+Suppressor Genes than Oncogenes have selection rate less than 1, for
+which losses are advantageous and gains are deleterious. Arms with more
+Oncogenes than Tumor Suppressor Genes have selection rate higher than 1,
+for which gains are advantageous and losses are deleterious. The
+strength of the selection force depends on the distance between the
+selection rate to 1: chromosome arms with very small or very large
+selection rates are strongly selected for, and chromosome arms with
+selection rates very close to 1 are essentially neutral.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>Arm_ID <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>    <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;p&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>),</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>    <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;q&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>Chromosome <span class="ot">&lt;-</span> <span class="fu">rep</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="dv">2</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>Bin_start <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>    <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome)),</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>    model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Centromere_location <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>)</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>Bin_end <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>    model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Centromere_location,</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>    model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Bin_count</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>)</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>s_rate <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="fu">length</span>(Arm_ID), <span class="dv">1</span> <span class="sc">/</span> <span class="fl">1.2</span>, <span class="fl">1.2</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>table_arm_selection_rates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>    <span class="at">Arm_ID =</span> Arm_ID,</span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>    <span class="at">Chromosome =</span> Chromosome,</span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>    <span class="at">Bin_start =</span> Bin_start,</span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>    <span class="at">Bin_end =</span> Bin_end,</span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>    <span class="at">s_rate =</span> s_rate</span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="b.-driver-gene-selection-rates" class="section level3">
+<h3>2b. Driver gene selection rates</h3>
+<p>If <code>selection_model</code> = <code>driver-gene-selection</code>
+or <code>chrom-arm-and-driver-gene-selection</code>, then cancer is
+driven solely or partially by gains, losses and mutations of driver
+genes.</p>
+<p>Each row in <code>table_gene_selection_rates</code> details the
+information for one driver gene. Its name is listed in column
+<code>Gene_ID</code>, and its location is recorded in columns
+<code>Chromosome</code> and <code>Bin</code>. The gene’s function as
+cancer driver is specified in column <code>Gene_role</code> (either
+<code>TSG</code> for Tumor Suppressor Genes or <code>ONCOGENE</code> for
+Oncogenes; other functions or dual roles are not currently supported),
+and its (positive) selection rate is in column <code>s_rate</code>.</p>
+<p>The impact of CNA events on the cell’s fitness depends on the mutated
+gene’s function. For a Tumor Suppressor Gene:</p>
+<ul>
+<li>Deletion of the wild-type alleles is advantageous.</li>
+<li>Amplification of the wild-type alleles is deleterious.</li>
+<li>Deletion of the mutant alleles is neutral.</li>
+<li>Mutation and amplification of the mutant alleles are
+advantageous.</li>
+</ul>
+<p>On the other hand, for an Oncogene:</p>
+<ul>
+<li>Amplification of the wild-type or mutant allele is
+advantageous.</li>
+<li>Deletion of the wild-type allele or the mutant allele is
+deleterious.</li>
+<li>Mutation is advantageous.</li>
+</ul>
+<p>Similar to the chromosome arm model, the strength of the selection
+force depends on the distance between the selection rate to 1.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>table_gene_selection_rates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>    <span class="at">Gene_ID =</span> <span class="fu">c</span>(<span class="st">&quot;Driver_1&quot;</span>, <span class="st">&quot;Driver_2&quot;</span>, <span class="st">&quot;Driver_3&quot;</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>    <span class="at">Gene_role =</span> <span class="fu">c</span>(<span class="st">&quot;TSG&quot;</span>, <span class="st">&quot;ONCOGENE&quot;</span>, <span class="st">&quot;TSG&quot;</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>    <span class="at">s_rate =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>    <span class="at">Chromosome =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    <span class="at">Bin =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="c.-update-cinner-model-variables" class="section level3">
+<h3>2c. Update CINner model variables</h3>
+<p>We now update <code>model_variables</code> to include the selection
+rates with function <code>BUILD_driver_library</code>. Only the relevant
+selection rate dataframes should be included.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>model_variables <span class="ot">&lt;-</span> <span class="fu">BUILD_driver_library</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>    <span class="at">model_variables =</span> model_variables,</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>    <span class="at">table_arm_selection_rates =</span> table_arm_selection_rates,</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>    <span class="at">table_gene_selection_rates =</span> table_gene_selection_rates</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+</div>
+<div id="initial-cell-population" class="section level2">
+<h2>3. Initial cell population</h2>
+<p>We now specify the initial cell population. Each clone in this
+population is described by its CN profile and list of driver
+mutations.</p>
+<p>The variable <code>CN_matrix</code> specifies the clone’s CN profile,
+consisting of 5 columns: <code>Chromosome</code>, <code>Strand</code>,
+<code>Bin_start</code>, <code>Bin_end</code>, and <code>Allele</code>.
+For convenience, we can use function
+<code>BUILD_cn_normal_autosomes</code> to build a normal genome
+consisting only of autosomes (chromosomes 1 to 22, each with 2 alleles A
+and B), or <code>BUILD_cn_normal_XX</code> to build a normal female
+genome (chromosomes 1 to 22 and X, each with 2 alleles A and B), or
+<code>BUILD_cn_normal_XY</code> to build a normal male genome
+(chromosome 1 to 22, each with 2 alleles A and B; and chromosomes X and
+Y, each with 1 allele A).</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>CN_matrix <span class="ot">&lt;-</span> <span class="fu">BUILD_cn_normal_autosomes</span>(model_variables<span class="sc">$</span>cn_info)</span></code></pre></div>
+<p>The variable <code>drivers</code> lists the driver mutations that are
+pre-existing in the clone.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>drivers <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;Driver_1&quot;</span>)</span></code></pre></div>
+<p>To add this clone to the initial cell population, we use function
+<code>BUILD_initial_population</code> to update
+<code>model_variables</code>. Beside <code>CN_matrix</code> and
+<code>drivers</code>, we also need to specify its
+<code>cell_count</code>.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>model_variables <span class="ot">&lt;-</span> <span class="fu">BUILD_initial_population</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>    <span class="at">model_variables =</span> model_variables,</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>    <span class="at">cell_count =</span> <span class="dv">20</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>    <span class="at">CN_matrix =</span> CN_matrix,</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>    <span class="at">drivers =</span> <span class="fu">list</span>()</span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>)</span></code></pre></div>
+<p>If the initial cell population consists of multiple clones, the
+function <code>BUILD_initial_population</code> can be repeated for each
+distinct clone with different <code>cell_count</code>,
+<code>CN_matrix</code> and <code>drivers</code>.</p>
+</div>
+</div>
+<div id="run-cinner" class="section level1">
+<h1>Run CINner</h1>
+<p>Before running CINner, we need to check that the model parameters are
+correctly defined.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>model_variables <span class="ot">&lt;-</span> <span class="fu">CHECK_model_variables</span>(model_variables)</span></code></pre></div>
+<p>The function <code>simulator_full_program</code> produces simulations
+according to the model variables listed in the csv files resulting from
+the previous section.</p>
+<p>There are several options for conditioning on the simulations or
+requesting specific results:</p>
+<ul>
+<li><code>model</code>: Includes the model parameters defined thus
+far.</li>
+<li><code>n_simulations</code>: Number of simulations requested.</li>
+<li><code>compute_parallel</code>: Simulations are produced sequentially
+if <code>FALSE</code>, or in parallel if <code>TRUE</code>. Default is
+<code>FALSE</code>.</li>
+<li><code>n_cores</code>: Number of computer CPUs to use to produce
+simulations in parallel (therefore only applied when
+<code>compute_parallel</code>=<code>TRUE</code>). If
+<code>n_cores</code> is not specified when
+<code>compute_parallel</code>=<code>TRUE</code>, the algorithm uses all
+available CPU cores except one.</li>
+<li><code>seed</code>: Seed to produce replicable stochastic
+simulations. Only applicable when
+<code>compute_parallel</code>=<code>FALSE</code>.</li>
+<li><code>report_progress</code>: The simulator prints updates of the
+progress if set to <code>TRUE</code>.</li>
+<li><code>save_simulation</code>: All output variables from each
+simulation are saved in separate <code>rda</code> files if set to
+<code>TRUE</code>. Default is <code>TRUE</code>.</li>
+<li><code>output_variables</code>: Vector of specific output variables
+from each simulation to return in the list format in R. Default is
+<code>NULL</code>, in which case no variable is returned.</li>
+<li><code>folder_workplace</code>: Name of folder in the current
+directory to store output files from the simulations. If the folder does
+not exist, it will be created. Default is <code>NULL</code>, in which
+case files are saved within the current directory.</li>
+<li><code>R_libPaths</code>: Name of folder where required R libraries
+are stored. Default is <code>NULL</code>, in which case the simulator
+assumes relevent R libraries are automatically usable.</li>
+<li><code>n_clones_min</code>: Lower limit for number of clones at the
+ending time point for simulations to be accepted. Default is
+<code>0</code>.</li>
+<li><code>n_clones_max</code>: Upper limit for number of clones at the
+ending time point for simulations to be accepted. Default is
+<code>Inf</code>.</li>
+<li><code>neutral_variations</code>: Whether neutral CNAs are simulated
+on top of the selective CNAs.</li>
+<li><code>save_newick_tree</code>: If <code>TRUE</code>, the phylogeny
+of sampled cells from each simulation is saved in the Newick format.
+Default is <code>FALSE</code>.</li>
+<li><code>save_cn_profile</code>: If <code>TRUE</code>, the CN profiles
+of sampled cells from each simulation are saved in a csv file. Default
+is <code>FALSE</code>.</li>
+<li><code>format_cn_profile</code>: If <code>long</code> when
+<code>save_cn_profile</code>=<code>TRUE</code>, the CN profiles are
+saved in the long format (subsequent cells are appended by row). If
+<code>wide</code> when <code>save_cn_profile</code>=<code>TRUE</code>,
+the CN profiles are saved in the wide format (each cell occupies a
+column). If <code>both</code> when
+<code>save_cn_profile</code>=<code>TRUE</code>, the CN profiles are
+saved in both formats (resulting in two csv files per simulation).
+Default is <code>long</code>.</li>
+<li><code>save_cn_clones</code>: If <code>TRUE</code>, the assignment of
+which cell belongs in which clone is saved in a csv file. Default is
+<code>FALSE</code>.</li>
+<li><code>internal_nodes_cn_info</code>: If <code>TRUE</code> when
+<code>save_cn_profile</code>=<code>TRUE</code>, the CN profiles of both
+the sampled cells and the internal nodes of their phylogeny are saved in
+the requested format(s). The internal node labels correspond to those in
+the Newick tree if <code>save_newick_tree</code>=<code>TRUE</code>.
+Default is <code>FALSE</code>.</li>
+<li><code>model_readcount</code>: If <code>TRUE</code>, noisy readcounts
+are simulated from each sampled cell’s CN profile and saved in a csv
+file. Default is <code>FALSE</code>.</li>
+<li><code>model_readcount_base</code>: If <code>truth</code> when
+<code>model_readcount</code>=<code>TRUE</code>, noisy readcounts are
+simulated from the CN profile without neutral variations. If
+<code>neuvar</code> when <code>model_readcount</code>=<code>TRUE</code>,
+noisy readcounts are simulated from the CN profile with neutral
+variations. Both are simulated and saved in separate csv files if
+<code>model_readcount_base</code>=<code>all</code> when
+<code>model_readcount</code>=<code>TRUE</code>. Default is
+<code>all</code>.</li>
+<li><code>HMM</code>: If <code>TRUE</code>, the cell’s CN profiles are
+inferred back from the simulated noisy readcounts using HMMcopy. Default
+is <code>FALSE</code>.</li>
+<li><code>HMM_containner</code>: Specifies which HMMcopy container is
+used when <code>HMM</code>=<code>TRUE</code>. Two available options are
+<code>singularity</code> and <code>docker</code>, which might have
+different efficiency.</li>
+<li><code>pseudo_corrected_readcount</code>: if <code>TRUE</code>, the
+pseudo-corrected readcounts (= cell’s HMM-inferred mean readcount X bin
+GC level) are computed and saved in a csv file. The specific data used
+depends on <code>model_readcount_base</code>. Default is
+<code>FALSE</code>.</li>
+</ul>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>CINner_simulations <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>    <span class="at">model =</span> model_variables,</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>    <span class="at">n_simulations =</span> <span class="dv">8</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>)</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;data.table&#39; was built under R version 4.3.3</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ape&#39; was built under R version 4.3.3</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; Loading required package: amap</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;amap&#39; was built under R version 4.3.3</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; Parallel cluster with 9 cores...</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
