@@ -57,14 +57,14 @@ The selection parameter serves as an indicator for the balance of tumor suppress
 ![Image](Figure3.jpg)
 
 The model for selection of driver mutations seeks to portray the selection of individual TSGs and OGs directly.
-In this model, the selection parameters for the wild-type (WT) and mutant (MUT) alleles of a gene, are defined according to whether the gene functions as a TSG or an OG in that specific cancer type.
+In this model, the selection parameters for the wild-type (WT) and mutant (MUT) alleles of a gene, are defined according to whether the gene functions as a tumor suppressor gene (TSG) or an oncogene (OG) in that specific cancer type.
 We assume that a cell’s fitness increases when
 
-- a TSG is mutated or lost, or
+- a TSG (with selection rate s < 1; e.g., TP53 in the schematic below) is mutated or lost, or
 
-- an OG is mutated or gained.
+- an OG (with selection rate s > 1; e.g., MYC in the schematic below) is mutated or gained.
 
-This model is based on the “one-hit” hypothesis, where each additional driver gene hit renders the cell more advantageous.
+This model is based on the [“one-hit” hypothesis](https://www.nature.com/articles/nature10275), where each additional driver gene hit renders the cell more advantageous.
 
 ![Image](Figure4.jpg)
 
