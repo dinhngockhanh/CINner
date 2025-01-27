@@ -853,17 +853,28 @@ GC level) are computed and saved in a csv file. The specific data used
 depends on <code>model_readcount_base</code>. Default is
 <code>FALSE</code>.</li>
 </ul>
+<p>Here we make 8 CINner simulations in parallel. Each simulation is
+performed with <code>stage_final</code> = 4, i.e. CINner runs all four
+main steps (clonal evolution, sampling, sample phylogeny, and neutral
+variations).</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>CINner_simulations <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>    <span class="at">model =</span> model_variables,</span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>    <span class="at">n_simulations =</span> <span class="dv">8</span>,</span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>)</span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;data.table&#39; was built under R version 4.3.3</span></span>
-<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ape&#39; was built under R version 4.3.3</span></span>
-<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="co">#&gt; Loading required package: amap</span></span>
-<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;amap&#39; was built under R version 4.3.3</span></span>
-<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a><span class="co">#&gt; Parallel cluster with 9 cores...</span></span></code></pre></div>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>    <span class="at">stage_final =</span> <span class="dv">4</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>)</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;data.table&#39; was built under R version 4.3.3</span></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ape&#39; was built under R version 4.3.3</span></span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="co">#&gt; Loading required package: amap</span></span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;amap&#39; was built under R version 4.3.3</span></span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a><span class="co">#&gt; Parallel cluster with 9 cores...</span></span></code></pre></div>
+<p><code>CINner_simulations</code> is a list object, where each entry is
+one simulation. We now explore the output data from the first
+simulation.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]])</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;parameters&quot;         &quot;clonal_evolution&quot;   &quot;sample&quot;            </span></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="co">#&gt; [4] &quot;sample_phylogeny&quot;   &quot;neutral_variations&quot;</span></span></code></pre></div>
 </div>
 </div>
 

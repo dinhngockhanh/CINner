@@ -161,6 +161,10 @@ model_variables$cn_info
 CINner_simulations <- simulator_full_program(
     model = model_variables,
     n_simulations = 8,
+    stage_final = 4,
     compute_parallel = TRUE
 )
+
+## -----------------------------------------------------------------------------
+names(CINner_simulations[[1]])
 
