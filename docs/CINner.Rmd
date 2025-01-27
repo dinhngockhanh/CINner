@@ -365,11 +365,27 @@ If the initial cell population consists of multiple clones, the function `BUILD_
 
 # Run CINner
 
-Before running CINner, we need to check that the model parameters are correctly defined.
+## 1. Check CINner model parameters
+
+Before running CINner, we need to check that the model parameters are correctly defined, otherwise CINner will run into errors.
 
 ```{r}
 model_variables <- CHECK_model_variables(model_variables)
 ```
+
+`model_variables` is a list object containing all the variables defined thus far.
+
+```{r}
+names(model_variables)
+```
+
+Interested readers can explore each entry, for instance information about the length (in bin count) and location of centromere for each chromosome:
+
+```{r}
+model_variables$cn_info
+```
+
+## 2. Make CINner simulations
 
 The function `simulator_full_program` produces simulations according to the model variables listed in the csv files resulting from the previous section.
 

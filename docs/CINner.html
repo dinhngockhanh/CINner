@@ -718,9 +718,48 @@ distinct clone with different <code>cell_count</code>,
 </div>
 <div id="run-cinner" class="section level1">
 <h1>Run CINner</h1>
+<div id="check-cinner-model-parameters" class="section level2">
+<h2>1. Check CINner model parameters</h2>
 <p>Before running CINner, we need to check that the model parameters are
-correctly defined.</p>
+correctly defined, otherwise CINner will run into errors.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>model_variables <span class="ot">&lt;-</span> <span class="fu">CHECK_model_variables</span>(model_variables)</span></code></pre></div>
+<p><code>model_variables</code> is a list object containing all the
+variables defined thus far.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">names</span>(model_variables)</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;general_variables&quot;      &quot;selection_model&quot;        &quot;cn_info&quot;               </span></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="co">#&gt;  [4] &quot;population_dynamics&quot;    &quot;sampling_info&quot;          &quot;gc_and_mappability&quot;    </span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;chromosome_arm_library&quot; &quot;driver_library&quot;         &quot;initial_others&quot;        </span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt; [10] &quot;initial_cn&quot;</span></span></code></pre></div>
+<p>Interested readers can explore each entry, for instance information
+about the length (in bin count) and location of centromere for each
+chromosome:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>model_variables<span class="sc">$</span>cn_info</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="co">#&gt;    Chromosome Bin_count Centromere_location</span></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="co">#&gt; 1           1       498                 250</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a><span class="co">#&gt; 2           2       485                 187</span></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&gt; 3           3       397                 182</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&gt; 4           4       381                 101</span></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a><span class="co">#&gt; 5           5       364                  97</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a><span class="co">#&gt; 6           6       342                 122</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="co">#&gt; 7           7       319                 120</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a><span class="co">#&gt; 8           8       291                  91</span></span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a><span class="co">#&gt; 9           9       277                  98</span></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a><span class="co">#&gt; 10         10       268                  80</span></span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a><span class="co">#&gt; 11         11       271                 107</span></span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a><span class="co">#&gt; 12         12       267                  72</span></span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1"></a><span class="co">#&gt; 13         13       229                  36</span></span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a><span class="co">#&gt; 14         14       215                  35</span></span>
+<span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a><span class="co">#&gt; 15         15       204                  38</span></span>
+<span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a><span class="co">#&gt; 16         16       181                  73</span></span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a><span class="co">#&gt; 17         17       167                  48</span></span>
+<span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a><span class="co">#&gt; 18         18       161                  34</span></span>
+<span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a><span class="co">#&gt; 19         19       118                  53</span></span>
+<span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a><span class="co">#&gt; 20         20       129                  55</span></span>
+<span id="cb24-23"><a href="#cb24-23" tabindex="-1"></a><span class="co">#&gt; 21         21        94                  26</span></span>
+<span id="cb24-24"><a href="#cb24-24" tabindex="-1"></a><span class="co">#&gt; 22         22       102                  29</span></span></code></pre></div>
+</div>
+<div id="make-cinner-simulations" class="section level2">
+<h2>2. Make CINner simulations</h2>
 <p>The function <code>simulator_full_program</code> produces simulations
 according to the model variables listed in the csv files resulting from
 the previous section.</p>
@@ -814,17 +853,18 @@ GC level) are computed and saved in a csv file. The specific data used
 depends on <code>model_readcount_base</code>. Default is
 <code>FALSE</code>.</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>CINner_simulations <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>    <span class="at">model =</span> model_variables,</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>    <span class="at">n_simulations =</span> <span class="dv">8</span>,</span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>)</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;data.table&#39; was built under R version 4.3.3</span></span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ape&#39; was built under R version 4.3.3</span></span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; Loading required package: amap</span></span>
-<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;amap&#39; was built under R version 4.3.3</span></span>
-<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; Parallel cluster with 9 cores...</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>CINner_simulations <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>    <span class="at">model =</span> model_variables,</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>    <span class="at">n_simulations =</span> <span class="dv">8</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>)</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;data.table&#39; was built under R version 4.3.3</span></span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ape&#39; was built under R version 4.3.3</span></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="co">#&gt; Loading required package: amap</span></span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;amap&#39; was built under R version 4.3.3</span></span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a><span class="co">#&gt; Parallel cluster with 9 cores...</span></span></code></pre></div>
+</div>
 </div>
 
 
