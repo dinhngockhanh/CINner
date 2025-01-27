@@ -12,12 +12,12 @@ The CINner library can be installed with
 devtools::install_github("dinhngockhanh/CINner")
 ```
 
-Detailed descriptions of how to run CINner and its capabilities can be viewed in the [introductory vignette](https://dinhngockhanh.github.io/CINner/CINner.html).
+Detailed descriptions of how to run CINner and its output can be viewed in the [introductory vignette](https://dinhngockhanh.github.io/CINner/CINner.html).
 
 ##  Mathematical model
 
 In CINner, each cell is characterized by its copy number (CN) profile, or driver single nucleotide variant (SNV) profile, or both.
-As genomic regions are amplified or deleted as copy number aberrations (CNAs) occur, the SNVs residing in those regions are correspondingly multiplied or lost.
+As genomic regions become amplified or deleted when copy number aberrations (CNAs) occur, the SNVs residing in those regions are correspondingly multiplied or lost.
 CINner models cancer evolution as a branching process.
 Cell lifespan is exponentially distributed with an input turnover rate.
 At the end of its lifespan, the cell either divides or dies.
