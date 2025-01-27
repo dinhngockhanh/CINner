@@ -21,7 +21,7 @@ set.seed(1)
 
 # Set up CINner
 
-CINner requires a number of input parameters about the assumed characteristics of tumor growth. 
+CINner requires a number of input parameters for the assumed characteristics of tumor growth. 
 One easy method to load the parameters to `CINner` is by creating `model_variables`, 
 a list containing relevant variables in a specific order.
 Here we detail how to create `model_variables`.
@@ -30,16 +30,20 @@ Here we detail how to create `model_variables`.
 
 ### 1a. Tissue-specific and sampling variables
 
-We first specify the cell lifespan, measured in days.
-`cell_lifespan` is the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
-independent of their particular cellular profiles.
+We first specify `cell_lifespan`, the mean of the exponentially distributed lifetime of every cell during cancer evolution, 
+independent of their particular cellular profiles (measured in days).
 
 ```{r}
 cell_lifespan <- 30
 ```
 
 Next, we specify the time points at the beginning and the end of each simulation. 
-The unit can be `day`, `week` (= 7 days), `month` (= 30 days) or `year` (= 365 days). 
+The unit can be
+- `day`
+- `week` (= 7 days)
+- `month` (= 30 days), or
+- `year` (= 365 days). 
+
 The unit for `T_0` and `T_end` should be consistent.
 
 ```{r}
@@ -391,7 +395,7 @@ There are several options for conditioning on the simulations or requesting spec
 - `pseudo_corrected_readcount`: if `TRUE`, the pseudo-corrected readcounts (= cell's HMM-inferred mean readcount X bin GC level) are computed and saved in a csv file. The specific data used depends on `model_readcount_base`. Default is `FALSE`.
 
 ```{r}
-tmp <- simulator_full_program(
+CINner_simulations <- simulator_full_program(
     model = model_variables,
     n_simulations = 8,
     compute_parallel = TRUE

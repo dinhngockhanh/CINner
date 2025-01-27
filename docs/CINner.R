@@ -160,7 +160,7 @@ model_variables <- BUILD_initial_population(
 model_variables <- CHECK_model_variables(model_variables)
 
 ## -----------------------------------------------------------------------------
-tmp <- simulator_full_program(
+CINner_simulations <- simulator_full_program(
     model = model_variables,
     n_simulations = 8,
     compute_parallel = TRUE

@@ -345,7 +345,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span></code></pre></div>
 <div id="set-up-cinner" class="section level1">
 <h1>Set up CINner</h1>
-<p>CINner requires a number of input parameters about the assumed
+<p>CINner requires a number of input parameters for the assumed
 characteristics of tumor growth. One easy method to load the parameters
 to <code>CINner</code> is by creating <code>model_variables</code>, a
 list containing relevant variables in a specific order. Here we detail
@@ -354,15 +354,16 @@ how to create <code>model_variables</code>.</p>
 <h2>1. General variables for every cell</h2>
 <div id="a.-tissue-specific-and-sampling-variables" class="section level3">
 <h3>1a. Tissue-specific and sampling variables</h3>
-<p>We first specify the cell lifespan, measured in days.
-<code>cell_lifespan</code> is the mean of the exponentially distributed
-lifetime of every cell during cancer evolution, independent of their
-particular cellular profiles.</p>
+<p>We first specify <code>cell_lifespan</code>, the mean of the
+exponentially distributed lifetime of every cell during cancer
+evolution, independent of their particular cellular profiles (measured
+in days).</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cell_lifespan <span class="ot">&lt;-</span> <span class="dv">30</span></span></code></pre></div>
 <p>Next, we specify the time points at the beginning and the end of each
-simulation. The unit can be <code>day</code>, <code>week</code> (= 7
-days), <code>month</code> (= 30 days) or <code>year</code> (= 365 days).
-The unit for <code>T_0</code> and <code>T_end</code> should be
+simulation. The unit can be - <code>day</code> - <code>week</code> (= 7
+days) - <code>month</code> (= 30 days), or - <code>year</code> (= 365
+days).</p>
+<p>The unit for <code>T_0</code> and <code>T_end</code> should be
 consistent.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>T_0 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="st">&quot;year&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>T_end <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">80</span>, <span class="st">&quot;year&quot;</span>)</span></code></pre></div>
@@ -807,7 +808,7 @@ GC level) are computed and saved in a csv file. The specific data used
 depends on <code>model_readcount_base</code>. Default is
 <code>FALSE</code>.</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>CINner_simulations <span class="ot">&lt;-</span> <span class="fu">simulator_full_program</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>    <span class="at">model =</span> model_variables,</span>
 <span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>    <span class="at">n_simulations =</span> <span class="dv">8</span>,</span>
 <span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">compute_parallel =</span> <span class="cn">TRUE</span></span>
