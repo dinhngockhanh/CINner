@@ -42,7 +42,7 @@ Driver mutation does not affect the CN profiles, but one allele of a randomly se
 ##  Selection models
 
 Three selection models are included in CINner.
-The first model characterizes the selection of chromosome arms (left schematic on the figure below), with the following assumptions:
+The first model characterizes the selection of chromosome arms, with the following assumptions:
 
 - For chromosome arms with selection parameter s > 1: gains increase the cell fitness and losses decrease fitness.
 This change increases with higher s.
@@ -52,7 +52,9 @@ The impact increases with higher 1/s.
 
 The selection parameter serves as an indicator for the balance of tumor suppressor genes (TSGs) and oncogenes (OGs), as arms with high OG counts are commonly amplified and arms with many TSGs frequently get lost in cancer.
 
-The model for selection of driver mutations (right schematic on the figure below) seeks to portray the selection of individual TSGs and OGs directly.
+![Image](Figure3.jpg)
+
+The model for selection of driver mutations seeks to portray the selection of individual TSGs and OGs directly.
 In this model, the selection parameters for the wild-type (WT) and mutant (MUT) alleles of a gene, are defined according to whether the gene functions as a TSG or an OG in that specific cancer type.
 We assume that a cell’s fitness increases when
 
@@ -62,9 +64,9 @@ We assume that a cell’s fitness increases when
 
 This model is based on the “one-hit” hypothesis, where each additional driver gene hit renders the cell more advantageous.
 
-The third selection model in CINner is a combination of these two models, describing cancer as driven both by small events targeting driver genes and large CNAs changing gene balance across the genome.
+![Image](Figure4.jpg)
 
-![Image](Figure3.jpg)
+The third selection model in CINner is a combination of these two models, describing cancer as driven both by small events targeting driver genes and large CNAs changing gene balance across the genome.
 
 ##  Output from CINner
 
@@ -88,7 +90,7 @@ In short, the sampled cell phylogeny is generated as a coalescent, informed by t
 Finally, cell-to-cell variations due to neutral CNAs and passenger mutations are simulated on top of the phylogeny tree and trickle down to the sample observations.
 CINner can complete prematurely if the later steps are not necessary, depending on the data requested by the user.
 
-![Image](Figure4.jpg)
+![Image](Figure5.jpg)
 
 The use of the “down-up-down” strategy and tau-leaping algorithm allows for significantly reduced runtime of CINner, compared to directly simulating the branching process for the whole population and then extracting the phylogeny only for the sampled cells.
 The runtime of simulating the clonal evolution (step 1) scales with the number of clones and the number of time steps.
