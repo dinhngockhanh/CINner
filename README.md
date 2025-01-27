@@ -46,10 +46,10 @@ Other events are chromosome specific:
 Three selection models are included in CINner.
 The first model characterizes the selection of chromosome arms, with the following assumptions:
 
-- For chromosome arms with selection parameter s > 1: gains increase the cell fitness and losses decrease fitness.
+- For chromosome arms with selection parameter s > 1 (e.g., arm 3p in the schematic below): gains increase the cell fitness and losses decrease fitness.
 The impact to cell fitness increases with higher s.
 
-- For arms with s < 1: losses increase fitness and gains decrease fitness.
+- For arms with s < 1 (e.g., chromosome 1 in the schematic below): losses increase fitness and gains decrease fitness.
 The impact increases with higher 1/s.
 
 The selection parameter serves as an indicator for the balance of tumor suppressor genes (TSGs) and oncogenes (OGs), as arms with high OG counts are commonly amplified and arms with many TSGs frequently get lost in cancer.
