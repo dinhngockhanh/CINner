@@ -512,8 +512,8 @@ mutations the cell has acquired.</li>
 (i.e. average CN among all bins) of the cell.</li>
 <li><code>bound_maximum_CN</code> is the upper bound on the CN in any
 bin in the cell.</li>
-<li><code>bound_homozygosity</code> is the upper bound on the bin count
-with homozygosity (i.e. bins with CN=0).</li>
+<li><code>bound_homozygosity</code> is the upper bound on the number of
+bins with homozygosity (i.e. bins with CN=0).</li>
 </ul>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>bound_driver <span class="ot">&lt;-</span> <span class="dv">3</span></span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>bound_average_ploidy <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
@@ -531,9 +531,10 @@ interpolated from the two nearest time points in this variable.</p>
 <p>Here, we expect the cell population to follow a logistic expansion,
 growing from 20 cells at <code>T_0</code> to 10000 cells at
 <code>T_end</code>, with the midpoint at 20 years.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>vec_time <span class="ot">&lt;-</span> T_0[[<span class="dv">1</span>]]<span class="sc">:</span>T_end[[<span class="dv">1</span>]]</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>vec_cell_count <span class="ot">&lt;-</span> <span class="dv">10000</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fl">0.3</span> <span class="sc">*</span> (vec_time <span class="sc">-</span> <span class="dv">20</span>)))</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>table_population_dynamics <span class="ot">&lt;-</span> <span class="fu">cbind</span>(vec_time, vec_cell_count)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>table_population_dynamics <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>    <span class="at">vec_time =</span> T_0[[<span class="dv">1</span>]]<span class="sc">:</span>T_end[[<span class="dv">1</span>]],</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>    <span class="at">vec_cell_count =</span> <span class="dv">10000</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fl">0.3</span> <span class="sc">*</span> ((T_0[[<span class="dv">1</span>]]<span class="sc">:</span>T_end[[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="dv">20</span>)))</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="f.-initiate-cinner-model-variables" class="section level3">
 <h3>1f. Initiate CINner model variables</h3>

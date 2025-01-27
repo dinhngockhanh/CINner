@@ -181,7 +181,7 @@ If it violates any of these conditions, a cell is deemed unviable and its fitnes
 - `bound_driver` is the upper bound on how many driver mutations the cell has acquired.
 - `bound_average_ploidy` is the upper bound on the ploidy (i.e. average CN among all bins) of the cell.
 - `bound_maximum_CN` is the upper bound on the CN in any bin in the cell.
-- `bound_homozygosity` is the upper bound on the bin count with homozygosity (i.e. bins with CN=0).
+- `bound_homozygosity` is the upper bound on the number of bins with homozygosity (i.e. bins with CN=0).
 
 ```{r}
 bound_driver <- 3
@@ -198,9 +198,10 @@ The expected population size in the CINner simulations at any time point is inte
 Here, we expect the cell population to follow a logistic expansion, growing from 20 cells at `T_0` to 10000 cells at `T_end`, with the midpoint at 20 years.
 
 ```{r}
-vec_time <- T_0[[1]]:T_end[[1]]
-vec_cell_count <- 10000 / (1 + exp(-0.3 * (vec_time - 20)))
-table_population_dynamics <- cbind(vec_time, vec_cell_count)
+table_population_dynamics <- cbind(
+    vec_time = T_0[[1]]:T_end[[1]],
+    vec_cell_count = 10000 / (1 + exp(-0.3 * ((T_0[[1]]:T_end[[1]]) - 20)))
+)
 ```
 
 ### 1f. Initiate CINner model variables

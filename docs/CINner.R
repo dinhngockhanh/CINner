@@ -65,9 +65,10 @@ bound_maximum_CN <- 8
 bound_homozygosity <- 0
 
 ## -----------------------------------------------------------------------------
-vec_time <- T_0[[1]]:T_end[[1]]
-vec_cell_count <- 10000 / (1 + exp(-0.3 * (vec_time - 20)))
-table_population_dynamics <- cbind(vec_time, vec_cell_count)
+table_population_dynamics <- cbind(
+    vec_time = T_0[[1]]:T_end[[1]],
+    vec_cell_count = 10000 / (1 + exp(-0.3 * ((T_0[[1]]:T_end[[1]]) - 20)))
+)
 
 ## -----------------------------------------------------------------------------
 model_variables <- BUILD_general_variables(
