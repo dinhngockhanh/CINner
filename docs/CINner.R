@@ -101,26 +101,21 @@ model_variables <- BUILD_general_variables(
 )
 
 ## -----------------------------------------------------------------------------
-Arm_ID <- c(
-    paste(model_variables$cn_info$Chromosome, "p", sep = ""),
-    paste(model_variables$cn_info$Chromosome, "q", sep = "")
-)
-Chromosome <- rep(model_variables$cn_info$Chromosome, 2)
-Bin_start <- c(
-    rep(1, length(model_variables$cn_info$Chromosome)),
-    model_variables$cn_info$Centromere_location + 1
-)
-Bin_end <- c(
-    model_variables$cn_info$Centromere_location,
-    model_variables$cn_info$Bin_count
-)
-s_rate <- runif(length(Arm_ID), 1 / 1.2, 1.2)
 table_arm_selection_rates <- data.frame(
-    Arm_ID = Arm_ID,
-    Chromosome = Chromosome,
-    Bin_start = Bin_start,
-    Bin_end = Bin_end,
-    s_rate = s_rate
+    Arm_ID = c(
+        paste(model_variables$cn_info$Chromosome, "p", sep = ""),
+        paste(model_variables$cn_info$Chromosome, "q", sep = "")
+    ),
+    Chromosome = rep(model_variables$cn_info$Chromosome, 2),
+    Bin_start = c(
+        rep(1, length(model_variables$cn_info$Chromosome)),
+        model_variables$cn_info$Centromere_location + 1
+    ),
+    Bin_end = c(
+        model_variables$cn_info$Centromere_location,
+        model_variables$cn_info$Bin_count
+    ),
+    s_rate = runif(2 * length(model_variables$cn_info$Chromosome), 1 / 1.2, 1.2)
 )
 
 ## -----------------------------------------------------------------------------

@@ -589,36 +589,39 @@ information for one chromosome arm. Its ID is listed in column
 <code>Arm_ID</code>, and its location is recorded in columns
 <code>Chromosome</code>, <code>Bin_start</code> and
 <code>Bin_end</code>. Its selection rate is specified in column
-<code>s_rate</code> as a positive number. Arms with more Tumor
-Suppressor Genes than Oncogenes have selection rate less than 1, for
-which losses are advantageous and gains are deleterious. Arms with more
-Oncogenes than Tumor Suppressor Genes have selection rate higher than 1,
-for which gains are advantageous and losses are deleterious. The
-strength of the selection force depends on the distance between the
-selection rate to 1: chromosome arms with very small or very large
-selection rates are strongly selected for, and chromosome arms with
-selection rates very close to 1 are essentially neutral.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>Arm_ID <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>    <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;p&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>),</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>    <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;q&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>Chromosome <span class="ot">&lt;-</span> <span class="fu">rep</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="dv">2</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>Bin_start <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>    <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome)),</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>    model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Centromere_location <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>)</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>Bin_end <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>    model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Centromere_location,</span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>    model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Bin_count</span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>)</span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>s_rate <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="fu">length</span>(Arm_ID), <span class="dv">1</span> <span class="sc">/</span> <span class="fl">1.2</span>, <span class="fl">1.2</span>)</span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>table_arm_selection_rates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>    <span class="at">Arm_ID =</span> Arm_ID,</span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>    <span class="at">Chromosome =</span> Chromosome,</span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>    <span class="at">Bin_start =</span> Bin_start,</span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>    <span class="at">Bin_end =</span> Bin_end,</span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>    <span class="at">s_rate =</span> s_rate</span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>)</span></code></pre></div>
+<code>s_rate</code> as a positive number.</p>
+<ul>
+<li>Arms with more Tumor Suppressor Genes than Oncogenes have selection
+rate less than 1, for which losses are advantageous and gains are
+deleterious.</li>
+<li>Arms with more Oncogenes than Tumor Suppressor Genes have selection
+rate higher than 1, for which gains are advantageous and losses are
+deleterious.</li>
+</ul>
+<p>The strength of the selection force depends on the distance between
+the selection rate to 1:</p>
+<ul>
+<li>Chromosome arms with very small or very large selection rates are
+strongly selected for</li>
+<li>Chromosome arms with selection rates very close to 1 are essentially
+neutral.</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>table_arm_selection_rates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>    <span class="at">Arm_ID =</span> <span class="fu">c</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>        <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;p&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>        <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;q&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>    ),</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>    <span class="at">Chromosome =</span> <span class="fu">rep</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="dv">2</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>    <span class="at">Bin_start =</span> <span class="fu">c</span>(</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>        <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome)),</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>        model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Centromere_location <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>    ),</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>    <span class="at">Bin_end =</span> <span class="fu">c</span>(</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>        model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Centromere_location,</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>        model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Bin_count</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>    ),</span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>    <span class="at">s_rate =</span> <span class="fu">runif</span>(<span class="dv">2</span> <span class="sc">*</span> <span class="fu">length</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome), <span class="dv">1</span> <span class="sc">/</span> <span class="fl">1.2</span>, <span class="fl">1.2</span>)</span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="b.-driver-gene-selection-rates" class="section level3">
 <h3>2b. Driver gene selection rates</h3>

@@ -250,32 +250,31 @@ If `selection_model` = `chrom-arm-selection` or `chrom-arm-and-driver-gene-selec
 Each row in `table_arm_selection_rates` details the information for one chromosome arm.
 Its ID is listed in column `Arm_ID`, and its location is recorded in columns `Chromosome`, `Bin_start` and `Bin_end`.
 Its selection rate is specified in column `s_rate` as a positive number.
-Arms with more Tumor Suppressor Genes than Oncogenes have selection rate less than 1, for which losses are advantageous and gains are deleterious. 
-Arms with more Oncogenes than Tumor Suppressor Genes have selection rate higher than 1, for which gains are advantageous and losses are deleterious. 
+
+- Arms with more Tumor Suppressor Genes than Oncogenes have selection rate less than 1, for which losses are advantageous and gains are deleterious. 
+- Arms with more Oncogenes than Tumor Suppressor Genes have selection rate higher than 1, for which gains are advantageous and losses are deleterious. 
+
 The strength of the selection force depends on the distance between the selection rate to 1:
-chromosome arms with very small or very large selection rates are strongly selected for, and chromosome arms with selection rates very close to 1 are essentially neutral.
+
+- Chromosome arms with very small or very large selection rates are strongly selected for
+- Chromosome arms with selection rates very close to 1 are essentially neutral.
 
 ```{r}
-Arm_ID <- c(
-    paste(model_variables$cn_info$Chromosome, "p", sep = ""),
-    paste(model_variables$cn_info$Chromosome, "q", sep = "")
-)
-Chromosome <- rep(model_variables$cn_info$Chromosome, 2)
-Bin_start <- c(
-    rep(1, length(model_variables$cn_info$Chromosome)),
-    model_variables$cn_info$Centromere_location + 1
-)
-Bin_end <- c(
-    model_variables$cn_info$Centromere_location,
-    model_variables$cn_info$Bin_count
-)
-s_rate <- runif(length(Arm_ID), 1 / 1.2, 1.2)
 table_arm_selection_rates <- data.frame(
-    Arm_ID = Arm_ID,
-    Chromosome = Chromosome,
-    Bin_start = Bin_start,
-    Bin_end = Bin_end,
-    s_rate = s_rate
+    Arm_ID = c(
+        paste(model_variables$cn_info$Chromosome, "p", sep = ""),
+        paste(model_variables$cn_info$Chromosome, "q", sep = "")
+    ),
+    Chromosome = rep(model_variables$cn_info$Chromosome, 2),
+    Bin_start = c(
+        rep(1, length(model_variables$cn_info$Chromosome)),
+        model_variables$cn_info$Centromere_location + 1
+    ),
+    Bin_end = c(
+        model_variables$cn_info$Centromere_location,
+        model_variables$cn_info$Bin_count
+    ),
+    s_rate = runif(2 * length(model_variables$cn_info$Chromosome), 1 / 1.2, 1.2)
 )
 ```
 
