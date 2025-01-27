@@ -47,7 +47,7 @@ Three selection models are included in CINner.
 The first model characterizes the selection of chromosome arms, with the following assumptions:
 
 - For chromosome arms with selection parameter s > 1: gains increase the cell fitness and losses decrease fitness.
-This change increases with higher s.
+The impact to cell fitness increases with higher s.
 
 - For arms with s < 1: losses increase fitness and gains decrease fitness.
 The impact increases with higher 1/s.
