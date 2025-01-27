@@ -591,12 +591,11 @@ information for one chromosome arm. Its ID is listed in column
 <code>Bin_end</code>. Its selection rate is specified in column
 <code>s_rate</code> as a positive number.</p>
 <ul>
-<li>Arms with more Tumor Suppressor Genes than Oncogenes have selection
-rate less than 1, for which losses are advantageous and gains are
-deleterious.</li>
-<li>Arms with more Oncogenes than Tumor Suppressor Genes have selection
-rate higher than 1, for which gains are advantageous and losses are
-deleterious.</li>
+<li>Arms with more Tumor Suppressor Genes (TSGs) than Oncogenes (OGs)
+have selection rate less than 1, for which losses are advantageous and
+gains are deleterious.</li>
+<li>Arms with more OGs than TSGs have selection rate higher than 1, for
+which gains are advantageous and losses are deleterious.</li>
 </ul>
 <p>The strength of the selection force depends on the distance between
 the selection rate to 1:</p>
@@ -606,6 +605,8 @@ strongly selected for</li>
 <li>Chromosome arms with selection rates very close to 1 are essentially
 neutral.</li>
 </ul>
+<p>Here, we randomly assign selection rate from a uniform distribution
+from 1/1.2 to 1.2 for each chromosome arm.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>table_arm_selection_rates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>    <span class="at">Arm_ID =</span> <span class="fu">c</span>(</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>        <span class="fu">paste</span>(model_variables<span class="sc">$</span>cn_info<span class="sc">$</span>Chromosome, <span class="st">&quot;p&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>),</span>
@@ -631,14 +632,14 @@ driven solely or partially by gains, losses and mutations of driver
 genes.</p>
 <p>Each row in <code>table_gene_selection_rates</code> details the
 information for one driver gene. Its name is listed in column
-<code>Gene_ID</code>, and its location is recorded in columns
+<code>Gene_ID</code>, and its genomic location is recorded in columns
 <code>Chromosome</code> and <code>Bin</code>. The gene’s function as
 cancer driver is specified in column <code>Gene_role</code> (either
 <code>TSG</code> for Tumor Suppressor Genes or <code>ONCOGENE</code> for
 Oncogenes; other functions or dual roles are not currently supported),
-and its (positive) selection rate is in column <code>s_rate</code>.</p>
+and its selection rate (&gt; 1) is in column <code>s_rate</code>.</p>
 <p>The impact of CNA events on the cell’s fitness depends on the mutated
-gene’s function. For a Tumor Suppressor Gene:</p>
+gene’s function. For a TSG:</p>
 <ul>
 <li>Deletion of the wild-type alleles is advantageous.</li>
 <li>Amplification of the wild-type alleles is deleterious.</li>
@@ -646,7 +647,7 @@ gene’s function. For a Tumor Suppressor Gene:</p>
 <li>Mutation and amplification of the mutant alleles are
 advantageous.</li>
 </ul>
-<p>On the other hand, for an Oncogene:</p>
+<p>On the other hand, for an OG:</p>
 <ul>
 <li>Amplification of the wild-type or mutant allele is
 advantageous.</li>
@@ -656,10 +657,12 @@ deleterious.</li>
 </ul>
 <p>Similar to the chromosome arm model, the strength of the selection
 force depends on the distance between the selection rate to 1.</p>
+<p>Here, we create three driver genes with random selection rates,
+including two TSGs and one OG.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>table_gene_selection_rates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
 <span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>    <span class="at">Gene_ID =</span> <span class="fu">c</span>(<span class="st">&quot;Driver_1&quot;</span>, <span class="st">&quot;Driver_2&quot;</span>, <span class="st">&quot;Driver_3&quot;</span>),</span>
 <span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>    <span class="at">Gene_role =</span> <span class="fu">c</span>(<span class="st">&quot;TSG&quot;</span>, <span class="st">&quot;ONCOGENE&quot;</span>, <span class="st">&quot;TSG&quot;</span>),</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>    <span class="at">s_rate =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>    <span class="at">s_rate =</span> <span class="fu">runif</span>(<span class="dv">3</span>, <span class="dv">1</span>, <span class="fl">1.2</span>),</span>
 <span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>    <span class="at">Chromosome =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
 <span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    <span class="at">Bin =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>)</span>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>)</span></code></pre></div>

@@ -122,7 +122,7 @@ table_arm_selection_rates <- data.frame(
 table_gene_selection_rates <- data.frame(
     Gene_ID = c("Driver_1", "Driver_2", "Driver_3"),
     Gene_role = c("TSG", "ONCOGENE", "TSG"),
-    s_rate = c(0.8, 1.2, 0.9),
+    s_rate = runif(3, 1, 1.2),
     Chromosome = c(1, 2, 3),
     Bin = c(10, 20, 30)
 )

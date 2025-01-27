@@ -251,13 +251,15 @@ Each row in `table_arm_selection_rates` details the information for one chromoso
 Its ID is listed in column `Arm_ID`, and its location is recorded in columns `Chromosome`, `Bin_start` and `Bin_end`.
 Its selection rate is specified in column `s_rate` as a positive number.
 
-- Arms with more Tumor Suppressor Genes than Oncogenes have selection rate less than 1, for which losses are advantageous and gains are deleterious. 
-- Arms with more Oncogenes than Tumor Suppressor Genes have selection rate higher than 1, for which gains are advantageous and losses are deleterious. 
+- Arms with more Tumor Suppressor Genes (TSGs) than Oncogenes (OGs) have selection rate less than 1, for which losses are advantageous and gains are deleterious. 
+- Arms with more OGs than TSGs have selection rate higher than 1, for which gains are advantageous and losses are deleterious. 
 
 The strength of the selection force depends on the distance between the selection rate to 1:
 
 - Chromosome arms with very small or very large selection rates are strongly selected for
 - Chromosome arms with selection rates very close to 1 are essentially neutral.
+
+Here, we randomly assign selection rate from a uniform distribution from 1/1.2 to 1.2 for each chromosome arm.
 
 ```{r}
 table_arm_selection_rates <- data.frame(
@@ -283,18 +285,18 @@ table_arm_selection_rates <- data.frame(
 If `selection_model` = `driver-gene-selection` or `chrom-arm-and-driver-gene-selection`, then cancer is driven solely or partially by gains, losses and mutations of driver genes.
 
 Each row in `table_gene_selection_rates` details the information for one driver gene.
-Its name is listed in column `Gene_ID`, and its location is recorded in columns `Chromosome` and `Bin`.
-The gene's function as cancer driver is specified in column `Gene_role` (either `TSG` for Tumor Suppressor Genes or `ONCOGENE` for Oncogenes; other functions or dual roles are not currently supported), and its (positive) selection rate is in column `s_rate`.
+Its name is listed in column `Gene_ID`, and its genomic location is recorded in columns `Chromosome` and `Bin`.
+The gene's function as cancer driver is specified in column `Gene_role` (either `TSG` for Tumor Suppressor Genes or `ONCOGENE` for Oncogenes; other functions or dual roles are not currently supported), and its selection rate (> 1) is in column `s_rate`.
 
 The impact of CNA events on the cell's fitness depends on the mutated gene's function.
-For a Tumor Suppressor Gene:
+For a TSG:
 
 - Deletion of the wild-type alleles is advantageous.
 - Amplification of the wild-type alleles is deleterious.
 - Deletion of the mutant alleles is neutral.
 - Mutation and amplification of the mutant alleles are advantageous.
 
-On the other hand, for an Oncogene:
+On the other hand, for an OG:
 
 - Amplification of the wild-type or mutant allele is advantageous.
 - Deletion of the wild-type allele or the mutant allele is deleterious.
@@ -302,11 +304,13 @@ On the other hand, for an Oncogene:
 
 Similar to the chromosome arm model, the strength of the selection force depends on the distance between the selection rate to 1.
 
+Here, we create three driver genes with random selection rates, including two TSGs and one OG.
+
 ```{r}
 table_gene_selection_rates <- data.frame(
     Gene_ID = c("Driver_1", "Driver_2", "Driver_3"),
     Gene_role = c("TSG", "ONCOGENE", "TSG"),
-    s_rate = c(0.8, 1.2, 0.9),
+    s_rate = runif(3, 1, 1.2),
     Chromosome = c(1, 2, 3),
     Bin = c(10, 20, 30)
 )
