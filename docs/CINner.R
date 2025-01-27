@@ -197,7 +197,7 @@ names(CINner_simulations[[1]]$sample)
 head(CINner_simulations[[1]]$sample$table_cell_clone)
 
 ## -----------------------------------------------------------------------------
-CINner_simulations[[1]]$clonal_evolution$table_clone_ID_vs_letters
+CINner_simulations[[1]]$sample$table_clone_ID_vs_letters
 
 ## -----------------------------------------------------------------------------
 names(CINner_simulations[[1]]$sample_phylogeny)

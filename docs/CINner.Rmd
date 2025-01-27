@@ -504,7 +504,7 @@ head(CINner_simulations[[1]]$sample$table_cell_clone)
 The clonal letter ID can be traced back to specific genotypes from the first step by comparing with:
 
 ```{r}
-CINner_simulations[[1]]$clonal_evolution$table_clone_ID_vs_letters
+CINner_simulations[[1]]$sample$table_clone_ID_vs_letters
 ```
 
 Each clone's CN and driver mutations can then be looked up in `genotype_list_ploidy_chrom`, `genotype_list_ploidy_block`, `genotype_list_ploidy_allele`,
