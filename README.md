@@ -70,7 +70,7 @@ This model is based on the [“one-hit” hypothesis](https://www.nature.com/art
 
 The third selection model in CINner is a combination of these two models, describing cancer as driven both by small events targeting driver genes and large CNAs changing gene balance across the genome.
 
-##  Output from CINner
+##  Running CINner
 
 CINner is developed to efficiently simulate observed SNVs and CNAs in a tumor sample.
 To optimize for computing memory and runtime, the genome is divided into bins of a fixed size, and the allele-specific bin-level copy number profile of each cell is tracked throughout tumor progression.
