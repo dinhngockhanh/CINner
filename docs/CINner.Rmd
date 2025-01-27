@@ -434,3 +434,103 @@ We now explore the output data from the first simulation.
 ```{r}
 names(CINner_simulations[[1]])
 ```
+
+### 2a. Accessing CINner simulations' model variables
+
+`CINner_simulations[[1]]$parameters` contains the model parameters used in the simulation.
+This should be the same as `model_variables` that we input in CINner earlier.
+
+```{r}
+names(CINner_simulations[[1]]$parameters)
+```
+
+### 2b. Accessing CINner simulations' clonal evolution information
+
+`CINner_simulations[[1]]$clonal_evolution` contains information from CINner's first step (clonal evolution).
+
+```{r}
+names(CINner_simulations[[1]]$clonal_evolution)
+```
+
+`genotype_list_ploidy_chrom`, `genotype_list_ploidy_block`, `genotype_list_ploidy_allele`,
+`genotype_list_WGD_count`, `genotype_list_driver_count`, `genotype_list_driver_map` and `genotype_list_selection_rate`
+contain information for every clone that arises during the simulation.
+
+For instance, the 10th clone to arrive has the following counts of chromosomal homologs:
+
+```{r}
+CINner_simulations[[1]]$clonal_evolution$genotype_list_ploidy_chrom[[10]]
+```
+
+Its bin-specific CN of the first homolog of chromosome 2 is:
+
+```{r}
+CINner_simulations[[1]]$clonal_evolution$genotype_list_ploidy_block[[10]][[2]][[1]]
+```
+
+The number of WGD events in this clone is:
+
+```{r}
+CINner_simulations[[1]]$clonal_evolution$genotype_list_WGD_count[[10]]
+```
+
+The count and information of driver mutations in this clone can be accessed by:
+
+```{r}
+CINner_simulations[[1]]$clonal_evolution$genotype_list_driver_count[[10]]
+CINner_simulations[[1]]$clonal_evolution$genotype_list_driver_map[[10]]
+```
+
+And finally its fitness:
+
+```{r}
+CINner_simulations[[1]]$clonal_evolution$genotype_list_selection_rate[[10]]
+```
+
+### 2c. Accessing CINner simulations' sampling information
+
+`CINner_simulations[[1]]$sample` contains information from CINner's second step (sampling).
+
+```{r}
+names(CINner_simulations[[1]]$sample)
+```
+
+The most relevant information includes the assignment of each sampled cell to a clone:
+
+```{r}
+head(CINner_simulations[[1]]$sample$table_cell_clone)
+```
+
+The clonal letter ID can be traced back to specific genotypes from the first step by comparing with:
+
+```{r}
+CINner_simulations[[1]]$clonal_evolution$table_clone_ID_vs_letters
+```
+
+Each clone's CN and driver mutations can then be looked up in `genotype_list_ploidy_chrom`, `genotype_list_ploidy_block`, `genotype_list_ploidy_allele`,
+`genotype_list_WGD_count`, `genotype_list_driver_count`, `genotype_list_driver_map`, as in Section 2b.
+
+### 2d. Accessing CINner simulations' sampled cell phylogeny
+
+`CINner_simulations[[1]]$sample_phylogeny` contains information from CINner's third step (sample phylogeny).
+
+```{r}
+names(CINner_simulations[[1]]$sample_phylogeny)
+```
+
+The object `CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree`
+contains the simulated phylogeny of the sampled cells from Section 2c, in the `phylo` format:
+
+```{r}
+CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree
+```
+
+### 2e. Accessing CINner simulations' neutral variations
+
+`CINner_simulations[[1]]$neutral_variations` contains information from CINner's forth step (neutral variations).
+
+```{r}
+names(CINner_simulations[[1]]$neutral_variations)
+```
+
+Each object contains information in similar format to Sections 2b-d, except with neutral CNAs and passenger mutations imposed on the sampled cell phylogeny.

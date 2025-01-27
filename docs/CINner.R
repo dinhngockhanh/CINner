@@ -168,3 +168,43 @@ CINner_simulations <- simulator_full_program(
 ## -----------------------------------------------------------------------------
 names(CINner_simulations[[1]])
 
+## -----------------------------------------------------------------------------
+names(CINner_simulations[[1]]$parameters)
+
+## -----------------------------------------------------------------------------
+names(CINner_simulations[[1]]$clonal_evolution)
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$clonal_evolution$genotype_list_ploidy_chrom[[10]]
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$clonal_evolution$genotype_list_ploidy_block[[10]][[2]][[1]]
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$clonal_evolution$genotype_list_WGD_count[[10]]
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$clonal_evolution$genotype_list_driver_count[[10]]
+CINner_simulations[[1]]$clonal_evolution$genotype_list_driver_map[[10]]
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$clonal_evolution$genotype_list_selection_rate[[10]]
+
+## -----------------------------------------------------------------------------
+names(CINner_simulations[[1]]$sample)
+
+## -----------------------------------------------------------------------------
+head(CINner_simulations[[1]]$sample$table_cell_clone)
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$clonal_evolution$table_clone_ID_vs_letters
+
+## -----------------------------------------------------------------------------
+names(CINner_simulations[[1]]$sample_phylogeny)
+
+## -----------------------------------------------------------------------------
+CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree
+
+## -----------------------------------------------------------------------------
+names(CINner_simulations[[1]]$neutral_variations)
+

@@ -875,6 +875,139 @@ simulation.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]])</span>
 <span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;parameters&quot;         &quot;clonal_evolution&quot;   &quot;sample&quot;            </span></span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="co">#&gt; [4] &quot;sample_phylogeny&quot;   &quot;neutral_variations&quot;</span></span></code></pre></div>
+<div id="a.-accessing-cinner-simulations-model-variables" class="section level3">
+<h3>2a. Accessing CINner simulations’ model variables</h3>
+<p><code>CINner_simulations[[1]]$parameters</code> contains the model
+parameters used in the simulation. This should be the same as
+<code>model_variables</code> that we input in CINner earlier.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>parameters)</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;general_variables&quot;      &quot;selection_model&quot;        &quot;gc_and_mappability&quot;    </span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt;  [4] &quot;population_dynamics&quot;    &quot;cn_info&quot;                &quot;sampling_info&quot;         </span></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;driver_library&quot;         &quot;chromosome_arm_library&quot; &quot;initial_cn&quot;            </span></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="co">#&gt; [10] &quot;initial_others&quot;</span></span></code></pre></div>
+</div>
+<div id="b.-accessing-cinner-simulations-clonal-evolution-information" class="section level3">
+<h3>2b. Accessing CINner simulations’ clonal evolution information</h3>
+<p><code>CINner_simulations[[1]]$clonal_evolution</code> contains
+information from CINner’s first step (clonal evolution).</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution)</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;T_current&quot;                    &quot;N_cells_current&quot;             </span></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="co">#&gt;  [3] &quot;N_events_current&quot;             &quot;N_clones&quot;                    </span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;genotype_list_ploidy_chrom&quot;   &quot;genotype_list_ploidy_block&quot;  </span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;genotype_list_ploidy_allele&quot;  &quot;genotype_list_WGD_count&quot;     </span></span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;genotype_list_driver_count&quot;   &quot;genotype_list_driver_map&quot;    </span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt; [11] &quot;genotype_list_selection_rate&quot; &quot;evolution_origin&quot;            </span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; [13] &quot;evolution_genotype_changes&quot;   &quot;evolution_traj_time&quot;         </span></span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; [15] &quot;evolution_traj_divisions&quot;     &quot;evolution_traj_clonal_ID&quot;    </span></span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; [17] &quot;evolution_traj_population&quot;</span></span></code></pre></div>
+<p><code>genotype_list_ploidy_chrom</code>,
+<code>genotype_list_ploidy_block</code>,
+<code>genotype_list_ploidy_allele</code>,
+<code>genotype_list_WGD_count</code>,
+<code>genotype_list_driver_count</code>,
+<code>genotype_list_driver_map</code> and
+<code>genotype_list_selection_rate</code> contain information for every
+clone that arises during the simulation.</p>
+<p>For instance, the 10th clone to arrive has the following counts of
+chromosomal homologs:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_ploidy_chrom[[<span class="dv">10</span>]]</span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#&gt;  [1] 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</span></span></code></pre></div>
+<p>Its bin-specific CN of the first homolog of chromosome 2 is:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_ploidy_block[[<span class="dv">10</span>]][[<span class="dv">2</span>]][[<span class="dv">1</span>]]</span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="co">#&gt;   [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="co">#&gt;  [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-4"><a href="#cb30-4" tabindex="-1"></a><span class="co">#&gt;  [75] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a><span class="co">#&gt; [112] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-6"><a href="#cb30-6" tabindex="-1"></a><span class="co">#&gt; [149] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="co">#&gt; [186] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="co">#&gt; [223] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-9"><a href="#cb30-9" tabindex="-1"></a><span class="co">#&gt; [260] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="co">#&gt; [297] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; [334] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-12"><a href="#cb30-12" tabindex="-1"></a><span class="co">#&gt; [371] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-13"><a href="#cb30-13" tabindex="-1"></a><span class="co">#&gt; [408] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-14"><a href="#cb30-14" tabindex="-1"></a><span class="co">#&gt; [445] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
+<span id="cb30-15"><a href="#cb30-15" tabindex="-1"></a><span class="co">#&gt; [482] 1 1 1 1</span></span></code></pre></div>
+<p>The number of WGD events in this clone is:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_WGD_count[[<span class="dv">10</span>]]</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span></code></pre></div>
+<p>The count and information of driver mutations in this clone can be
+accessed by:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_driver_count[[<span class="dv">10</span>]]</span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_driver_map[[<span class="dv">10</span>]]</span>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a><span class="co">#&gt;      [,1]</span></span>
+<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a><span class="co">#&gt; [1,]    0</span></span></code></pre></div>
+<p>And finally its fitness:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_selection_rate[[<span class="dv">10</span>]]</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="co">#&gt; [1] 2.735714</span></span></code></pre></div>
+</div>
+<div id="c.-accessing-cinner-simulations-sampling-information" class="section level3">
+<h3>2c. Accessing CINner simulations’ sampling information</h3>
+<p><code>CINner_simulations[[1]]$sample</code> contains information from
+CINner’s second step (sampling).</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>sample)</span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;sample_cell_ID&quot;                 &quot;sample_clone_ID&quot;               </span></span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a><span class="co">#&gt;  [3] &quot;sample_clone_ID_letters&quot;        &quot;table_cell_clone&quot;              </span></span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;table_clone_ID_vs_letters&quot;      &quot;sample_time&quot;                   </span></span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;all_sample_genotype&quot;            &quot;all_sample_sampled_time&quot;       </span></span>
+<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;all_sample_ID&quot;                  &quot;sample_genotype_unique&quot;        </span></span>
+<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a><span class="co">#&gt; [11] &quot;sample_genotype_unique_profile&quot; &quot;sample_genotype_unique_drivers&quot;</span></span>
+<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a><span class="co">#&gt; [13] &quot;Table_sampling&quot;                 &quot;cn_profiles_long&quot;</span></span></code></pre></div>
+<p>The most relevant information includes the assignment of each sampled
+cell to a clone:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">head</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>sample<span class="sc">$</span>table_cell_clone)</span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="co">#&gt;               Cell Clone</span></span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="co">#&gt; 1 SA01-Library-1-1     A</span></span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a><span class="co">#&gt; 2 SA01-Library-2-2     A</span></span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a><span class="co">#&gt; 3 SA01-Library-3-3     B</span></span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="co">#&gt; 4 SA01-Library-4-4     A</span></span>
+<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#&gt; 5 SA01-Library-5-5     A</span></span>
+<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a><span class="co">#&gt; 6 SA01-Library-6-6     C</span></span></code></pre></div>
+<p>The clonal letter ID can be traced back to specific genotypes from
+the first step by comparing with:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>table_clone_ID_vs_letters</span>
+<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+<p>Each clone’s CN and driver mutations can then be looked up in
+<code>genotype_list_ploidy_chrom</code>,
+<code>genotype_list_ploidy_block</code>,
+<code>genotype_list_ploidy_allele</code>,
+<code>genotype_list_WGD_count</code>,
+<code>genotype_list_driver_count</code>,
+<code>genotype_list_driver_map</code>, as in Section 2b.</p>
+</div>
+<div id="d.-accessing-cinner-simulations-sampled-cell-phylogeny" class="section level3">
+<h3>2d. Accessing CINner simulations’ sampled cell phylogeny</h3>
+<p><code>CINner_simulations[[1]]$sample_phylogeny</code> contains
+information from CINner’s third step (sample phylogeny).</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>sample_phylogeny)</span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;phylogeny_clustering_truth&quot;          &quot;cell_phylogeny_hclust&quot;              </span></span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co">#&gt; [3] &quot;clone_phylogeny_hclust&quot;              &quot;package_cell_phylogeny_hclust_extra&quot;</span></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co">#&gt; [5] &quot;clone_phylogeny_phylo&quot;               &quot;package_cell_phylogeny&quot;             </span></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co">#&gt; [7] &quot;package_clone_phylogeny&quot;</span></span></code></pre></div>
+<p>The object
+<code>CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree</code>
+contains the simulated phylogeny of the sampled cells from Section 2c,
+in the <code>phylo</code> format:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>sample_phylogeny<span class="sc">$</span>phylogeny_clustering_truth<span class="sc">$</span>tree</span>
+<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb38-3"><a href="#cb38-3" tabindex="-1"></a><span class="co">#&gt; Phylogenetic tree with 300 tips and 299 internal nodes.</span></span>
+<span id="cb38-4"><a href="#cb38-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb38-5"><a href="#cb38-5" tabindex="-1"></a><span class="co">#&gt; Tip labels:</span></span>
+<span id="cb38-6"><a href="#cb38-6" tabindex="-1"></a><span class="co">#&gt;   SA01-Library-1-1, SA01-Library-2-2, SA01-Library-3-3, SA01-Library-4-4, SA01-Library-5-5, SA01-Library-6-6, ...</span></span>
+<span id="cb38-7"><a href="#cb38-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb38-8"><a href="#cb38-8" tabindex="-1"></a><span class="co">#&gt; Rooted; includes branch length(s).</span></span></code></pre></div>
+</div>
+<div id="e.-accessing-cinner-simulations-neutral-variations" class="section level3">
+<h3>2e. Accessing CINner simulations’ neutral variations</h3>
+<p><code>CINner_simulations[[1]]$neutral_variations</code> contains
+information from CINner’s forth step (neutral variations).</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">names</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>neutral_variations)</span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;clonal_evolution&quot; &quot;cell_phylogeny&quot;   &quot;sample&quot;</span></span></code></pre></div>
+<p>Each object contains information in similar format to Sections 2b-d,
+except with neutral CNAs and passenger mutations imposed on the sampled
+cell phylogeny.</p>
+</div>
 </div>
 </div>
 
