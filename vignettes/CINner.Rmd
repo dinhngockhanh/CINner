@@ -391,7 +391,7 @@ There are several options for conditioning on the simulations or requesting spec
 - `pseudo_corrected_readcount`: if `TRUE`, the pseudo-corrected readcounts (= cell's HMM-inferred mean readcount X bin GC level) are computed and saved in a csv file. The specific data used depends on `model_readcount_base`. Default is `FALSE`.
 
 ```{r}
-tmp <- simulator_full_program(
+CINner_simulations <- simulator_full_program(
     model = model_variables,
     n_simulations = 8,
     compute_parallel = TRUE

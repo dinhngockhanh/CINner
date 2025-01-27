@@ -4,7 +4,7 @@
 
 CINner [1] (read preprint on [bioRxiv](https://www.biorxiv.org/content/10.1101/2024.04.03.587939v1))
 is an algorithm to simulate cancer evolution driven by the occurrence and selection of mutations and Copy Number Aberrations (CNAs).
-It is designed to reproduce data from single-cell DNA sequencing, such as [Direct Library Preparation+ (DLP+)](https://www.cell.com/cell/fulltext/S0092-8674(19)31176-6).
+It is designed to reproduce data from both bulk DNA sequencing (such as from the [Pan-Cancer Analysis of Whole Genomes](https://www.nature.com/articles/s41586-020-1969-6)) and single-cell DNA sequencing (such as [Direct Library Preparation+ (DLP+)](https://www.cell.com/cell/fulltext/S0092-8674(19)31176-6)).
 
 The CINner library can be installed with
 
