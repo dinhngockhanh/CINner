@@ -424,7 +424,7 @@ CINner_simulations <- simulator_full_program(
     model = model_variables,
     n_simulations = 8,
     stage_final = 4,
-    compute_parallel = FALSE
+    compute_parallel = TRUE
 )
 ```
 

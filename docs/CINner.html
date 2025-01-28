@@ -911,7 +911,7 @@ clone that arises during the simulation.</p>
 <p>For instance, the 10th clone to arrive has the following counts of
 chromosomal homologs:</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_ploidy_chrom[[<span class="dv">10</span>]]</span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#&gt;  [1] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4</span></span></code></pre></div>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#&gt;  [1] 2 2 2 1 2 2 2 2 2 2 2 2 2 2 3 3 2 2 3 2 2 2</span></span></code></pre></div>
 <p>Its bin-specific CN of the first homolog of chromosome 2 is:</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_ploidy_block[[<span class="dv">10</span>]][[<span class="dv">2</span>]][[<span class="dv">1</span>]]</span>
 <span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="co">#&gt;   [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
@@ -930,7 +930,7 @@ chromosomal homologs:</p>
 <span id="cb30-15"><a href="#cb30-15" tabindex="-1"></a><span class="co">#&gt; [482] 1 1 1 1</span></span></code></pre></div>
 <p>The number of WGD events in this clone is:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_WGD_count[[<span class="dv">10</span>]]</span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 <p>The count and information of driver mutations in this clone can be
 accessed by:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_driver_count[[<span class="dv">10</span>]]</span>
@@ -940,7 +940,7 @@ accessed by:</p>
 <span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a><span class="co">#&gt; [1,]    0</span></span></code></pre></div>
 <p>And finally its fitness:</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>clonal_evolution<span class="sc">$</span>genotype_list_selection_rate[[<span class="dv">10</span>]]</span>
-<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="co">#&gt; [1] 2.772639</span></span></code></pre></div>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="co">#&gt; [1] 2.88646</span></span></code></pre></div>
 </div>
 <div id="c.-accessing-cinner-simulations-sampling-information" class="section level3">
 <h3>2c. Accessing CINner simulations’ sampling information</h3>
@@ -959,23 +959,17 @@ cell to a clone:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">head</span>(CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>sample<span class="sc">$</span>table_cell_clone)</span>
 <span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="co">#&gt;               Cell Clone</span></span>
 <span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="co">#&gt; 1 SA01-Library-1-1     A</span></span>
-<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a><span class="co">#&gt; 2 SA01-Library-2-2     B</span></span>
-<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a><span class="co">#&gt; 3 SA01-Library-3-3     B</span></span>
-<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="co">#&gt; 4 SA01-Library-4-4     C</span></span>
-<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#&gt; 5 SA01-Library-5-5     B</span></span>
-<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a><span class="co">#&gt; 6 SA01-Library-6-6     B</span></span></code></pre></div>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a><span class="co">#&gt; 2 SA01-Library-2-2     A</span></span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a><span class="co">#&gt; 3 SA01-Library-3-3     A</span></span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="co">#&gt; 4 SA01-Library-4-4     A</span></span>
+<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#&gt; 5 SA01-Library-5-5     A</span></span>
+<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a><span class="co">#&gt; 6 SA01-Library-6-6     A</span></span></code></pre></div>
 <p>The clonal letter ID can be traced back to specific genotypes from
 the first step by comparing with:</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>CINner_simulations[[<span class="dv">1</span>]]<span class="sc">$</span>sample<span class="sc">$</span>table_clone_ID_vs_letters</span>
 <span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a><span class="co">#&gt;   Clone_ID_number Clone_ID_letter</span></span>
-<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a><span class="co">#&gt; 1            2974               A</span></span>
-<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a><span class="co">#&gt; 2            2619               B</span></span>
-<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a><span class="co">#&gt; 3            2967               C</span></span>
-<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a><span class="co">#&gt; 4            2953               D</span></span>
-<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a><span class="co">#&gt; 5            3126               E</span></span>
-<span id="cb36-8"><a href="#cb36-8" tabindex="-1"></a><span class="co">#&gt; 6            2931               F</span></span>
-<span id="cb36-9"><a href="#cb36-9" tabindex="-1"></a><span class="co">#&gt; 7            2984               G</span></span>
-<span id="cb36-10"><a href="#cb36-10" tabindex="-1"></a><span class="co">#&gt; 8            3092               H</span></span></code></pre></div>
+<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a><span class="co">#&gt; 1            2287               A</span></span>
+<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a><span class="co">#&gt; 2            2260               B</span></span></code></pre></div>
 <p>Each clone’s CN and driver mutations can then be looked up in
 <code>genotype_list_ploidy_chrom</code>,
 <code>genotype_list_ploidy_block</code>,
