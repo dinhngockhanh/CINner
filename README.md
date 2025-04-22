@@ -2,9 +2,9 @@
 
 ##  Installation
 
-CINner [1] (read preprint on [bioRxiv](https://www.biorxiv.org/content/10.1101/2024.04.03.587939v1))
+CINner [1] (read published paper in [PLOS Computational Biology](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1012902))
 is an algorithm to simulate cancer evolution driven by the occurrence and selection of mutations and Copy Number Aberrations (CNAs).
-It is designed to reproduce data from both bulk DNA sequencing (such as from the [Pan-Cancer Analysis of Whole Genomes](https://www.nature.com/articles/s41586-020-1969-6)) and single-cell DNA sequencing (such as [Direct Library Preparation+ (DLP+)](https://www.cell.com/cell/fulltext/S0092-8674(19)31176-6)).
+It is designed to reproduce data from both bulk DNA sequencing (e.g., from the [Pan-Cancer Analysis of Whole Genomes](https://www.nature.com/articles/s41586-020-1969-6)) and single-cell DNA sequencing (e.g., [Direct Library Preparation+ (DLP+)](https://www.cell.com/cell/fulltext/S0092-8674(19)31176-6)).
 
 The CINner library can be installed with
 
@@ -115,4 +115,4 @@ Depending on the applications, the users may utilize the data from either step f
 
 1.  Dinh KN, Vázquez-García I, Chan A, Malhotra R, Weiner A, McPherson AW, Tavaré S.
 CINner: modeling and simulation of chromosomal instability in cancer at single-cell resolution.
-bioRxiv. 2024 Apr 3.
+PLOS Computational Biology. 2025 Apr 3;21(4):e1012902.
