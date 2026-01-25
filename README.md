@@ -115,4 +115,4 @@ Depending on the applications, the users may utilize the data from either step f
 
 1.  Dinh KN, Vázquez-García I, Chan A, Malhotra R, Weiner A, McPherson AW, Tavaré S.
 CINner: modeling and simulation of chromosomal instability in cancer at single-cell resolution.
-PLOS Computational Biology. 2025 Apr 3;21(4):e1012902.
+PLOS Computational Biology 21(4):e1012902 (2025). https://doi.org/10.1371/journal.pcbi.1012902
