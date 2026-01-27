@@ -1,14 +1,13 @@
 #' Check/Clean up the model variables
-#' 
+#'
 #' @description
 #' `CHECK_model_variable` returns an updated object that checks the specified model variables to clean up the libraries of CN information and chromosome arm selection rates.
 #'
 #' @inheritParams BUILD_initial_population
-#' 
-#' @examples 
-#' 
-#' CHECK_model_variables(model_variables)
 #'
+#' @examples
+#'
+#' CHECK_model_variables(model_variables)
 #'
 #' @export
 CHECK_model_variables <- function(model_variables) {
@@ -26,7 +25,7 @@ CHECK_model_variables <- function(model_variables) {
         }
     }
     if (length(vec_delete) > 0) {
-        model_variables$cn_info <- model_variables$cn_info[-which(is.element(model_variables$cn_info$Chrom, vec_delete)), ]
+        model_variables$cn_info <- model_variables$cn_info[-which(is.element(model_variables$cn_info$Chromosome, vec_delete)), ]
     }
     #-----------------Clean up library of chromosome arm selection rates
     TABLE_CANCER_ARMS <- model_variables$chromosome_arm_library
