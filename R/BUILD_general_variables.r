@@ -259,9 +259,72 @@ BUILD_general_variables <- function(model_name = "CINner_model",
     }
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("T_start_time", T_start_time, "day", "Age when simulation starts (for internal use)")
+    ##################################################################
+    ##################################################################
+    ##################################################################
+    ########### Change here, remove age_end <- T_end, because we remove it from user side
+    ##################################################################
+    ##################################################################
+    ##################################################################
     #   Set up the end time of simulations
-    age_end <- T_end[[1]]
-    age_end_unit <- T_end[[2]]
+    # age_end <- T_end[[1]]
+    # age_end_unit <- T_end[[2]]
+
+    #------------------------------------
+    # Derive simulation end time from sample table
+    #------------------------------------
+    # We just use the age_sample as t_end instead
+    # age_end <- Table_sample$Age_sample
+    # age_end_unit <- T_0[[2]]
+    # if (nrow(Table_sample) != 1) {
+    #     stop("Table_sample must contain exactly one sample time point.")
+    # }
+
+    if (!"Age_sample" %in% colnames(Table_sample)) {
+        stop("Table_sample must contain column 'Age_sample'.")
+    }
+    #------------------------------------
+    # Checkpoint: exactly one sample time > T_0
+    #------------------------------------
+    ####### Add valid times for sample table should have only one time point that is > "T_0"
+    valid_times <- Table_sample$Age_sample[Table_sample$Age_sample > age_birth]
+
+
+    if (length(valid_times) != 1) {
+        stop("Table_sample must contain exactly one sampling time greater than T_0.")
+    }
+
+    age_end <- valid_times[1]
+    age_end_unit <- T_0[[2]]
+
+    ######### The below is the debug message
+
+
+    # See debugging message if they match
+    print("DEBUG: age_end derived from Table_sample (updated!xzx12)")
+    print(age_end)
+    if (age_end <= age_birth) {
+        stop("Sample time must be greater than T_0.")
+    }
+
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("age_end", age_end, age_end_unit, "Age when simulation stops")
+    ##################################################################
+    ##################################################################
+    if (age_end_unit == "day") {
+        T_end_time <- age_end
+    } else if (age_end_unit == "week") {
+        T_end_time <- 7 * age_end
+    } else if (age_end_unit == "month") {
+        T_end_time <- 30 * age_end
+    } else if (age_end_unit == "year") {
+        T_end_time <- 365 * age_end
+    }
+
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("T_end_time", T_end_time, "day", "Age when simulation stops (internal)")
+
+
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("age_end", age_end, age_end_unit, "Age when simulation stops")
     if (age_birth_unit != age_end_unit) {

@@ -70,12 +70,14 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
             style = 3, width = 50, char = "="
         )
     }
+    # Step 1.1
     while ((T_current < T_end_simulation) && (N_cells_current < Max_cell_count) && (N_events_current < Max_events)) {
         if (report_progress == TRUE) {
             setTxtProgressBar(pb, T_current)
         }
-        #   Find the Poisson propensities of event count for all clones
+        #  Expected duration of a single cell's life
         rate_base_lifetime <- func_event_rate(T_current)
+        #   Find the propensity for each clone
         all_propensity <- T_tau_step * rate_base_lifetime * clonal_population_current
         #   Find the probability of division for all clones
         clonal_portion <- genotype_list_selection_rate[clonal_ID_current]
@@ -125,6 +127,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                 #   Find number of events
                 prop <- all_propensity[i]
                 count_new_events <- Inf
+                # Step 1.2
+                # Sample number of event from Poisson distribution, or from Normal distribution if the expected number of events is large (to save time)
                 while ((count_new_events > clone_population) || (count_new_events < 0)) {
                     if (prop > 1000) {
                         count_new_events <- round(rnorm(n = 1, mean = prop, sd = sqrt(prop)))
@@ -133,6 +137,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                     }
                 }
                 N_events_current <- N_events_current + count_new_events
+                # Step 1.3
+                #  Find how many of the events are deaths, divisions with no new genotype, and divisions with new genotype, using multinomial distribution
                 count_event_types <- rmultinom(n = 1, size = count_new_events, prob = c((1 - prob_division), prob_division * (1 - prob_new_genotype), prob_division * prob_new_genotype))
                 count_deaths <- count_event_types[1]
                 count_div_old <- count_event_types[2]
@@ -155,6 +161,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                         flag_cnloh_interstitial <- 0
                         flag_cnloh_terminal <- 0
                         vec_flag <- c(flag_drivers, flag_whole_genome_duplication, flag_missegregation, flag_chrom_arm_missegregation, flag_amplification, flag_deletion, flag_cnloh_interstitial, flag_cnloh_terminal)
+                        # Step 1.4.1
+                        # Determine what events lead to the new genotype, by sampling from the probabilities of each events
                         while (max(vec_flag) == 0) {
                             flag_drivers <- as.numeric(runif(1) < (prob_new_drivers / prob_new_genotype))
                             flag_whole_genome_duplication <- as.numeric(runif(1) < (prob_CN_WGD / prob_new_genotype))
@@ -172,6 +180,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                         position_daughter_1 <- output[[2]]
                         genotype_daughter_2 <- output[[3]]
                         position_daughter_2 <- output[[4]]
+                        # Simulation for each type of events, and update the properties of the daughter cells accordingly
                         #   Simulate new driver event
                         if (flag_drivers == 1) {
                             SIMULATOR_FULL_PHASE_1_drivers(
@@ -190,6 +199,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                                 )
                             }
                         }
+                        # Step 1.4.2
                         #   Simulate missegregation event
                         if (flag_missegregation == 1) {
                             if (mode_CN_misseg == "per_division") {
@@ -303,7 +313,8 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                         } else {
                             mat_divisions <- rbind(mat_divisions, c(1, genotype_to_react, genotype_daughter_1, genotype_daughter_2))
                         }
-                        #   Update the clonal population according to what happens
+                        # Step 1.5.1
+                        #   Update the clonal population according to what happens (Globally)
                         clonal_population_next[position_to_react] <<- clonal_population_next[position_to_react] - 1
                         clonal_population_next[position_daughter_1] <<- clonal_population_next[position_daughter_1] + 1
                         clonal_population_next[position_daughter_2] <<- clonal_population_next[position_daughter_2] + 1
@@ -315,6 +326,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
                 }
             }
         }
+        # Step 1.5.2
         #   Clean clonal populations
         SIMULATOR_FULL_PHASE_1_clonal_population_cleaning(option_lite_memory)
         #   Update clonal populations
@@ -323,6 +335,7 @@ SIMULATOR_FULL_PHASE_1_main <- function(option_lite_memory, report_progress) {
         T_current <- T_next
         #   Update count of cells
         N_cells_current <- sum(clonal_population_current)
+        # Step 1.6 Update the clonal population, and update the record of clonal evolution
         #   Update record of clonal evolution over time
         evolution_traj_count <- evolution_traj_count + 1
 

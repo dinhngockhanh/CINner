@@ -73,6 +73,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
                 future_genotypes <- setdiff(original_elapsed_genotypes[(elapsed_gen + 1):length(original_elapsed_genotypes)], original_elapsed_genotypes[elapsed_gen])
                 future_genotypes <- unique(c(future_genotypes, progeny_genotypes))
             }
+            # Step 1: Identify Chromosomes to Exclude
             chroms_excluded <- c()
             if (length(future_genotypes) > 0) {
                 for (i in 1:length(future_genotypes)) {
@@ -111,6 +112,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
             } else {
                 previous_genotype <- original_elapsed_genotypes[elapsed_gen]
             }
+            # Step 2: Apply Predetermined Selective Events
             if (original_elapsed_genotypes[elapsed_gen] != previous_genotype) {
                 #   Create a new genotype
                 genotype_parent <- genotype_current
@@ -185,6 +187,17 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
             selection_rate <- 0
             T_current <- phylogeny_birthtime[branch] + (phylogeny_deathtime[branch] - phylogeny_birthtime[branch]) * elapsed_gen / length(original_elapsed_genotypes)
 
+            # Step 3, 4: Sample Neutral Events & The Critical Loop - Rejection Sampling
+            "
+            Algorithm:
+            1. Sample random neutral events (Bernoulli trials)
+            2. Apply them to create new genotype
+            3. Calculate fitness of new genotype
+            4. If fitness decreased → reject and retry
+            5. If fitness same/better → accept
+
+            This is Rejection Sampling!
+            "
             while ((selection_rate <= 0) & (selection_rate < selection_rate_tmp)) {
                 genotype_current <- genotype_current_tmp
                 flag_whole_genome_duplication <- as.numeric(runif(1) < prob_CN_WGD)
@@ -195,6 +208,7 @@ SIMULATOR_FULL_PHASE_4_main <- function(package_clonal_evolution, package_sample
                 flag_cnloh_interstitial <- as.numeric(runif(1) < prob_CN_cnloh_i)
                 flag_cnloh_terminal <- as.numeric(runif(1) < prob_CN_cnloh_t)
                 vec_flag <- c(flag_whole_genome_duplication, flag_missegregation, flag_chrom_arm_missegregation, flag_amplification, flag_deletion, flag_cnloh_interstitial, flag_cnloh_terminal)
+                # Step 5: Apply Accepted Neutral Events
                 if (max(vec_flag) == 1) {
                     #   Create a new genotype
                     genotype_parent <- genotype_current

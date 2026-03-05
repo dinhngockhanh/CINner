@@ -1,9 +1,14 @@
+# devtools::install_github("dinhngockhanh/CINner")
+# devtools::load_all()
+
+rm(list = ls())
 ## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
-
+# Clone the cinner and modify
+# 1. Remove t_end from user end, 2. and get t_end from sample table, 3. modify sample table to make it can only have 1 time point 4. only have 1 t0
 ## ----setup--------------------------------------------------------------------
 library(CINner)
 set.seed(1)
@@ -12,14 +17,16 @@ set.seed(1)
 cell_lifespan <- 30
 
 ## -----------------------------------------------------------------------------
+# default is years, but it can be changed to "day", "month", "week", etc.
+# max_t <- ???
 T_0 <- list(0, "year")
-T_end <- list(80, "year")
+# T_end <- list(100, "year") # 80 originally, test 100 (break)
 
 ## -----------------------------------------------------------------------------
 Table_sample <- data.frame(
     Sample_ID = "SA01",
-    Cell_count = 300,
-    Age_sample = 80
+    Cell_count = 300, #300 originally, test 800 (broke), test 500, 800 face edge cases (At simulation 6 Error: Clonal populations in sample are larger than in total cell population)
+    Age_sample = 5 # 80 originally, test 100 (pass), change to max_t, change to 0 to see if it break the one time point that is > "T_0",::: If change to < 11 will also break out of bound
 )
 
 ## -----------------------------------------------------------------------------
@@ -66,14 +73,24 @@ bound_homozygosity <- 0
 
 ## -----------------------------------------------------------------------------
 table_population_dynamics <- cbind(
-    vec_time = T_0[[1]]:T_end[[1]],
-    vec_cell_count = 10000 / (1 + exp(-0.3 * ((T_0[[1]]:T_end[[1]]) - 20)))
+    #####
+    ##### Remove t_end
+    # Modify here
+    vec_time = T_0[[1]]:Table_sample$Age_sample, # T_0[[1]]:T_end[[1]]
+    vec_cell_count = 10000 / (1 + exp(-0.3 * ((T_0[[1]]:Table_sample$Age_sample) - 20))) # 10000 / (1 + exp(-0.3 * ((T_0[[1]]:T_end[[1]]) - 20)))
 )
-
+#### Modify here!
 ## -----------------------------------------------------------------------------
 model_variables <- BUILD_general_variables(
+    ##
+    # cell_lifespan = cell_lifespan,
+    # T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    # Table_sample = Table_sample,
+    ##
+    # remove T_end = T_end,
+    ##
     cell_lifespan = cell_lifespan,
-    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    T_0 = T_0, T_tau_step = T_tau_step,
     Table_sample = Table_sample,
     CN_bin_length = CN_bin_length,
     prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
@@ -160,9 +177,9 @@ model_variables$cn_info
 ## -----------------------------------------------------------------------------
 CINner_simulations <- simulator_full_program(
     model = model_variables,
-    n_simulations = 8,
-    stage_final = 4,
-    compute_parallel = TRUE
+    n_simulations = 8, #8
+    stage_final = 3, #4
+    compute_parallel = FALSE # from true to false to see the output
 )
 
 ## -----------------------------------------------------------------------------
@@ -208,3 +225,16 @@ CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree
 ## -----------------------------------------------------------------------------
 names(CINner_simulations[[1]]$neutral_variations)
 
+
+
+
+# model_variables$general_variables
+
+
+
+# When removing it, the code showed error in stage 3
+# Stage 3: sample phylogeny...
+# [PHASE 3] Début
+# Number of sample cells : 800 
+# Error in if (standard_time_unit == "day") { : 
+#   the condition has length > 1

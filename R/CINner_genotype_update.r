@@ -1,6 +1,7 @@
 # =================UPDATE DNA LENGTH AND SELECTION RATES OF NEW GENOTYPES
 #' @export
 SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype, time) {
+    # Step 1. Read current genotype information, including the CN profile, WGD count, driver count, and driver map. Then, update the DNA length and selection rate for the new genotype.
     #-----------------------------Get the CN profile of the new genotype
     ploidy_chrom <- genotype_list_ploidy_chrom[[genotype]]
     ploidy_allele <- genotype_list_ploidy_allele[[genotype]]
@@ -9,6 +10,7 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype, time) {
     driver_count <- genotype_list_driver_count[genotype]
     driver_map <- genotype_list_driver_map[[genotype]]
     #------------------------Update the DNA length for the new genotypes
+    # Step 2. Calculate the DNA length for the new genotype, which is the sum of the DNA length of each chromosome, which is the sum of the DNA length of each strand, which is the sum of the DNA length of each block, which is the product of the number of blocks and the size of each block. The size of each block is determined by the model variable "size_CN_block_DNA".
     #   Compute the DNA length for genotype 1
     DNA_length <- 0
     for (chrom in 1:N_chromosomes) {
@@ -23,6 +25,7 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype, time) {
     DNA_length <- size_CN_block_DNA * DNA_length
     genotype_list_DNA_length[[genotype]] <<- DNA_length
     #--------------------Update the selection rate for the new genotypes
+    # Step 3. Update the selection rate for the new genotype, which is determined by the WGD count, driver count, driver map, ploidy of each chromosome, ploidy of each block, and ploidy of each allele. The selection rate is computed using the function "SIMULATOR_FULL_PHASE_1_selection_rate", which takes the WGD count, driver count, driver map, ploidy of each chromosome, ploidy of each block, and ploidy of each allele as input, and returns the selection rate for the new genotype.
     genotype_list_selection_rate[genotype] <<- SIMULATOR_FULL_PHASE_1_selection_rate(
         WGD_count = WGD_count,
         driver_count = driver_count,
@@ -32,12 +35,14 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype, time) {
         ploidy_allele = ploidy_allele
     )
     #--------------------------Update prob(driver) for the new genotypes
+    # Step 4. Update driver mutation probability for the new genotype, which is determined by the DNA length of the new genotype, and the driver mutation rate. The driver mutation probability is computed using the Poisson distribution, which takes the driver mutation rate and the DNA length as input, and returns the probability of at least one driver mutation occurring in the new genotype.    
     genotype_list_prob_new_drivers[genotype] <<- 1 - dpois(x = 0, lambda = rate_driver * DNA_length)
     #----------------------------Update prob(CNAs) for the new genotypes
     #   Find ingredients to compute probabilities of CNA/driver mutation
     chrom_ploidy <- genotype_list_ploidy_chrom[[genotype]]
     DNA_length <- genotype_list_DNA_length[[genotype]]
     WGD_count <- genotype_list_WGD_count[genotype]
+    # Step 5. Update driver mutation probability for the new genotype (per division or per homolog), which is determined by the DNA length of the new genotype, and the driver mutation rate. The driver mutation probability is computed using the Poisson distribution, which takes the driver mutation rate and the DNA length as input, and returns the probability of at least one driver mutation occurring in the new genotype.
     #   Find probability of new genotype
     if (mode_CN_WGD == "per_division") {
         prob_CN_WGD <- min(1, eval(parse(text = sub(".*:", "", formula_CN_whole_genome_duplication))))
@@ -68,6 +73,7 @@ SIMULATOR_FULL_PHASE_1_genotype_update <- function(genotype, time) {
     if (mode_CN_cnloh_t == "per_division") {
         prob_CN_cnloh_t <- min(1, eval(parse(text = sub(".*:", "", formula_CN_cnloh_terminal))))
     }
+    # Step 6. Store all CNA prob (WGD, missegregation, chrom arm missegregation, focal amplification, focal deletion, cnloh interstitial, and cnloh terminal) for the new genotype in the list of probabilities of CNAs for each genotype.
     #   Update prob(CNAs) for the new genotypes
     prob_CNAs <- c(
         prob_CN_WGD,
