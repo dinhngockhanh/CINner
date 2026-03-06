@@ -93,17 +93,17 @@ BUILD_general_variables(
 
 \item{Table_sample}{A dataframe specifying the information about sampled cells. Must have 'Age_sample' column, which is the age at which the sample is taken, usually the \code{T_end}. Default is \code{data.frame()}.}
 
-\item{table_population_dynamics}{A matrix consisting of the start and end time of the simulation as well as the initial and final population size??? Default is \code{matrix(0, ncol = 2, nrow = 2)}.}
+\item{table_population_dynamics}{A two-column matrix or data frame describing the expected population dynamics over time. The first column contains simulation time points, and the second column contains the corresponding total cell population size at each time point. Default is \code{matrix(0, ncol = 2, nrow = 2)}.}
 
-\item{Max_cell_count}{An integer value specifying the maximum number of cells in the simulation??? Default is Inf.}
+\item{Max_cell_count}{Maximum allowed population size during the simulation; if the total number of cells exceeds this limit, the simulation terminates. Default is \code{Inf}.}
 
-\item{Min_cell_count}{An integer value specifying the minimum number of cells in the simulation??? Default is 0.}
+\item{Min_cell_count}{Minimum allowed population size during the simulation; if the total number of cells falls below this value, the simulation terminates. Default is \code{0}.}
 
-\item{Max_events}{An integer value specifying the maximum number of mutation events??? Default is Inf.}
+\item{Max_events}{Maximum allowed number of mutation events during the simulation; if this limit is reached, the simulation terminates. Default is \code{Inf}.}
 
 \item{CN_bin_length}{An integer value specifying the number of basepairs belongs in a single bin of a chomosome. Default is 500000.}
 
-\item{CN_arm_level}{??? Default is FALSE.}
+\item{CN_arm_level}{Logical value indicating whether copy-number alterations are simulated at the chromosome arm level instead of the default bin-level resolution. Default is \code{FALSE}.}
 
 \item{alpha_aneuploidy}{An integer value representing the rate of chromosomal missegregations in WGD cells as compared to non-WGD cells. Default is 1.}
 
@@ -185,7 +185,7 @@ BUILD_general_variables(
 
 \item{rate_passenger}{A numerical value for the poisson rate of getting a new passenger mutation. Default is 0.}
 
-\item{selection_model}{A string specifying the selection model to be used. ???}
+\item{selection_model}{Character string specifying the evolutionary selection model used in the simulation (e.g., "chrom-arm-selection" or "chrom-arm-and-driver-gene-selection").}
 
 \item{bound_driver}{An integer number representing the maximum driver count in viable cells (cells exceeding this will die). Default is Inf.}
 
@@ -205,7 +205,7 @@ BUILD_general_variables(
 
 \item{lower_limit_tot_counts}{A numerical value representing the lower limit of total read counts for mutations to be detected. Default is 0.}
 
-\item{gc}{???}
+\item{gc}{Data frame containing GC content and mappability information for genomic bins, used to model sequencing coverage bias in simulated read counts.}
 
 \item{gc_slope}{A numerical value for the slope of the linear GC model. Default is 1.2.}
 

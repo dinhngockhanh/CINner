@@ -1,6 +1,7 @@
 # =============================================PHASE 2: SAMPLE PHYLOGENY
 #' @export
 SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progress) {
+    # Step 2.1 Input the sampling scheme
     #-----------------------------------------Input the clonal evolution
     T_current <- package_clonal_evolution$T_current
     N_cells_current <- package_clonal_evolution$N_cells_current
@@ -9,7 +10,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     evolution_traj_time <- package_clonal_evolution$evolution_traj_time
     evolution_traj_clonal_ID <- package_clonal_evolution$evolution_traj_clonal_ID
     evolution_traj_population <- package_clonal_evolution$evolution_traj_population
-
+    # Step 2.2 Define the sampling scheme
     for (row in 1:nrow(Table_sampling)) {
         loc <- which.min(abs(evolution_traj_time - Table_sampling$T_sample[row]))
         N_cells_total <- sum(evolution_traj_population[[loc]])
@@ -26,6 +27,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     all_sample_genotype <- c()
     all_sample_ID <- c()
     all_sample_sampled_time <- c()
+    # Step 2.3.1 or each sample, find the closest time point in the clonal evolution trajectory, and find the clonal composition at that time point. Then, sample cells from the clonal population according to the sampling scheme.
     for (sample in 1:nrow(Table_sampling)) {
         N_sample <- Table_sampling$Cell_count[sample]
         ID_sample <- Table_sampling$Sample_ID[sample]
@@ -39,6 +41,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
 
 
         vec_clonal_ID <- evolution_traj_clonal_ID[[loc]]
+        # 2.3.2 Create a vector of clonal IDs for the population at that time point, according to the clonal composition
         vec_clonal_population <- evolution_traj_population[[loc]]
         vec_population <- c()
         for (i in 1:length(vec_clonal_ID)) {
@@ -46,8 +49,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
             clonal_population <- vec_clonal_population[i]
             vec_population <- c(vec_population, rep(clone, 1, clonal_population))
         }
-
+        # 2.3.3 Sample cells from the population according to the sampling scheme without replacement geometrically
         sample_genotype <- sample(x = vec_population, size = N_sample, replace = FALSE)
+        # 2.3.4 Record the clonal ID of each sampled cell, the sample ID, and the time point of sampling
         all_sample_genotype <- c(all_sample_genotype, sample_genotype)
         all_sample_ID <- c(all_sample_ID, rep(ID_sample, N_sample))
         all_sample_sampled_time <- c(all_sample_sampled_time, rep(T_sample, N_sample))
@@ -59,6 +63,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     if (report_progress == TRUE) {
         cat(paste("Detected ", length(unique(all_sample_genotype)), " clones in all samples\n", sep = ""))
     }
+    # 2.4. Extract the CN profiles for each clone found in the sample, and create a CN object for the sampled cells, which contains the CN profiles for each clone, and the mapping of each cell to its clone.
     #-----------------------------Create CN object for the sampled cells
     #---Find the CN profiles for each clone found in the sample
     sample_genotype_unique <- unique(all_sample_genotype)
@@ -76,7 +81,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     sample_cell_ID <- c()
     sample_clone_ID <- all_sample_genotype
     sample_time <- all_sample_sampled_time
-    #
+    # Step 2.5. Create cell IDs for each sampled cell, and create a mapping of each cell to its clone ID (both numeric and character)
     for (i_cell in 1:length(all_sample_genotype)) {
         sample_ID <- all_sample_ID[i_cell]
         cell_ID <- paste(sample_ID, "-Library-", as.character(i_cell), "-", as.character(i_cell), sep = "")
@@ -84,6 +89,7 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     }
     #----------------------Give each clone a character index (A,B,C,...)
     sample_clone_ID_unique_numeric <- unique(all_sample_genotype)
+    # Step 2.6. Assign a character index to each clone, and create a mapping of clone ID in numeric to character
     sample_clone_ID_unique_letters <- rep("", length = length(sample_clone_ID_unique_numeric))
     for (i in 1:length(sample_clone_ID_unique_letters)) {
         if (i <= 26) {
@@ -110,7 +116,9 @@ SIMULATOR_FULL_PHASE_2_main <- function(package_clonal_evolution, report_progres
     for (i in 1:length(all_sample_genotype)) {
         sample_clone_ID_letters[i] <- table_clone_ID_vs_letters$Clone_ID_letter[which(table_clone_ID_vs_letters$Clone_ID_number == all_sample_genotype[i])]
     }
+    # 2.7 Mapping of cell to clone (both numeric and character)
     table_cell_clone <- data.frame(Cell = sample_cell_ID, Clone = sample_clone_ID_letters)
+    # 2.8 Package the data for output
     #-----------------------------Output package of data from simulation
     output <- list()
     output$sample_cell_ID <- sample_cell_ID

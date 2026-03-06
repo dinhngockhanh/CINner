@@ -3,6 +3,7 @@
 SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, driver_map, ploidy_chrom, ploidy_block, ploidy_allele) {
     #---------------------Cell is not viable if losing whole chromosomes
     #--------------------------------or exceeding maximum average ploidy
+    # Step 1. Build CN profile for the clone
     vec_CN_all <- c()
     for (chrom in 1:N_chromosomes) {
         vec_CN <- rep(0, vec_CN_block_no[chrom])
@@ -14,11 +15,13 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, drive
         }
         vec_CN_all <- c(vec_CN_all, vec_CN)
     }
+    # Step 2. Determine ploidy 
     if (selection_model == "WGD-chrom-arm-selection") {
         ploidy <- 2^(WGD_count + 1)
     } else {
         ploidy <- mean(vec_CN_all)
     }
+    # Step 3. Constraint
     if (mean(vec_CN_all) > bound_average_ploidy) {
         clone_selection_rate <- 0
         return(clone_selection_rate)
@@ -62,7 +65,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, drive
         #--------------------------------------------Find average ploidy
         ploidy <- round(mean(vec_CN_all))
         #-----------------------------------------Compute selection rate
-        #   Find average CN per chromosome arm
+        #  Step 4.1. Find average CN per chromosome arm
         chrom_arm_library_copy <- chrom_arm_library
         chrom_arm_library_copy$cn <- 0
         for (i_arm in 1:nrow(chrom_arm_library_copy)) {
@@ -86,6 +89,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, drive
         clone_selection_rate <- prod(chrom_arm_library_copy$s_rate^(chrom_arm_library_copy$cn / ploidy))
     } else if (selection_model == "WGD-chrom-arm-selection") {
         #--------------------------------------------Find average ploidy
+        
         ploidy <- 2^(WGD_count + 1)
         # ploidy <- round(mean(vec_CN_all))
         #-----------------------------------------Compute selection rate
@@ -402,6 +406,7 @@ SIMULATOR_FULL_PHASE_1_selection_rate <- function(WGD_count, driver_count, drive
             }
         }
         #   Compute selection rate
+        # Formula for selection rate in the old model: s_normalization^(average CN) * product of s_rate_WT for all WT alleles * product of s_rate_MUT for all MUT alleles
         clone_selection_rate <- prod(driver_library_copy$s_rate_WT^driver_library_copy$Copy_WT) *
             prod(driver_library_copy$s_rate_MUT^driver_library_copy$Copy_MUT)
     }

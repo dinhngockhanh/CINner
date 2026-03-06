@@ -40,6 +40,7 @@ SIMULATOR_FULL_PHASE_1_CN_focal_amplification <- function(genotype_to_react,
             chrom_length <- vec_CN_block_no[chrom]
             #       Choose the chromosome arm to be focally amplified
             chrom_arm <- sample.int(2, size = 1)
+            # We set the max length as centromere and cutoff the overall length?
             if (chrom_arm == 1) {
                 max_length <- centromere
             } else {

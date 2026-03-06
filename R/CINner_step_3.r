@@ -2,6 +2,7 @@
 #' @export
 SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample, report_progress) {
     #-----------------------------------------Input the clonal evolution
+    cat("[PHASE 3] Début\n")
     T_final <- package_clonal_evolution$T_current
     genotype_list_ploidy_chrom <- package_clonal_evolution$genotype_list_ploidy_chrom
     genotype_list_ploidy_block <- package_clonal_evolution$genotype_list_ploidy_block
@@ -13,6 +14,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     evolution_origin <- package_clonal_evolution$evolution_origin
     #---------------------------------------------------Input the sample
     sample_cell_ID <- package_sample$sample_cell_ID
+    cat(paste("Number of sample cells :", length(sample_cell_ID), "\n"))
     sample_clone_ID <- package_sample$sample_clone_ID
     sample_clone_ID_letters <- package_sample$sample_clone_ID_letters
     table_clone_ID_vs_letters <- package_sample$table_clone_ID_vs_letters
@@ -22,18 +24,18 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     all_sample_ID <- package_sample$all_sample_ID
 
     N_sample <- length(sample_cell_ID)
-
-    if (standard_time_unit == "day") {
+###### Modify here: if (standard_time_unit == "day") --> if (standard_time_unit[1] == "day") same for week, month, year
+    if (standard_time_unit[1] == "day") {
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real
-    } else if (standard_time_unit == "week") {
+    } else if (standard_time_unit[1] == "week") {
         T_final <- T_final / 7
         evolution_traj_time <- evolution_traj_time / 7
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 7
-    } else if (standard_time_unit == "month") {
+    } else if (standard_time_unit[1] == "month") {
         T_final <- T_final / 30
         evolution_traj_time <- evolution_traj_time / 30
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 30
-    } else if (standard_time_unit == "year") {
+    } else if (standard_time_unit[1] == "year") {
         T_final <- T_final / 365
         evolution_traj_time <- evolution_traj_time / 365
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 365
@@ -75,7 +77,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             style = 3, width = 50, char = "="
         )
     }
+    
+    cat(" Début de la boucle sur les divisions\n")
     for (i in seq(length(evolution_traj_divisions), 1, -1)) {
+        # I commented out this
+        cat(paste("   → Étape i =", i, "/", length(evolution_traj_divisions), "\n"))
         if (report_progress == TRUE) {
             setTxtProgressBar(pb, length(evolution_traj_divisions) - i + 1)
         }
@@ -113,6 +119,30 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                 }
             }
         }
+        limit_clonal_total_population <- pmax(limit_clonal_total_population, eligible_clonal_sample_population)
+        # We save clones that are in current_node_genotype but not yet in eligible_clonal_ID
+        new_clones <- setdiff(unique(current_node_genotype),
+                              eligible_clonal_ID)
+        if (length(new_clones) > 0) {
+          # We add them to eligible_clonal_ID
+          eligible_clonal_ID <- c(eligible_clonal_ID, new_clones)
+          # For these new clones, we set the total population to Inf
+          eligible_clonal_total_population <-
+            c(eligible_clonal_total_population,
+              rep(Inf, length(new_clones)))
+          limit_clonal_total_population <-
+            c(limit_clonal_total_population,
+              rep(Inf, length(new_clones)))
+          # And we calculate their sample population
+          extra_counts <- sapply(new_clones, function(id)
+            sum(current_node_genotype == id))
+          eligible_clonal_sample_population <-
+            c(eligible_clonal_sample_population, extra_counts)
+        }
+        print("Calculating limit_clonal_total_population...")
+        print(paste("Eligible clonal IDs:", paste(eligible_clonal_ID, collapse = ", ")))
+        print(paste("Eligible clonal total population:", paste(eligible_clonal_total_population, collapse = ", ")))
+        print(paste("Limit clonal total population:", paste(limit_clonal_total_population, collapse = ", ")))
         # =======Sanity tests
         if (sum(eligible_clonal_sample_population) != length(current_node_genotype)) {
             stop("Clonal populations in sample do not add up", call. = FALSE)
@@ -129,9 +159,11 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
         if (length(mat_division_total_population) == 0) {
             next
         }
+        n_daughters <- ncol(mat_division_total_population) - 2
         # =======One huge loop to make sure clonal populations in sample are correct
         logic_correct <- 0
         while (logic_correct == 0) {
+            cat("      [Boucle] Tentative de division, i =", i, "\n")
             #---Simulate identities of all divisions occurring in sample
             #   Row:            corresponding to mat_division_total_population
             #   Column 1:       node indices undergoing division as daughter 1
@@ -142,7 +174,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             #   Entries (1:4)   corresponds to row 1
             #   Entries (5:8)   corresponds to row 2
             #   ...
-            mat_division_sample <- vector("list", length = (4 * nrow(mat_division_total_population)))
+            mat_division_sample <- vector("list", length = (2 * n_daughters * nrow(mat_division_total_population)))
             for (clone in 1:length(eligible_clonal_ID)) {
                 #   For every clone found in the total population...
                 #   Find its clonal ID
@@ -160,7 +192,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                 #   Row 3:      Cell count for this division/position in total population
                 #   Row 4:      Node count for this division/position in sample ------> to be done in next sections
                 mat_division_sample_clone <- c()
-                for (daughter in 1:2) {
+                for (daughter in seq_len(n_daughters)) {
                     vec_division_genotype_daughter <- mat_division_total_population[, daughter + 2]
                     vec_division <- which(vec_division_genotype_daughter == clonal_ID)
                     mat_division_sample_clone_new <- rbind(
@@ -227,7 +259,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                     col <- mat_division_sample_clone[2, division_type]
                     count <- mat_division_sample_clone[4, division_type]
                     if (count > 0) {
-                        ind <- (row - 1) * 4 + col
+                        ind <- (row - 1) * 2 * n_daughters + col
                         mat_division_sample[[ind]] <- node_indices_all[1:count]
                         node_indices_all <- node_indices_all[-(1:count)]
                     }
@@ -239,8 +271,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                     col <- mat_division_sample_clone[2, division_type]
                     count <- mat_division_sample_clone[4, division_type]
                     if (count > 0) {
-                        col <- col + 2
-                        ind <- (row - 1) * 4 + col
+                        col <- col + n_daughters
+                        ind <- (row - 1) * (2 * n_daughters) + col
                         count_divisions_total <- mat_division_total_population[row, 1]
                         mat_division_sample[[ind]] <- sample(x = count_divisions_total, size = count, replace = FALSE)
                     }
@@ -273,80 +305,86 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             current_node_list_tmp <- current_node_list
             current_node_genotype_tmp <- current_node_genotype
             #   Update phylogeny according to every division
+            # === Secure, generalized phylogeny update loop ===
             for (division_type in 1:nrow(mat_division_total_population)) {
-                genotype_mother <- mat_division_total_population[division_type, 2]
-                #   Get list of nodes in positions of daughter 1 and daughter 2
-                ind_1 <- (division_type - 1) * 4 + 1
-                vec_nodes_daughter_1 <- mat_division_sample[[ind_1]]
-                ind_2 <- (division_type - 1) * 4 + 2
-                vec_nodes_daughter_2 <- mat_division_sample[[ind_2]]
-                if ((length(vec_nodes_daughter_1) == 0) && (length(vec_nodes_daughter_2) == 0)) {
-                    next
-                }
-                #   Get list of division indices of daughter 1 and daughter 2
-                ind_1 <- (division_type - 1) * 4 + 3
-                vec_div_indices_1 <- mat_division_sample[[ind_1]]
-                ind_2 <- (division_type - 1) * 4 + 4
-                vec_div_indices_2 <- mat_division_sample[[ind_2]]
-                vec_div_indices_all <- unique(c(vec_div_indices_1, vec_div_indices_2))
-                #   Perform each division
-                for (division in 1:length(vec_div_indices_all)) {
-                    div_index <- vec_div_indices_all[division]
-                    loc_1 <- which(vec_div_indices_1 == div_index)
-                    loc_2 <- which(vec_div_indices_2 == div_index)
-                    if ((length(loc_1) != 0) && (length(loc_2) != 0)) {
-                        #   Nodes 1 and 2 are mergning...
-                        node_1 <- vec_nodes_daughter_1[loc_1]
-                        node_2 <- vec_nodes_daughter_2[loc_2]
+            genotype_mother <- mat_division_total_population[division_type, 2]
+            tmp_nodes <- vector("list", n_daughters)
+            tmp_divs  <- vector("list", n_daughters)
+            for (d in seq_len(n_daughters)) {
+                ind_nodes <- (division_type - 1) * 2 * n_daughters + d
+                ind_divs  <- ind_nodes + n_daughters
+                # %||% is an operator that returns the operand on the right if the first operand is NULL
+                tmp_nodes[[d]] <- mat_division_sample[[ind_nodes]] %||% integer(0)
+                tmp_divs[[d]]  <- mat_division_sample[[ind_divs]]  %||% integer(0)
+            }
+            # Keep only active daughter positions
+            keep <- which(sapply(tmp_nodes, length) + sapply(tmp_divs, length) > 0)
+            if (length(keep) == 0) next
+            tmp_nodes <- tmp_nodes[keep]
+            tmp_divs  <- tmp_divs[keep]
 
-                        node_mother <- node_mother_next
-                        node_mother_next <- node_mother_next - 1
-                        #   Update phylogeny in hclust style
-                        hclust_row <- hclust_row + 1
-                        hclust_nodes[node_mother] <- hclust_row
-                        hclust_merge[hclust_row, ] <- c(hclust_nodes[node_1], hclust_nodes[node_2])
-                        hclust_height[hclust_row] <- T_final - time
-                        #   Update internal nodes' genotypes in hclust style
-                        hclust_internal_genotypes[hclust_row] <- genotype_mother
-                        #   Update table of CN events for internal nodes (if necessary)
-                        genotype_daughter_1 <- phylogeny_genotype[node_1]
-                        genotype_daughter_2 <- phylogeny_genotype[node_2]
-                        if (genotype_daughter_1 != genotype_mother) {
-                            hclust_CN_events[nrow(hclust_CN_events) + 1, ] <- c(hclust_row, hclust_nodes[node_1], genotype_mother, genotype_daughter_1)
-                        }
-                        if (genotype_daughter_2 != genotype_mother) {
-                            hclust_CN_events[nrow(hclust_CN_events) + 1, ] <- c(hclust_row, hclust_nodes[node_2], genotype_mother, genotype_daughter_2)
-                        }
-                        #   Update phylogeny in our style
-                        phylogeny_origin[node_1] <- node_mother
-                        phylogeny_origin[node_2] <- node_mother
-                        phylogeny_elapsed_gens[node_mother] <- 1
-                        phylogeny_elapsed_genotypes[[node_mother]] <- c(genotype_mother)
-                        phylogeny_genotype[node_mother] <- genotype_mother
-                        phylogeny_birthtime[node_1] <- time
-                        phylogeny_birthtime[node_2] <- time
-                        phylogeny_deathtime[node_mother] <- time
-                        #   Update phylogeny records in our style
-                        pos_delete <- c(which(current_node_list == node_1), which(current_node_list == node_2))
-                        current_node_list <- current_node_list[-pos_delete]
-                        current_node_list <- c(node_mother, current_node_list)
-                        current_node_genotype <- current_node_genotype[-pos_delete]
-                        current_node_genotype <- c(genotype_mother, current_node_genotype)
-                    } else {
-                        #   Either node 1 or node 2 has one more division...
-                        if (length(loc_1) != 0) {
-                            node_daughter <- vec_nodes_daughter_1[loc_1]
-                        } else {
-                            node_daughter <- vec_nodes_daughter_2[loc_2]
-                        }
-                        #   Update phylogeny in our style
-                        phylogeny_elapsed_gens[node_daughter] <- phylogeny_elapsed_gens[node_daughter] + 1
-                        phylogeny_elapsed_genotypes[[node_daughter]] <- c(genotype_mother, phylogeny_elapsed_genotypes[[node_daughter]])
-                        #   Update phylogeny records in our style
-                        loc_daughter <- which(current_node_list == node_daughter)
-                        current_node_genotype[loc_daughter] <- genotype_mother
+            # Complete list of division indexes to be processed
+            all_divs <- unique(unlist(tmp_divs))
+
+            for (div_index in all_divs) {
+                # Retrieves all nodes participating in this division
+                merging_nodes <- unlist(
+                lapply(seq_along(tmp_divs), function(d) {
+                    locs <- which(tmp_divs[[d]] == div_index)
+                    if (length(locs)) tmp_nodes[[d]][locs] else NULL
+                })
+                )
+                if (length(merging_nodes) >= 2) {
+                # Pairwise merge
+                for (k in seq_len(length(merging_nodes) - 1)) {
+                    node_1 <- merging_nodes[k]
+                    node_2 <- merging_nodes[k + 1]
+
+                    node_mother <- node_mother_next
+                    node_mother_next <- node_mother_next - 1
+                    #   Update phylogeny in hclust style
+                    hclust_row <- hclust_row + 1
+                    hclust_nodes[node_mother] <- hclust_row
+                    hclust_merge[hclust_row, ] <- c(hclust_nodes[node_1], hclust_nodes[node_2])
+                    hclust_height[hclust_row] <- T_final - time
+                    #   Update internal nodes' genotypes in hclust style
+                    hclust_internal_genotypes[hclust_row] <- genotype_mother
+                    #   Update table of CN events for internal nodes (if necessary)
+                    genotype_daughter_1 <- phylogeny_genotype[node_1]
+                    genotype_daughter_2 <- phylogeny_genotype[node_2]
+                    if (genotype_daughter_1 != genotype_mother) {
+                        hclust_CN_events[nrow(hclust_CN_events) + 1, ] <- c(hclust_row, hclust_nodes[node_1], genotype_mother, genotype_daughter_1)
                     }
+                    if (genotype_daughter_2 != genotype_mother) {
+                        hclust_CN_events[nrow(hclust_CN_events) + 1, ] <- c(hclust_row, hclust_nodes[node_2], genotype_mother, genotype_daughter_2)
+                    }
+                    #   Update phylogeny in our style
+                    phylogeny_origin[node_1] <- node_mother
+                    phylogeny_origin[node_2] <- node_mother
+                    phylogeny_elapsed_gens[node_mother] <- 1
+                    phylogeny_elapsed_genotypes[[node_mother]] <- c(genotype_mother)
+                    phylogeny_genotype[node_mother] <- genotype_mother
+                    phylogeny_birthtime[node_1] <- time
+                    phylogeny_birthtime[node_2] <- time
+                    phylogeny_deathtime[node_mother] <- time
+                    #   Update phylogeny records in our style
+                    pos_delete <- c(which(current_node_list == node_1), which(current_node_list == node_2))
+                    current_node_list <- current_node_list[-pos_delete]
+                    current_node_list <- c(node_mother, current_node_list)
+                    current_node_genotype <- current_node_genotype[-pos_delete]
+                    current_node_genotype <- c(genotype_mother, current_node_genotype)
                 }
+                } else {
+                # If only one cell is present, simply increment the counter
+                node_daughter <- merging_nodes[1]
+                #   Update phylogeny in our style
+                phylogeny_elapsed_gens[node_daughter] <- phylogeny_elapsed_gens[node_daughter] + 1
+                phylogeny_elapsed_genotypes[[node_daughter]] <- c(genotype_mother, phylogeny_elapsed_genotypes[[node_daughter]])
+                #   Update phylogeny records in our style
+                loc_daughter <- which(current_node_list == node_daughter)
+                current_node_genotype[loc_daughter] <- genotype_mother
+                }
+            }
             }
             #---Check if the clonal populations in sample satisfy conditions
             #   Find clonal populations in sample after new divisions
@@ -357,6 +395,12 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             }
             #   Redo this whole step if clonal populations violate thresholds
             if (any(tmp_clonal_sample_population > limit_clonal_total_population)) {
+                indices_probleme <- which(tmp_clonal_sample_population > limit_clonal_total_population)
+                cat("\n\n🚨 DEBUG CLONE 🚨\n")
+                cat("Clones pb :", eligible_clonal_ID[indices_probleme], "\n")
+                cat("tmp_clonal_sample_population pb :", tmp_clonal_sample_population[indices_probleme], "\n")
+                cat("limit_clonal_total_population pb :", limit_clonal_total_population[indices_probleme], "\n\n")
+                cat("6\n")
                 node_mother_next <- node_mother_next_tmp
 
                 hclust_row <- hclust_row_tmp
@@ -380,6 +424,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
             }
         }
     }
+    cat("[PHASE 3] ✔️ Fin de la boucle de divisions\n")
     if (report_progress == TRUE) {
         cat("\n")
     }
@@ -554,6 +599,7 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
         clone_phylogeny_deathtime[node] <- T_final
     }
     #   Build the clone phylogeny tree
+    cat("[PHASE 3] ➤ Construction de l’arbre de clones\n")
     for (hclust_mother_cell_node in 1:nrow(hclust_merge)) {
         #   Get daughter cells' indices in hclust style
         hclust_daughter_cell_nodes <- hclust_merge[hclust_mother_cell_node, ]

@@ -12,12 +12,12 @@
 #' @param T_end A list consisting of an integer followed by a string specifying the end of the simulation and the unit of time eg. `list(100, 'days')`. Default is `list(100, "year")`.
 #' @param T_tau_step A numerical value represeting the time step for the tau-leaping algorithm for the simulation. Default is Inf.
 #' @param Table_sample A dataframe specifying the information about sampled cells. Must have 'Age_sample' column, which is the age at which the sample is taken, usually the `T_end`. Default is `data.frame()`.
-#' @param table_population_dynamics A matrix consisting of the start and end time of the simulation as well as the initial and final population size??? Default is `matrix(0, ncol = 2, nrow = 2)`.
-#' @param Max_cell_count An integer value specifying the maximum number of cells in the simulation??? Default is Inf.
-#' @param Min_cell_count An integer value specifying the minimum number of cells in the simulation??? Default is 0.
-#' @param Max_events An integer value specifying the maximum number of mutation events??? Default is Inf.
+#' @param table_population_dynamics A two-column matrix or data frame describing the expected population dynamics over time. The first column contains simulation time points, and the second column contains the corresponding total cell population size at each time point. Default is `matrix(0, ncol = 2, nrow = 2)`.
+#' @param Max_cell_count Maximum allowed population size during the simulation; if the total number of cells exceeds this limit, the simulation terminates. Default is `Inf`.
+#' @param Min_cell_count Minimum allowed population size during the simulation; if the total number of cells falls below this value, the simulation terminates. Default is `0`.
+#' @param Max_events Maximum allowed number of mutation events during the simulation; if this limit is reached, the simulation terminates. Default is `Inf`.
 #' @param CN_bin_length An integer value specifying the number of basepairs belongs in a single bin of a chomosome. Default is 500000.
-#' @param CN_arm_level ??? Default is FALSE.
+#' @param CN_arm_level Logical value indicating whether copy-number alterations are simulated at the chromosome arm level instead of the default bin-level resolution. Default is `FALSE`.
 #' @param alpha_aneuploidy An integer value representing the rate of chromosomal missegregations in WGD cells as compared to non-WGD cells. Default is 1.
 #' @param prob_CN_whole_genome_duplication A numerical value representing the probability for a cell division to harbor a WGD event. Default is 0.
 #' @param prob_CN_missegregation A numerical value representing the probability of whole chromosome missegregation. Default is 0.
@@ -58,7 +58,7 @@
 #' @param prob_CN_cnloh_terminal_length_shape_2 A numerical value for the beta parameter shape 2 for the block length of a terminal CN-LOH event. Only used if a beta distribution is specified. Default is 0.
 #' @param rate_driver A numerical value for the poisson rate of getting new driver mutations. Default is 0.
 #' @param rate_passenger A numerical value for the poisson rate of getting a new passenger mutation. Default is 0.
-#' @param selection_model A string specifying the selection model to be used. ???
+#' @param selection_model Character string specifying the evolutionary selection model used in the simulation (e.g., "chrom-arm-selection" or "chrom-arm-and-driver-gene-selection").
 #' @param bound_driver An integer number representing the maximum driver count in viable cells (cells exceeding this will die). Default is Inf.
 #' @param bound_average_ploidy An integer number representing the maximum average ploidy across genome (cells exceeding this will die). Default is Inf.
 #' @param bound_homozygosity An integer number representing the maximum number of bins under homozygosity (cells exceeding this will die). Default is 0.
@@ -68,7 +68,7 @@
 #' @param lower_limit_cell_counts A numerical value representing the lower limit of cell counts for mutations to be detected. Default is 0.
 #' @param lower_limit_alt_counts A numerical value representing the lower limit of alternate read counts for mutations to be detected. Default is 3.
 #' @param lower_limit_tot_counts A numerical value representing the lower limit of total read counts for mutations to be detected. Default is 0.
-#' @param gc ???
+#' @param gc Data frame containing GC content and mappability information for genomic bins, used to model sequencing coverage bias in simulated read counts.
 #' @param gc_slope A numerical value for the slope of the linear GC model. Default is 1.2.
 #' @param gc_int A numerical value for the intercept of the linear GC model. Default is 0.
 #' @param sigma1 A numerical value for the gamma scale for read depth noise. Default is 0.1.
@@ -259,9 +259,72 @@ BUILD_general_variables <- function(model_name = "CINner_model",
     }
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("T_start_time", T_start_time, "day", "Age when simulation starts (for internal use)")
+    ##################################################################
+    ##################################################################
+    ##################################################################
+    ########### Change here, remove age_end <- T_end, because we remove it from user side
+    ##################################################################
+    ##################################################################
+    ##################################################################
     #   Set up the end time of simulations
-    age_end <- T_end[[1]]
-    age_end_unit <- T_end[[2]]
+    # age_end <- T_end[[1]]
+    # age_end_unit <- T_end[[2]]
+
+    #------------------------------------
+    # Derive simulation end time from sample table
+    #------------------------------------
+    # We just use the age_sample as t_end instead
+    # age_end <- Table_sample$Age_sample
+    # age_end_unit <- T_0[[2]]
+    # if (nrow(Table_sample) != 1) {
+    #     stop("Table_sample must contain exactly one sample time point.")
+    # }
+
+    if (!"Age_sample" %in% colnames(Table_sample)) {
+        stop("Table_sample must contain column 'Age_sample'.")
+    }
+    #------------------------------------
+    # Checkpoint: exactly one sample time > T_0
+    #------------------------------------
+    ####### Add valid times for sample table should have only one time point that is > "T_0"
+    valid_times <- Table_sample$Age_sample[Table_sample$Age_sample > age_birth]
+
+
+    if (length(valid_times) != 1) {
+        stop("Table_sample must contain exactly one sampling time greater than T_0.")
+    }
+
+    age_end <- valid_times[1]
+    age_end_unit <- T_0[[2]]
+
+    ######### The below is the debug message
+
+
+    # See debugging message if they match
+    print("DEBUG: age_end derived from Table_sample (updated!xzx12)")
+    print(age_end)
+    if (age_end <= age_birth) {
+        stop("Sample time must be greater than T_0.")
+    }
+
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("age_end", age_end, age_end_unit, "Age when simulation stops")
+    ##################################################################
+    ##################################################################
+    if (age_end_unit == "day") {
+        T_end_time <- age_end
+    } else if (age_end_unit == "week") {
+        T_end_time <- 7 * age_end
+    } else if (age_end_unit == "month") {
+        T_end_time <- 30 * age_end
+    } else if (age_end_unit == "year") {
+        T_end_time <- 365 * age_end
+    }
+
+    N_row <- N_row + 1
+    TABLE_VARIABLES[N_row, ] <- c("T_end_time", T_end_time, "day", "Age when simulation stops (internal)")
+
+
     N_row <- N_row + 1
     TABLE_VARIABLES[N_row, ] <- c("age_end", age_end, age_end_unit, "Age when simulation stops")
     if (age_birth_unit != age_end_unit) {
