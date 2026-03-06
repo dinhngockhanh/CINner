@@ -26,7 +26,7 @@ T_0 <- list(0, "year")
 Table_sample <- data.frame(
     Sample_ID = "SA01",
     Cell_count = 300, #300 originally, test 800 (broke), test 500, 800 face edge cases (At simulation 6 Error: Clonal populations in sample are larger than in total cell population)
-    Age_sample = 5 # 80 originally, test 100 (pass), change to max_t, change to 0 to see if it break the one time point that is > "T_0",::: If change to < 11 will also break out of bound
+    Age_sample = 80 # 80 originally, test 100 (pass), change to max_t, change to 0 to see if it break the one time point that is > "T_0",::: If change to < 11 will also break out of bound
 )
 
 ## -----------------------------------------------------------------------------
