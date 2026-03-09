@@ -77,8 +77,7 @@
 #'
 #' cell_lifespan <- 1
 #' T_0 <- list(0, "day")
-#' T_end <- list(300, "day")
-#' Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+#' Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = sample_time
 #' T_tau_step <- cell_lifespan / 2
 #' CN_bin_length <- 500000
 #'
@@ -107,7 +106,7 @@
 #' bound_maximum_CN <- 8
 #' bound_homozygosity <- 0
 #'
-#' vec_time <- T_0[[1]]:T_end[[1]]
+#' vec_time <- T_0[[1]]:Table_sample$Age_sample
 #' vec_cell_count <- rep(1000, length(vec_time))
 #' table_population_dynamics <- cbind(vec_time, vec_cell_count)
 #'
@@ -119,7 +118,7 @@
 #'
 #' model_variables_base <- BUILD_general_variables(
 #'     cell_lifespan = cell_lifespan,
-#'     T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+#'     T_0 = T_0, T_tau_step = T_tau_step,
 #'     Table_sample = Table_sample,
 #'     CN_bin_length = CN_bin_length,
 #'     prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
@@ -157,7 +156,6 @@ BUILD_general_variables <- function(model_name = "CINner_model",
                                     cell_lifespan = 10,
                                     cell_prob_division = NA,
                                     T_0 = list(0, "year"),
-                                    T_end = list(100, "year"),
                                     T_tau_step = Inf,
                                     Table_sample = data.frame(),
                                     table_population_dynamics = matrix(0, ncol = 2, nrow = 2),
@@ -266,8 +264,6 @@ BUILD_general_variables <- function(model_name = "CINner_model",
     ##################################################################
     ##################################################################
     #   Set up the end time of simulations
-    # age_end <- T_end[[1]]
-    # age_end_unit <- T_end[[2]]
 
     #------------------------------------
     # Derive simulation end time from sample table
@@ -300,7 +296,7 @@ BUILD_general_variables <- function(model_name = "CINner_model",
 
 
     # See debugging message if they match
-    print("DEBUG: age_end derived from Table_sample (updated!xzx12)")
+    print("DEBUG: age_end derived from Table_sample (updated!xzx13)")
     print(age_end)
     if (age_end <= age_birth) {
         stop("Sample time must be greater than T_0.")
@@ -329,23 +325,23 @@ BUILD_general_variables <- function(model_name = "CINner_model",
     if (age_birth_unit != age_end_unit) {
         print("START AND END TIMES DO NOT USE THE SAME UNIT")
     }
-    if (age_end_unit == "day") {
-        T_end_time <- age_end
-    } else {
-        if (age_end_unit == "week") {
-            T_end_time <- 7 * age_end
-        } else {
-            if (age_end_unit == "month") {
-                T_end_time <- 30 * age_end
-            } else {
-                if (age_end_unit == "year") {
-                    T_end_time <- 365 * age_end
-                }
-            }
-        }
-    }
-    N_row <- N_row + 1
-    TABLE_VARIABLES[N_row, ] <- c("T_end_time", T_end_time, "day", "Age when simulation stops (for internal use)")
+    # if (age_end_unit == "day") {
+    #     T_end_time <- age_end
+    # } else {
+    #     if (age_end_unit == "week") {
+    #         T_end_time <- 7 * age_end
+    #     } else {
+    #         if (age_end_unit == "month") {
+    #             T_end_time <- 30 * age_end
+    #         } else {
+    #             if (age_end_unit == "year") {
+    #                 T_end_time <- 365 * age_end
+    #             }
+    #         }
+    #     }
+    # }
+    # N_row <- N_row + 1
+    # TABLE_VARIABLES[N_row, ] <- c("T_end_time", T_end_time, "day", "Age when simulation stops (for internal use)")
     #   Set up the time step for tau-leaping algorithm
     N_row <- N_row + 1
     if (T_tau_step == Inf) {

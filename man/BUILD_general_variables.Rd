@@ -9,7 +9,6 @@ BUILD_general_variables(
   cell_lifespan = 10,
   cell_prob_division = NA,
   T_0 = list(0, "year"),
-  T_end = list(100, "year"),
   T_tau_step = Inf,
   Table_sample = data.frame(),
   table_population_dynamics = matrix(0, ncol = 2, nrow = 2),
@@ -86,8 +85,6 @@ BUILD_general_variables(
 \item{cell_prob_division}{A float representing the probability of division of a cell. Default is NA. If NA, it overrides the selection model and the population follows neutral exponential growth.}
 
 \item{T_0}{A list consisting of an integer followed by a string specifying the start of the simulation and the unit of time eg. \code{list(0, 'days')}. Default is \code{list(0, "year")}.}
-
-\item{T_end}{A list consisting of an integer followed by a string specifying the end of the simulation and the unit of time eg. \code{list(100, 'days')}. Default is \code{list(100, "year")}.}
 
 \item{T_tau_step}{A numerical value represeting the time step for the tau-leaping algorithm for the simulation. Default is Inf.}
 
@@ -222,8 +219,7 @@ BUILD_general_variables(
 
 cell_lifespan <- 1
 T_0 <- list(0, "day")
-T_end <- list(300, "day")
-Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = c(T_end[[1]]))
+Table_sample <- data.frame(Sample_ID = c("SA"), Cell_count = c(Inf), Age_sample = sample_time
 T_tau_step <- cell_lifespan / 2
 CN_bin_length <- 500000
 
@@ -252,7 +248,7 @@ bound_average_ploidy <- 6
 bound_maximum_CN <- 8
 bound_homozygosity <- 0
 
-vec_time <- T_0[[1]]:T_end[[1]]
+vec_time <- T_0[[1]]:Table_sample$Age_sample
 vec_cell_count <- rep(1000, length(vec_time))
 table_population_dynamics <- cbind(vec_time, vec_cell_count)
 
@@ -264,7 +260,7 @@ num_reads <- 3906632
 
 model_variables_base <- BUILD_general_variables(
     cell_lifespan = cell_lifespan,
-    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    T_0 = T_0, T_tau_step = T_tau_step,
     Table_sample = Table_sample,
     CN_bin_length = CN_bin_length,
     prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
