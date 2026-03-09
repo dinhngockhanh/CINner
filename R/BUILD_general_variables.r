@@ -9,7 +9,6 @@
 #' @param cell_lifespan An integer number representing the mean lifespan of a cell. Each cell's lifespan is exponentially distributed. Default is 4.
 #' @param cell_prob_division A float representing the probability of division of a cell. Default is NA. If NA, it overrides the selection model and the population follows neutral exponential growth.
 #' @param T_0 A list consisting of an integer followed by a string specifying the start of the simulation and the unit of time eg. `list(0, 'days')`. Default is `list(0, "year")`.
-#' @param T_end A list consisting of an integer followed by a string specifying the end of the simulation and the unit of time eg. `list(100, 'days')`. Default is `list(100, "year")`.
 #' @param T_tau_step A numerical value represeting the time step for the tau-leaping algorithm for the simulation. Default is Inf.
 #' @param Table_sample A dataframe specifying the information about sampled cells. Must have 'Age_sample' column, which is the age at which the sample is taken, usually the `T_end`. Default is `data.frame()`.
 #' @param table_population_dynamics A two-column matrix or data frame describing the expected population dynamics over time. The first column contains simulation time points, and the second column contains the corresponding total cell population size at each time point. Default is `matrix(0, ncol = 2, nrow = 2)`.
