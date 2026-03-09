@@ -1,8 +1,0 @@
-q()
-setwd("~/Downloads/CINner")
-rmarkdown::render("vignettes/CINner.Rmd")
-brew install pandoc
-brew install pandoc
-setwd("~/Downloads/CINner")#
-#
-rmarkdown::render("vignettes/CINner.Rmd")
