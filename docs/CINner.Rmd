@@ -12,11 +12,14 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+# rmarkdown::render("vignettes/CINner.Rmd")
 ```
 
 ```{r setup}
 library(CINner)
 set.seed(1)
+# For visibility
+options(max.print = 100)
 ```
 
 # Set up CINner
@@ -37,7 +40,8 @@ independent of their particular cellular profiles (measured in days).
 cell_lifespan <- 30
 ```
 
-Next, we specify the time points at the beginning and the end of each simulation. 
+Next, we specify the starting time point of the simulation using `T_0`.  
+The simulation end time is automatically inferred from the sampling table (`Table_sample$Age_sample`). 
 The unit can be
 
 - `day`
@@ -45,22 +49,29 @@ The unit can be
 - `month` (= 30 days), or
 - `year` (= 365 days). 
 
-The unit for `T_0` and `T_end` should be consistent.
+The unit for `T_0` should be consistent with the values in `Table_sample$Age_sample`.
 
 ```{r}
 T_0 <- list(0, "year")
-T_end <- list(80, "year")
 ```
 
-`Table_sample` details the time point that the DNA sample is taken (in the same unit as `T_0` and `T_end`), 
-how many cells are in the sample, and the sample's ID.
-The following code specifies that the sample in each CINner simulation
-is to be labeled "SA01" and consist of 300 cells, taken at 80 years.
+Table_sample specifies the time point at which the DNA sample is collected 
+(in the same time unit as `T_0`).
+
+The simulation end time is automatically inferred from the `Age_sample` column.
+
+The table also defines:
+- the number of cells in the sample, and
+- the sample ID.
+
+The following example specifies that the sample in each CINner simulation 
+is labeled "SA01", consists of 300 cells, and is collected at 80 years.
+
 
 ```{r}
 Table_sample <- data.frame(
     Sample_ID = "SA01",
-    Cell_count = 300,
+    Cell_count = 300, 
     Age_sample = 80
 )
 ```
@@ -69,7 +80,7 @@ CINner's efficiency is based partially on its use of the tau-leaping algorithm,
 instead of the exact Gillespie algorithm. 
 As such, it requires a suggested `T_tau_step`.
 Each CINner result then simulates the cell population starting from `T_0` at time points `T_0 + T_tau_step`, `T_0 + 2 * T_tau_step`, ..., 
-until it reaches `T_end`.
+until it reaches the final sampling time.
 If not specified, `T_tau_step` is automatically set to be `cell_lifespan / 2`. 
 High time steps will lead to decreased simulation run time, but the simulations might not be statistically accurate.
 Low time steps will lead to longer run time, but the simulations will be more reliable.
@@ -195,12 +206,14 @@ CINner simulations are designed to follow any population dynamic (limited by how
 The dataframe `table_population_dynamics` lists the expected total cell counts at corresponding time points.
 The expected population size in the CINner simulations at any time point is interpolated from the two nearest time points in this variable.
 
-Here, we expect the cell population to follow a logistic expansion, growing from 20 cells at `T_0` to 10000 cells at `T_end`, with the midpoint at 20 years.
+Here, we expect the cell population to follow a logistic expansion, growing from 20 cells at `T_0` to 10000 cells at the sampling time defined in `Table_sample$Age_sample`.
+
 
 ```{r}
+
 table_population_dynamics <- cbind(
-    vec_time = T_0[[1]]:T_end[[1]],
-    vec_cell_count = 10000 / (1 + exp(-0.3 * ((T_0[[1]]:T_end[[1]]) - 20)))
+    vec_time = T_0[[1]]:Table_sample$Age_sample,
+    vec_cell_count = 10000 / (1 + exp(-0.3 * ((T_0[[1]]:Table_sample$Age_sample) - 20)))
 )
 ```
 
@@ -211,7 +224,7 @@ Finally, we use function `BUILD_general_variables` to initiate `model_variables`
 ```{r}
 model_variables <- BUILD_general_variables(
     cell_lifespan = cell_lifespan,
-    T_0 = T_0, T_end = T_end, T_tau_step = T_tau_step,
+    T_0 = T_0, T_tau_step = T_tau_step,
     Table_sample = Table_sample,
     CN_bin_length = CN_bin_length,
     prob_CN_whole_genome_duplication = prob_CN_whole_genome_duplication,
@@ -422,9 +435,9 @@ i.e. CINner runs all four main steps (clonal evolution, sampling, sample phyloge
 ```{r}
 CINner_simulations <- simulator_full_program(
     model = model_variables,
-    n_simulations = 8,
-    stage_final = 4,
-    compute_parallel = TRUE
+    n_simulations = 8, # 8
+    stage_final = 4, # 4
+    compute_parallel = FALSE #TRUE
 )
 ```
 
@@ -527,7 +540,7 @@ CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree
 
 ### 2e. Accessing CINner simulations' neutral variations
 
-`CINner_simulations[[1]]$neutral_variations` contains information from CINner's forth step (neutral variations).
+`CINner_simulations[[1]]$neutral_variations` contains information from CINner's fourth step (neutral variations).
 
 ```{r}
 names(CINner_simulations[[1]]$neutral_variations)

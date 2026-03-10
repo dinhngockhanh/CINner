@@ -12,11 +12,14 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
+# rmarkdown::render("vignettes/CINner.Rmd")
 ```
 
 ```{r setup}
 library(CINner)
 set.seed(1)
+# For visibility
+options(max.print = 100)
 ```
 
 # Set up CINner
@@ -50,7 +53,6 @@ The unit for `T_0` should be consistent with the values in `Table_sample$Age_sam
 
 ```{r}
 T_0 <- list(0, "year")
-# T_end <- list(80, "year")
 ```
 
 Table_sample specifies the time point at which the DNA sample is collected 
@@ -69,7 +71,7 @@ is labeled "SA01", consists of 300 cells, and is collected at 80 years.
 ```{r}
 Table_sample <- data.frame(
     Sample_ID = "SA01",
-    Cell_count = 50, #300 originally
+    Cell_count = 300, 
     Age_sample = 80
 )
 ```
@@ -433,8 +435,8 @@ i.e. CINner runs all four main steps (clonal evolution, sampling, sample phyloge
 ```{r}
 CINner_simulations <- simulator_full_program(
     model = model_variables,
-    n_simulations = 8,
-    stage_final = 3, # 4
+    n_simulations = 8, # 8
+    stage_final = 4, # 4
     compute_parallel = FALSE #TRUE
 )
 ```
@@ -538,7 +540,7 @@ CINner_simulations[[1]]$sample_phylogeny$phylogeny_clustering_truth$tree
 
 ### 2e. Accessing CINner simulations' neutral variations
 
-`CINner_simulations[[1]]$neutral_variations` contains information from CINner's forth step (neutral variations).
+`CINner_simulations[[1]]$neutral_variations` contains information from CINner's fourth step (neutral variations).
 
 ```{r}
 names(CINner_simulations[[1]]$neutral_variations)

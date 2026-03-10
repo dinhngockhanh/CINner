@@ -1,6 +1,8 @@
 # =============================PHASE 3: COPY-NUMBER PROFILES OF A SAMPLE
 #' @export
 SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample, report_progress) {
+    # SET SEED HERE for debugging
+    set.seed(123)
     #-----------------------------------------Input the clonal evolution
     cat("[PHASE 3] Début\n")
     T_final <- package_clonal_evolution$T_current
@@ -24,6 +26,10 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
     all_sample_ID <- package_sample$all_sample_ID
 
     N_sample <- length(sample_cell_ID)
+############################################################
+############################################################
+############################################################
+############################################################    
 ###### Modify here: if (standard_time_unit == "day") --> if (standard_time_unit[1] == "day") same for week, month, year
     if (standard_time_unit[1] == "day") {
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real
