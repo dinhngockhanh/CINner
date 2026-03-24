@@ -2,7 +2,7 @@
 #' @export
 SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample, report_progress) {
     # SET SEED HERE for debugging
-    set.seed(123)
+    # set.seed(123)
     #-----------------------------------------Input the clonal evolution
     cat("[PHASE 3] Début\n")
     T_final <- package_clonal_evolution$T_current
@@ -31,17 +31,17 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
 ############################################################
 ############################################################    
 ###### Modify here: if (standard_time_unit == "day") --> if (standard_time_unit[1] == "day") same for week, month, year
-    if (standard_time_unit[1] == "day") {
+    if (standard_time_unit == "day") {
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real
-    } else if (standard_time_unit[1] == "week") {
+    } else if (standard_time_unit == "week") {
         T_final <- T_final / 7
         evolution_traj_time <- evolution_traj_time / 7
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 7
-    } else if (standard_time_unit[1] == "month") {
+    } else if (standard_time_unit == "month") {
         T_final <- T_final / 30
         evolution_traj_time <- evolution_traj_time / 30
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 30
-    } else if (standard_time_unit[1] == "year") {
+    } else if (standard_time_unit == "year") {
         T_final <- T_final / 365
         evolution_traj_time <- evolution_traj_time / 365
         Table_sampling$T_sample_phylo <- Table_sampling$T_sample_real / 365
@@ -125,7 +125,8 @@ SIMULATOR_FULL_PHASE_3_main <- function(package_clonal_evolution, package_sample
                 }
             }
         }
-        limit_clonal_total_population <- pmax(limit_clonal_total_population, eligible_clonal_sample_population)
+
+
         # We save clones that are in current_node_genotype but not yet in eligible_clonal_ID
         new_clones <- setdiff(unique(current_node_genotype),
                               eligible_clonal_ID)
