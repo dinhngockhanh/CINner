@@ -2,7 +2,7 @@
 
 ##  Installation
 
-[CINner](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1012902) [1] is an algorithm to simulate cancer evolution driven by the occurrence and selection of mutations and Copy Number Aberrations (CNAs).
+[CINner](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1012902) is an algorithm to simulate cancer evolution driven by the occurrence and selection of mutations and Copy Number Aberrations (CNAs).
 It is designed to reproduce data from both bulk DNA sequencing (e.g., from the [Pan-Cancer Analysis of Whole Genomes](https://www.nature.com/articles/s41586-020-1969-6)) and single-cell DNA sequencing (e.g., [Direct Library Preparation+ (DLP+)](https://www.cell.com/cell/fulltext/S0092-8674(19)31176-6)).
 
 The CINner library can be installed with
